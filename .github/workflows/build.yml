@@ -11,14 +11,14 @@ jobs:
         uses: actions/checkout@v2
       - name: Checkout submodules
         uses: textbook/git-checkout-submodule-action@master
-      - name: Install pp
-        run: cd pp && make && make install
-      - name: Install pandoc
-        run: sudo apt-get install -y pandoc pandoc-citeproc
       - name: Install cabal
         run: sudo apt-get install -y cabal-install
       - name: Update cabal
         run: cabal update
+      - name: Install pp
+        run: cd pp && make && make install
+      - name: Install pandoc
+        run: sudo apt-get install -y pandoc pandoc-citeproc
       - name: Install alex
         run: cabal install -y alex
       - name: Install happy
