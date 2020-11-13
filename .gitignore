@@ -7,3 +7,4 @@ _includes/svgs
 src/_build
 *~
 *.bak
+tmp/
