@@ -15,7 +15,7 @@ record _ω {ℓ} (A : Set ℓ) : Set ℓ where
   constructor _∷_
   field
     head : A
-    tail : A ω
+    tl : A ω
 
 open _ω public
 
@@ -23,7 +23,7 @@ record _≈_ {ℓ} {A : Set ℓ} (xs ys : A ω) : Set ℓ where
   coinductive
   field
     head-≈ : head xs ≡ head ys
-    tail-≈ : tail xs ≈ tail ys
+    tl-≈ : tl xs ≈ tl ys
 
 infix 5 _∈ω_
 data _∈ω_ {ℓ} {A : Set ℓ} : A → A ω → Set where
@@ -37,7 +37,7 @@ data _∈ω_ {ℓ} {A : Set ℓ} : A → A ω → Set where
 
 _!_ : ∀ {ℓ} {A : Set ℓ} → A ω → ℕ → A
 as ! zero = head as
-as ! suc n = tail as ! n
+as ! suc n = tl as ! n
 
 infixl 9 _⊆ω_
 
@@ -52,35 +52,35 @@ forAllInω B = ∀[ a ] ∀[ as ] (a ∈ω as → B a as)
 
 scanω : ∀ {ℓ m} {A : Set ℓ} {B : Set m} → (A → B → A) → A → B ω → A ω
 head (scanω f a bs) = a
-tail (scanω f a bs) = scanω f (f a (head bs)) (tail bs)
+tl (scanω f a bs) = scanω f (f a (head bs)) (tl bs)
 
 mapω : ∀ {ℓ m} {A : Set ℓ} {B : Set m} → (A → B) → A ω → B ω
 head (mapω f as) = f (head as)
-tail (mapω f as) = mapω f (tail as)
+tl (mapω f as) = mapω f (tl as)
 
 zipWithω : ∀ {ℓ m n} {A : Set ℓ} {B : Set m} {C : Set n} → (A → B → C) → A ω → B ω → C ω
 head (zipWithω f as bs) = f (head as) (head bs)
-tail (zipWithω f as bs) = zipWithω f (tail as) (tail bs)
+tl (zipWithω f as bs) = zipWithω f (tl as) (tl bs)
 
 takeω : ∀ {ℓ} {A : Set ℓ} → ℕ → A ω → A *
 takeω zero _ = ε
-takeω (suc n) as = head as ∷ takeω n (tail as)
+takeω (suc n) as = head as ∷ takeω n (tl as)
 
 dropω : ∀ {ℓ} {A : Set ℓ} → ℕ → A ω → A ω
 dropω zero as = as
-dropω (suc n) as = dropω n (tail as)
+dropω (suc n) as = dropω n (tl as)
 
 {-# TERMINATING #-}
 nats : ℕ ω
 head nats = 0
-tail nats = mapω suc nats
+tl nats = mapω suc nats
 
 zeroes ones : ℕ ω
 head zeroes = 0
-tail zeroes = zeroes
+tl zeroes = zeroes
 
 head ones = 1
-tail ones = ones
+tl ones = ones
 
 nats' : ℕ ω
 nats' = scanω _+_ 0 ones
@@ -88,15 +88,15 @@ nats' = scanω _+_ 0 ones
 {-# TERMINATING #-}
 fibs : ℕ ω
 head fibs = 0
-head (tail fibs) = 1
-tail (tail fibs) = zipWithω _+_ fibs (tail fibs)
+head (tl fibs) = 1
+tl (tl fibs) = zipWithω _+_ fibs (tl fibs)
 
 
 
 -- scan2ω : ∀ {ℓ m} {A : Set ℓ} {B : Set m} → (A → A → B → A) → A → A → B ω → A ω
 -- head (scan2ω f a1 a2 bs) = a1
--- head (tail (scan2ω f a1 a2 bs)) = a2
--- tail (tail (scan2ω f a1 a2 bs)) = scan2ω f a2 (f a1 a2 (head bs)) (tail bs)
+-- head (tl (scan2ω f a1 a2 bs)) = a2
+-- tl (tl (scan2ω f a1 a2 bs)) = scan2ω f a2 (f a1 a2 (head bs)) (tl bs)
 
 -- fibs' : ℕ ω
 -- fibs' = scan2ω (λ a b c → a + b) 0 1 zeroes
