@@ -276,7 +276,7 @@ $(OUTDIR)/$1/$2.md: $(TMPDIR)/$1.$2.md
 
 # STEP 1: process citations
 # Table of contents shows up only with options "--from markdown --to markdown_phpextra"
-	@$(PANDOC) --citeproc --filter=pandoc-numbering --bibliography=bibliography.bib --csl=$(CSL) --metadata link-citations=true --metadata numbersections=true --metadata number-sections=true --from markdown+latex_macros --to markdown_phpextra $(TMPDIR)/$1.$2.pp.md -o $(TMPDIR)/$1.$2.pandoc.md --number-sections
+	@$(PANDOC) --filter=pandoc-citeproc --filter=pandoc-numbering --bibliography=bibliography.bib --csl=$(CSL) --metadata link-citations=true --metadata numbersections=true --metadata number-sections=true --from markdown+latex_macros --to markdown_phpextra $(TMPDIR)/$1.$2.pp.md -o $(TMPDIR)/$1.$2.pandoc.md --number-sections
 # 
 
 # sometimes pandoc transforms <pre class="Agda"> to <pre markdown="1" class="Agda">, we need to undo this 
