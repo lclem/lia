@@ -1,0 +1,35 @@
+name: 'build'
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: [ubuntu-latest]
+    steps:
+      - name: Set up git repo
+        uses: actions/checkout@v2
+      - name: Checkout submodules
+        uses: textbook/git-checkout-submodule-action@master
+      - name: Install cabal
+        run: sudo apt-get install cabal-install
+      - name: Update cabal
+        run: cabal update
+      - name: Install alex
+        run: cabal install alex
+      - name: Install happy
+        run: cabal install happy
+#      - name: Install agda
+#        run: sudo apt-get install agda
+#      - name: Install agda-mode
+#        run: sudo apt-get install agda-mode
+#      - name: Install agda-stdlib
+#        run: sudo apt-get install agda-stdlib
+      - name: Install Agda
+        run: cabal install Agda && agda-mode setup
+      - name: Build the book 1
+        run: make agda; make agda
+      - name: Build the book 2
+        run: make docs
