@@ -12,7 +12,7 @@ authors:
     github_username: lclem
 
 repository: lclem/lia
-#  branch: dev
+  branch: main
 
 collections_dir     : .
 plugins_dir         : _plugins
@@ -23,14 +23,12 @@ encoding            : "utf-8"
 show_dir_listing    : false
 
 plugins:
-  - jekyll-toc
-#  - jekyll-latex
-  - jekyll-paginate
-  - jekyll-sitemap
-#  - jekyll-scholar
-  - jekyll-gist
-  - jekyll-feed
-  - jemoji
+#  - jekyll-toc
+#  - jekyll-paginate
+#  - jekyll-sitemap
+#  - jekyll-gist
+#  - jekyll-feed
+#  - jemoji
 
 baseurl: ""
 url: "https://lclem.github.io/lia"
