@@ -1,4 +1,4 @@
-OUTDIR := html
+OUTDIR := docs
 TMPDIR := tmp
 SITEDIR := _site
 SRCDIR := src
