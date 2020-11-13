@@ -12,7 +12,7 @@ jobs:
       - name: Checkout submodules
         uses: textbook/git-checkout-submodule-action@master
       - name: Ls
-        run: ls -la lia/pp/src/
+        run: ls -la pp/src/
       - name: Cache ~/.cabal/packages
         uses: actions/cache@v1  
         with:
@@ -47,7 +47,7 @@ jobs:
       - name: Make pp
         run: cd pp && make 
       - name: Ls
-        run: ls -la lia/pp/src/
+        run: ls -la pp/src/
       - name: Install pp
         run: cd pp && make  install
       - name: Install pandoc
