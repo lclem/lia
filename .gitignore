@@ -3,3 +3,7 @@ _site/
 _includes/svgs
 .DS_Store
 .jekyll-metadata
+.!*
+src/_build
+*~
+*.bak
