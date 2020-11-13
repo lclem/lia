@@ -1,6 +1,6 @@
 title: Logic in Agda
   
-description: Lropositional and fist-order logic developed with the proof assistant Agda.
+description: Propositional and fist-order logic developed with the proof assistant Agda.
 
 license: Creative Commons Attribution 4.0 International License
 license-file: https://creativecommons.org/licenses/by/4.0/
@@ -30,8 +30,8 @@ plugins:
 #  - jekyll-feed
 #  - jemoji
 
-baseurl: "lia/"
-url: "https://lclem.github.io/lia"
+baseurl: "https://lclem.github.io/lia"
+url: "lia"
 markdown: kramdown
 
 kramdown:
@@ -56,6 +56,7 @@ exclude:
   - "src/"
   - "tmp/"
   - "_build/"
+  - "docs/"
   - "Guardfile"
   - "Gemfile"
   - "Gemfile.lock"
