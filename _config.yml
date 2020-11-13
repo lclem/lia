@@ -23,7 +23,7 @@ encoding            : "utf-8"
 show_dir_listing    : false
 
 plugins:
-#  - jekyll-toc
+  - jekyll-toc
 #  - jekyll-paginate
 #  - jekyll-sitemap
 #  - jekyll-gist

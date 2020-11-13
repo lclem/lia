@@ -1,6 +1,7 @@
 OUTDIR := html
 TMPDIR := tmp
 SITEDIR := _site
+DOCSDIR := docs
 SRCDIR := src
 BUILDDIR := $(SRCDIR)/_build
 INCLUDES := _includes
@@ -58,10 +59,10 @@ PART_DIRS := $(patsubst %,$(OUTDIR)/%,$(PARTS))
 all: build
 
 docs: build
-	rsync -aP _site/ docs/
+	rsync -aP $(SITEDIR)/ $(DOCSDIR)/
 
 clean:
-	@rm -fr keys.make $(OUTDIR)/ $(TMPDIR)/ $(SITEDIR)/ $(BUILDDIR)/ $(SVGS)/
+	@rm -fr keys.make $(OUTDIR)/ $(TMPDIR)/ $(SITEDIR)/ $(BUILDDIR)/ $(SVGS)/ $(DOCSDIR)/
 
 markdown: agda refs $(MARKDOWN_MD)
 
@@ -328,7 +329,8 @@ $(OUTDIR)/$1/$2.md: $(TMPDIR)/$1.$2.md
 #	@gsed -i "12i\        general:" $(OUTDIR)/$1/$2.md
 #	@gsed -i "13i\            listing-title: List of exercises" $(OUTDIR)/$1/$2.md
 
-	@$(foreach PART,$(PARTS),$(foreach AGDA_MODULE,$(AGDA_MODULES),sed -i "" 's|$(PART).$(AGDA_MODULE).html|{% endraw %}{% link $(OUTDIR)/$(PART)/$(AGDA_MODULE).md %}{% raw %}|g;' $(OUTDIR)/$1/$2.md;))
+# fix the links in place: $(PART).$(AGDA_MODULE).html --> $(OUTDIR)/$(PART)/$(AGDA_MODULE).md
+	@$(foreach PART,$(PARTS),$(foreach AGDA_MODULE,$(AGDA_MODULES),sed -i "" 's+$(PART).$(AGDA_MODULE).html+{% endraw %}{{ site.baseurl }}{% link $(OUTDIR)/$(PART)/$(AGDA_MODULE).md %}{% raw %}+g;' $(OUTDIR)/$1/$2.md;))
 
 	@echo " [DONE]"
 

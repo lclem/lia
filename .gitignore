@@ -9,3 +9,4 @@ src/_build
 *.bak
 tmp/
 html/
+.jekyll-cache
