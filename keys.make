@@ -1,0 +1,2 @@
+REFS := $(shell cat $(TMPDIR)/keys.dep.txt)
+$(foreach REF,$(REFS),$(eval $(call process_refs,$(word 1,$(subst ., ,$(REF))),$(word 2,$(subst ., ,$(REF))),$(word 3,$(subst ., ,$(REF))),$(word 4,$(subst ., ,$(REF))),$(word 5,$(subst ., ,$(REF))))))

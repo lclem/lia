@@ -1,0 +1,76 @@
+title: Logic in Agda
+  
+description: Lropositional and fist-order logic developed with the proof assistant Agda.
+
+license: Creative Commons Attribution 4.0 International License
+license-file: https://creativecommons.org/licenses/by/4.0/
+
+authors:
+  - name: Lorenzo Clemente
+    email: clementelorenzo@gmail.com
+    corresponding: true
+    github_username: lclem
+
+repository: lclem/lia
+#  branch: dev
+
+collections_dir     : .
+plugins_dir         : _plugins
+layouts_dir         : _layouts
+data_dir            : _data
+includes_dir        : _includes
+encoding            : "utf-8"
+show_dir_listing    : false
+
+plugins:
+  - jekyll-toc
+#  - jekyll-latex
+  - jekyll-paginate
+  - jekyll-sitemap
+#  - jekyll-scholar
+  - jekyll-gist
+  - jekyll-feed
+  - jemoji
+
+baseurl: ""
+url: "https://lclem.github.io/lia"
+markdown: kramdown
+
+kramdown:
+  input: GFM
+  math_engine: mathjax
+  parse_block_html: true
+
+theme: minima
+#theme: alembic-jekyll-theme
+excerpt_separator: <!--more-->
+
+toc:
+  min_level: 1 # default: 1
+  max_level: 2 # default: 6
+
+exclude:
+  - "Makefile"
+  - "*.lagda.md"
+  - "*.agdai"
+  - "*.agda-lib"
+  - "epub/"
+  - "src/"
+  - "tmp/"
+  - "_build/"
+  - "Guardfile"
+  - "Gemfile"
+  - "Gemfile.lock"
+  - "pp-macros.txt"
+  - "spell-checker/"
+  - "TODO.md"
+  - "*.awk"
+  - "*.sh"
+  - "ignore/"
+  - "*.dep"
+  - "*.make"
+  - "*.dot"
+  - "*.bib"
+  - "*.csl"
+  - "*#*"
+  - "*!*"
