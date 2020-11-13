@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  trigger-binder-build:
+  build:
     runs-on: [ubuntu-latest]
     steps:
       - name: Set up git repo
