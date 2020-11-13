@@ -13,14 +13,16 @@ jobs:
         uses: textbook/git-checkout-submodule-action@master
       - name: Install pp
         run: cd pp && make && make install
+      - name: Install pandoc
+        run: sudo apt-get install -y pandoc
       - name: Install cabal
-        run: sudo apt-get install cabal-install
+        run: sudo apt-get install -y cabal-install
       - name: Update cabal
         run: cabal update
       - name: Install alex
-        run: cabal install alex
+        run: cabal install -y alex
       - name: Install happy
-        run: cabal install happy
+        run: cabal install -y happy
 #      - name: Install agda
 #        run: sudo apt-get install agda
 #      - name: Install agda-mode
