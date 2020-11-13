@@ -30,8 +30,8 @@ plugins:
 #  - jekyll-feed
 #  - jemoji
 
-baseurl: "https://lclem.github.io/lia"
-url: "lia"
+baseurl: ""
+url: ""
 markdown: kramdown
 
 kramdown:
