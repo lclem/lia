@@ -1,11 +1,12 @@
-OUTDIR := docs
+OUTDIR := html
 TMPDIR := tmp
 SITEDIR := _site
 SRCDIR := src
 BUILDDIR := $(SRCDIR)/_build
 INCLUDES := _includes
 SVGS := $(INCLUDES)/svgs
-PARTS := part0 part1 part2 part3 part4
+PARTS := part0
+#part1 part2 part3 part4
 AGDA := agda
 PANDOC := pandoc
 PP := ~/.local/bin/pp
@@ -92,33 +93,34 @@ server-start:
 server-stop:
 	pkill -f jekyll
 
-define process_refs
+# don't process refs for now
+# define process_refs
 
-$(OUTDIR)/refs/$1/$2/index.md: $(OUTDIR)/refs/$1/$2/$4.dep
+# $(OUTDIR)/refs/$1/$2/index.md: $(OUTDIR)/refs/$1/$2/$4.dep
 
-$(OUTDIR)/refs/$1/$2/$4.dep:
-	@mkdir -p $(OUTDIR)/refs/$1/$2/
-	@echo "making $(OUTDIR)/refs/$1/$2/$4.dep...\c"
+# $(OUTDIR)/refs/$1/$2/$4.dep:
+# 	@mkdir -p $(OUTDIR)/refs/$1/$2/
+# 	@echo "making $(OUTDIR)/refs/$1/$2/$4.dep...\c"
 
-# @echo "---" > $(OUTDIR)/refs/$1/$2/$4.md
-# @echo "title: References to \`"'$5'"\`" >> $(OUTDIR)/refs/$1/$2/$4.md
-# @echo "permalink: /refs/$1/$2/$4" >> $(OUTDIR)/refs/$1/$2/$4.md
-# @echo "---" >> $(OUTDIR)/refs/$1/$2/$4.md
+# # @echo "---" > $(OUTDIR)/refs/$1/$2/$4.md
+# # @echo "title: References to \`"'$5'"\`" >> $(OUTDIR)/refs/$1/$2/$4.md
+# # @echo "permalink: /refs/$1/$2/$4" >> $(OUTDIR)/refs/$1/$2/$4.md
+# # @echo "---" >> $(OUTDIR)/refs/$1/$2/$4.md
 
-#	@echo "ref to $5"
-	@echo "References to "'$5'" {#ref-$4}: \n" > $(OUTDIR)/refs/$1/$2/$4.dep
+# #	@echo "ref to $5"
+# 	@echo "References to "'$5'" {#ref-$4}: \n" > $(OUTDIR)/refs/$1/$2/$4.dep
 
-	@cat $(TMPDIR)/all.dep.txt | awk -f dep_filter.awk -v mykey=$1.$2.$3.$4 | sed 's|\([a-zA-Z0-9]*\)\.\([a-zA-Z0-9]*\)\.\([a-zA-Z0-9]*\)\.\([0-9]*\)|\* [{% link '$(OUTDIR)'/\1/\2.md %}#\4]({% link '$(OUTDIR)'/\1/\2.md %}#\4)|' >> $(OUTDIR)/refs/$1/$2/$4.dep
+# 	@cat $(TMPDIR)/all.dep.txt | awk -f dep_filter.awk -v mykey=$1.$2.$3.$4 | sed 's|\([a-zA-Z0-9]*\)\.\([a-zA-Z0-9]*\)\.\([a-zA-Z0-9]*\)\.\([0-9]*\)|\* [{% link '$(OUTDIR)'/\1/\2.md %}#\4]({% link '$(OUTDIR)'/\1/\2.md %}#\4)|' >> $(OUTDIR)/refs/$1/$2/$4.dep
 
-	@echo "\n" >> $(OUTDIR)/refs/$1/$2/$4.dep
+# 	@echo "\n" >> $(OUTDIR)/refs/$1/$2/$4.dep
 
-	@echo " [DONE]"
+# 	@echo " [DONE]"
 
-#part0.vector.md.21610
+# #part0.vector.md.21610
 
-#refs: $(OUTDIR)/refs/$1/$2/$4.md
+# #refs: $(OUTDIR)/refs/$1/$2/$4.md
 
-endef
+# endef
 
 # use keys.dep.txt;
 # use all_keys.dep.txt in case you want to create refs also for names not referenced anywhere else...
@@ -132,8 +134,9 @@ ifneq ($(strip $(keys_exist)),)
 # it is convenient to have this rule when running "make clean"
 # (otherwise it will try to build keys.dep.txt every time...)
 
-REFS := $(shell cat $(TMPDIR)/keys.dep.txt)
-$(foreach REF,$(REFS),$(eval $(call process_refs,$(word 1,$(subst ., ,$(REF))),$(word 2,$(subst ., ,$(REF))),$(word 3,$(subst ., ,$(REF))),$(word 4,$(subst ., ,$(REF))),$(word 5,$(subst ., ,$(REF))))))
+# don't do refs now
+# REFS := $(shell cat $(TMPDIR)/keys.dep.txt)
+# $(foreach REF,$(REFS),$(eval $(call process_refs,$(word 1,$(subst ., ,$(REF))),$(word 2,$(subst ., ,$(REF))),$(word 3,$(subst ., ,$(REF))),$(word 4,$(subst ., ,$(REF))),$(word 5,$(subst ., ,$(REF))))))
 
 else
 
@@ -297,13 +300,15 @@ $(OUTDIR)/$1/$2.md: $(TMPDIR)/$1.$2.md
 # this is achieved by matching on positions as below
 # <a id="𝔹"></a><a id="200" href="part0.Booleans.html#200"
 
-	@sed -i "" 's|<a id="\([^"]*\)"></a><a id="\([0-9]*\)" href="\([a-zA-Z0-9\.]*\)\#[0-9]*"|<a id="\1"></a><a id="\2" href="{% endraw %}{% link '$(OUTDIR)/refs/$1/$2/'index.md %}#ref-\2{% raw %}"|g' $(OUTDIR)/$1/$2.md
+#IGNORE FOR NOW
+#	@sed -i "" 's|<a id="\([^"]*\)"></a><a id="\([0-9]*\)" href="\([a-zA-Z0-9\.]*\)\#[0-9]*"|<a id="\1"></a><a id="\2" href="{% endraw %}{% link '$(OUTDIR)/refs/$1/$2/'index.md %}#ref-\2{% raw %}"|g' $(OUTDIR)/$1/$2.md
 
 # do the same for modules, we now match on things like
 # <a id="37" class="Keyword">module</a> <a id="44" href="part0.Booleans.html" class="Module"> or
 # <a id="113" class="Keyword">module</a> <a id="120" href="part1.Hilbert.html#120" class="Module">part1.Hilbert</a>
 
-	@sed -i "" 's|<a id="\([^"]*\)" class="Keyword">module</a> <a id="\([^"]*\)" href="[^"]*" class="Module">|<a id="\1" class="Keyword">module</a> <a id="\2" href="{% endraw %}{% link '$(OUTDIR)/refs/$1/$2/'index.md %}{% raw %}" class="Module">|g' $(OUTDIR)/$1/$2.md
+#IGNORE FOR NOW
+#	@sed -i "" 's|<a id="\([^"]*\)" class="Keyword">module</a> <a id="\([^"]*\)" href="[^"]*" class="Module">|<a id="\1" class="Keyword">module</a> <a id="\2" href="{% endraw %}{% link '$(OUTDIR)/refs/$1/$2/'index.md %}{% raw %}" class="Module">|g' $(OUTDIR)/$1/$2.md
 
 # this is just for debugging to see the intermediate result
 #	@cp $(OUTDIR)/$1/$2.md $(OUTDIR)/$1/$2.md.txt

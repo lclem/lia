@@ -12,7 +12,7 @@ authors:
     github_username: lclem
 
 repository: lclem/lia
-  branch: main
+branch: main
 
 collections_dir     : .
 plugins_dir         : _plugins

@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Streams | Logic in Agda</title><!-- Begin Jekyll SEO tag v2.6.1 -->
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Streams" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Lropositional and fist-order logic developed with the proof assistant Agda." />
+<meta property="og:description" content="Lropositional and fist-order logic developed with the proof assistant Agda." />
+<link rel="canonical" href="http://localhost:4000/part0/Stream/" />
+<meta property="og:url" content="http://localhost:4000/part0/Stream/" />
+<meta property="og:site_name" content="Logic in Agda" />
+<script type="application/ld+json">
+{"url":"http://localhost:4000/part0/Stream/","headline":"Streams","description":"Lropositional and fist-order logic developed with the proof assistant Agda.","@type":"WebPage","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/main.css">
+  <!-- <link rel="stylesheet" href="/assets/custom.css"> --><!-- Mathjax Support -->
+  <script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+  <!-- Load KaTeX -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1.1/katex.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1.1/katex.min.js"></script>
+</head>
+<body><header class="site-header" role="banner">
+
+    <div class="wrapper">
+
+        <a class="site-title" href="/">Logic in Agda</a>
+
+        <nav class="site-nav">
+            <span class="menu-icon">
+                <svg viewBox="0 0 18 15" width="18px" height="15px">
+                    <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+                    <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+                    <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+                </svg>
+            </span>
+
+            <div class="trigger">
+                <a class="page-link" href="/part0/index/">Part 0</a>
+                <a class="page-link" href="/part1/index/">Part 1</a>
+                <a class="page-link" href="/part2/index/">Part 2</a>
+                <a class="page-link" href="/part3/index/">Part 3</a>
+                <a class="page-link" href="/part4/index/">Part 4</a>
+            </div>
+        </nav>
+
+    </div>
+
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post">
+
+    <header class="post-header">
+        <h1 class="post-title">Streams</h1>
+    </header>
+  
+    <p style="text-align:center;">
+    
+    
+    
+    <a alt="Part" href="/part0/index/">Part</a>
+    &bullet;
+    
+    
+    <a alt="Source code" href="https://github.com/lclem/lia/blob/mainsrc/part0/Stream.lagda.md">Source</a>
+    
+    
+    
+</p>
+
+  
+    <div class="post-content">
+        <h2>Contents</h2>    
+        <ul class="section-nav">
+</ul><pre class="Agda"><a id="29" class="Keyword">module</a> <a id="36" href="/part0/Stream/" class="Module">part0.Stream</a> <a id="49" class="Keyword">where</a>
+<a id="55" class="Keyword">open</a> <a id="60" class="Keyword">import</a> <a id="67" href="Agda.Primitive.html" class="Module">Agda.Primitive</a>
+<a id="82" class="Keyword">open</a> <a id="87" class="Keyword">import</a> <a id="94" href="/part0/nat/" class="Module">part0.nat</a>
+<a id="104" class="Keyword">open</a> <a id="109" class="Keyword">import</a> <a id="116" href="/part0/eq/" class="Module">part0.eq</a>
+<a id="125" class="Keyword">open</a> <a id="130" class="Keyword">import</a> <a id="137" href="/part0/list/" class="Module">part0.list</a> <a id="148" class="Keyword">hiding</a> <a id="155" class="Symbol">(</a><a id="156" href="/part0/list/#23516" class="Function Operator">_≈_</a><a id="159" class="Symbol">;</a> <a id="161" href="/part0/list/#11628" class="Function">head</a><a id="165" class="Symbol">)</a>
+<a id="167" class="Keyword">open</a> <a id="172" class="Keyword">import</a> <a id="179" href="/part0/logic/" class="Module">part0.logic</a>
+
+<a id="192" class="Keyword">record</a> <a id="_ω"></a><a id="199" href="/part0/Stream/#199" class="Record Operator">_ω</a> <a id="202" class="Symbol">{</a><a id="203" href="/part0/Stream/#203" class="Bound">ℓ</a><a id="204" class="Symbol">}</a> <a id="206" class="Symbol">(</a><a id="207" href="/part0/Stream/#207" class="Bound">A</a> <a id="209" class="Symbol">:</a> <a id="211" class="PrimitiveType">Set</a> <a id="215" href="/part0/Stream/#203" class="Bound">ℓ</a><a id="216" class="Symbol">)</a> <a id="218" class="Symbol">:</a> <a id="220" class="PrimitiveType">Set</a> <a id="224" href="/part0/Stream/#203" class="Bound">ℓ</a> <a id="226" class="Keyword">where</a>
+  <a id="234" class="Keyword">coinductive</a>
+  <a id="248" class="Keyword">constructor</a> <a id="_∷_"></a><a id="260" href="/part0/Stream/#260" class="CoinductiveConstructor Operator">_∷_</a>
+  <a id="266" class="Keyword">field</a>
+    <a id="_ω.head"></a><a id="276" href="/part0/Stream/#276" class="Field">head</a> <a id="281" class="Symbol">:</a> <a id="283" href="/part0/Stream/#207" class="Bound">A</a>
+    <a id="_ω.tl"></a><a id="289" href="/part0/Stream/#289" class="Field">tl</a> <a id="292" class="Symbol">:</a> <a id="294" href="/part0/Stream/#207" class="Bound">A</a> <a id="296" href="/part0/Stream/#199" class="Record Operator">ω</a>
+
+<a id="299" class="Keyword">open</a> <a id="304" href="/part0/Stream/#199" class="Module Operator">_ω</a> <a id="307" class="Keyword">public</a>
+
+<a id="315" class="Keyword">record</a> <a id="_≈_"></a><a id="322" href="/part0/Stream/#322" class="Record Operator">_≈_</a> <a id="326" class="Symbol">{</a><a id="327" href="/part0/Stream/#327" class="Bound">ℓ</a><a id="328" class="Symbol">}</a> <a id="330" class="Symbol">{</a><a id="331" href="/part0/Stream/#331" class="Bound">A</a> <a id="333" class="Symbol">:</a> <a id="335" class="PrimitiveType">Set</a> <a id="339" href="/part0/Stream/#327" class="Bound">ℓ</a><a id="340" class="Symbol">}</a> <a id="342" class="Symbol">(</a><a id="343" href="/part0/Stream/#343" class="Bound">xs</a> <a id="346" href="/part0/Stream/#346" class="Bound">ys</a> <a id="349" class="Symbol">:</a> <a id="351" href="/part0/Stream/#331" class="Bound">A</a> <a id="353" href="/part0/Stream/#199" class="Record Operator">ω</a><a id="354" class="Symbol">)</a> <a id="356" class="Symbol">:</a> <a id="358" class="PrimitiveType">Set</a> <a id="362" href="/part0/Stream/#327" class="Bound">ℓ</a> <a id="364" class="Keyword">where</a>
+  <a id="372" class="Keyword">coinductive</a>
+  <a id="386" class="Keyword">field</a>
+    <a id="_≈_.head-≈"></a><a id="396" href="/part0/Stream/#396" class="Field">head-≈</a> <a id="403" class="Symbol">:</a> <a id="405" href="/part0/Stream/#276" class="Field">head</a> <a id="410" href="/part0/Stream/#343" class="Bound">xs</a> <a id="413" href="/part0/eq/#174" class="Datatype Operator">≡</a> <a id="415" href="/part0/Stream/#276" class="Field">head</a> <a id="420" href="/part0/Stream/#346" class="Bound">ys</a>
+    <a id="_≈_.tl-≈"></a><a id="427" href="/part0/Stream/#427" class="Field">tl-≈</a> <a id="432" class="Symbol">:</a> <a id="434" href="/part0/Stream/#289" class="Field">tl</a> <a id="437" href="/part0/Stream/#343" class="Bound">xs</a> <a id="440" href="/part0/Stream/#322" class="Record Operator">≈</a> <a id="442" href="/part0/Stream/#289" class="Field">tl</a> <a id="445" href="/part0/Stream/#346" class="Bound">ys</a>
+
+<a id="449" class="Keyword">infix</a> <a id="455" class="Number">5</a> <a id="457" href="/part0/Stream/#467" class="Datatype Operator">_∈ω_</a>
+<a id="462" class="Keyword">data</a> <a id="_∈ω_"></a><a id="467" href="/part0/Stream/#467" class="Datatype Operator">_∈ω_</a> <a id="472" class="Symbol">{</a><a id="473" href="/part0/Stream/#473" class="Bound">ℓ</a><a id="474" class="Symbol">}</a> <a id="476" class="Symbol">{</a><a id="477" href="/part0/Stream/#477" class="Bound">A</a> <a id="479" class="Symbol">:</a> <a id="481" class="PrimitiveType">Set</a> <a id="485" href="/part0/Stream/#473" class="Bound">ℓ</a><a id="486" class="Symbol">}</a> <a id="488" class="Symbol">:</a> <a id="490" href="/part0/Stream/#477" class="Bound">A</a> <a id="492" class="Symbol">→</a> <a id="494" href="/part0/Stream/#477" class="Bound">A</a> <a id="496" href="/part0/Stream/#199" class="Record Operator">ω</a> <a id="498" class="Symbol">→</a> <a id="500" class="PrimitiveType">Set</a> <a id="504" class="Keyword">where</a>
+  <a id="_∈ω_.here"></a><a id="512" href="/part0/Stream/#512" class="InductiveConstructor">here</a> <a id="517" class="Symbol">:</a> <a id="519" class="Symbol">∀</a> <a id="521" class="Symbol">{</a><a id="522" href="/part0/Stream/#522" class="Bound">a</a><a id="523" class="Symbol">}</a> <a id="525" class="Symbol">{</a><a id="526" href="/part0/Stream/#526" class="Bound">as</a> <a id="529" class="Symbol">:</a> <a id="531" href="/part0/Stream/#477" class="Bound">A</a> <a id="533" href="/part0/Stream/#199" class="Record Operator">ω</a><a id="534" class="Symbol">}</a> <a id="536" class="Symbol">→</a> <a id="538" href="/part0/Stream/#522" class="Bound">a</a> <a id="540" href="/part0/Stream/#467" class="Datatype Operator">∈ω</a> <a id="543" href="/part0/Stream/#522" class="Bound">a</a> <a id="545" href="/part0/Stream/#260" class="CoinductiveConstructor Operator">∷</a> <a id="547" href="/part0/Stream/#526" class="Bound">as</a>
+  <a id="_∈ω_.there"></a><a id="552" href="/part0/Stream/#552" class="InductiveConstructor">there</a> <a id="558" class="Symbol">:</a> <a id="560" class="Symbol">∀</a> <a id="562" class="Symbol">{</a><a id="563" href="/part0/Stream/#563" class="Bound">a</a> <a id="565" href="/part0/Stream/#565" class="Bound">b</a><a id="566" class="Symbol">}</a> <a id="568" class="Symbol">{</a><a id="569" href="/part0/Stream/#569" class="Bound">as</a> <a id="572" class="Symbol">:</a> <a id="574" href="/part0/Stream/#477" class="Bound">A</a> <a id="576" href="/part0/Stream/#199" class="Record Operator">ω</a><a id="577" class="Symbol">}</a> <a id="579" class="Symbol">→</a> <a id="581" href="/part0/Stream/#563" class="Bound">a</a> <a id="583" href="/part0/Stream/#467" class="Datatype Operator">∈ω</a> <a id="586" href="/part0/Stream/#569" class="Bound">as</a> <a id="589" class="Symbol">→</a> <a id="591" href="/part0/Stream/#563" class="Bound">a</a> <a id="593" href="/part0/Stream/#467" class="Datatype Operator">∈ω</a> <a id="596" href="/part0/Stream/#565" class="Bound">b</a> <a id="598" href="/part0/Stream/#260" class="CoinductiveConstructor Operator">∷</a> <a id="600" href="/part0/Stream/#569" class="Bound">as</a>
+
+<a id="604" class="Comment">-- infix 5 _∈ω_!_</a>
+<a id="622" class="Comment">-- data _∈ω_ {ℓ} {A : Set ℓ} : A → A ω → Set where</a>
+<a id="673" class="Comment">--   here : ∀ {a} {as : A ω} → a ∈ω a ∷ as</a>
+<a id="716" class="Comment">--   there : ∀ {a b} {as : A ω} → a ∈ω as → a ∈ω b ∷ as</a>
+
+<a id="_!_"></a><a id="773" href="/part0/Stream/#773" class="Function Operator">_!_</a> <a id="777" class="Symbol">:</a> <a id="779" class="Symbol">∀</a> <a id="781" class="Symbol">{</a><a id="782" href="/part0/Stream/#782" class="Bound">ℓ</a><a id="783" class="Symbol">}</a> <a id="785" class="Symbol">{</a><a id="786" href="/part0/Stream/#786" class="Bound">A</a> <a id="788" class="Symbol">:</a> <a id="790" class="PrimitiveType">Set</a> <a id="794" href="/part0/Stream/#782" class="Bound">ℓ</a><a id="795" class="Symbol">}</a> <a id="797" class="Symbol">→</a> <a id="799" href="/part0/Stream/#786" class="Bound">A</a> <a id="801" href="/part0/Stream/#199" class="Record Operator">ω</a> <a id="803" class="Symbol">→</a> <a id="805" href="/part0/nat/#203" class="Datatype">ℕ</a> <a id="807" class="Symbol">→</a> <a id="809" href="/part0/Stream/#786" class="Bound">A</a>
+<a id="811" href="/part0/Stream/#811" class="Bound">as</a> <a id="814" href="/part0/Stream/#773" class="Function Operator">!</a> <a id="816" href="/part0/nat/#219" class="InductiveConstructor">zero</a> <a id="821" class="Symbol">=</a> <a id="823" href="/part0/Stream/#276" class="Field">head</a> <a id="828" href="/part0/Stream/#811" class="Bound">as</a>
+<a id="831" href="/part0/Stream/#831" class="Bound">as</a> <a id="834" href="/part0/Stream/#773" class="Function Operator">!</a> <a id="836" href="/part0/nat/#230" class="InductiveConstructor">suc</a> <a id="840" href="/part0/Stream/#840" class="Bound">n</a> <a id="842" class="Symbol">=</a> <a id="844" href="/part0/Stream/#289" class="Field">tl</a> <a id="847" href="/part0/Stream/#831" class="Bound">as</a> <a id="850" href="/part0/Stream/#773" class="Function Operator">!</a> <a id="852" href="/part0/Stream/#840" class="Bound">n</a>
+
+<a id="855" class="Keyword">infixl</a> <a id="862" class="Number">9</a> <a id="864" href="/part0/Stream/#870" class="Function Operator">_⊆ω_</a>
+
+<a id="_⊆ω_"></a><a id="870" href="/part0/Stream/#870" class="Function Operator">_⊆ω_</a> <a id="875" class="Symbol">:</a> <a id="877" class="Symbol">∀</a> <a id="879" class="Symbol">{</a><a id="880" href="/part0/Stream/#880" class="Bound">ℓ</a><a id="881" class="Symbol">}</a> <a id="883" class="Symbol">{</a><a id="884" href="/part0/Stream/#884" class="Bound">A</a> <a id="886" class="Symbol">:</a> <a id="888" class="PrimitiveType">Set</a> <a id="892" href="/part0/Stream/#880" class="Bound">ℓ</a><a id="893" class="Symbol">}</a> <a id="895" class="Symbol">→</a> <a id="897" href="/part0/Stream/#884" class="Bound">A</a> <a id="899" href="/part0/list/#548" class="Datatype Operator">*</a> <a id="901" class="Symbol">→</a> <a id="903" href="/part0/Stream/#884" class="Bound">A</a> <a id="905" href="/part0/Stream/#199" class="Record Operator">ω</a> <a id="907" class="Symbol">→</a> <a id="909" class="PrimitiveType">Set</a> <a id="913" href="/part0/Stream/#880" class="Bound">ℓ</a>
+<a id="915" href="/part0/Stream/#915" class="Bound">xs</a> <a id="918" href="/part0/Stream/#870" class="Function Operator">⊆ω</a> <a id="921" href="/part0/Stream/#921" class="Bound">ys</a> <a id="924" class="Symbol">=</a> <a id="926" href="/part0/logic/#208" class="Function">∀[</a> <a id="929" href="/part0/Stream/#929" class="Bound">x</a> <a id="931" href="/part0/logic/#208" class="Function">]</a> <a id="933" class="Symbol">(</a><a id="934" href="/part0/Stream/#929" class="Bound">x</a> <a id="936" href="/part0/list/#7294" class="Datatype Operator">∈</a> <a id="938" href="/part0/Stream/#915" class="Bound">xs</a> <a id="941" class="Symbol">→</a> <a id="943" href="/part0/Stream/#929" class="Bound">x</a> <a id="945" href="/part0/Stream/#467" class="Datatype Operator">∈ω</a> <a id="948" href="/part0/Stream/#921" class="Bound">ys</a><a id="950" class="Symbol">)</a>
+
+<a id="forAllInω"></a><a id="953" href="/part0/Stream/#953" class="Function">forAllInω</a> <a id="963" class="Symbol">:</a> <a id="965" class="Symbol">∀</a> <a id="967" class="Symbol">{</a><a id="968" href="/part0/Stream/#968" class="Bound">ℓ</a> <a id="970" href="/part0/Stream/#970" class="Bound">m</a><a id="971" class="Symbol">}</a> <a id="973" class="Symbol">{</a><a id="974" href="/part0/Stream/#974" class="Bound">A</a> <a id="976" class="Symbol">:</a> <a id="978" class="PrimitiveType">Set</a> <a id="982" href="/part0/Stream/#968" class="Bound">ℓ</a><a id="983" class="Symbol">}</a> <a id="985" class="Symbol">(</a><a id="986" href="/part0/Stream/#986" class="Bound">B</a> <a id="988" class="Symbol">:</a> <a id="990" href="/part0/Stream/#974" class="Bound">A</a> <a id="992" class="Symbol">→</a> <a id="994" href="/part0/Stream/#974" class="Bound">A</a> <a id="996" href="/part0/Stream/#199" class="Record Operator">ω</a> <a id="998" class="Symbol">→</a> <a id="1000" class="PrimitiveType">Set</a> <a id="1004" href="/part0/Stream/#970" class="Bound">m</a><a id="1005" class="Symbol">)</a> <a id="1007" class="Symbol">→</a> <a id="1009" class="PrimitiveType">Set</a> <a id="1013" class="Symbol">(</a><a id="1014" href="/part0/Stream/#968" class="Bound">ℓ</a> <a id="1016" href="Agda.Primitive.html#636" class="Primitive Operator">⊔</a> <a id="1018" href="/part0/Stream/#970" class="Bound">m</a><a id="1019" class="Symbol">)</a>
+<a id="1021" href="/part0/Stream/#953" class="Function">forAllInω</a> <a id="1031" href="/part0/Stream/#1031" class="Bound">B</a> <a id="1033" class="Symbol">=</a> <a id="1035" href="/part0/logic/#208" class="Function">∀[</a> <a id="1038" href="/part0/Stream/#1038" class="Bound">a</a> <a id="1040" href="/part0/logic/#208" class="Function">]</a> <a id="1042" href="/part0/logic/#208" class="Function">∀[</a> <a id="1045" href="/part0/Stream/#1045" class="Bound">as</a> <a id="1048" href="/part0/logic/#208" class="Function">]</a> <a id="1050" class="Symbol">(</a><a id="1051" href="/part0/Stream/#1038" class="Bound">a</a> <a id="1053" href="/part0/Stream/#467" class="Datatype Operator">∈ω</a> <a id="1056" href="/part0/Stream/#1045" class="Bound">as</a> <a id="1059" class="Symbol">→</a> <a id="1061" href="/part0/Stream/#1031" class="Bound">B</a> <a id="1063" href="/part0/Stream/#1038" class="Bound">a</a> <a id="1065" href="/part0/Stream/#1045" class="Bound">as</a><a id="1067" class="Symbol">)</a>
+
+<a id="1070" class="Comment">--infix 8 ∀[_∈ω_]_</a>
+<a id="1089" class="Comment">--syntax forAllInω (λ a as → B) = ∀[ a ∈ω as ] B</a>
+
+<a id="scanω"></a><a id="1139" href="/part0/Stream/#1139" class="Function">scanω</a> <a id="1145" class="Symbol">:</a> <a id="1147" class="Symbol">∀</a> <a id="1149" class="Symbol">{</a><a id="1150" href="/part0/Stream/#1150" class="Bound">ℓ</a> <a id="1152" href="/part0/Stream/#1152" class="Bound">m</a><a id="1153" class="Symbol">}</a> <a id="1155" class="Symbol">{</a><a id="1156" href="/part0/Stream/#1156" class="Bound">A</a> <a id="1158" class="Symbol">:</a> <a id="1160" class="PrimitiveType">Set</a> <a id="1164" href="/part0/Stream/#1150" class="Bound">ℓ</a><a id="1165" class="Symbol">}</a> <a id="1167" class="Symbol">{</a><a id="1168" href="/part0/Stream/#1168" class="Bound">B</a> <a id="1170" class="Symbol">:</a> <a id="1172" class="PrimitiveType">Set</a> <a id="1176" href="/part0/Stream/#1152" class="Bound">m</a><a id="1177" class="Symbol">}</a> <a id="1179" class="Symbol">→</a> <a id="1181" class="Symbol">(</a><a id="1182" href="/part0/Stream/#1156" class="Bound">A</a> <a id="1184" class="Symbol">→</a> <a id="1186" href="/part0/Stream/#1168" class="Bound">B</a> <a id="1188" class="Symbol">→</a> <a id="1190" href="/part0/Stream/#1156" class="Bound">A</a><a id="1191" class="Symbol">)</a> <a id="1193" class="Symbol">→</a> <a id="1195" href="/part0/Stream/#1156" class="Bound">A</a> <a id="1197" class="Symbol">→</a> <a id="1199" href="/part0/Stream/#1168" class="Bound">B</a> <a id="1201" href="/part0/Stream/#199" class="Record Operator">ω</a> <a id="1203" class="Symbol">→</a> <a id="1205" href="/part0/Stream/#1156" class="Bound">A</a> <a id="1207" href="/part0/Stream/#199" class="Record Operator">ω</a>
+<a id="1209" href="/part0/Stream/#276" class="Field">head</a> <a id="1214" class="Symbol">(</a><a id="1215" href="/part0/Stream/#1139" class="Function">scanω</a> <a id="1221" href="/part0/Stream/#1221" class="Bound">f</a> <a id="1223" href="/part0/Stream/#1223" class="Bound">a</a> <a id="1225" href="/part0/Stream/#1225" class="Bound">bs</a><a id="1227" class="Symbol">)</a> <a id="1229" class="Symbol">=</a> <a id="1231" href="/part0/Stream/#1223" class="Bound">a</a>
+<a id="1233" href="/part0/Stream/#289" class="Field">tl</a> <a id="1236" class="Symbol">(</a><a id="1237" href="/part0/Stream/#1139" class="Function">scanω</a> <a id="1243" href="/part0/Stream/#1243" class="Bound">f</a> <a id="1245" href="/part0/Stream/#1245" class="Bound">a</a> <a id="1247" href="/part0/Stream/#1247" class="Bound">bs</a><a id="1249" class="Symbol">)</a> <a id="1251" class="Symbol">=</a> <a id="1253" href="/part0/Stream/#1139" class="Function">scanω</a> <a id="1259" href="/part0/Stream/#1243" class="Bound">f</a> <a id="1261" class="Symbol">(</a><a id="1262" href="/part0/Stream/#1243" class="Bound">f</a> <a id="1264" href="/part0/Stream/#1245" class="Bound">a</a> <a id="1266" class="Symbol">(</a><a id="1267" href="/part0/Stream/#276" class="Field">head</a> <a id="1272" href="/part0/Stream/#1247" class="Bound">bs</a><a id="1274" class="Symbol">))</a> <a id="1277" class="Symbol">(</a><a id="1278" href="/part0/Stream/#289" class="Field">tl</a> <a id="1281" href="/part0/Stream/#1247" class="Bound">bs</a><a id="1283" class="Symbol">)</a>
+
+<a id="mapω"></a><a id="1286" href="/part0/Stream/#1286" class="Function">mapω</a> <a id="1291" class="Symbol">:</a> <a id="1293" class="Symbol">∀</a> <a id="1295" class="Symbol">{</a><a id="1296" href="/part0/Stream/#1296" class="Bound">ℓ</a> <a id="1298" href="/part0/Stream/#1298" class="Bound">m</a><a id="1299" class="Symbol">}</a> <a id="1301" class="Symbol">{</a><a id="1302" href="/part0/Stream/#1302" class="Bound">A</a> <a id="1304" class="Symbol">:</a> <a id="1306" class="PrimitiveType">Set</a> <a id="1310" href="/part0/Stream/#1296" class="Bound">ℓ</a><a id="1311" class="Symbol">}</a> <a id="1313" class="Symbol">{</a><a id="1314" href="/part0/Stream/#1314" class="Bound">B</a> <a id="1316" class="Symbol">:</a> <a id="1318" class="PrimitiveType">Set</a> <a id="1322" href="/part0/Stream/#1298" class="Bound">m</a><a id="1323" class="Symbol">}</a> <a id="1325" class="Symbol">→</a> <a id="1327" class="Symbol">(</a><a id="1328" href="/part0/Stream/#1302" class="Bound">A</a> <a id="1330" class="Symbol">→</a> <a id="1332" href="/part0/Stream/#1314" class="Bound">B</a><a id="1333" class="Symbol">)</a> <a id="1335" class="Symbol">→</a> <a id="1337" href="/part0/Stream/#1302" class="Bound">A</a> <a id="1339" href="/part0/Stream/#199" class="Record Operator">ω</a> <a id="1341" class="Symbol">→</a> <a id="1343" href="/part0/Stream/#1314" class="Bound">B</a> <a id="1345" href="/part0/Stream/#199" class="Record Operator">ω</a>
+<a id="1347" href="/part0/Stream/#276" class="Field">head</a> <a id="1352" class="Symbol">(</a><a id="1353" href="/part0/Stream/#1286" class="Function">mapω</a> <a id="1358" href="/part0/Stream/#1358" class="Bound">f</a> <a id="1360" href="/part0/Stream/#1360" class="Bound">as</a><a id="1362" class="Symbol">)</a> <a id="1364" class="Symbol">=</a> <a id="1366" href="/part0/Stream/#1358" class="Bound">f</a> <a id="1368" class="Symbol">(</a><a id="1369" href="/part0/Stream/#276" class="Field">head</a> <a id="1374" href="/part0/Stream/#1360" class="Bound">as</a><a id="1376" class="Symbol">)</a>
+<a id="1378" href="/part0/Stream/#289" class="Field">tl</a> <a id="1381" class="Symbol">(</a><a id="1382" href="/part0/Stream/#1286" class="Function">mapω</a> <a id="1387" href="/part0/Stream/#1387" class="Bound">f</a> <a id="1389" href="/part0/Stream/#1389" class="Bound">as</a><a id="1391" class="Symbol">)</a> <a id="1393" class="Symbol">=</a> <a id="1395" href="/part0/Stream/#1286" class="Function">mapω</a> <a id="1400" href="/part0/Stream/#1387" class="Bound">f</a> <a id="1402" class="Symbol">(</a><a id="1403" href="/part0/Stream/#289" class="Field">tl</a> <a id="1406" href="/part0/Stream/#1389" class="Bound">as</a><a id="1408" class="Symbol">)</a>
+
+<a id="zipWithω"></a><a id="1411" href="/part0/Stream/#1411" class="Function">zipWithω</a> <a id="1420" class="Symbol">:</a> <a id="1422" class="Symbol">∀</a> <a id="1424" class="Symbol">{</a><a id="1425" href="/part0/Stream/#1425" class="Bound">ℓ</a> <a id="1427" href="/part0/Stream/#1427" class="Bound">m</a> <a id="1429" href="/part0/Stream/#1429" class="Bound">n</a><a id="1430" class="Symbol">}</a> <a id="1432" class="Symbol">{</a><a id="1433" href="/part0/Stream/#1433" class="Bound">A</a> <a id="1435" class="Symbol">:</a> <a id="1437" class="PrimitiveType">Set</a> <a id="1441" href="/part0/Stream/#1425" class="Bound">ℓ</a><a id="1442" class="Symbol">}</a> <a id="1444" class="Symbol">{</a><a id="1445" href="/part0/Stream/#1445" class="Bound">B</a> <a id="1447" class="Symbol">:</a> <a id="1449" class="PrimitiveType">Set</a> <a id="1453" href="/part0/Stream/#1427" class="Bound">m</a><a id="1454" class="Symbol">}</a> <a id="1456" class="Symbol">{</a><a id="1457" href="/part0/Stream/#1457" class="Bound">C</a> <a id="1459" class="Symbol">:</a> <a id="1461" class="PrimitiveType">Set</a> <a id="1465" href="/part0/Stream/#1429" class="Bound">n</a><a id="1466" class="Symbol">}</a> <a id="1468" class="Symbol">→</a> <a id="1470" class="Symbol">(</a><a id="1471" href="/part0/Stream/#1433" class="Bound">A</a> <a id="1473" class="Symbol">→</a> <a id="1475" href="/part0/Stream/#1445" class="Bound">B</a> <a id="1477" class="Symbol">→</a> <a id="1479" href="/part0/Stream/#1457" class="Bound">C</a><a id="1480" class="Symbol">)</a> <a id="1482" class="Symbol">→</a> <a id="1484" href="/part0/Stream/#1433" class="Bound">A</a> <a id="1486" href="/part0/Stream/#199" class="Record Operator">ω</a> <a id="1488" class="Symbol">→</a> <a id="1490" href="/part0/Stream/#1445" class="Bound">B</a> <a id="1492" href="/part0/Stream/#199" class="Record Operator">ω</a> <a id="1494" class="Symbol">→</a> <a id="1496" href="/part0/Stream/#1457" class="Bound">C</a> <a id="1498" href="/part0/Stream/#199" class="Record Operator">ω</a>
+<a id="1500" href="/part0/Stream/#276" class="Field">head</a> <a id="1505" class="Symbol">(</a><a id="1506" href="/part0/Stream/#1411" class="Function">zipWithω</a> <a id="1515" href="/part0/Stream/#1515" class="Bound">f</a> <a id="1517" href="/part0/Stream/#1517" class="Bound">as</a> <a id="1520" href="/part0/Stream/#1520" class="Bound">bs</a><a id="1522" class="Symbol">)</a> <a id="1524" class="Symbol">=</a> <a id="1526" href="/part0/Stream/#1515" class="Bound">f</a> <a id="1528" class="Symbol">(</a><a id="1529" href="/part0/Stream/#276" class="Field">head</a> <a id="1534" href="/part0/Stream/#1517" class="Bound">as</a><a id="1536" class="Symbol">)</a> <a id="1538" class="Symbol">(</a><a id="1539" href="/part0/Stream/#276" class="Field">head</a> <a id="1544" href="/part0/Stream/#1520" class="Bound">bs</a><a id="1546" class="Symbol">)</a>
+<a id="1548" href="/part0/Stream/#289" class="Field">tl</a> <a id="1551" class="Symbol">(</a><a id="1552" href="/part0/Stream/#1411" class="Function">zipWithω</a> <a id="1561" href="/part0/Stream/#1561" class="Bound">f</a> <a id="1563" href="/part0/Stream/#1563" class="Bound">as</a> <a id="1566" href="/part0/Stream/#1566" class="Bound">bs</a><a id="1568" class="Symbol">)</a> <a id="1570" class="Symbol">=</a> <a id="1572" href="/part0/Stream/#1411" class="Function">zipWithω</a> <a id="1581" href="/part0/Stream/#1561" class="Bound">f</a> <a id="1583" class="Symbol">(</a><a id="1584" href="/part0/Stream/#289" class="Field">tl</a> <a id="1587" href="/part0/Stream/#1563" class="Bound">as</a><a id="1589" class="Symbol">)</a> <a id="1591" class="Symbol">(</a><a id="1592" href="/part0/Stream/#289" class="Field">tl</a> <a id="1595" href="/part0/Stream/#1566" class="Bound">bs</a><a id="1597" class="Symbol">)</a>
+
+<a id="takeω"></a><a id="1600" href="/part0/Stream/#1600" class="Function">takeω</a> <a id="1606" class="Symbol">:</a> <a id="1608" class="Symbol">∀</a> <a id="1610" class="Symbol">{</a><a id="1611" href="/part0/Stream/#1611" class="Bound">ℓ</a><a id="1612" class="Symbol">}</a> <a id="1614" class="Symbol">{</a><a id="1615" href="/part0/Stream/#1615" class="Bound">A</a> <a id="1617" class="Symbol">:</a> <a id="1619" class="PrimitiveType">Set</a> <a id="1623" href="/part0/Stream/#1611" class="Bound">ℓ</a><a id="1624" class="Symbol">}</a> <a id="1626" class="Symbol">→</a> <a id="1628" href="/part0/nat/#203" class="Datatype">ℕ</a> <a id="1630" class="Symbol">→</a> <a id="1632" href="/part0/Stream/#1615" class="Bound">A</a> <a id="1634" href="/part0/Stream/#199" class="Record Operator">ω</a> <a id="1636" class="Symbol">→</a> <a id="1638" href="/part0/Stream/#1615" class="Bound">A</a> <a id="1640" href="/part0/list/#548" class="Datatype Operator">*</a>
+<a id="1642" href="/part0/Stream/#1600" class="Function">takeω</a> <a id="1648" href="/part0/nat/#219" class="InductiveConstructor">zero</a> <a id="1653" class="Symbol">_</a> <a id="1655" class="Symbol">=</a> <a id="1657" href="/part0/list/#585" class="InductiveConstructor">ε</a>
+<a id="1659" href="/part0/Stream/#1600" class="Function">takeω</a> <a id="1665" class="Symbol">(</a><a id="1666" href="/part0/nat/#230" class="InductiveConstructor">suc</a> <a id="1670" href="/part0/Stream/#1670" class="Bound">n</a><a id="1671" class="Symbol">)</a> <a id="1673" href="/part0/Stream/#1673" class="Bound">as</a> <a id="1676" class="Symbol">=</a> <a id="1678" href="/part0/Stream/#276" class="Field">head</a> <a id="1683" href="/part0/Stream/#1673" class="Bound">as</a> <a id="1686" href="/part0/list/#597" class="InductiveConstructor Operator">∷</a> <a id="1688" href="/part0/Stream/#1600" class="Function">takeω</a> <a id="1694" href="/part0/Stream/#1670" class="Bound">n</a> <a id="1696" class="Symbol">(</a><a id="1697" href="/part0/Stream/#289" class="Field">tl</a> <a id="1700" href="/part0/Stream/#1673" class="Bound">as</a><a id="1702" class="Symbol">)</a>
+
+<a id="dropω"></a><a id="1705" href="/part0/Stream/#1705" class="Function">dropω</a> <a id="1711" class="Symbol">:</a> <a id="1713" class="Symbol">∀</a> <a id="1715" class="Symbol">{</a><a id="1716" href="/part0/Stream/#1716" class="Bound">ℓ</a><a id="1717" class="Symbol">}</a> <a id="1719" class="Symbol">{</a><a id="1720" href="/part0/Stream/#1720" class="Bound">A</a> <a id="1722" class="Symbol">:</a> <a id="1724" class="PrimitiveType">Set</a> <a id="1728" href="/part0/Stream/#1716" class="Bound">ℓ</a><a id="1729" class="Symbol">}</a> <a id="1731" class="Symbol">→</a> <a id="1733" href="/part0/nat/#203" class="Datatype">ℕ</a> <a id="1735" class="Symbol">→</a> <a id="1737" href="/part0/Stream/#1720" class="Bound">A</a> <a id="1739" href="/part0/Stream/#199" class="Record Operator">ω</a> <a id="1741" class="Symbol">→</a> <a id="1743" href="/part0/Stream/#1720" class="Bound">A</a> <a id="1745" href="/part0/Stream/#199" class="Record Operator">ω</a>
+<a id="1747" href="/part0/Stream/#1705" class="Function">dropω</a> <a id="1753" href="/part0/nat/#219" class="InductiveConstructor">zero</a> <a id="1758" href="/part0/Stream/#1758" class="Bound">as</a> <a id="1761" class="Symbol">=</a> <a id="1763" href="/part0/Stream/#1758" class="Bound">as</a>
+<a id="1766" href="/part0/Stream/#1705" class="Function">dropω</a> <a id="1772" class="Symbol">(</a><a id="1773" href="/part0/nat/#230" class="InductiveConstructor">suc</a> <a id="1777" href="/part0/Stream/#1777" class="Bound">n</a><a id="1778" class="Symbol">)</a> <a id="1780" href="/part0/Stream/#1780" class="Bound">as</a> <a id="1783" class="Symbol">=</a> <a id="1785" href="/part0/Stream/#1705" class="Function">dropω</a> <a id="1791" href="/part0/Stream/#1777" class="Bound">n</a> <a id="1793" class="Symbol">(</a><a id="1794" href="/part0/Stream/#289" class="Field">tl</a> <a id="1797" href="/part0/Stream/#1780" class="Bound">as</a><a id="1799" class="Symbol">)</a>
+
+<a id="1802" class="Symbol">{-#</a> <a id="1806" class="Keyword">TERMINATING</a> <a id="1818" class="Symbol">#-}</a>
+<a id="nats"></a><a id="1822" href="/part0/Stream/#1822" class="Function">nats</a> <a id="1827" class="Symbol">:</a> <a id="1829" href="/part0/nat/#203" class="Datatype">ℕ</a> <a id="1831" href="/part0/Stream/#199" class="Record Operator">ω</a>
+<a id="1833" href="/part0/Stream/#276" class="Field">head</a> <a id="1838" href="/part0/Stream/#1822" class="Function">nats</a> <a id="1843" class="Symbol">=</a> <a id="1845" class="Number">0</a>
+<a id="1847" href="/part0/Stream/#289" class="Field">tl</a> <a id="1850" href="/part0/Stream/#1822" class="Function">nats</a> <a id="1855" class="Symbol">=</a> <a id="1857" href="/part0/Stream/#1286" class="Function">mapω</a> <a id="1862" href="/part0/nat/#230" class="InductiveConstructor">suc</a> <a id="1866" href="/part0/Stream/#1822" class="Function">nats</a>
+
+<a id="zeroes"></a><a id="1872" href="/part0/Stream/#1872" class="Function">zeroes</a> <a id="ones"></a><a id="1879" href="/part0/Stream/#1879" class="Function">ones</a> <a id="1884" class="Symbol">:</a> <a id="1886" href="/part0/nat/#203" class="Datatype">ℕ</a> <a id="1888" href="/part0/Stream/#199" class="Record Operator">ω</a>
+<a id="1890" href="/part0/Stream/#276" class="Field">head</a> <a id="1895" href="/part0/Stream/#1872" class="Function">zeroes</a> <a id="1902" class="Symbol">=</a> <a id="1904" class="Number">0</a>
+<a id="1906" href="/part0/Stream/#289" class="Field">tl</a> <a id="1909" href="/part0/Stream/#1872" class="Function">zeroes</a> <a id="1916" class="Symbol">=</a> <a id="1918" href="/part0/Stream/#1872" class="Function">zeroes</a>
+
+<a id="1926" href="/part0/Stream/#276" class="Field">head</a> <a id="1931" href="/part0/Stream/#1879" class="Function">ones</a> <a id="1936" class="Symbol">=</a> <a id="1938" class="Number">1</a>
+<a id="1940" href="/part0/Stream/#289" class="Field">tl</a> <a id="1943" href="/part0/Stream/#1879" class="Function">ones</a> <a id="1948" class="Symbol">=</a> <a id="1950" href="/part0/Stream/#1879" class="Function">ones</a>
+
+<a id="nats'"></a><a id="1956" href="/part0/Stream/#1956" class="Function">nats'</a> <a id="1962" class="Symbol">:</a> <a id="1964" href="/part0/nat/#203" class="Datatype">ℕ</a> <a id="1966" href="/part0/Stream/#199" class="Record Operator">ω</a>
+<a id="1968" href="/part0/Stream/#1956" class="Function">nats'</a> <a id="1974" class="Symbol">=</a> <a id="1976" href="/part0/Stream/#1139" class="Function">scanω</a> <a id="1982" href="/part0/nat/#3683" class="Function Operator">_+_</a> <a id="1986" class="Number">0</a> <a id="1988" href="/part0/Stream/#1879" class="Function">ones</a>
+
+<a id="1994" class="Symbol">{-#</a> <a id="1998" class="Keyword">TERMINATING</a> <a id="2010" class="Symbol">#-}</a>
+<a id="fibs"></a><a id="2014" href="/part0/Stream/#2014" class="Function">fibs</a> <a id="2019" class="Symbol">:</a> <a id="2021" href="/part0/nat/#203" class="Datatype">ℕ</a> <a id="2023" href="/part0/Stream/#199" class="Record Operator">ω</a>
+<a id="2025" href="/part0/Stream/#276" class="Field">head</a> <a id="2030" href="/part0/Stream/#2014" class="Function">fibs</a> <a id="2035" class="Symbol">=</a> <a id="2037" class="Number">0</a>
+<a id="2039" href="/part0/Stream/#276" class="Field">head</a> <a id="2044" class="Symbol">(</a><a id="2045" href="/part0/Stream/#289" class="Field">tl</a> <a id="2048" href="/part0/Stream/#2014" class="Function">fibs</a><a id="2052" class="Symbol">)</a> <a id="2054" class="Symbol">=</a> <a id="2056" class="Number">1</a>
+<a id="2058" href="/part0/Stream/#289" class="Field">tl</a> <a id="2061" class="Symbol">(</a><a id="2062" href="/part0/Stream/#289" class="Field">tl</a> <a id="2065" href="/part0/Stream/#2014" class="Function">fibs</a><a id="2069" class="Symbol">)</a> <a id="2071" class="Symbol">=</a> <a id="2073" href="/part0/Stream/#1411" class="Function">zipWithω</a> <a id="2082" href="/part0/nat/#3683" class="Function Operator">_+_</a> <a id="2086" href="/part0/Stream/#2014" class="Function">fibs</a> <a id="2091" class="Symbol">(</a><a id="2092" href="/part0/Stream/#289" class="Field">tl</a> <a id="2095" href="/part0/Stream/#2014" class="Function">fibs</a><a id="2099" class="Symbol">)</a>
+
+
+
+<a id="2104" class="Comment">-- scan2ω : ∀ {ℓ m} {A : Set ℓ} {B : Set m} → (A → A → B → A) → A → A → B ω → A ω</a>
+<a id="2186" class="Comment">-- head (scan2ω f a1 a2 bs) = a1</a>
+<a id="2219" class="Comment">-- head (tl (scan2ω f a1 a2 bs)) = a2</a>
+<a id="2257" class="Comment">-- tl (tl (scan2ω f a1 a2 bs)) = scan2ω f a2 (f a1 a2 (head bs)) (tl bs)</a>
+
+<a id="2331" class="Comment">-- fibs' : ℕ ω</a>
+<a id="2346" class="Comment">-- fibs' = scan2ω (λ a b c → a + b) 0 1 zeroes</a>
+
+
+</pre>
+
+    </div>
+  
+    <p style="text-align:center;">
+    
+    
+    
+    <a alt="Part" href="/part0/index/">Part</a>
+    &bullet;
+    
+    
+    <a alt="Source code" href="https://github.com/lclem/lia/blob/mainsrc/part0/Stream.lagda.md">Source</a>
+    
+    
+    
+</p>
+
+    <p class="p-name"> Last-modified: Nov 13 18:23:19 2020 </p>
+  </article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Logic in Agda</h2><div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Lorenzo Clemente</li>
+          <li><a class="u-email" href="mailto:clementelorenzo@gmail.com">clementelorenzo@gmail.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/lclem"><svg class="svg-icon"><use xlink:href="/assets/minima-social-icons.svg#github"></use></svg> <span class="username">lclem</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3"></div>
+    </div>This work is licensed under a <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>
+  </div>
+</footer>
+
+<!-- Parse the Latex divs with Katex
+<script type="text/javascript">
+  $("script[type='math/tex']").replaceWith(
+    function(){
+      var tex = $(this).text();
+      return katex.renderToString(tex, {displayMode: false});
+  });
+  
+  $("script[type='math/tex; mode=display']").replaceWith(
+    function(){
+      var tex = $(this).text();
+      return katex.renderToString(tex.replace(/%.*/g, ''), {displayMode: true});
+  });
+</script>
+-->
+
+<script type="text/javascript" src="/assets/hidebox.js"></script>
+</body>
+
+</html>
