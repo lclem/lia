@@ -30,7 +30,7 @@ plugins:
 #  - jekyll-feed
 #  - jemoji
 
-baseurl: "lia"
+baseurl: "/lia"
 url: ""
 markdown: kramdown
 

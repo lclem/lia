@@ -9,11 +9,11 @@
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="Propositional and fist-order logic developed with the proof assistant Agda." />
 <meta property="og:description" content="Propositional and fist-order logic developed with the proof assistant Agda." />
-<link rel="canonical" href="/lia/" />
-<meta property="og:url" content="/lia/" />
+<link rel="canonical" href="http://localhost:4000/lia/" />
+<meta property="og:url" content="http://localhost:4000/lia/" />
 <meta property="og:site_name" content="Logic in Agda" />
 <script type="application/ld+json">
-{"url":"/lia/","headline":"Table of Contents","description":"Propositional and fist-order logic developed with the proof assistant Agda.","name":"Logic in Agda","@type":"WebSite","@context":"https://schema.org"}</script>
+{"url":"http://localhost:4000/lia/","headline":"Table of Contents","description":"Propositional and fist-order logic developed with the proof assistant Agda.","name":"Logic in Agda","@type":"WebSite","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/lia/assets/main.css">
   <!-- <link rel="stylesheet" href="/lia/assets/custom.css"> --><!-- Mathjax Support -->
@@ -55,44 +55,8 @@
       <div class="wrapper">
         <div class="home">
 
-  <script type="text/x-thebe-config">
-      {
-        bootstrap: true,
-	requestKernel: true,
-        selector: "pre",
-        binderOptions: {
-          repo: "lclem/logic_course",
-	  ref: "master",
-	  binderUrl: "https://mybinder.org",
-	  repoProvider: "github",
-        },
-        kernelOptions: {
-          name: "agda",
-	  kernelName: "agda",
-	  path: ".",
-    // notebook server configuration; not needed with binder
-    // serverSettings: {
-    //      "baseUrl": "http://127.0.0.1:8888",
-    //      "token": "test-secret"
-    //    }
-        },
-
-      }
-</script>
-
-<script type="text/javascript" src="https://unpkg.com/thebelab@latest"></script>
-
-<p>This book is an introduction to propositional and first-order logic.
+  <p>This book is an introduction to propositional and first-order logic.
 The material is developed using the proof assistant Agda.</p>
-
-<pre>
-
-module test where
-
-id : ∀ {A : Set} → A → A
-id x = x
-
-</pre>
 
 <p>An example citation to [@Craig:JSL:1957]
 and another to the same [@Craig:JSL:1957],
@@ -108,22 +72,7 @@ Russell (1956) replied, “I am delighted to know that Principia Mathematica can
 <h2 id="part-0-programming-in-agda">Part 0: Programming in Agda</h2>
 
 <ul>
-  <li><a href="lia/part0/nat/">Natural numbers</a>.</li>
-</ul>
-
-<h2 id="part-1-propositional-logic">Part 1: Propositional logic</h2>
-
-<ul>
-  <li><a href="lia/part1/Syntax/">Syntax</a>: Syntax of propositional logic.</li>
-  <li><a href="lia/part1/Semantics/">Semantics</a>: Semantics of propositional logic.</li>
-  <li><a href="lia/part1/NormalForms/">NormalForms</a>: Negation, conjunctive, and disjunctive normal forms.</li>
-</ul>
-
-<h2 id="part-2-first-order-logic">Part 2: First-order logic</h2>
-
-<ul>
-  <li><a href="lia/part2/Syntax/">Syntax</a>: Syntax of first-order logic.</li>
-  <li><a href="lia/part2/Semantics/">Semantics</a>: Semantics of first-order logic.</li>
+  <li><a href="/lia/part0/nat/">Natural numbers</a>.</li>
 </ul>
 
 <h1 id="references">References</h1>

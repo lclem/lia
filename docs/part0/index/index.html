@@ -9,11 +9,11 @@
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="Propositional and fist-order logic developed with the proof assistant Agda." />
 <meta property="og:description" content="Propositional and fist-order logic developed with the proof assistant Agda." />
-<link rel="canonical" href="/lia/part0/index/" />
-<meta property="og:url" content="/lia/part0/index/" />
+<link rel="canonical" href="http://localhost:4000/lia/part0/index/" />
+<meta property="og:url" content="http://localhost:4000/lia/part0/index/" />
 <meta property="og:site_name" content="Logic in Agda" />
 <script type="application/ld+json">
-{"url":"/lia/part0/index/","headline":"Part 0: Basic programming in Agda","description":"Propositional and fist-order logic developed with the proof assistant Agda.","@type":"WebPage","@context":"https://schema.org"}</script>
+{"url":"http://localhost:4000/lia/part0/index/","headline":"Part 0: Basic programming in Agda","description":"Propositional and fist-order logic developed with the proof assistant Agda.","@type":"WebPage","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/lia/assets/main.css">
   <!-- <link rel="stylesheet" href="/lia/assets/custom.css"> --><!-- Mathjax Support -->
@@ -63,7 +63,7 @@
     
     
     
-    <a alt="Part" href="lia/part0/index/">Part</a>
+    <a alt="Part" href="/lia/part0/index/">Part</a>
     &bullet;
     
     
@@ -77,63 +77,9 @@
     <div class="post-content">
         <h2>Contents</h2>    
         <ul class="section-nav">
-</ul><pre class="Agda"><a id="57" class="Keyword">module</a> <a id="64" href="lia/part0/index/" class="Module">part0.index</a> <a id="76" class="Keyword">where</a>
-<a id="82" class="Keyword">open</a> <a id="87" class="Keyword">import</a> <a id="94" href="lia/part0/utils/" class="Module">part0.utils</a> <a id="106" class="Keyword">public</a>
-<a id="113" class="Keyword">open</a> <a id="118" class="Keyword">import</a> <a id="125" href="lia/part0/eq/" class="Module">part0.eq</a> <a id="134" class="Keyword">public</a>
-<a id="141" class="Keyword">open</a> <a id="146" class="Keyword">import</a> <a id="153" href="lia/part0/decidable/" class="Module">part0.decidable</a> <a id="169" class="Keyword">public</a>
-<a id="176" class="Keyword">open</a> <a id="181" class="Keyword">import</a> <a id="188" href="lia/part0/Booleans/" class="Module">part0.Booleans</a> <a id="203" class="Keyword">public</a>
-<a id="210" class="Keyword">open</a> <a id="215" class="Keyword">import</a> <a id="222" href="lia/part0/nat/" class="Module">part0.nat</a> <a id="232" class="Keyword">public</a>
-<a id="239" class="Keyword">open</a> <a id="244" class="Keyword">import</a> <a id="251" href="lia/part0/fun/" class="Module">part0.fun</a> <a id="261" class="Keyword">public</a>
-<a id="268" class="Keyword">open</a> <a id="273" class="Keyword">import</a> <a id="280" href="lia/part0/vector/" class="Module">part0.vector</a> <a id="293" class="Keyword">public</a>
-<a id="300" class="Keyword">open</a> <a id="305" class="Keyword">import</a> <a id="312" href="lia/part0/wf/" class="Module">part0.wf</a> <a id="321" class="Keyword">public</a>
-<a id="328" class="Keyword">open</a> <a id="333" class="Keyword">import</a> <a id="340" href="lia/part0/list/" class="Module">part0.list</a> <a id="351" class="Keyword">public</a>
-<a id="358" class="Keyword">open</a> <a id="363" class="Keyword">import</a> <a id="370" href="lia/part0/Fin/" class="Module">part0.Fin</a> <a id="380" class="Keyword">public</a>
-<a id="387" class="Keyword">open</a> <a id="392" class="Keyword">import</a> <a id="399" href="lia/part0/decidable/" class="Module">part0.decidable</a> <a id="415" class="Keyword">public</a>
-<a id="422" class="Keyword">open</a> <a id="427" class="Keyword">import</a> <a id="434" href="lia/part0/Enum/" class="Module">part0.Enum</a> <a id="445" class="Keyword">public</a>
-<a id="452" class="Keyword">open</a> <a id="457" class="Keyword">import</a> <a id="464" href="lia/part0/Context/" class="Module">part0.Context</a> <a id="478" class="Keyword">public</a>
-<a id="485" class="Keyword">open</a> <a id="490" class="Keyword">import</a> <a id="497" href="lia/part0/Tree/" class="Module">part0.Tree</a> <a id="508" class="Keyword">public</a>
-<a id="515" class="Keyword">open</a> <a id="520" class="Keyword">import</a> <a id="527" href="lia/part0/logic/" class="Module">part0.logic</a> <a id="539" class="Keyword">using</a> <a id="545" class="Symbol">(</a><a id="546" href="lia/part0/logic/#316" class="Record">Σ</a><a id="547" class="Symbol">;</a> <a id="549" href="lia/part0/logic/#129" class="Function">Π</a><a id="550" class="Symbol">;</a> <a id="552" href="lia/part0/logic/#208" class="Function">forAll</a><a id="558" class="Symbol">;</a> <a id="560" href="lia/part0/logic/#453" class="Function">thereExists</a><a id="571" class="Symbol">;</a> <a id="573" href="lia/part0/logic/#388" class="InductiveConstructor Operator">_,_</a><a id="576" class="Symbol">;</a> <a id="578" href="lia/part0/logic/#408" class="Field">dfst</a><a id="582" class="Symbol">;</a> <a id="584" href="lia/part0/logic/#423" class="Field">dsnd</a><a id="588" class="Symbol">;</a> <a id="590" href="lia/part0/logic/#1240" class="Field">fst</a><a id="593" class="Symbol">;</a> <a id="595" href="lia/part0/logic/#1252" class="Field">snd</a><a id="598" class="Symbol">;</a> <a id="600" href="lia/part0/logic/#1663" class="Function">⊥-elim</a><a id="606" class="Symbol">;</a> <a id="608" href="lia/part0/logic/#1900" class="InductiveConstructor">left</a><a id="612" class="Symbol">;</a> <a id="614" href="lia/part0/logic/#1921" class="InductiveConstructor">right</a><a id="619" class="Symbol">;</a> <a id="621" href="lia/part0/logic/#2528" class="Function Operator">_↔_</a><a id="624" class="Symbol">)</a> <a id="626" class="Keyword">renaming</a> <a id="635" class="Symbol">(</a><a id="636" href="lia/part0/logic/#1156" class="Record Operator">_∧_</a> <a id="640" class="Symbol">to</a> <a id="_∧_"></a><a id="643" href="lia/part0/index/#643" class="Record Operator">_×_</a><a id="646" class="Symbol">;</a> <a id="648" href="lia/part0/logic/#1842" class="Datatype Operator">_∨_</a> <a id="652" class="Symbol">to</a> <a id="_∨_"></a><a id="655" href="lia/part0/index/#655" class="Datatype Operator">_⊎_</a><a id="658" class="Symbol">;</a> <a id="660" href="lia/part0/logic/#1648" class="Datatype">⊥</a> <a id="662" class="Symbol">to</a> <a id="⊥"></a><a id="665" href="lia/part0/index/#665" class="Datatype">F</a><a id="666" class="Symbol">;</a> <a id="668" href="lia/part0/logic/#1722" class="Function Operator">¬_</a> <a id="671" class="Symbol">to</a> <a id="¬_"></a><a id="674" href="lia/part0/index/#674" class="Function Operator">~_</a><a id="676" class="Symbol">)</a> <a id="678" class="Keyword">public</a>
+</ul><pre class="Agda"><a id="57" class="Keyword">module</a> <a id="64" href="/lia/part0/index/" class="Module">part0.index</a> <a id="76" class="Keyword">where</a>
+<a id="82" class="Keyword">open</a> <a id="87" class="Keyword">import</a> <a id="94" href="/lia/part0/utils/" class="Module">part0.utils</a> <a id="106" class="Keyword">public</a>
 </pre>
-
-<p>Literature on learning Agda</p>
-
-<ul>
-  <li>
-<a href="#ref-Norell:AFP:2009">Norell</a> [<a href="#ref-Norell:AFP:2009">(2009)</a>].</li>
-  <li>
-<a href="#ref-OurySwierstra:ICFP:2008">Oury and Swierstra</a>
-[<a href="#ref-OurySwierstra:ICFP:2008">(2008)</a>].</li>
-  <li>
-<a href="#ref-BoveDybjer:LerNet:2008">Bove and Dybjer</a>
-[<a href="#ref-BoveDybjer:LerNet:2008">(2008)</a>].</li>
-</ul>
-
-<div id="refs" class="references csl-bib-body hanging-indent">
-
-  <div id="ref-BoveDybjer:LerNet:2008" class="csl-entry">
-
-    <p>[Bove and Dybjer(2008)] A Bove and P Dybjer. Dependent types at work.
-In A Bove et al., editors., <em>Language engineering and rigorous software
-development</em>, pages 57–99. Springer-Verlag, Berlin, Heidelberg, 2008.</p>
-
-  </div>
-
-  <div id="ref-Norell:AFP:2009" class="csl-entry">
-
-    <p>[Norell(2009)] U Norell. Dependently typed programming in agda.
-<em>Proceedings of the 6th international conference on advanced functional
-programming</em> (Berlin, Heidelberg, 2009), 230–266.</p>
-
-  </div>
-
-  <div id="ref-OurySwierstra:ICFP:2008" class="csl-entry">
-
-    <p>[Oury and Swierstra(2008)] N Oury and W Swierstra. The power of pi.
-<em>Proc. Of ICFP’08</em> (2008), 39–50.</p>
-
-  </div>
-
-</div>
 
     </div>
   
@@ -141,7 +87,7 @@ programming</em> (Berlin, Heidelberg, 2009), 230–266.</p>
     
     
     
-    <a alt="Part" href="lia/part0/index/">Part</a>
+    <a alt="Part" href="/lia/part0/index/">Part</a>
     &bullet;
     
     
@@ -151,7 +97,7 @@ programming</em> (Berlin, Heidelberg, 2009), 230–266.</p>
     
 </p>
 
-    <p class="p-name"> Last-modified: Nov  9 10:46:09 2020 </p>
+    <p class="p-name"> Last-modified: Nov 13 20:30:40 2020 </p>
   </article>
       </div>
     </main><footer class="site-footer h-card">

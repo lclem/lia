@@ -329,6 +329,8 @@ $(OUTDIR)/$1/$2.md: $(TMPDIR)/$1.$2.md
 #	@gsed -i "12i\        general:" $(OUTDIR)/$1/$2.md
 #	@gsed -i "13i\            listing-title: List of exercises" $(OUTDIR)/$1/$2.md
 
+#{{ site.baseurl }}
+
 # fix the links in place: $(PART).$(AGDA_MODULE).html --> $(OUTDIR)/$(PART)/$(AGDA_MODULE).md
 	@$(foreach PART,$(PARTS),$(foreach AGDA_MODULE,$(AGDA_MODULES),sed -i "" 's+$(PART).$(AGDA_MODULE).html+{% endraw %}{{ site.baseurl }}{% link $(OUTDIR)/$(PART)/$(AGDA_MODULE).md %}{% raw %}+g;' $(OUTDIR)/$1/$2.md;))
 
