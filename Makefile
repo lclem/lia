@@ -60,7 +60,7 @@ PART_DIRS := $(patsubst %,$(OUTDIR)/%,$(PARTS))
 all: build
 
 docs: build
-	rsync -aP $(SITEDIR)/ $(DOCSDIR)/
+	rm -fr $(DOCSDIR)/ && rsync -aP $(SITEDIR)/ $(DOCSDIR)/
 
 clean:
 	@rm -fr keys.make $(OUTDIR)/ $(TMPDIR)/ $(SITEDIR)/ $(BUILDDIR)/ $(SVGS)/ $(DOCSDIR)/
