@@ -73,3 +73,10 @@ jobs:
         run: make agda; make agda
       - name: Build the book 2
         run: make docs
+      - name: Add docs
+        run: git add docs
+      - name: Commit
+        uses: stefanzweifel/git-auto-commit-action@v4.1.6
+        with:
+          #repository: 'somewhereelse'
+          commit_message: Update docs
