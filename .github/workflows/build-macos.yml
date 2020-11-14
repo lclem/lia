@@ -1,10 +1,10 @@
-name: 'build'
+name: 'build-macos'
 on:
   push:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-macos:
     runs-on: [macos-10.15]
     steps:
       - name: Set up git repo
