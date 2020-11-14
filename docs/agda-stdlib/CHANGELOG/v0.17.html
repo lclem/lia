@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Version 0.17 | Logic in Agda</title><!-- Begin Jekyll SEO tag v2.6.1 -->
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Version 0.17" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Propositional and fist-order logic developed with the proof assistant Agda." />
+<meta property="og:description" content="Propositional and fist-order logic developed with the proof assistant Agda." />
+<link rel="canonical" href="/lia/agda-stdlib/CHANGELOG/v0.17.html" />
+<meta property="og:url" content="/lia/agda-stdlib/CHANGELOG/v0.17.html" />
+<meta property="og:site_name" content="Logic in Agda" />
+<script type="application/ld+json">
+{"url":"/lia/agda-stdlib/CHANGELOG/v0.17.html","headline":"Version 0.17","description":"Propositional and fist-order logic developed with the proof assistant Agda.","@type":"WebPage","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/lia/assets/main.css">
+  <!-- <link rel="stylesheet" href="/lia/assets/custom.css"> --><!-- Mathjax Support -->
+  <script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+  <!-- Load KaTeX -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1.1/katex.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1.1/katex.min.js"></script>
+</head>
+<body><header class="site-header" role="banner">
+
+    <div class="wrapper">
+
+        <a class="site-title" href="/lia/">Logic in Agda</a>
+
+        <nav class="site-nav">
+            <span class="menu-icon">
+                <svg viewBox="0 0 18 15" width="18px" height="15px">
+                    <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+                    <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+                    <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+                </svg>
+            </span>
+
+            <div class="trigger">
+                <a class="page-link" href="/lia/part0/index/">Part 0</a>
+                <a class="page-link" href="/lia/part1/index/">Part 1</a>
+                <a class="page-link" href="/lia/part2/index/">Part 2</a>
+                <a class="page-link" href="/lia/part3/index/">Part 3</a>
+                <a class="page-link" href="/lia/part4/index/">Part 4</a>
+            </div>
+        </nav>
+
+    </div>
+
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post">
+
+    <header class="post-header">
+        <h1 class="post-title">Version 0.17</h1>
+    </header>
+  
+    <p style="text-align:center;">
+    
+    
+    
+    
+    
+    
+</p>
+
+  
+    <div class="post-content">
+        <h2>Contents</h2>    
+        <h1 id="version-017">Version 0.17</h1>
+
+<p>The library has been tested using Agda version 2.5.4.1.</p>
+
+<p>Important changes since 0.16:</p>
+
+<h2 id="non-backwards-compatible-changes">Non-backwards compatible changes</h2>
+
+<h4 id="overhaul-of-safety-of-the-library">Overhaul of safety of the library</h4>
+
+<ul>
+  <li>
+    <p>Currently the library is very difficult to type check with the <code class="language-plaintext highlighter-rouge">--safe</code>
+flag as there are unsafe functions scattered throughout the key modules.
+This means that it is almost impossible to verify the safety of any code
+depending on the standard library. The following reorganisation will fix
+this problem after the <strong>next</strong> full release of Agda. (Agda 2.5.4.1 uses
+<code class="language-plaintext highlighter-rouge">postulate</code>s in the <code class="language-plaintext highlighter-rouge">Agda.Builtin.X</code> that will be removed in the next release).</p>
+  </li>
+  <li>The following new <code class="language-plaintext highlighter-rouge">Unsafe</code> modules have been created. Nearly all of these
+are all marked as unsafe as they use the <code class="language-plaintext highlighter-rouge">trustMe</code> functionality, either for
+performance reasons or for informative decidable equality tests.
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Data.Char.Unsafe
+Data.Float.Unsafe
+Data.Nat.Unsafe
+Data.Nat.DivMod.Unsafe
+Data.String.Unsafe
+Data.Word.Unsafe
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>The other modules affected are <code class="language-plaintext highlighter-rouge">Relation.Binary.HeterogeneousEquality.Quotients(.Examples)</code>
+which previously postulated function extensionality. The relevant submodules
+now take extensionality as a module parameter instead of postulating it. If you
+want to use these results then you should postulate it yourself.</p>
+  </li>
+  <li>The full list of unsafe modules is:
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Data.Char.Unsafe
+Data.Float.Unsafe
+Data.Nat.Unsafe
+Data.Nat.DivMod.Unsafe
+Data.String.Unsafe
+Data.Word.Unsafe
+IO
+IO.Primitive
+Reflection
+Relation.Binary.PropositionalEquality.TrustMe
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<h4 id="new-codata-library">New codata library</h4>
+
+<ul>
+  <li>A new <code class="language-plaintext highlighter-rouge">Codata</code> library has been added that is based on copatterns and sized
+types rather than musical notation . The library is built around a generic
+notion of coinductive <code class="language-plaintext highlighter-rouge">Thunk</code> and provides the basic data types:
+    <pre><code class="language-agda">Codata.Thunk
+
+Codata.Colist
+Codata.Conat
+Codata.Cofin
+Codata.Covec
+Codata.Delay
+Codata.M
+Codata.Stream
+</code></pre>
+    <p>Each coinductive type comes with a notion of bisimilarity in the corresponding
+<code class="language-plaintext highlighter-rouge">Codata.X.Bisimilarity</code> module and at least a couple of proofs demonstrating
+how they can be used in <code class="language-plaintext highlighter-rouge">Codata.X.Properties</code>. This library is somewhat
+experimental and may undergo minor changes in later versions.</p>
+  </li>
+  <li>To avoid confusion, the old codata modules that previously lived in the <code class="language-plaintext highlighter-rouge">Data</code>
+directory have been moved to the folder <code class="language-plaintext highlighter-rouge">Codata.Musical</code>
+    <pre><code class="language-agda">Coinduction ↦ Codata.Musical.Notation
+Data.Cofin  ↦ Codata.Musical.Cofin
+Data.Colist ↦ Codata.Musical.Colist
+Data.Conat  ↦ Codata.Musical.Conat
+Data.Covec  ↦ Codata.Musical.Covec
+Data.M      ↦ Codata.Musical.M
+Data.Stream ↦ Codata.Musical.Stream
+</code></pre>
+  </li>
+  <li>
+    <p>Each new-style coinduction type comes with two functions (<code class="language-plaintext highlighter-rouge">fromMusical</code> and
+<code class="language-plaintext highlighter-rouge">toMusical</code>) converting back and forth between old-style coinduction values
+and new-style ones.</p>
+  </li>
+  <li>
+    <p>The type <code class="language-plaintext highlighter-rouge">Costring</code> and method <code class="language-plaintext highlighter-rouge">toCostring</code> have been moved from <code class="language-plaintext highlighter-rouge">Data.String</code>
+to a new module <code class="language-plaintext highlighter-rouge">Codata.Musical.Costring</code>.</p>
+  </li>
+  <li>The <code class="language-plaintext highlighter-rouge">Rec</code> construction has been dropped from <code class="language-plaintext highlighter-rouge">Codata.Musical.Notation</code> as the
+<code class="language-plaintext highlighter-rouge">--guardedness-preserving-type-constructors</code> flag which made it useful has been
+removed from Agda.</li>
+</ul>
+
+<h4 id="improved-consistency-between-datalistvecanyallmembership">Improved consistency between <code class="language-plaintext highlighter-rouge">Data.(List/Vec).(Any/All/Membership)</code></h4>
+
+<ul>
+  <li>
+    <p>Added new module <code class="language-plaintext highlighter-rouge">Data.Vec.Any</code>.</p>
+  </li>
+  <li>
+    <p>The type <code class="language-plaintext highlighter-rouge">_∈_</code> has been moved from <code class="language-plaintext highlighter-rouge">Data.Vec</code> to the new module
+<code class="language-plaintext highlighter-rouge">Data.Vec.Membership.Propositional</code> and has been reimplemented using
+<code class="language-plaintext highlighter-rouge">Any</code> from <code class="language-plaintext highlighter-rouge">Data.Vec.Any</code>. In particular this means that you must now
+pass a <code class="language-plaintext highlighter-rouge">refl</code> proof to the <code class="language-plaintext highlighter-rouge">here</code> constructor.</p>
+  </li>
+  <li>The proofs associated with <code class="language-plaintext highlighter-rouge">_∈_</code> have been moved from <code class="language-plaintext highlighter-rouge">Data.Vec.Properties</code>
+to the new module  <code class="language-plaintext highlighter-rouge">Data.Vec.Membership.Propositional.Properties</code>
+and have been renamed as follows:
+    <pre><code class="language-agda">∈-++ₗ      ↦ ∈-++⁺ˡ
+∈-++ᵣ      ↦ ∈-++⁺ʳ
+∈-map      ↦ ∈-map⁺
+∈-tabulate ↦ ∈-tabulate⁺
+∈-allFin   ↦ ∈-allFin⁺
+∈-allPairs ↦ ∈-allPairs⁺
+∈⇒List-∈   ↦ ∈-toList⁺
+List-∈⇒∈   ↦ ∈-fromList⁺
+</code></pre>
+  </li>
+  <li>
+    <p>The proofs <code class="language-plaintext highlighter-rouge">All-universal</code> and <code class="language-plaintext highlighter-rouge">All-irrelevance</code> have been moved from
+<code class="language-plaintext highlighter-rouge">Data.(List/Vec).All.Properties</code> and renamed <code class="language-plaintext highlighter-rouge">universal</code> and <code class="language-plaintext highlighter-rouge">irrelevant</code> in
+<code class="language-plaintext highlighter-rouge">Data.(List/Vec).All</code>.</p>
+  </li>
+  <li>The existing function <code class="language-plaintext highlighter-rouge">tabulate</code> in <code class="language-plaintext highlighter-rouge">Data.Vec.All</code> has been renamed
+<code class="language-plaintext highlighter-rouge">universal</code>. The name <code class="language-plaintext highlighter-rouge">tabulate</code> now refers to a function with following type:
+    <pre><code class="language-agda">tabulate : (∀ i → P (lookup i xs)) → All P xs
+</code></pre>
+  </li>
+</ul>
+
+<h4 id="deprecating-datafindec">Deprecating <code class="language-plaintext highlighter-rouge">Data.Fin.Dec</code>:</h4>
+
+<ul>
+  <li>
+    <p>This module has been deprecated as its non-standard position
+was causing dependency cycles. The move also makes finding
+subset properties easier.</p>
+  </li>
+  <li>The following proofs have been moved to <code class="language-plaintext highlighter-rouge">Data.Fin.Properties</code>:
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>decFinSubset, any?, all?, ¬∀⟶∃¬-smallest, ¬∀⟶∃¬
+</code></pre></div>    </div>
+  </li>
+  <li>The following proofs have been moved to <code class="language-plaintext highlighter-rouge">Data.Fin.Subset.Properties</code>:
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>_∈?_, _⊆?_, nonempty?, anySubset?, decLift
+</code></pre></div>    </div>
+    <p>The latter has been renamed to <code class="language-plaintext highlighter-rouge">Lift?</code>.</p>
+  </li>
+  <li>The file <code class="language-plaintext highlighter-rouge">Data.Fin.Dec</code> still exists for backwards compatibility
+and exports all the old names, but may be removed in some
+future version.</li>
+</ul>
+
+<h4 id="rearrangement-of-algebraic-solvers">Rearrangement of algebraic solvers</h4>
+
+<ul>
+  <li>Standardised and moved the generic solver modules as follows:
+    <pre><code class="language-agda">Algebra.RingSolver                        ↦ Algebra.Solver.Ring
+Algebra.Monoid-solver                     ↦ Algebra.Solver.Monoid
+Algebra.CommutativeMonoidSolver           ↦ Algebra.Solver.CommutativeMonoid
+Algebra.IdempotentCommutativeMonoidSolver ↦ Algebra.Solver.IdempotentCommutativeMonoid
+</code></pre>
+  </li>
+  <li>In order to avoid dependency cycles, special instances of solvers for the following
+data types have been moved from <code class="language-plaintext highlighter-rouge">Data.X.Properties</code> to new modules <code class="language-plaintext highlighter-rouge">Data.X.Solver</code>.
+The naming conventions for these solver modules have also been standardised.
+    <pre><code class="language-agda">Data.Bool.Properties.RingSolver          ↦  Data.Bool.Solver.∨-∧-Solver
+Data.Bool.Properties.XorRingSolver       ↦  Data.Bool.Solver.xor-∧-Solver
+Data.Integer.Properties.RingSolver       ↦  Data.Integer.Solver.+-*-Solver
+Data.List.Properties.List-solver         ↦  Data.List.Solver.++-Solver
+Data.Nat.Properties.SemiringSolver       ↦  Data.Nat.Solver.+-*-Solver
+Function.Related.TypeIsomorphisms.Solver ↦ Function.Related.TypeIsomorphisms.Solver.×-⊎-Solver
+</code></pre>
+  </li>
+  <li>Renamed <code class="language-plaintext highlighter-rouge">Algebra.Solver.Ring.Natural-coefficients</code> to <code class="language-plaintext highlighter-rouge">Algebra.Solver.Ring.NaturalCoefficients</code>.</li>
+</ul>
+
+<h4 id="overhaul-of-dataxcategorical">Overhaul of <code class="language-plaintext highlighter-rouge">Data.X.Categorical</code></h4>
+
+<ul>
+  <li>Added new modules:
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Category.Comonad
+
+Data.List.NonEmpty.Categorical
+Data.Maybe.Categorical
+Data.Product.Categorical.Left
+Data.Product.Categorical.Right
+Data.Product.N-ary.Categorical
+Data.Sum.Categorical.Left
+Data.Sum.Categorical.Right
+Data.These.Categorical.Left
+Data.These.Categorical.Right
+
+Codata.Colist.Categorical
+Codata.Covec.Categorical
+Codata.Delay.Categorical
+Codata.Stream.Categorical
+</code></pre></div>    </div>
+  </li>
+  <li>In <code class="language-plaintext highlighter-rouge">Data.List.Categorical</code> renamed:
+    <pre><code class="language-agda">sequence ↦ sequenceM
+</code></pre>
+  </li>
+  <li>
+    <p>Moved <code class="language-plaintext highlighter-rouge">monad</code> from <code class="language-plaintext highlighter-rouge">Data.List.NonEmpty</code> to <code class="language-plaintext highlighter-rouge">Data.List.NonEmpty.Categorical</code>.</p>
+  </li>
+  <li>
+    <p>Moved <code class="language-plaintext highlighter-rouge">functor</code>, <code class="language-plaintext highlighter-rouge">monadT</code>, <code class="language-plaintext highlighter-rouge">monad</code>, <code class="language-plaintext highlighter-rouge">monadZero</code> and <code class="language-plaintext highlighter-rouge">monadPlus</code> from <code class="language-plaintext highlighter-rouge">Data.Maybe</code>
+to <code class="language-plaintext highlighter-rouge">Data.Maybe.Categorical</code>.</p>
+  </li>
+  <li>Created new module <code class="language-plaintext highlighter-rouge">Function.Identity.Categorical</code> and merged the existing modules
+<code class="language-plaintext highlighter-rouge">Category.Functor.Identity</code> and <code class="language-plaintext highlighter-rouge">Category.Monad.Identity</code> into it.</li>
+</ul>
+
+<h4 id="overhaul-of-datacontainer-dataw-and-codatamusicalm">Overhaul of <code class="language-plaintext highlighter-rouge">Data.Container</code>, <code class="language-plaintext highlighter-rouge">Data.W</code> and <code class="language-plaintext highlighter-rouge">Codata.(Musical.)M</code></h4>
+
+<ul>
+  <li>
+    <p>Made <code class="language-plaintext highlighter-rouge">Data.Container</code> (and associated modules) more level-polymorphic</p>
+  </li>
+  <li>
+    <p>Created <code class="language-plaintext highlighter-rouge">Data.Container.Core</code> for the core definition of <code class="language-plaintext highlighter-rouge">Container</code>,
+container morphisms <code class="language-plaintext highlighter-rouge">_⇒_</code>, <code class="language-plaintext highlighter-rouge">All</code> and <code class="language-plaintext highlighter-rouge">Any</code>. This breaks the dependency cycle
+with <code class="language-plaintext highlighter-rouge">Data.W</code> and <code class="language-plaintext highlighter-rouge">Codata.Musical.M</code>.</p>
+  </li>
+  <li>
+    <p>Refactored <code class="language-plaintext highlighter-rouge">Data.W</code> and <code class="language-plaintext highlighter-rouge">Codata.Musical.M</code> to use <code class="language-plaintext highlighter-rouge">Container</code>.</p>
+  </li>
+</ul>
+
+<h4 id="rearrangement-of-constructed-relations-in-relationbinary">Rearrangement of constructed relations in <code class="language-plaintext highlighter-rouge">Relation.Binary</code></h4>
+
+<ul>
+  <li>
+    <p>In order to improve the organisation and general searchability of
+<code class="language-plaintext highlighter-rouge">Relation.Binary</code>, modules that construct specific binary relations have
+been moved from <code class="language-plaintext highlighter-rouge">Relation.Binary</code> to <code class="language-plaintext highlighter-rouge">Relation.Binary.Construct</code>.</p>
+  </li>
+  <li>
+    <p>The module <code class="language-plaintext highlighter-rouge">Relation.Binary.Simple</code> has been split into <code class="language-plaintext highlighter-rouge">Constant</code>,
+<code class="language-plaintext highlighter-rouge">Always</code> and <code class="language-plaintext highlighter-rouge">Never</code>.</p>
+  </li>
+  <li>
+    <p>The module <code class="language-plaintext highlighter-rouge">Relation.Binary.InducedPreorders</code> has been split into
+<code class="language-plaintext highlighter-rouge">Relation.Binary.Construct.FromPred</code> and <code class="language-plaintext highlighter-rouge">Relation.Binary.Construct.FromRel</code>.</p>
+  </li>
+  <li>
+    <p>The full list of changes is as follows:</p>
+    <pre><code class="language-agda">Relation.Binary.Closure           ↦ Relation.Binary.Construct.Closure
+Relation.Binary.Flip              ↦ Relation.Binary.Construct.Flip
+Relation.Binary.InducedPreorders  ↦ Relation.Binary.Construct.FromPred
+                                  ↘ Relation.Binary.Construct.FromRel
+Relation.Binary.On                ↦ Relation.Binary.Construct.On
+Relation.Binary.Simple            ↦ Relation.Binary.Construct.Always
+                                  ↘ Relation.Binary.Construct.Never
+                                  ↘ Relation.Binary.Construct.Constant
+Relation.Binary.NonStrictToStrict ↦ Relation.Binary.Construct.NonStrictToStrict
+Relation.Binary.StrictToNonStrict ↦ Relation.Binary.Construct.StrictToNonStrict
+</code></pre>
+  </li>
+</ul>
+
+<h4 id="overhaul-of-relationbinaryindexed-subtree">Overhaul of <code class="language-plaintext highlighter-rouge">Relation.Binary.Indexed</code> subtree</h4>
+
+<ul>
+  <li>
+    <p>The module <code class="language-plaintext highlighter-rouge">Relation.Binary.Indexed</code> has been renamed
+<code class="language-plaintext highlighter-rouge">Relation.Binary.Indexed.Heterogeneous</code>.</p>
+  </li>
+  <li>
+    <p>The names <code class="language-plaintext highlighter-rouge">REL</code>, <code class="language-plaintext highlighter-rouge">Rel</code>, <code class="language-plaintext highlighter-rouge">IsEquivalence</code> and <code class="language-plaintext highlighter-rouge">Setoid</code> in
+<code class="language-plaintext highlighter-rouge">Relation.Binary.Indexed.Heterogeneous</code> and <code class="language-plaintext highlighter-rouge">Relation.Binary.Indexed.Homogeneous</code>
+have been deprecated in favour of <code class="language-plaintext highlighter-rouge">IREL</code>, <code class="language-plaintext highlighter-rouge">IRel</code>, <code class="language-plaintext highlighter-rouge">IsIndexedEquivalence</code> and
+<code class="language-plaintext highlighter-rouge">IndexedSetoid</code>. This should significantly improves code readability and avoid
+confusion with the contents of <code class="language-plaintext highlighter-rouge">Relation.Binary</code>. The old names still exist
+but have been deprecated.</p>
+  </li>
+  <li>
+    <p>The record <code class="language-plaintext highlighter-rouge">IsIndexedEquivalence</code> in <code class="language-plaintext highlighter-rouge">Relation.Binary.Indexed.Homogeneous</code>
+is now implemented as a record encapsulating indexed versions of the required
+properties, unlike the old version which directly indexed equivalences.</p>
+  </li>
+  <li>
+    <p>In order to avoid dependency cycles, the <code class="language-plaintext highlighter-rouge">Setoid</code> record in <code class="language-plaintext highlighter-rouge">Relation.Binary</code>
+no longer exports <code class="language-plaintext highlighter-rouge">indexedSetoid</code>.  Instead the corresponding indexed setoid can
+be constructed using the <code class="language-plaintext highlighter-rouge">setoid</code> function in
+<code class="language-plaintext highlighter-rouge">Relation.Binary.Indexed.Heterogeneous.Construct.Trivial</code>.</p>
+  </li>
+  <li>
+    <p>The function <code class="language-plaintext highlighter-rouge">_at_</code> in <code class="language-plaintext highlighter-rouge">Relation.Binary.Indexed.Heterogeneous</code> has been moved to
+<code class="language-plaintext highlighter-rouge">Relation.Binary.Indexed.Heterogeneous.Construct.At</code> and renamed to <code class="language-plaintext highlighter-rouge">_atₛ_</code>.</p>
+  </li>
+</ul>
+
+<h4 id="overhaul-of-decidability-proofs-in-numeric-base-modules">Overhaul of decidability proofs in numeric base modules</h4>
+
+<ul>
+  <li>
+    <p>Several numeric datatypes such as <code class="language-plaintext highlighter-rouge">Nat/Integer/Fin</code> had decidability proofs in
+<code class="language-plaintext highlighter-rouge">Data.X.Base</code>. This required several proofs to live in <code class="language-plaintext highlighter-rouge">Data.X.Base</code> that should
+really have been living in <code class="language-plaintext highlighter-rouge">Data.X.Properties</code> . For example <code class="language-plaintext highlighter-rouge">≤-pred</code>
+in <code class="language-plaintext highlighter-rouge">Data.Nat.Base</code>. This problem has been growing as more decidability proofs are
+added.</p>
+  </li>
+  <li>
+    <p>To fix this all decidability proofs in <code class="language-plaintext highlighter-rouge">Data.X.Base</code> for <code class="language-plaintext highlighter-rouge">Nat</code>/<code class="language-plaintext highlighter-rouge">Integer</code>/<code class="language-plaintext highlighter-rouge">Fin</code>
+have been moved to <code class="language-plaintext highlighter-rouge">Data.X.Properties</code> from <code class="language-plaintext highlighter-rouge">Data.X.Base</code>. Backwards compatibility
+has been (nearly completely) preserved by having <code class="language-plaintext highlighter-rouge">Data.X</code> publicly re-export the
+decidability proofs. If you were using the <code class="language-plaintext highlighter-rouge">Data.X.Base</code> module directly
+and were using decidability queries you should probably switch to use <code class="language-plaintext highlighter-rouge">Data.X</code>.</p>
+  </li>
+  <li>
+    <p>The following proofs have therefore been moved to the <code class="language-plaintext highlighter-rouge">Properties</code> files.
+The old versions remain in the original files but have been deprecated and
+may be removed at some future version.</p>
+    <pre><code class="language-agda">Data.Nat.≤-pred             ↦ Data.Nat.Properties.≤-pred
+
+Data.Integer.◃-cong         ↦ Data.Integer.Properties.◃-cong
+Data.Integer.drop‿+≤+       ↦ Data.Integer.Properties.drop‿+≤+
+Data.Integer.drop‿-≤-       ↦ Data.Integer.Properties.drop‿-≤-
+Data.Integer.◃-left-inverse ↦ Data.Integer.Properties.◃-inverse
+</code></pre>
+  </li>
+</ul>
+
+<h4 id="other">Other</h4>
+
+<ul>
+  <li>
+    <p>The <code class="language-plaintext highlighter-rouge">Data.List.Relation.Sublist</code> module was misnamed as it contained a subset
+rather than a sublist relation. It has been correctly renamed to
+<code class="language-plaintext highlighter-rouge">Data.List.Relation.Subset</code>. In its place a new module <code class="language-plaintext highlighter-rouge">Data.List.Relation.Sublist</code>
+has been added that correctly implements the sublist relation.</p>
+  </li>
+  <li>
+    <p>The types <code class="language-plaintext highlighter-rouge">IrrelevantPred</code> and <code class="language-plaintext highlighter-rouge">IrrelevantRel</code> in
+<code class="language-plaintext highlighter-rouge">Relation.Binary.PropositionalEquality</code> have both been renamed to
+<code class="language-plaintext highlighter-rouge">Irrelevant</code> and have been moved to <code class="language-plaintext highlighter-rouge">Relation.Unary</code> and
+<code class="language-plaintext highlighter-rouge">Relation.Binary</code> respectively.</p>
+  </li>
+  <li>
+    <p>Removed <code class="language-plaintext highlighter-rouge">Data.Char.Core</code> which was doing nothing of interest.</p>
+  </li>
+  <li>
+    <p>In <code class="language-plaintext highlighter-rouge">Data.Maybe.Base</code> the <code class="language-plaintext highlighter-rouge">Set</code> argument to <code class="language-plaintext highlighter-rouge">From-just</code> has been made implicit
+to be consistent with the definition of <code class="language-plaintext highlighter-rouge">Data.Sum</code>’s <code class="language-plaintext highlighter-rouge">From-injₙ</code>.</p>
+  </li>
+  <li>
+    <p>In <code class="language-plaintext highlighter-rouge">Data.Product</code> the function <code class="language-plaintext highlighter-rouge">,_</code> has been renamed to <code class="language-plaintext highlighter-rouge">-,_</code> to avoid
+conflict with the right section of <code class="language-plaintext highlighter-rouge">_,_</code>.</p>
+  </li>
+  <li>
+    <p>Made <code class="language-plaintext highlighter-rouge">Data.Star.Decoration</code>, <code class="language-plaintext highlighter-rouge">Data.Star.Environment</code> and <code class="language-plaintext highlighter-rouge">Data.Star.Pointer</code>
+more level polymorphic. In particular <code class="language-plaintext highlighter-rouge">EdgePred</code> now takes an extra explicit
+level parameter.</p>
+  </li>
+  <li>
+    <p>In <code class="language-plaintext highlighter-rouge">Level</code> the target level of <code class="language-plaintext highlighter-rouge">Lift</code> is now explicit.</p>
+  </li>
+  <li>
+    <p>In <code class="language-plaintext highlighter-rouge">Function</code> the precedence level of <code class="language-plaintext highlighter-rouge">_$_</code> (and variants) has been changed to <code class="language-plaintext highlighter-rouge">-1</code>
+in order to improve its interaction with <code class="language-plaintext highlighter-rouge">_∋_</code> (e.g. <code class="language-plaintext highlighter-rouge">f $ Maybe A ∋ do (...)</code>).</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">Relation.Binary</code> now no longer exports <code class="language-plaintext highlighter-rouge">_≡_</code>, <code class="language-plaintext highlighter-rouge">_≢_</code> and <code class="language-plaintext highlighter-rouge">refl</code>. The standard
+way of accessing them remains <code class="language-plaintext highlighter-rouge">Relation.Binary.PropositionalEquality</code>.</p>
+  </li>
+  <li>
+    <p>The syntax <code class="language-plaintext highlighter-rouge">∀[_]</code> in <code class="language-plaintext highlighter-rouge">Relation.Unary</code> has been renamed to <code class="language-plaintext highlighter-rouge">Π[_]</code>. The original
+name is now used for for implicit universal quantifiers.</p>
+  </li>
+</ul>
+
+<h2 id="other-major-changes">Other major changes</h2>
+
+<ul>
+  <li>
+    <p>Added new module <code class="language-plaintext highlighter-rouge">Algebra.Properties.CommutativeMonoid</code>. This contains proofs
+of lots of properties of summation, including ‘big summation’.</p>
+  </li>
+  <li>
+    <p>Added new modules <code class="language-plaintext highlighter-rouge">Data.List.Relation.Permutation.Inductive(.Properties)</code>,
+which give an inductive definition of permutations over lists.</p>
+  </li>
+  <li>
+    <p>Added a new module <code class="language-plaintext highlighter-rouge">Data.These</code> for the classic either-or-both Haskell datatype.</p>
+  </li>
+  <li>
+    <p>Added new module <code class="language-plaintext highlighter-rouge">Data.List.Relation.Sublist.Inductive</code> which gives
+an inductive definition of the sublist relation (i.e. order-preserving embeddings).
+We also provide a solver for this order in <code class="language-plaintext highlighter-rouge">Data.List.Relation.Sublist.Inductive.Solver</code>.</p>
+  </li>
+  <li>
+    <p>Added new module <code class="language-plaintext highlighter-rouge">Relation.Binary.Construct.Converse</code>. This is very similar
+to the existing module <code class="language-plaintext highlighter-rouge">Relation.Binary.Construct.Flip</code> in that it flips the relation.
+However unlike the existing module, the new module leaves the underlying equality unchanged.</p>
+  </li>
+  <li>
+    <p>Added new modules <code class="language-plaintext highlighter-rouge">Relation.Unary.Closure.(Preorder/StrictPartialOrder)</code> providing
+closures of a predicate with respect to either a preorder or a strict partial order.</p>
+  </li>
+  <li>
+    <p>Added new modules <code class="language-plaintext highlighter-rouge">Relation.Binary.Properties.(DistributiveLattice/HeytingAlgebra)</code>.</p>
+  </li>
+</ul>
+
+<h2 id="deprecated-features">Deprecated features</h2>
+
+<ul>
+  <li>All deprecated names now give warnings at point-of-use when type-checked.</li>
+</ul>
+
+<p>The following deprecations have occurred as part of a drive to improve consistency across
+the library. The deprecated names still exist and therefore all existing code should still
+work, however they have been deprecated and use of any new names is encouraged. Although not
+anticipated any time soon, they may eventually be removed in some future release of the library.</p>
+
+<ul>
+  <li>In <code class="language-plaintext highlighter-rouge">Data.Fin.Properties</code>:
+    <pre><code class="language-agda">≤+≢⇒&lt;  ↦  ≤∧≢⇒&lt;
+</code></pre>
+  </li>
+  <li>In <code class="language-plaintext highlighter-rouge">Data.List.Properties</code>:
+    <pre><code class="language-agda">idIsFold   ↦  id-is-foldr
+++IsFold   ↦  ++-is-foldr
+mapIsFold  ↦  map-is-foldr
+</code></pre>
+  </li>
+  <li>In <code class="language-plaintext highlighter-rouge">Data.Nat.Properties</code>:
+    <pre><code class="language-agda">≤+≢⇒&lt;  ↦  ≤∧≢⇒&lt;
+</code></pre>
+  </li>
+  <li>In <code class="language-plaintext highlighter-rouge">Function.Related</code>:
+    <pre><code class="language-agda">preorder               ↦  R-preorder
+setoid                 ↦  SR-setoid
+EquationReasoning.sym  ↦  SR-sym
+</code></pre>
+  </li>
+  <li>In <code class="language-plaintext highlighter-rouge">Function.Related.TypeIsomorphisms</code>:
+    <pre><code class="language-agda">×-CommutativeMonoid     ↦  ×-commutativeMonoid
+⊎-CommutativeMonoid     ↦  ⊎-commutativeMonoid
+×⊎-CommutativeSemiring  ↦  ×-⊎-commutativeSemiring
+</code></pre>
+  </li>
+  <li>In <code class="language-plaintext highlighter-rouge">Relation.Binary.Lattice</code>:
+    <pre><code class="language-agda">BoundedJoinSemilattice.joinSemiLattice  ↦  BoundedJoinSemilattice.joinSemilattice
+BoundedMeetSemilattice.meetSemiLattice  ↦  BoundedMeetSemilattice.meetSemilattice
+</code></pre>
+  </li>
+</ul>
+
+<p>The following have been deprecated without replacement:</p>
+
+<ul>
+  <li>In <code class="language-plaintext highlighter-rouge">Data.Nat.Divisibility</code>:
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>nonZeroDivisor-lemma
+</code></pre></div>    </div>
+  </li>
+  <li>In <code class="language-plaintext highlighter-rouge">Data.Nat.Properties</code>:
+    <pre><code class="language-agda">i∸k∸j+j∸k≡i+j∸k
+im≡jm+n⇒[i∸j]m≡n
+</code></pre>
+  </li>
+  <li>In <code class="language-plaintext highlighter-rouge">Relation.Binary.Construct.Always</code>
+    <pre><code class="language-agda">Always-setoid ↦ setoid
+</code></pre>
+  </li>
+</ul>
+
+<h2 id="other-minor-additions">Other minor additions</h2>
+
+<ul>
+  <li>Added new records to <code class="language-plaintext highlighter-rouge">Algebra</code>:
+    <pre><code class="language-agda">record RawSemigroup c ℓ : Set (suc (c ⊔ ℓ))
+record RawGroup     c ℓ : Set (suc (c ⊔ ℓ))
+record RawSemiring  c ℓ : Set (suc (c ⊔ ℓ))
+</code></pre>
+  </li>
+  <li>Added new function <code class="language-plaintext highlighter-rouge">Category.Functor</code>’s <code class="language-plaintext highlighter-rouge">RawFunctor</code>:
+    <pre><code class="language-agda">_&lt;&amp;&gt;_ : F A → (A → B) → F B
+</code></pre>
+  </li>
+  <li>Added new function to <code class="language-plaintext highlighter-rouge">Category.Monad.Indexed</code>:
+    <pre><code class="language-agda">RawIMonadT : (T : IFun I f → IFun I f) → Set (i ⊔ suc f)
+</code></pre>
+  </li>
+  <li>Added new function to <code class="language-plaintext highlighter-rouge">Category.Monad</code>:
+    <pre><code class="language-agda">RawMonadT : (T : (Set f → Set f) → (Set f → Set f)) → Set _
+</code></pre>
+  </li>
+  <li>Added new functions to <code class="language-plaintext highlighter-rouge">Codata.Delay</code>:
+    <pre><code class="language-agda">alignWith : (These A B → C) → Delay A i → Delay B i → Delay C i
+zip       : Delay A i → Delay B i → Delay (A × B) i
+align     : Delay A i → Delay B i → Delay (These A B) i
+</code></pre>
+  </li>
+  <li>Added new functions to <code class="language-plaintext highlighter-rouge">Codata.Musical.M</code>:
+    <pre><code class="language-agda">map    : (C₁ ⇒ C₂) → M C₁ → M C₂
+unfold : (S → ⟦ C ⟧ S) → S → M C
+</code></pre>
+  </li>
+  <li>Added new proof to <code class="language-plaintext highlighter-rouge">Data.Fin.Permutation</code>:
+    <pre><code class="language-agda">refute : m ≢ n → ¬ Permutation m n
+</code></pre>
+    <p>Additionally the definitions <code class="language-plaintext highlighter-rouge">punchIn-permute</code> and <code class="language-plaintext highlighter-rouge">punchIn-permute′</code>
+have been generalised to work with heterogeneous permutations.</p>
+  </li>
+  <li>Added new proof to <code class="language-plaintext highlighter-rouge">Data.Fin.Properties</code>:
+    <pre><code class="language-agda">toℕ-fromℕ≤″ : toℕ (fromℕ≤″ m m&lt;n) ≡ m
+
+pigeonhole  : m &lt; n → (f : Fin n → Fin m) → ∃₂ λ i j → i ≢ j × f i ≡ f j
+</code></pre>
+  </li>
+  <li>Added new function to <code class="language-plaintext highlighter-rouge">Data.List.Any</code>:
+    <pre><code class="language-agda">head    : ¬ Any P xs → Any P (x ∷ xs) → P x
+toSum   : Any P (x ∷ xs) → P x ⊎ Any P xs
+fromSum : P x ⊎ Any P xs → Any P (x ∷ xs)
+</code></pre>
+  </li>
+  <li>Added new proofs to <code class="language-plaintext highlighter-rouge">Data.List.Any.Properties</code>:
+    <pre><code class="language-agda">here-injective  : here  p ≡ here  q → p ≡ q
+there-injective : there p ≡ there q → p ≡ q
+
+singleton⁺      : P x → Any P [ x ]
+singleton⁻      : Any P [ x ] → P x
+++-insert       : P x → Any P (xs ++ [ x ] ++ ys)
+</code></pre>
+  </li>
+  <li>Added new functions to <code class="language-plaintext highlighter-rouge">Data.List.Base</code>:
+    <pre><code class="language-agda">uncons      : List A → Maybe (A × List A)
+head        : List A → Maybe A
+tail        : List A → Maybe (List A)
+alignWith   : (These A B → C) → List A → List B → List C
+unalignWith : (A → These B C) → List A → List B × List C
+align       : List A → List B → List (These A B)
+unalign     : List (These A B) → List A × List B
+</code></pre>
+  </li>
+  <li>Added new functions to <code class="language-plaintext highlighter-rouge">Data.List.Categorical</code>:
+    <pre><code class="language-agda">functor     : RawFunctor List
+applicative : RawApplicative List
+monadT      : RawMonadT (_∘′ List)
+sequenceA   : RawApplicative F → List (F A) → F (List A)
+mapA        : RawApplicative F → (A → F B) → List A → F (List B)
+forA        : RawApplicative F → List A → (A → F B) → F (List B)
+forM        : RawMonad M → List A → (A → M B) → M (List B)
+</code></pre>
+  </li>
+  <li>Added new proofs to <code class="language-plaintext highlighter-rouge">Data.List.Membership.(Setoid/Propositional).Properties</code>:
+    <pre><code class="language-agda">∈-insert : v ≈ v′ → v ∈ xs ++ [ v′ ] ++ ys
+∈-∃++    : v ∈ xs → ∃₂ λ ys zs → ∃ λ w → v ≈ w × xs ≋ ys ++ [ w ] ++ zs
+</code></pre>
+  </li>
+  <li>Added new functions to <code class="language-plaintext highlighter-rouge">Data.List.NonEmpty</code>:
+    <pre><code class="language-agda">uncons      : List⁺ A → A × List A
+concatMap   : (A → List⁺ B) → List⁺ A → List⁺ B
+alignWith   : (These A B → C) → List⁺ A → List⁺ B → List⁺ C
+zipWith     : (A → B → C) → List⁺ A → List⁺ B → List⁺ C
+unalignWith : (A → These B C) → List⁺ A → These (List⁺ B) (List⁺ C)
+unzipWith   : (A → B × C) → List⁺ A → List⁺ B × List⁺ C
+align       : List⁺ A → List⁺ B → List⁺ (These A B)
+zip         : List⁺ A → List⁺ B → List⁺ (A × B)
+unalign     : List⁺ (These A B) → These (List⁺ A) (List⁺ B)
+unzip       : List⁺ (A × B) → List⁺ A × List⁺ B
+</code></pre>
+  </li>
+  <li>Added new functions to <code class="language-plaintext highlighter-rouge">Data.List.Properties</code>:
+    <pre><code class="language-agda">alignWith-cong        : f ≗ g → alignWith f as ≗ alignWith g as
+length-alignWith      : length (alignWith f xs ys) ≡ length xs ⊔ length ys
+alignWith-map         : alignWith f (map g xs) (map h ys) ≡ alignWith (f ∘′ These.map g h) xs ys
+map-alignWith         : map g (alignWith f xs ys) ≡ alignWith (g ∘′ f) xs ys
+unalignWith-this      : unalignWith this ≗ (_, [])
+unalignWith-that      : unalignWith that ≗ ([] ,_)
+unalignWith-cong      : f ≗ g → unalignWith f ≗ unalignWith g
+unalignWith-map       : unalignWith f (map g ds) ≡ unalignWith (f ∘′ g) ds
+map-unalignWith       : Prod.map (map g) (map h) ∘′ unalignWith f ≗ unalignWith (These.map g h ∘′ f)
+unalignWith-alignWith : f ∘′ g ≗ id → unalignWith f (alignWith g as bs) ≡ (as , bs)
+</code></pre>
+  </li>
+  <li>Added new function to <code class="language-plaintext highlighter-rouge">Data.Maybe.Base</code>:
+    <pre><code class="language-agda">fromMaybe : A → Maybe A → A
+alignWith : (These A B → C) → Maybe A → Maybe B → Maybe C
+zipWith   : (A → B → C) → Maybe A → Maybe B → Maybe C
+align     : Maybe A → Maybe B → Maybe (These A B)
+zip       : Maybe A → Maybe B → Maybe (A × B)
+</code></pre>
+  </li>
+  <li>Added new operator to <code class="language-plaintext highlighter-rouge">Data.Nat.Base</code>:
+    <pre><code class="language-agda">∣_-_∣ : ℕ → ℕ → ℕ
+</code></pre>
+  </li>
+  <li>Added new proofs to <code class="language-plaintext highlighter-rouge">Data.Nat.Divisibility</code>:
+    <pre><code class="language-agda">n∣m⇒m%n≡0 : suc n ∣ m → m % (suc n) ≡ 0
+m%n≡0⇒n∣m : m % (suc n) ≡ 0 → suc n ∣ m
+m%n≡0⇔n∣m : m % (suc n) ≡ 0 ⇔ suc n ∣ m
+</code></pre>
+  </li>
+  <li>Added new operations and proofs to <code class="language-plaintext highlighter-rouge">Data.Nat.DivMod</code>:
+    <pre><code class="language-agda">_%_ : (dividend divisor : ℕ) {≢0 : False (divisor ≟ 0)} → ℕ
+
+a≡a%n+[a/n]*n : a ≡ a % suc n + (a div (suc n)) * suc n
+a%1≡0         : a % 1 ≡ 0
+a%n&lt;n         : a % suc n &lt; suc n
+n%n≡0         : suc n % suc n ≡ 0
+a%n%n≡a%n     : a % suc n % suc n ≡ a % suc n
+[a+n]%n≡a%n   : (a + suc n) % suc n ≡ a % suc n
+[a+kn]%n≡a%n  : (a + k * (suc n)) % suc n ≡ a % suc n
+kn%n≡0        : k * (suc n) % suc n ≡ 0
+%-distribˡ-+  : (a + b) % suc n ≡ (a % suc n + b % suc n) % suc n
+</code></pre>
+  </li>
+  <li>Added new proofs to <code class="language-plaintext highlighter-rouge">Data.Nat.Properties</code>:
+    <pre><code class="language-agda">_≥?_  : Decidable _≥_
+_&gt;?_  : Decidable _&gt;_
+_≤′?_ : Decidable _≤′_
+_&lt;′?_ : Decidable _&lt;′_
+_≤″?_ : Decidable _≤″_
+_&lt;″?_ : Decidable _&lt;″_
+_≥″?_ : Decidable _≥″_
+_&gt;″?_ : Decidable _&gt;″_
+
+n≤0⇒n≡0      : n ≤ 0 → n ≡ 0
+m&lt;n⇒n≢0      : m &lt; n → n ≢ 0
+
+m⊓n≡m⇒m≤n    : m ⊓ n ≡ m → m ≤ n
+m⊓n≡n⇒n≤m    : m ⊓ n ≡ n → n ≤ m
+n⊔m≡m⇒n≤m    : n ⊔ m ≡ m → n ≤ m
+n⊔m≡n⇒m≤n    : n ⊔ m ≡ n → m ≤ n
+
+*-distribˡ-∸ : _*_ DistributesOverˡ _∸_
+*-distrib-∸  : _*_ DistributesOver _∸_
+^-*-assoc    : (m ^ n) ^ p ≡ m ^ (n * p)
+
+≤-poset                : Poset 0ℓ 0ℓ 0ℓ
+&lt;-resp₂-≡              : _&lt;_ Respects₂ _≡_
+&lt;-isStrictPartialOrder : IsStrictPartialOrder _≡_ _&lt;_
+&lt;-strictPartialOrder   : StrictPartialOrder 0ℓ 0ℓ 0ℓ
+
+*-+-isSemiring         : IsSemiring _+_ _*_ 0 1
+
+⊓-semigroup            : Semigroup 0ℓ 0ℓ
+⊔-semigroup            : Semigroup 0ℓ 0ℓ
+⊔-0-commutativeMonoid  : CommutativeMonoid 0ℓ 0ℓ
+⊓-⊔-lattice            : Lattice 0ℓ 0ℓ
+
+n≡m⇒∣n-m∣≡0       : n ≡ m → ∣ n - m ∣ ≡ 0
+m≤n⇒∣n-m∣≡n∸m     : m ≤ n → ∣ n - m ∣ ≡ n ∸ m
+∣n-m∣≡0⇒n≡m       : ∣ n - m ∣ ≡ 0 → n ≡ m
+∣n-m∣≡n∸m⇒m≤n     : ∣ n - m ∣ ≡ n ∸ m → m ≤ n
+∣n-n∣≡0           : ∣ n - n ∣ ≡ 0
+∣n-n+m∣≡m         : ∣ n - n + m ∣ ≡ m
+∣n+m-n+o∣≡∣m-o|   : ∣ n + m - n + o ∣ ≡ ∣ m - o ∣
+n∸m≤∣n-m∣         : n ∸ m ≤ ∣ n - m ∣
+∣n-m∣≤n⊔m         : ∣ n - m ∣ ≤ n ⊔ m
+∣-∣-comm          : Commutative ∣_-_∣
+∣n-m∣≡[n∸m]∨[m∸n] : (∣ n - m ∣ ≡ n ∸ m) ⊎ (∣ n - m ∣ ≡ m ∸ n)
+*-distribˡ-∣-∣    : _*_ DistributesOverˡ ∣_-_∣
+*-distribʳ-∣-∣    : _*_ DistributesOverʳ ∣_-_∣
+*-distrib-∣-∣     : _*_ DistributesOver ∣_-_∣
+</code></pre>
+  </li>
+  <li>Added new function to <code class="language-plaintext highlighter-rouge">Data.String.Base</code>:
+    <pre><code class="language-agda">fromList⁺ : List⁺ Char → String
+</code></pre>
+  </li>
+  <li>Added new functions to <code class="language-plaintext highlighter-rouge">Data.Sum</code>:
+    <pre><code class="language-agda">map₁ : (A → B) → A ⊎ C → B ⊎ C
+map₂ : (B → C) → A ⊎ B → A ⊎ C
+</code></pre>
+  </li>
+  <li>Added new functions in <code class="language-plaintext highlighter-rouge">Data.Table.Base</code>:
+    <pre><code class="language-agda">remove  : Fin (suc n) → Table A (suc n) → Table A n
+fromVec : Vec A n → Table A n
+toVec   : Table A n → Vec A n
+</code></pre>
+  </li>
+  <li>Added new proofs in <code class="language-plaintext highlighter-rouge">Data.Table.Properties</code>:
+    <pre><code class="language-agda">select-lookup  : lookup (select x i t) i ≡ lookup t i
+select-remove  : remove i (select x i t) ≗ replicate {n} x
+remove-permute : remove (π ⟨$⟩ˡ i) (permute π t) ≗ permute (Perm.remove (π ⟨$⟩ˡ i) π) (remove i t)
+</code></pre>
+  </li>
+  <li>Added new functions to <code class="language-plaintext highlighter-rouge">Data.Vec</code>:
+    <pre><code class="language-agda">alignWith : (These A B → C) → Vec A m → Vec B n → Vec C (m ⊔ n)
+align     : Vec A m → Vec B n → Vec (These A B) (m ⊔ n)
+unzipWith : (A → B × C) → Vec A n → Vec B n × Vec C n
+</code></pre>
+  </li>
+  <li>Added new proofs to <code class="language-plaintext highlighter-rouge">Data.Vec.All.Properties</code>:
+    <pre><code class="language-agda">toList⁺   : All P (toList xs) → All P xs
+toList⁻   : All P xs → All P (toList xs)
+
+fromList⁺ : All P xs → All P (fromList xs)
+fromList⁻ : All P (fromList xs) → All P xs
+</code></pre>
+  </li>
+  <li>Added new functions to <code class="language-plaintext highlighter-rouge">Data.Vec.Any</code>:
+    <pre><code class="language-agda">head    : ¬ Any P xs → Any P (x ∷ xs) → P x
+toSum   : Any P (x ∷ xs) → P x ⊎ Any P xs
+fromSum : P x ⊎ Any P xs → Any P (x ∷ xs)
+</code></pre>
+  </li>
+  <li>Added new functions to <code class="language-plaintext highlighter-rouge">Data.Vec.Categorical</code>:
+    <pre><code class="language-agda">sequenceA : RawApplicative F → Vec (F A) n → F (Vec A n)
+mapA      : RawApplicative F → (A → F B) → Vec A n → F (Vec B n)
+forA      : RawApplicative F → Vec A n → (A → F B) → F (Vec B n)
+sequenceM : RawMonad M → Vec (M A) n → M (Vec A n)
+mapM      : RawMonad M → (A → M B) → Vec A n → M (Vec B n)
+forM      : RawMonad M → Vec A n → (A → M B) → M (Vec B n)
+</code></pre>
+  </li>
+  <li>Added new proofs to <code class="language-plaintext highlighter-rouge">Data.Vec.Membership.Propositional.Properties</code>:
+    <pre><code class="language-agda">∈-lookup    : lookup i xs ∈ xs
+
+∈-toList⁻   : v ∈ toList xs   → v ∈ xs
+∈-fromList⁻ : v ∈ fromList xs → v ∈ xs
+</code></pre>
+  </li>
+  <li>Added new proof to <code class="language-plaintext highlighter-rouge">Data.Vec.Properties</code>:
+    <pre><code class="language-agda">lookup-zipWith : lookup i (zipWith f xs ys) ≡ f (lookup i xs) (lookup i ys)
+</code></pre>
+  </li>
+  <li>Added new proofs to <code class="language-plaintext highlighter-rouge">Data.Vec.Relation.Pointwise.Inductive</code>:
+    <pre><code class="language-agda">tabulate⁺ : (∀ i → f i ~ g i) → Pointwise _~_ (tabulate f) (tabulate g)
+tabulate⁻ : Pointwise _~_ (tabulate f) (tabulate g) → (∀ i → f i ~ g i)
+</code></pre>
+  </li>
+  <li>Added new type to <code class="language-plaintext highlighter-rouge">Foreign.Haskell</code>:
+    <pre><code class="language-agda">Pair : (A : Set ℓ) (B : Set ℓ′) : Set (ℓ ⊔ ℓ′)
+</code></pre>
+  </li>
+  <li>Added new function to <code class="language-plaintext highlighter-rouge">Function</code>:
+    <pre><code class="language-agda">typeOf : {A : Set a} → A → Set a
+</code></pre>
+  </li>
+  <li>Added new functions to <code class="language-plaintext highlighter-rouge">Function.Related</code>:
+    <pre><code class="language-agda">isEquivalence : IsEquivalence (Related ⌊ k ⌋)
+↔-isPreorder  : IsPreorder _↔_ (Related k)
+</code></pre>
+  </li>
+  <li>Added new result to <code class="language-plaintext highlighter-rouge">Function.Related.TypeIsomorphisms</code>:
+    <pre><code class="language-agda">×-comm                    : (A × B) ↔ (B × A)
+×-identityˡ               : LeftIdentity _↔_ (Lift ℓ ⊤) _×_
+×-identityʳ               : RightIdentity _↔_ (Lift ℓ ⊤) _×_
+×-identity                : Identity _↔_ (Lift ℓ ⊤) _×_
+×-zeroˡ                   : LeftZero _↔_ (Lift ℓ ⊥) _×_
+×-zeroʳ                   : RightZero _↔_ (Lift ℓ ⊥) _×_
+×-zero                    : Zero _↔_ (Lift ℓ ⊥) _×_
+⊎-assoc                   : Associative _↔_ _⊎_
+⊎-comm                    : (A ⊎ B) ↔ (B ⊎ A)
+⊎-identityˡ               : LeftIdentity _↔_ (Lift ℓ ⊥) _⊎_
+⊎-identityʳ               : RightIdentity _↔_ (Lift ℓ ⊥) _⊎_
+⊎-identity                : Identity _↔_ (Lift ℓ ⊥) _⊎_
+×-distribˡ-⊎              : _DistributesOverˡ_ _↔_ _×_ _⊎_
+×-distribʳ-⊎              : _DistributesOverʳ_ _↔_ _×_ _⊎_
+×-distrib-⊎               : _DistributesOver_ _↔_ _×_ _⊎_
+×-isSemigroup             : IsSemigroup (Related ⌊ k ⌋) _×_
+×-semigroup               : Symmetric-kind → Level → Semigroup _ _
+×-isMonoid                : IsMonoid (Related ⌊ k ⌋) _×_ (Lift ℓ ⊤)
+×-monoid                  : Symmetric-kind → Level → Monoid _ _
+×-isCommutativeMonoid     : IsCommutativeMonoid (Related ⌊ k ⌋) _×_ (Lift ℓ ⊤)
+×-commutativeMonoid       : Symmetric-kind → Level → CommutativeMonoid _ _
+⊎-isSemigroup             : IsSemigroup (Related ⌊ k ⌋) _⊎_
+⊎-semigroup               : Symmetric-kind → Level → Semigroup _ _
+⊎-isMonoid                : IsMonoid (Related ⌊ k ⌋) _⊎_ (Lift ℓ ⊥)
+⊎-monoid                  : Symmetric-kind → Level → Monoid _ _
+⊎-isCommutativeMonoid     : IsCommutativeMonoid (Related ⌊ k ⌋) _⊎_ (Lift ℓ ⊥)
+⊎-commutativeMonoid       : Symmetric-kind → Level → CommutativeMonoid _ _
+×-⊎-isCommutativeSemiring : IsCommutativeSemiring (Related ⌊ k ⌋) _⊎_ _×_ (Lift ℓ ⊥) (Lift ℓ ⊤)
+</code></pre>
+  </li>
+  <li>Added new type and function to <code class="language-plaintext highlighter-rouge">Function.Bijection</code>:
+    <pre><code class="language-agda">From ⤖ To = Bijection (P.setoid From) (P.setoid To)
+
+bijection : (∀ {x y} → to x ≡ to y → x ≡ y) → (∀ x → to (from x) ≡ x) → From ⤖ To
+</code></pre>
+  </li>
+  <li>Added new function to <code class="language-plaintext highlighter-rouge">Function.Injection</code>:
+    <pre><code class="language-agda">injection : (∀ {x y} → to x ≡ to y → x ≡ y) → From ↣ To
+</code></pre>
+  </li>
+  <li>Added new function to <code class="language-plaintext highlighter-rouge">Function.Inverse</code>:
+    <pre><code class="language-agda">inverse : (∀ x → from (to x) ≡ x) → (∀ x → to (from x) ≡ x) → From ↔ To
+</code></pre>
+  </li>
+  <li>Added new function to <code class="language-plaintext highlighter-rouge">Function.LeftInverse</code>:
+    <pre><code class="language-agda">leftInverse : (∀ x → from (to x) ≡ x) → From ↞ To
+</code></pre>
+  </li>
+  <li>Added new proofs to <code class="language-plaintext highlighter-rouge">Function.Related</code>:
+    <pre><code class="language-agda">K-refl       : Reflexive (Related k)
+K-reflexive  : _≡_ ⇒ Related k
+K-trans      : Trans (Related k) (Related k) (Related k)
+K-isPreorder : IsPreorder _↔_ (Related k)
+
+SK-sym           : Sym (Related ⌊ k ⌋) (Related ⌊ k ⌋)
+SK-isEquivalence : IsEquivalence (Related ⌊ k ⌋)
+</code></pre>
+  </li>
+  <li>Added new proofs to <code class="language-plaintext highlighter-rouge">Function.Related.TypeIsomorphisms</code>:
+    <pre><code class="language-agda">×-≡×≡↔≡,≡ : (x ≡ proj₁ p × y ≡ proj₂ p) ↔ (x , y) ≡ p
+×-comm    : (A × B) ↔ (B × A)
+</code></pre>
+  </li>
+  <li>Added new function to <code class="language-plaintext highlighter-rouge">Function.Surjection</code>:
+    <pre><code class="language-agda">surjection : (∀ x → to (from x) ≡ x) → From ↠ To
+</code></pre>
+  </li>
+  <li>Added new synonym to <code class="language-plaintext highlighter-rouge">Level</code>:
+    <pre><code class="language-agda">0ℓ = zero
+</code></pre>
+  </li>
+  <li>Added new module <code class="language-plaintext highlighter-rouge">Level.Literals</code> with functions:
+    <pre><code class="language-agda">_ℕ+_   : Nat → Level → Level
+#_     : Nat → Level
+Levelℕ : Number Level
+</code></pre>
+  </li>
+  <li>Added new proofs to record <code class="language-plaintext highlighter-rouge">IsStrictPartialOrder</code> in <code class="language-plaintext highlighter-rouge">Relation.Binary</code>:
+    <pre><code class="language-agda">&lt;-respʳ-≈ : _&lt;_ Respectsʳ _≈_
+&lt;-respˡ-≈ : _&lt;_ Respectsˡ _≈_
+</code></pre>
+  </li>
+  <li>Added new functions and records to <code class="language-plaintext highlighter-rouge">Relation.Binary.Indexed.Heterogeneous</code>:
+    <pre><code class="language-agda">record IsIndexedPreorder  (_≈_ : Rel A ℓ₁) (_∼_ : Rel A ℓ₂) : Set (i ⊔ a ⊔ ℓ₁ ⊔ ℓ₂)
+record IndexedPreorder {i} (I : Set i) c ℓ₁ ℓ₂ : Set (suc (i ⊔ c ⊔ ℓ₁ ⊔ ℓ₂))
+</code></pre>
+  </li>
+  <li>Added new proofs to <code class="language-plaintext highlighter-rouge">Relation.Binary.Indexed.Heterogeneous.Construct.At</code>:
+    <pre><code class="language-agda">isEquivalence : IsIndexedEquivalence A _≈_  → (i : I) → B.IsEquivalence (_≈_ {i})
+isPreorder    : IsIndexedPreorder A _≈_ _∼_ → (i : I) → B.IsPreorder (_≈_ {i}) _∼_
+setoid        : IndexedSetoid I a ℓ → I → B.Setoid a ℓ
+preorder      : IndexedPreorder I a ℓ₁ ℓ₂ → I → B.Preorder a ℓ₁ ℓ₂
+</code></pre>
+  </li>
+  <li>Added new proofs to <code class="language-plaintext highlighter-rouge">Relation.Binary.Indexed.Heterogeneous.Construct.Trivial</code>:
+    <pre><code class="language-agda">isIndexedEquivalence : IsEquivalence _≈_ → IsIndexedEquivalence (λ (_ : I) → A) _≈_
+isIndexedPreorder    : IsPreorder _≈_ _∼_ → IsIndexedPreorder (λ (_ : I) → A) _≈_ _∼_
+indexedSetoid        : Setoid a ℓ → ∀ {I} → IndexedSetoid I a ℓ
+indexedPreorder      : Preorder a ℓ₁ ℓ₂ → ∀ {I} → IndexedPreorder I a ℓ₁ ℓ₂
+</code></pre>
+  </li>
+  <li>Added new types, functions and records to <code class="language-plaintext highlighter-rouge">Relation.Binary.Indexed.Homogeneous</code>:
+    <pre><code class="language-agda">Implies _∼₁_ _∼₂_      = ∀ {i} → _∼₁_ B.⇒ (_∼₂_ {i})
+Antisymmetric _≈_ _∼_  = ∀ {i} → B.Antisymmetric _≈_ (_∼_ {i})
+Decidable _∼_          = ∀ {i} → B.Decidable (_∼_ {i})
+Respects P _∼_         = ∀ {i} {x y : A i} → x ∼ y → P x → P y
+Respectsˡ P _∼_        = ∀ {i} {x y z : A i} → x ∼ y → P x z → P y z
+Respectsʳ P _∼_        = ∀ {i} {x y z : A i} → x ∼ y → P z x → P z y
+Respects₂ P _∼_        = (Respectsʳ P _∼_) × (Respectsˡ P _∼_)
+Lift _∼_ x y           = ∀ i → x i ∼ y i
+
+record IsIndexedEquivalence    (_≈ᵢ_ : Rel A ℓ)                   : Set (i ⊔ a ⊔ ℓ)
+record IsIndexedDecEquivalence (_≈ᵢ_ : Rel A ℓ)                   : Set (i ⊔ a ⊔ ℓ)
+record IsIndexedPreorder       (_≈ᵢ_ : Rel A ℓ₁) (_∼ᵢ_ : Rel A ℓ₂) : Set (i ⊔ a ⊔ ℓ₁ ⊔ ℓ₂)
+record IsIndexedPartialOrder   (_≈ᵢ_ : Rel A ℓ₁) (_≤ᵢ_ : Rel A ℓ₂) : Set (i ⊔ a ⊔ ℓ₁ ⊔ ℓ₂)
+
+record IndexedSetoid    {i} (I : Set i) c ℓ     : Set (suc (i ⊔ c ⊔ ℓ))
+record IndexedDecSetoid {i} (I : Set i) c ℓ     : Set (suc (i ⊔ c ⊔ ℓ))
+record IndexedPreorder  {i} (I : Set i) c ℓ₁ ℓ₂ : Set (suc (i ⊔ c ⊔ ℓ₁ ⊔ ℓ₂))
+record IndexedPoset     {i} (I : Set i) c ℓ₁ ℓ₂ : Set (suc (i ⊔ c ⊔ ℓ₁ ⊔ ℓ₂))
+</code></pre>
+  </li>
+  <li>Added new types, records and proofs to <code class="language-plaintext highlighter-rouge">Relation.Binary.Lattice</code>:
+    <pre><code class="language-agda">Exponential _≤_ _∧_ _⇨_ = ∀ w x y → ((w ∧ x) ≤ y → w ≤ (x ⇨ y)) × (w ≤ (x ⇨ y) → (w ∧ x) ≤ y)
+
+IsJoinSemilattice.x≤x∨y      : x ≤ x ∨ y
+IsJoinSemilattice.y≤x∨y      : y ≤ x ∨ y
+IsJoinSemilattice.∨-least    : x ≤ z → y ≤ z → x ∨ y ≤ z
+
+IsMeetSemilattice.x∧y≤x      : x ∧ y ≤ x
+IsMeetSemilattice.x∧y≤y      : x ∧ y ≤ y
+IsMeetSemilattice.∧-greatest : x ≤ y → x ≤ z → x ≤ y ∧ z
+
+record IsDistributiveLattice _≈_ _≤_ _∨_ _∧_
+record IsHeytingAlgebra      _≈_ _≤_ _∨_ _∧_ _⇨_ ⊤ ⊥
+record IsBooleanAlgebra      _≈_ _≤_ _∨_ _∧_ ¬_ ⊤ ⊥
+
+record DistributiveLattice c ℓ₁ ℓ₂
+record HeytingAlgebra      c ℓ₁ ℓ₂
+record BooleanAlgebra      c ℓ₁ ℓ₂
+</code></pre>
+  </li>
+  <li>Added new proofs to <code class="language-plaintext highlighter-rouge">Relation.Binary.NonStrictToStrict</code>:
+    <pre><code class="language-agda">&lt;⇒≤ : _&lt;_ ⇒ _≤_
+</code></pre>
+  </li>
+  <li>Added new proofs to <code class="language-plaintext highlighter-rouge">Relation.Binary.PropositionalEquality</code>:
+    <pre><code class="language-agda">respˡ : ∼ Respectsˡ _≡_
+respʳ : ∼ Respectsʳ _≡_
+</code></pre>
+  </li>
+  <li>Added new proofs to <code class="language-plaintext highlighter-rouge">Relation.Binary.Construct.Always</code>:
+    <pre><code class="language-agda">refl          : Reflexive Always
+sym           : Symmetric Always
+trans         : Transitive Always
+isEquivalence : IsEquivalence Always
+</code></pre>
+  </li>
+  <li>Added new proofs to <code class="language-plaintext highlighter-rouge">Relation.Binary.Construct.Constant</code>:
+    <pre><code class="language-agda">refl          : C → Reflexive (Const C)
+sym           : Symmetric (Const C)
+trans         : Transitive (Const C)
+isEquivalence : C → IsEquivalence (Const C)
+setoid        : C → Setoid a c
+</code></pre>
+  </li>
+  <li>Added new definitions and proofs to <code class="language-plaintext highlighter-rouge">Relation.Binary.Construct.FromPred</code>:
+    <pre><code class="language-agda">Resp x y = P x → P y
+
+reflexive  : P Respects _≈_ → _≈_ ⇒ Resp
+refl       : P Respects _≈_ → Reflexive Resp
+trans      : Transitive Resp
+isPreorder : P Respects _≈_ → IsPreorder _≈_ Resp
+preorder   : P Respects _≈_ → Preorder _ _ _
+</code></pre>
+  </li>
+  <li>Added new definitions and proofs to <code class="language-plaintext highlighter-rouge">Relation.Binary.Construct.FromRel</code>:
+    <pre><code class="language-agda">Resp x y = ∀ {a} → a R x → a R y
+
+reflexive  : (∀ {a} → (a R_) Respects _≈_) → _≈_ ⇒ Resp
+trans      : Transitive Resp
+isPreorder : (∀ {a} → (a R_) Respects _≈_) → IsPreorder _≈_ Resp
+preorder   : (∀ {a} → (a R_) Respects _≈_) → Preorder _ _ _
+</code></pre>
+  </li>
+  <li>Added new proofs to <code class="language-plaintext highlighter-rouge">Relation.Binary.Construct.StrictToNonStrict</code>:
+    <pre><code class="language-agda">&lt;⇒≤ : _&lt;_ ⇒ _≤_
+
+≤-respʳ-≈ : Transitive _≈_ → _&lt;_ Respectsʳ _≈_ → _≤_ Respectsʳ _≈_
+≤-respˡ-≈ : Symmetric _≈_ → Transitive _≈_ → _&lt;_ Respectsˡ _≈_ → _≤_ Respectsˡ _≈_
+
+&lt;-≤-trans : Transitive _&lt;_ → _&lt;_ Respectsʳ _≈_ → Trans _&lt;_ _≤_ _&lt;_
+≤-&lt;-trans : Symmetric _≈_ → Transitive _&lt;_ → _&lt;_ Respectsˡ _≈_ → Trans _≤_ _&lt;_ _&lt;_
+</code></pre>
+  </li>
+  <li>Added new types in <code class="language-plaintext highlighter-rouge">Relation.Unary</code>:
+    <pre><code class="language-agda">Satisfiable P = ∃ λ x → x ∈ P
+IUniversal P  = ∀ {x} → x ∈ P
+</code></pre>
+  </li>
+  <li>Added new proofs in <code class="language-plaintext highlighter-rouge">Relation.Unary.Properties</code>:
+    <pre><code class="language-agda">∅? : Decidable ∅
+U? : Decidable U
+</code></pre>
+  </li>
+</ul>
+
+    </div>
+  
+    <p style="text-align:center;">
+    
+    
+    
+    
+    
+    
+</p>
+
+    <p class="p-name"> Last-modified:  </p>
+  </article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/lia/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Logic in Agda</h2><div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Lorenzo Clemente</li>
+          <li><a class="u-email" href="mailto:clementelorenzo@gmail.com">clementelorenzo@gmail.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/lclem"><svg class="svg-icon"><use xlink:href="/lia/assets/minima-social-icons.svg#github"></use></svg> <span class="username">lclem</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3"></div>
+    </div>This work is licensed under a <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>
+  </div>
+</footer>
+
+<!-- Parse the Latex divs with Katex
+<script type="text/javascript">
+  $("script[type='math/tex']").replaceWith(
+    function(){
+      var tex = $(this).text();
+      return katex.renderToString(tex, {displayMode: false});
+  });
+  
+  $("script[type='math/tex; mode=display']").replaceWith(
+    function(){
+      var tex = $(this).text();
+      return katex.renderToString(tex.replace(/%.*/g, ''), {displayMode: true});
+  });
+</script>
+-->
+
+<script type="text/javascript" src="/lia/assets/hidebox.js"></script>
+</body>
+
+</html>
