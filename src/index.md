@@ -22,12 +22,15 @@ Russell (1956) replied, "I am delighted to know that Principia Mathematica can n
 
 ## Part 0: Programming in Agda 🚧
 
-- [Natural numbers]({{ site.baseurl }}/part0/nat/) 🚧 .
+- [Natural numbers](/part0/Naturals.md) 🚧 .
 
 ## Part 1: Classical propositional logic 🚧
 
-- [Syntax and semantics]({{ site.baseurl }}/part1/Semantics/): Syntax and semantics of propositional logic 🚧.
+- [Syntax and semantics](/part1/Semantics.md): Syntax and semantics of propositional logic 🚧.
+
+<!--
 - [Normal forms]({{ site.baseurl }}/part1/NormalForms/): Negation, conjunctive, and disjunctive normal forms 🚧.
+-->
 
 ::: {#refs}
 

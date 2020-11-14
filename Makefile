@@ -54,7 +54,7 @@ AGDA_MODULES := $(patsubst %.lagda.md,%,$(notdir $(AGDA_SOURCES)))
 #AGDA_MD := $(patsubst $(SRCDIR)/%.lagda.md,$(OUTDIR)/%.md,$(AGDA_SOURCES))
 #$(info AGDA_MD:$(AGDA_MD))
 
-MARKDOWN_SOURCES := $(shell find $(SRCDIR) -name '*.md' -and -not -name '*.lagda.md')
+MARKDOWN_SOURCES := $(shell find $(SRCDIR) -name '*.md' -and -not -name '*.lagda.md' -and -not -name '*\#*')
 #$(info MARKDOWN_SOURCES:$(MARKDOWN_SOURCES))
 
 MARKDOWN_MD := $(patsubst $(SRCDIR)/%.md,$(OUTDIR)/%.md,$(MARKDOWN_SOURCES))
@@ -101,7 +101,7 @@ serve: markdown
 #pkill -f fswatch
 
 watch:
-	fswatch -o ./src | xargs -n1 -I{} make -j4 agda2
+	fswatch -o ./src | xargs -n1 -I{} make agda2
 
 # Start detached Jekyll server
 server-start:
@@ -112,6 +112,8 @@ server-stop:
 	pkill -f jekyll
 
 # special treatment for the index
+agda: $(OUTDIR)/index.md
+
 $(OUTDIR)/index.md: $(SRCDIR)/index.md
 	@echo "$(SRCDIR)/index.md --> $(OUTDIR)/index.md\c"
 
