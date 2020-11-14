@@ -47,6 +47,8 @@ jobs:
           key: ${{ runner.os }}-stack-work-${{ hashFiles('stack.yaml') }}-${{ hashFiles('package.yaml') }}-${{ '**/*.hs' }}
       - name: Install deps
         run: brew install agda pandoc pandoc-citeproc gsed aspell
+      - name: Install pandoc-numbering
+        run: pip install pandoc-numbering
         #agda-mode setup
 #      - name: Update cabal
 #        run: cabal update
