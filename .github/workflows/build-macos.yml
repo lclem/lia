@@ -46,7 +46,8 @@ jobs:
           path: .stack-work
           key: ${{ runner.os }}-stack-work-${{ hashFiles('stack.yaml') }}-${{ hashFiles('package.yaml') }}-${{ '**/*.hs' }}
       - name: Install cabal & agda & pandoc
-        run: brew install cabal agda pandoc pandoc-citeproc && agda-mode setup
+        run: brew install cabal agda pandoc pandoc-citeproc 
+        #agda-mode setup
       - name: Update cabal
         run: cabal update
       - name: Make pp
