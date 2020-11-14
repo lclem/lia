@@ -55,6 +55,7 @@ exclude:
   - "epub/"
   - "src/"
   - "tmp/"
+  - "pp/"
   - "_build/"
   - "docs/"
   - "Guardfile"

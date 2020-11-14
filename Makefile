@@ -10,7 +10,8 @@ PARTS := part0
 #part1 part2 part3 part4
 AGDA := agda
 PANDOC := pandoc
-PP := ~/.local/bin/pp
+PP := ./pp/pp-macos
+#~/.local/bin/pp
 EPUBCHECK := epubcheck
 RUBY := ruby
 GEM := $(RUBY) -S gem
