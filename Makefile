@@ -163,7 +163,7 @@ define add_dependency
 
 $(TMPDIR)/$1.$2.md: $(SRCDIR)/$1/$2.lagda.md
 	@echo "$(SRCDIR)/$1/$2.lagda.md --> $(TMPDIR)/$1.$2.md\c"
-	@cd $(SRCDIR) && $(AGDA) --html --html-highlight=code --html-dir=../$(TMPDIR) "$1/$2.lagda.md" | \
+	@cd $(SRCDIR) && $(AGDA) --library-file=../.agda/libraries --html --html-highlight=code --html-dir=../$(TMPDIR) "$1/$2.lagda.md" | \
 		sed '/^Generating.*/d; /^Warning\: HTML.*/d; /^reached from the.*/d; /.*Checking.*/d' | \
 		tr -d '\n'
 	@echo " [DONE]"
