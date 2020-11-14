@@ -45,11 +45,11 @@ jobs:
         with:
           path: .stack-work
           key: ${{ runner.os }}-stack-work-${{ hashFiles('stack.yaml') }}-${{ hashFiles('package.yaml') }}-${{ '**/*.hs' }}
-      - name: Install cabal & agda & pandoc
-        run: brew install agda pandoc pandoc-citeproc 
+      - name: Install deps
+        run: brew install agda pandoc pandoc-citeproc gsed aspell
         #agda-mode setup
-      - name: Update cabal
-        run: cabal update
+#      - name: Update cabal
+#        run: cabal update
 #      - name: Make pp
 #        run: cd pp && make 
       - name: make pp executable    
