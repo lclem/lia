@@ -58,9 +58,9 @@ jobs:
       - name: Install pandoc
         run: sudo apt-get install -y pandoc pandoc-citeproc
       - name: Install alex
-        run: cabal install -y alex
+        run: cabal install alex
       - name: Install happy
-        run: cabal install -y happy
+        run: cabal install happy
 #      - name: Install agda
 #        run: sudo apt-get install agda
 #      - name: Install agda-mode
