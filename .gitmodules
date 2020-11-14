@@ -3,4 +3,4 @@
 	url = https://github.com/lclem/pp
 [submodule "agda-stdlib"]
 	path = agda-stdlib
-	url = https://github.com/agda/agda-stdlib
+	url = https://github.com/lclem/agda-stdlib

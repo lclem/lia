@@ -106,7 +106,8 @@ In other words, a formula is either
 
 [^implication-symbol]: Other commonly used symbols for implication are "$\to$"
 (which conflicts with Agda's function space constructor `→` and thus must be avoided),
-and the more old-fashioned "$\supset$".
+and the old-fashioned "$\supset$" (which conflicts with common sense,
+since in terms of the subset relation, and implication is more akin to "$⊆$").
 
 This straightforwardly translates to the following inductive type:
 
@@ -180,35 +181,26 @@ _ = refl
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 As an exercise, we observe the following two inequalities satisfied by `size`.
-(This will be used in the chapter on [Normal Forms](/part1/NormalForms).)
 
 !exercise(#exercise:size-neg)(`size-¬`)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Prove the following property:
+
+Prove that !ref(size) satisfies the following two inequalities:
 
 ```
 size-¬ : ∀ φ → size φ ≤ size (¬ φ)
+size-¬¬ : ∀ φ → size φ ≤ size (¬ ¬ φ)
 ```
+
+(This will be used in the chapter on [Normal Forms](/part1/NormalForms).)
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
 size-¬ _ = n≤sucn
-```
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-!exercise(#exercise:size-negneg)(`size-¬¬`)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Prove the following property:
-
-```
-size-¬¬ : ∀ φ → size φ ≤ size (¬ ¬ φ)
-```
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-```
 size-¬¬ φ = trans-≤ (size-¬ φ) (size-¬ (¬ φ)) 
 ```
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ## Equality
 
