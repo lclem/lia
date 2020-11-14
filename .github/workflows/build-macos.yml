@@ -10,7 +10,7 @@ jobs:
       - name: Set up git repo
         uses: actions/checkout@v2
       - name: Checkout submodules
-        uses: textbook/git-checkout-submodule-action@master
+        run: git submodule update --init --recursive
       - name: Ls
         run: ls -la pp/src/
       - name: Cache ~/pp
