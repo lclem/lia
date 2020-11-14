@@ -26,9 +26,16 @@ CSL := natbib.csl
 # the bibliography file
 BIB := bibliography.bib
 
-PANDOC := pandoc --citeproc --filter=pandoc-numbering --bibliography=$(BIB) --csl=$(CSL) --metadata link-citations=true --from markdown --to markdown_phpextra
+ifeq ($(shell pandoc --version | head -n1),pandoc 2.11.1.1)
+	# more recent pandoc versions embed the citeproc library
+	PANDOCEXEC := pandoc --citeproc
+else
+	PANDOCEXEC := pandoc --filter=pandoc-citeproc
+endif
 
+PANDOC := $(PANDOCEXEC) --filter=pandoc-numbering --bibliography=$(BIB) --csl=$(CSL) --metadata link-citations=true --from markdown --to markdown_phpextra
 #--metadata numbersections=true --metadata number-sections=true --number-sections 
+$(info PANDOC: $(PANDOC))
 
 #$(info PARTS:$(PARTS))
 
