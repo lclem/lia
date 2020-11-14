@@ -6,7 +6,7 @@ SRCDIR := src
 BUILDDIR := $(SRCDIR)/_build
 INCLUDES := _includes
 SVGS := $(INCLUDES)/svgs
-PARTS := part0
+PARTS := part0 part1
 #part1 part2 part3 part4
 AGDA := agda
 PP := ./pp/pp-macos
@@ -293,12 +293,14 @@ $(OUTDIR)/$1/$2.md: $(TMPDIR)/$1.$2.md
 	@gsed -i "6ilast-modified: $(LAST_MODIFIED)" $(TMPDIR)/$1.$2.headers.md
 	@gsed -i "7ipart: /$(1)/index/" $(TMPDIR)/$1.$2.headers.md
 	@gsed -i "8itoc: true" $(TMPDIR)/$1.$2.headers.md
-#	@gsed -i "9inumbersections: true" $(TMPDIR)/$1.$2.headers.md
+	@gsed -i "9inumbersections: true" $(TMPDIR)/$1.$2.headers.md
 #	@gsed -i "10ipandoc-numbering:" $(TMPDIR)/$1.$2.headers.md
 #	@gsed -i "11i\    exercise:" $(TMPDIR)/$1.$2.headers.md
 #	@gsed -i "12i\        general:" $(TMPDIR)/$1.$2.headers.md
 #	@gsed -i "13i\            listing-title: List of exercises" $(TMPDIR)/$1.$2.headers.md
 #	@gsed -i "14i\            listing-identifier: False" $(TMPDIR)/$1.$2.headers.md
+
+# WARNING: the number of added lines will affect the following!
 
 # STEP 0: expand solution entries
 
