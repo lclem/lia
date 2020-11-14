@@ -26,7 +26,9 @@ CSL := natbib.csl
 # the bibliography file
 BIB := bibliography.bib
 
-PANDOC := pandoc --citeproc --filter=pandoc-numbering --bibliography=$(BIB) --csl=$(CSL) --metadata link-citations=true --metadata numbersections=true --metadata number-sections=true --number-sections --from markdown --to markdown_phpextra
+PANDOC := pandoc --citeproc --filter=pandoc-numbering --bibliography=$(BIB) --csl=$(CSL) --metadata link-citations=true --from markdown --to markdown_phpextra
+
+#--metadata numbersections=true --metadata number-sections=true --number-sections 
 
 #$(info PARTS:$(PARTS))
 
@@ -284,7 +286,7 @@ $(OUTDIR)/$1/$2.md: $(TMPDIR)/$1.$2.md
 	@gsed -i "6ilast-modified: $(LAST_MODIFIED)" $(TMPDIR)/$1.$2.headers.md
 	@gsed -i "7ipart: /$(1)/index/" $(TMPDIR)/$1.$2.headers.md
 	@gsed -i "8itoc: true" $(TMPDIR)/$1.$2.headers.md
-	@gsed -i "9inumbersections: true" $(TMPDIR)/$1.$2.headers.md
+#	@gsed -i "9inumbersections: true" $(TMPDIR)/$1.$2.headers.md
 #	@gsed -i "10ipandoc-numbering:" $(TMPDIR)/$1.$2.headers.md
 #	@gsed -i "11i\    exercise:" $(TMPDIR)/$1.$2.headers.md
 #	@gsed -i "12i\        general:" $(TMPDIR)/$1.$2.headers.md

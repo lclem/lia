@@ -1,5 +1,5 @@
 ---
-title: "Part 0: Basic programming in Agda" 🚧
+title: "Part 0: Basic programming in Agda 🚧"
 ---
 
 ```
@@ -22,4 +22,8 @@ or even just (@Craig:JSL:1957),
 finally another one [@Langford:AM:1926:B],
 and then Craig again [@Craig:JSL:1957].
 
+::: {#refs}
+
 # References
+
+:::

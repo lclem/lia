@@ -1,5 +1,5 @@
 ---
-title: "Part 1: Classical propositional logic" 🚧
+title: "Part 1: Classical propositional logic 🚧"
 ---
 
 ```
@@ -19,3 +19,9 @@ open import part1.Semantics
 References:
 
 * Mention the library @Prieto-CubidesGarzonSicard-Ramirez:zenodo:2018. Interesting points: normal forms NNF, DNF, and CNF are defined and it is shown that the normal form transformations preserve provability. In this way there is no need to resort to the semantics. In our approach, we would use soundness of the transformation (which is easier to establish) and then use the completeness theorem (which is a powerful property to have anyway).
+
+::: {#refs}
+
+# References
+
+:::
