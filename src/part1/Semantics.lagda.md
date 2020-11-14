@@ -324,11 +324,7 @@ Formula2Tree-inj : Injective Formula2Tree
 ```
 
 *Hint:* Exploit the fact that the list constructor `_∷_` is injective on both arguments
-(c.f. !ref(part0.List)(∷-inj-left) and !ref(part0.List)(∷-inj-left)).
-
-```
-_ = ∷-inj-left , ∷-inj-right
-```
+(c.f. !remoteRef(part0)(List)(∷-inj-left) and !remoteRef(part0)(List)(∷-inj-right) from !chapterRef(part0)(List)).
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```

@@ -23,6 +23,7 @@ Russell (1956) replied, "I am delighted to know that Principia Mathematica can n
 ## Part 0: Programming in Agda 🚧
 
 - [Natural numbers](/part0/Naturals.md) 🚧 .
+- [Lists](/part0/List.md) 🚧 .
 
 ## Part 1: Classical propositional logic 🚧
 
