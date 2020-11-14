@@ -56,13 +56,13 @@ cons-≡2 refl refl = refl
 -- equality is decidable on A *, if it is on A}
 instance
   eqList : ∀ {ℓ} {A : Set ℓ} → {{Eq A}} → Eq (A *)
-  _≡?_ {{eqList}} ε ε = yes (refl)
+  _≡?_ {{eqList}} ε ε = yes refl
   _≡?_ {{eqList}} ε (_ ∷ _) = no (λ ())
   _≡?_ {{eqList}} (_ ∷ _) ε  = no (λ ())
   _≡?_ {{eqList}} (a ∷ as) (b ∷ bs) with a ≡? b
   ... | no proof = no (λ p → proof (fst (cons-≡1 p)))
   ... | yes refl with as ≡? bs
-  ... | yes refl = yes (refl)
+  ... | yes refl = yes refl
   ... | no proof = no (λ p → proof (snd (cons-≡1 p)))
 
 Fun : ∀ {ℓ} (A : Set ℓ) (B : Set ℓ) (n : ℕ) → Set ℓ
@@ -415,7 +415,7 @@ head (a ∷ _) = right (a , here)
 
 instance
   eq∈ : ∀ {ℓ} {A : Set ℓ} {a : A} {as : A *} → Eq (a ∈ as)
-  _≡?_ {{eq∈}} here here = yes (refl)
+  _≡?_ {{eq∈}} here here = yes refl
   _≡?_ {{eq∈}} here (there _) = no (λ ())
   _≡?_ {{eq∈}} (there _) here = no (λ ())
   _≡?_ {{eq∈}} (there a∈as1) (there a∈as2) with a∈as1 ≡? a∈as2
@@ -490,16 +490,16 @@ remove-∈-inv = {!!}
 ```
 
 ```
-~∈-++1 : ∀ {ℓ} {A : Set ℓ} {a : A} {as bs : A *} →
+~∈-++-left : ∀ {ℓ} {A : Set ℓ} {a : A} {as bs : A *} →
   a ~∈ as ++ bs →
   a ~∈ as
-~∈-++1 = {!!}
+~∈-++-left = {!!}
 
 -- for some reason it won't guess the as right
-~∈-++2 : ∀ {ℓ} {A : Set ℓ} {a : A} (as : A *) {bs : A *} →
+~∈-++-right : ∀ {ℓ} {A : Set ℓ} {a : A} (as : A *) {bs : A *} →
   a ~∈ as ++ bs →
   a ~∈ bs
-~∈-++2 = {!!}
+~∈-++-right = {!!}
 
 data _∉_ {ℓ} {A : Set ℓ} : A → A * → Set ℓ where
   notHere : ∀ {x} → x ∉ ε
@@ -526,15 +526,15 @@ data _∉_ {ℓ} {A : Set ℓ} : A → A * → Set ℓ where
   with ~∈→∉ a~∈as
 ... | a∉as = notThere a≢b a∉as
 
-∉-++1 : ∀ {ℓ} {A : Set ℓ} {a : A} {as bs : A *} →
+∉-++-left : ∀ {ℓ} {A : Set ℓ} {a : A} {as bs : A *} →
   a ∉ as ++ bs →
   a ∉ as
-∉-++1 = {!!}
+∉-++-left = {!!}
 
-∉-++2 : ∀ {ℓ} {A : Set ℓ} {a : A} {as bs : A *} →
+∉-++-right : ∀ {ℓ} {A : Set ℓ} {a : A} {as bs : A *} →
   a ∉ as ++ bs →
   a ∉ bs
-∉-++2 = {!!}
+∉-++-right = {!!}
 
 ∉-concat : ∀ {ℓ} {A : Set ℓ} {a : A} {as : A *} {ass : A * *} →
   a ∉ concat ass →
@@ -704,7 +704,7 @@ AgreeUpdate ρ τ (x ∷ xs) here
 AgreeUpdate ρ τ (x ∷ xs) {a} (there a∈xs)
   with AgreeUpdate ρ τ xs {a} a∈xs
 ... | ρa≡τ[xs↦mapρxs]a with x ≡? a
-... | yes (refl) = refl
+... | yes refl = refl
 ... | no (x≢x) = ρa≡τ[xs↦mapρxs]a
 
 Agree-∘ : ∀ {ℓ m o} {A : Set ℓ} {B : Set m} {C : Set o} {{_ : Eq A}} (f : B → C) (g h : A → B) → (as : A *) → Agree g h as → Agree (f ∘ g) (f ∘ h) as

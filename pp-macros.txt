@@ -5,7 +5,7 @@
 
 !define(remoteRef)
 ~~~~~~~~~~~~
-[`!3`](../../!1/!2#!3)
+[`!ifne(!4)()(!4)(!3)`](../../!1/!2#!ifne(!4)()(!3.!4)(!3))
 ~~~~~~~~~~~~
 
 !define(chapterRef)
@@ -34,9 +34,11 @@
 <span class="hidden">∎</span>
 <span class="right-aligned">∎</span>
 
+<!--
 ::::::: {.solutionlink}
 [solution](!1-solution)
 :::::::
+-->
 
 :::::
 

@@ -18,11 +18,11 @@ suc-inj : ∀ {m n : ℕ} → suc m ≡ suc n → m ≡ n
 suc-inj refl = refl
 
 _≟ℕ_ : Decidable2 (_≡_ {A = ℕ})
-zero ≟ℕ zero  = yes (refl)
+zero ≟ℕ zero  = yes refl
 zero ≟ℕ suc _ = no (λ ())
 suc x ≟ℕ zero = no (λ ())
 suc x ≟ℕ suc y with x ≟ℕ y
-... | yes refl = yes (refl)
+... | yes refl = yes refl
 ... | no x≢y = no (λ sucx≡sucy → x≢y (suc-inj sucx≡sucy))
 
 instance

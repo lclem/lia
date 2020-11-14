@@ -8,7 +8,7 @@ In this chapter we introduce the syntax of propositional logic.
 {-# OPTIONS --allow-unsolved-metas  #-}
 open import part0.Naturals using (ℕ)
 
-module part1.Semantics (n : ℕ) where
+module part1.Semantics (n′ : ℕ) where
 open import part0.index public 
 ```
 
@@ -27,21 +27,18 @@ provided that
 * We can decide whether two given propositions are equal, and
 * We can enumerate all propositions.
 
-Our choice is to represent propositional variables with the datatype `Fin` of [finite sets](/part0/Fin).
-The module parameter `n : ℕ` allows us to name a fixed but arbitrary number of distinct propositions,
+Our choice is to represent propositional variables with the datatype !remoteRef(part0)(Finite)(Fin).
+The module parameter `n′ : ℕ` allows us to name a fixed but arbitrary number of distinct propositions,
 leading to the following definition (we omit the type annotation `Set`).
 
 ```
-PropName = Fin (3 + n)
+n = 3 + n′
+PropName = Fin n
 ```
 
-We use `p`, `q`, and `r` as generic variable names.
-In examples, we use `p₀`, `p₁`, and `p₂` as the following concrete variables [^10+n]:
+In examples, we use !ref(p₀), !ref(p₁), and !ref(p₂) as the following concrete variables [^10+n]:
 
 ```
-variable
-  p : PropName
-
 p₀ p₁ p₂ : PropName
 p₀ = fzero
 p₁ = fsuc fzero 
@@ -49,12 +46,21 @@ p₂ = fsuc (fsuc fzero)
 ```
 
 [^10+n]:
-    With the simpler and perhaps more natural definition `PropName = Fin n`
+    With the simpler and perhaps more natural definition `PropName = Fin n′`
     we would not be able to name any specific proposition such as `p = fzero`
-    since `n` is arbitrary and in particular it could be `0`,
+    since `n′` is arbitrary and in particular it could be `0`,
     i.e., there could be no proposition at all.
 
-Since propositions are modelled with `Fin`,
+
+We use !ref(p), !ref(q), and !ref(r) as generic variable names,
+which will be abstracted automatically as implicit arguments:
+
+```
+variable
+  p q r : PropName
+```
+
+Since propositions are modelled with !remoteRef(part0)(Finite)(Fin),
 they inherit all the properties of the latter.
 In particular, they enjoy decidable equality as initially required,
 
@@ -76,8 +82,7 @@ findPropName : ∀ p → p ∈ propNames
 findPropName = find
 ```
 
-For example, the first variable in the enumeration is `p`
-and the second is `q`:
+For example, the first variable in the enumeration is !ref(p₀) and the second is !ref(p₁):
 
 ```
 _ : findPropName p₀ ≡ here
@@ -97,7 +102,7 @@ In other words, a formula is either
 
 * a propositional variable $p$, or
 * the *false* constant $\bot$ (pronounced "bottom"), or
-* the *true* constant $\top$ (pronoounced "top"), or
+* the *true* constant $\top$ (pronounced "top"), or
 * the *negation* $\neg \varphi$ of a formula $\varphi$, or
 * the *conjunction* $\varphi \land \psi$ of two formulas $\varphi, \psi$, or
 * the *disjunction* $\varphi \lor \psi$ of two formulas $\varphi, \psi$, or
@@ -190,7 +195,7 @@ size-¬ : ∀ φ → size φ ≤ size (¬ φ)
 size-¬¬ : ∀ φ → size φ ≤ size (¬ ¬ φ)
 ```
 
-(This will be used in the chapter on [Normal Forms](/part1/NormalForms).)
+(This will be used in the chapter on [Normal Forms](../../part1/NormalForms).)
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -211,9 +216,9 @@ A naïve way to decide equality would be to list all the 8 × 8 = 64 pairs of co
     instance eqFormula : Eq (Formula)
     _≡?_ {{eqFormula}} = go where
       go : ∀ φ ψ → Dec (φ ≡ ψ)
-      go ⊤ ⊤ = yes (refl)
-      go ⊤ ⊥ = no (λ ())
-      go ⊤ (` _) = no (λ ())
+      go ⊤ ⊤ = yes refl
+      go ⊤ ⊥ = no λ ()
+      go ⊤ (` _) = no λ ()
     ...
 
 which is not practical [^no-split-on-catchall].
@@ -232,7 +237,7 @@ for which decidable equality is easier to prove [^dec-eq-reference].
         instance eqFormula : Eq (Formula)
         _≡?_ {{eqFormula}} = go where
           go : ∀ φ ψ → Dec (φ ≡ ψ)
-          go ⊤ ⊤ = yes (refl)
+          go ⊤ ⊤ = yes refl
           go ⊤ _ = no (λ ())
         ...
     This seems to be an often-made [complaint](https://github.com/agda/agda/issues/4804) about Agda.
@@ -389,7 +394,7 @@ In this section we introduce the semantics of classical logic.
 
 ## Valuations
 
-An *valuation* is a mapping that associates a Boolean value `𝔹` to each propositional variable.
+An *valuation* is a mapping that associates a Boolean value !remoteRef(part0)(Booleans)(𝔹) to each propositional variable.
 We use `ϱ`, `ϱ'` for indicating a generic valuation.
 
 ```
@@ -398,8 +403,8 @@ Val = PropName → 𝔹
 variable ϱ ϱ' : Val
 ```
 
-For instance, the valuation `ϱ₀` below
-assigns `ff` to `p₀` and `p₁`, and `tt` to every other variable:
+For instance, the valuation !ref(ϱ₀) below
+assigns !remoteRef(part0)(Booleans)(𝔹)(ff) to `p₀` and `p₁`, and !remoteRef(part0)(Booleans)(𝔹)(tt) to every other variable:
 
 ```
 ϱ₀ : Val
@@ -424,7 +429,8 @@ The semantics `⟦ φ ⟧ ϱ : 𝔹` of a formula `φ : Formula` in a given valu
 is a Boolean value (a.k.a. *truth value*) which is determined by
 structural induction on `φ`:
 
-* In the base cases `⊤` and `⊥`, the semantics is the corresponding truth value `tt`, resp., `ff`.
+* In the base cases !ref(Formula)(⊤) and !ref(Formula)(⊥),
+the semantics is the corresponding truth value !remoteRef(part0)(Booleans)(𝔹)(tt), resp., !remoteRef(part0)(Booleans)(𝔹)(ff).
 * In the variable case `` ` p ``, the semantics is `ϱ p` as provided by the valuation `ϱ`.
 * In the negation case `¬ φ`, we inductively compute the semantics `⟦ φ ⟧ ϱ` of `φ`,
 and then we apply the Boolean negation function `¬𝔹 : 𝔹 → 𝔹`.
@@ -449,7 +455,7 @@ infix 200 ⟦_⟧_
 !example(#example:semantics)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 For example, we can compute the semantics of some simple formulas
-(recall that both `p₀` and `p₁` evaluate to `ff` under `ϱ₀`):
+(recall that both `p₀` and `p₁` evaluate to !remoteRef(part0)(Booleans)(ff) under `ϱ₀`):
 
 ```
 _ : ⟦ ` p₀ ∧ ¬ ` p₁ ⟧ ϱ₀ ≡ ff
@@ -459,7 +465,7 @@ _ = refl
 
 ## Invariance of the semantics
 
-In principle the semantics `⟦ φ ⟧ ϱ` of a formula `φ` depends on the valuation `ϱ`.
+The semantics `⟦ φ ⟧ ϱ` of a formula `φ` depends on the valuation `ϱ`.
 However, if a formula `φ` does not contain a certain proposition `p`
 then clearly the value `ϱ p` of `ϱ` on `p` should not matter.
 We now formalise this intuition by showing
@@ -573,11 +579,21 @@ _F[_↦_] : Formula → PropName → Formula → Formula
 
 Intuitively, `φ F[ p ↦ ψ ]` is obtained from the formula `φ`
 by replacing every occurrence of proposition `p` with `ψ`.
-Substitution binds tighter than `Formula` constructors[^substitution-notation],
-e.g., ¬ φ F[ p ↦ ξ ]` is interpreted as `¬ (φ F[ p ↦ ξ ])`.
+Substitution binds tighter than !ref(Formula) constructors[^substitution-notation],
+e.g., `¬ φ F[ p ↦ ξ ] ≡ ¬ (φ F[ p ↦ ξ ])`.
+The definition of substitution follows a natural structural induction:
 
-[^substitution-notation]: Recall that the similar notation `_[_↦_]`
-is reserved for function updates.
+<!--
+```
+_ : ∀ φ p ξ →
+  ----------------------------------
+  ¬ φ F[ p ↦ ξ ] ≡ ¬ (φ F[ p ↦ ξ ])
+
+_ = λ _ _ _ → refl
+```
+-->
+
+[^substitution-notation]: Recall that the similar notation !remoteRef(part0)(Functions)(_[_↦_]) is reserved for function updates.
 
 ```
 ⊤ F[ _ ↦ ξ ] = ⊤
@@ -594,7 +610,7 @@ is reserved for function updates.
 
 !example(#example:substitution)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-For example, we have
+We have
 
 ```
 _ : (` p₀ ∨ ` p₁) F[ p₁ ↦ ` p₁ ∨ ` p₂ ] ≡ ` p₀ ∨ ` p₁ ∨ ` p₂
@@ -606,10 +622,7 @@ _ = refl
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 From time to time it is useful to substitute in parallel two propositions `p` and `q` by `ψ`, resp., `ξ`,
 written `φ F2[ p , q ↦ ψ , ξ ]`.
-For example,
-
-      ` p₀ ∨ ` p₁ F2[ p₀ , p₁ ↦ p₁ , p₀ ] ≡ ` p₁ ∨ ` p₀
-
+For example, `` ` p₀ ∨ ` p₁ F2[ p₀ , p₁ ↦ p₁ , p₀ ] ≡ ` p₁ ∨ ` p₀ ``.
 Provide a definition of parallel substitution:
 
 ```
@@ -645,14 +658,17 @@ What happens if `p ≡ q` ?
 ```
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The main property of substitution regards its interaction with the semantics
-as expressed as the following *substitution lemma*:
+The main property of substitution regards its interaction with the semantics.
+This is expressed by the following *substitution lemma*:
 
 ```
 substitution : ∀ φ p ξ ϱ →
   --------------------------------------------
   ⟦ φ F[ p ↦ ξ ] ⟧ ϱ ≡ ⟦ φ ⟧ ϱ [ p ↦ ⟦ ξ ⟧ ϱ ]
 ```
+
+Intuitively, the substitution lemma says that we can implement a syntactical substitution with a suitable update of the valuation.
+One could say that the substitution lemma shows a certain *commutation rule* between substitution and evaluation.
 
 !exercise(#exercise:substitution)(`substitution`) 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -680,6 +696,7 @@ It is convenient to state the substitution lemma in the special case of variable
 renamings : ∀ φ p q ϱ →
   ------------------------------------------
   ⟦ φ F[ p ↦ ` q ] ⟧ ϱ ≡ ⟦ φ ⟧ ϱ [ p ↦ ϱ q ]
+  
 renamings φ p q ϱ = substitution φ p (` q) ϱ 
 ```
 
@@ -689,15 +706,15 @@ Prove that a substitution `φ F[ p ↦ ξ ]` does not alter the formula `φ`
 if the variable `p` does not actually appear in `φ`:
 
 ```
-subst-id : ∀ φ p ξ → p ~∈ props φ → φ F[ p ↦ ξ ] ≡ φ
-
-aux-left = ~∈-++1
-aux-right = ~∈-++2
+subst-id : ∀ φ p ξ →
+  p ~∈ props φ →
+  ----------------
+  φ F[ p ↦ ξ ] ≡ φ
 ```
 
 *Hint:* Proceed by structural induction,
 using the assumption `p ~∈ props φ` in the variable case;
-the two auxiliary functions `aux-left` and `aux-right` will be useful in the inductive case.
+the two auxiliary functions !remoteRef(part0)(List)(~∈-++-left) and !remoteRef(part0)(List)(~∈-++-right) will be useful in the inductive case.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
@@ -710,17 +727,17 @@ subst-id (` q) p ξ p~∈φ with p ≡? q
 subst-id (¬ φ) p ξ p~∈φ
   rewrite subst-id φ p ξ p~∈φ = refl
 subst-id (φ ∧ ψ) p ξ p~∈φ
-  rewrite subst-id φ p ξ (aux-left p~∈φ) |
-          subst-id ψ p ξ (aux-right (props φ) p~∈φ) = refl 
+  rewrite subst-id φ p ξ (~∈-++-left  p~∈φ) |
+          subst-id ψ p ξ (~∈-++-right (props φ) p~∈φ) = refl 
 subst-id (φ ∨ ψ) p ξ p~∈φ
-  rewrite subst-id φ p ξ (aux-left p~∈φ) |
-          subst-id ψ p ξ (aux-right (props φ) p~∈φ) = refl 
+  rewrite subst-id φ p ξ (~∈-++-left p~∈φ) |
+          subst-id ψ p ξ (~∈-++-right (props φ) p~∈φ) = refl 
 subst-id (φ ⇒ ψ) p ξ p~∈φ
-  rewrite subst-id φ p ξ (aux-left p~∈φ) |
-          subst-id ψ p ξ (aux-right (props φ) p~∈φ) = refl 
+  rewrite subst-id φ p ξ (~∈-++-left p~∈φ) |
+          subst-id ψ p ξ (~∈-++-right (props φ) p~∈φ) = refl 
 subst-id (φ ⇔ ψ) p ξ p~∈φ
-  rewrite subst-id φ p ξ (aux-left p~∈φ) |
-          subst-id ψ p ξ (aux-right (props φ) p~∈φ) = refl 
+  rewrite subst-id φ p ξ (~∈-++-left p~∈φ) |
+          subst-id ψ p ξ (~∈-++-right (props φ) p~∈φ) = refl 
 ```
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -731,7 +748,10 @@ Prove that a double substitution ``φ F[ p ↦ ` q ] F[ q ↦ ` p ]`` does not c
 if the variable `q` does not occur in `φ`:
 
 ```
-rename-undo : ∀ φ p q → q ∉ props φ → φ F[ p ↦ ` q ] F[ q ↦ ` p ] ≡ φ
+rename-undo : ∀ φ p q →
+  q ∉ props φ →
+  --------------------------------
+  φ F[ p ↦ ` q ] F[ q ↦ ` p ] ≡ φ
 ```
 
 **Warning**: `q ∉ props φ` here is different from `q ~∈ props φ`.
@@ -739,18 +759,11 @@ While the latter is just an abbreviation for `~ (q ∈ props φ)`
 and thus it provides indirect evidence that `q` is not in `props φ`,
 the former provides direct evidence that `q` is not in `props φ`
 and thus it is stronger.
-The two happen to be equivalent thanks to the coversion functions
-
-```
-_ = ~∈→∉ , ∉→~∈
-```
+The two happen to be equivalent thanks to the conversion functions
+!remoteRef(part0)(List)(~∈→∉) and !remoteRef(part0)(List)(∉→~∈)
 
 *Hint:* Proceed by induction on the evidence `q ∉ props φ` that `q` is not in `φ`.
-The following two auxiliary functions will be useful in the inductive cases:
-
-```
-_ = ∉-++1 , ∉-++2
-```
+The auxiliary functions !remoteRef(part0)(List)(∉-++-left) and !remoteRef(part0)(List)(∉-++-right) will be useful in the inductive cases.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
@@ -771,23 +784,23 @@ rename-undo (¬ φ) p q q∉φ
   rewrite rename-undo φ p q q∉φ = refl
 
 rename-undo (φ ∧ ψ) p q q∉φ
-  rewrite rename-undo φ p q (∉-++1 q∉φ) |
-          rename-undo ψ p q (∉-++2 {as = props φ} q∉φ)
+  rewrite rename-undo φ p q (∉-++-left q∉φ) |
+          rename-undo ψ p q (∉-++-right {as = props φ} q∉φ)
   = refl
   
 rename-undo (φ ∨ ψ) p q q∉φ
-  rewrite rename-undo φ p q (∉-++1 q∉φ) |
-          rename-undo ψ p q (∉-++2 {as = props φ} q∉φ)
+  rewrite rename-undo φ p q (∉-++-left q∉φ) |
+          rename-undo ψ p q (∉-++-right {as = props φ} q∉φ)
   = refl
   
 rename-undo (φ ⇒ ψ) p q q∉φ
-  rewrite rename-undo φ p q (∉-++1 q∉φ) |
-          rename-undo ψ p q (∉-++2 {as = props φ} q∉φ)
+  rewrite rename-undo φ p q (∉-++-left q∉φ) |
+          rename-undo ψ p q (∉-++-right {as = props φ} q∉φ)
   = refl
   
 rename-undo (φ ⇔ ψ) p q q∉φ
-  rewrite rename-undo φ p q (∉-++1 q∉φ) |
-          rename-undo ψ p q (∉-++2 {as = props φ} q∉φ)
+  rewrite rename-undo φ p q (∉-++-left q∉φ) |
+          rename-undo ψ p q (∉-++-right {as = props φ} q∉φ)
   = refl
 ```
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -796,7 +809,7 @@ rename-undo (φ ⇔ ψ) p q q∉φ
 
 ### Tautology
 
-A *tautology* is a formula that evaluates to `tt` under every valuation.
+A *tautology* is a formula that evaluates to !remoteRef(part0)(Booleans)(tt) under every valuation:
 
 ```
 Tautology : Formula → Set
@@ -804,8 +817,8 @@ Tautology φ = ∀[ ϱ ] ⟦ φ ⟧ ϱ ≡ tt
 ```
 
 For instance the *law of excluded middle* `` ` p ∨ ¬ ` p ``,
-which amounts to say that the propositional variable `p` has either the value `tt` or `ff`,
-is a tautology:
+which amounts to say that the propositional variable `p` has either the value !remoteRef(part0)(Booleans)(tt) or !remoteRef(part0)(Booleans)(ff),
+is a tautology of classical logic:
 
 ```
 LEM : Tautology (` p ∨ ¬ ` p)
@@ -814,8 +827,7 @@ LEM {p} ϱ with ϱ p
 ... | ff = refl
 ```
 
-On the other hand, `` ` p `` is not a tautology since the (any) valuation that maps `p` to `ff`
-(such as `const ff`) does not satisfy it:
+On the other hand, `` ` p `` is not a tautology since the (any) valuation that maps `p` to !remoteRef(part0)(Booleans)(ff), such as `const ff`, does not satisfy it:
 
 ```
 _ : ~ Tautology (` p)
@@ -831,21 +843,23 @@ Tautology? : Decidable Tautology
 Tautology? φ = ∀?[ ϱ ] ⟦ φ ⟧ ϱ ≡? tt
 ```
 
-For instance, we can check that `` ` p₀ ∨ ¬ ` p₀ `` is a tautology,
-while `` ` p₀ ∨ ` p₁ `` is not by computation,
-where `p₀` and `p₁` are two concrete propositions.
+For instance, we can check by computing that `` ` p₀ ∨ ¬ ` p₀ `` is a tautology,
+and that `` ` p₀ ∨ ` p₁ `` is not a tautology,
+where `p₀` and `p₁` are two concrete propositions [^why-erasure].
+
+[^why-erasure]: We use the erasure mapping !remoteRef(part0)(Decidable)(⌞_⌟) converting a !remoteRef(part0)(Decidable)(Decidable) to the corresponding Boolean value !remoteRef(part0)(Booleans)(𝔹) in order to avoid reasoning about equality of decidability proofs.
 
 ```
-_ : n ≡ 0 → erase (Tautology? (` p₀ ∨ ¬ ` p₀)) ≡ tt
+_ : n ≡ 3 → ⌞ Tautology? (` p₀ ∨ ¬ ` p₀) ⌟ ≡ tt
 _ = λ{refl → refl}
 
-_ : n ≡ 0 → erase (Tautology? (` p₀ ∨ ¬ ` p₁)) ≡ ff
+_ : n ≡ 3 → ⌞ Tautology? (` p₀ ∨ ¬ ` p₁) ⌟ ≡ ff
 _ = λ{refl → refl}
 ```
 
 (Note that we need to assume that `n` is some concrete number here,
 allowing us to actually enumerate all valuations.
-We added the function `erase` to convert `yes`, resp., `no`, to `tt`, resp., `ff`,
+We added the function `erase` to convert `yes`, resp., `no`, to !remoteRef(part0)(Booleans)(tt), resp., !remoteRef(part0)(Booleans)(ff),
 thus discarding the proof of correctness returned by `Tautology?`.)
 
 ### Entailment and equivalence
@@ -882,13 +896,13 @@ For instance, we can check that `` ` p₀ `` entails `` ` p₀ ∨ ` p₁ ``, bu
 and that `` ` p₀ ∧ ` p₁ `` is logically equivalent to `` ` p₁ ∧ ` p₀ ``:
 
 ```
-_ : n ≡ 0 → erase (` p₀ ⇛? ` p₀ ∨ ` p₁) ≡ tt
+_ : n ≡ 3 → ⌞ ` p₀ ⇛? ` p₀ ∨ ` p₁ ⌟ ≡ tt
 _ = λ{refl → refl}
 
-_ : n ≡ 0 → erase (` p₀ ⇛? ` p₁) ≡ ff
+_ : n ≡ 3 → ⌞ ` p₀ ⇛? ` p₁ ⌟ ≡ ff
 _ = λ{refl → refl}
 
-_ : n ≡ 0 → erase (` p₀ ∧ ` p₁ ⟺? ` p₁ ∧ ` p₀) ≡ tt
+_ : n ≡ 3 → ⌞ ` p₀ ∧ ` p₁ ⟺? ` p₁ ∧ ` p₀ ⌟ ≡ tt
 _ = λ{refl → refl}
 ```
 
@@ -1086,10 +1100,10 @@ For instance, the formula `` ` p₀ ∧ ¬ ` p₁ `` is satisfiable,
 however `` ` p₀ ∧ ¬ ` p₀ `` is not:
 
 ```
-_ : n ≡ 0 → erase (Sat? (` p₀ ∧ ¬ ` p₁)) ≡ tt
+_ : n ≡ 3 → ⌞ Sat? (` p₀ ∧ ¬ ` p₁) ⌟ ≡ tt
 _ = λ{refl → refl}
 
-_ : n ≡ 0 → erase (Sat? (` p₀ ∧ ¬ ` p₀)) ≡ ff
+_ : n ≡ 3 → ⌞ Sat? (` p₀ ∧ ¬ ` p₀) ⌟ ≡ ff
 _ = λ{refl → refl}
 ```
 
@@ -1467,7 +1481,7 @@ For instance, consider the valuation
 ϱ₁ = const tt [ p₀ ↦ ff ] [ p₁ ↦ ff ]
 ```
 
-that assigns value `tt` to every proposition,
+that assigns value !remoteRef(part0)(Booleans)(tt) to every proposition,
 except for `p₀` and `p₁`.
 Under the assumption that there are only three propositions `p₀, p₁, p₂` in the universe,
 a characteristic formula for `ϱ₁` is, e.g.,
@@ -1478,11 +1492,11 @@ a characteristic formula for `ϱ₁` is, e.g.,
 
 In order to show `ψ₁ CharFormulaOf ϱ₁`, we use appropriate Boolean inversion properties
 to enforce that every valuation `ϱ′` satisfying `ψ₁`
-necessarily assigns `ff` to `p₀, p₁`, and `tt` to `p₂`.
+necessarily assigns !remoteRef(part0)(Booleans)(ff) to `p₀, p₁`, and !remoteRef(part0)(Booleans)(tt) to `p₂`.
 We then use function extensionality to conclude `ϱ′ ≡ ϱ₁`, as required:
 
 ```
-ψ₁CharFormulaOfϱ₁ : n ≡ 0 → ψ₁ CharFormulaOf ϱ₁
+ψ₁CharFormulaOfϱ₁ : n ≡ 3 → ψ₁ CharFormulaOf ϱ₁
 ψ₁CharFormulaOfϱ₁ refl = refl , goal where
 
   goal : ∀ ϱ′ → ⟦ ψ₁ ⟧ ϱ′ ≡ tt → ϱ′ ≡ ϱ₁
@@ -1550,7 +1564,7 @@ into a corresponding *characteristic literal* `「 p 」 ϱ` depending on whethe
 ... | ff = ¬ ` p
 ```
 
-In the first case (i.e., if `ϱ p` is `tt`)
+In the first case (i.e., if `ϱ p` is !remoteRef(part0)(Booleans)(tt))
 we say that the characteristic literal of `「 p 」 ϱ` is *positive*,
 and in the other case that it is *negative*.
 There are two fundamental properties satisfied by `「 p 」 ϱ`.
@@ -1569,7 +1583,7 @@ charLit-sound ϱ p with inspect (ϱ p)
 (Notice that we need to rewrite twice in each case.
 For example in the first case we need to rewrite twice accoriding to the same equality `ϱp≡tt : ϱ p ≡ tt`:
 The first rewrite transforms `⟦ 「 p 」 ϱ ⟧ ϱ` into ``⟦ ` p ⟧ ϱ``,
-and the second rewrite transforms the latter into `tt`, as required.
+and the second rewrite transforms the latter into !remoteRef(part0)(Booleans)(tt), as required.
 A single rewrite does not suffice.
 For this reason, the simpler solution
 
@@ -1634,7 +1648,7 @@ For example, we can compute the characteristic formula of `ϱ₀`
 (automatically, this time):
 
 ```
-_ : n ≡ 0 → 〔 ϱ₀ 〕 ≡ ¬ ` p₀ ∧ ¬ ` p₁ ∧ ` p₂ ∧ ⊤
+_ : n ≡ 3 → 〔 ϱ₀ 〕 ≡ ¬ ` p₀ ∧ ¬ ` p₁ ∧ ` p₂ ∧ ⊤
 _ = λ{refl → refl}
 ```
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1780,14 +1794,14 @@ and false otherwise:
 
 ```
 f₀ : 𝔹Fun
-f₀ ϱ = foldr (λ b₀ b₁ → b₁ ∧𝔹 erase (b₀ ≡? ϱ p₀)) tt (map ϱ propNames)
+f₀ ϱ = foldr (λ b₀ b₁ → b₁ ∧𝔹 ⌞ b₀ ≡? ϱ p₀ ⌟) tt (map ϱ propNames)
 ```
 
 We can construct the corresponding formula in the special case of three propositional variables
 (the application of !ref(simplify) removes some redundant !ref(Formula)(⊤) and !ref(Formula)(⊥) constants):
 
 ```
-_ : n ≡ 0 → simplify (fun→formula f₀) ≡
+_ : n ≡ 3 → simplify (fun→formula f₀) ≡
   ` p₀ ∧ ` p₁ ∧ ` p₂ ∨
     ¬ ` p₀ ∧ ¬ ` p₁ ∧ ¬ ` p₂
 _ = λ{ refl → refl}
@@ -1802,9 +1816,9 @@ and compute the corresponding formula with the help of `fun→formula`.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
 xor : 𝔹Fun
-xor ϱ = foldr (λ b₀ b₁ → erase (b₀ ≡? b₁)) (ϱ p₀) (tail (map ϱ propNames))
+xor ϱ = foldr (λ b₀ b₁ → ⌞ b₀ ≡? b₁ ⌟) (ϱ p₀) (tail (map ϱ propNames))
 
-_ : n ≡ 0 → simplify (fun→formula xor) ≡
+_ : n ≡ 3 → simplify (fun→formula xor) ≡
   ` p₀ ∧ ` p₁ ∧ ` p₂ ∨
     ¬ ` p₀ ∧ ¬ ` p₁ ∧ ` p₂ ∨
       ¬ ` p₀ ∧ ` p₁ ∧ ¬ ` p₂ ∨
@@ -1889,7 +1903,7 @@ then we need to show that `fun→formula f` also evaluates to true:
   goal : ⟦ fun→formula f ⟧ ϱ ≡ tt
 ```
 
-We begin by finding the occurrence `findVal ϱ` of `ϱ` in the list of all valuations !ref(vals) and then, knowing that `f ϱ` evaluates to `tt` by assumption,
+We begin by finding the occurrence `findVal ϱ` of `ϱ` in the list of all valuations !ref(vals) and then, knowing that `f ϱ` evaluates to !remoteRef(part0)(Booleans)(tt) by assumption,
 we find a witness `ϱ∈ttVals` that `ϱ` belongs to !ref(𝔹Fun→Formula)(ttVals):
 
 ```
@@ -2302,7 +2316,7 @@ f¬ ϱ = ¬𝔹 ϱ p₀
 
 The first observation is that this fragment can only encode monotone Boolean functions.
 (We have here in mind the natural ordering `ff ≤𝔹 tt` on `𝔹`.)
-Intuitively, a Boolean function is monotone iff flipping one input from `ff` to `tt` can only increase the output.
+Intuitively, a Boolean function is monotone iff flipping one input from !remoteRef(part0)(Booleans)(ff) to !remoteRef(part0)(Booleans)(tt) can only increase the output.
 Formally, we define a partial order `_≤V_` on valuation by lifting `_≤𝔹_` point-wise in the expected way:
 
 ```

@@ -24,11 +24,12 @@ show_dir_listing    : false
 
 plugins:
   - jekyll-toc
+  - html-proofer
 #  - jekyll-paginate
 #  - jekyll-sitemap
 #  - jekyll-gist
 #  - jekyll-feed
-#  - jemoji
+  - jemoji
 
 baseurl: "/lia"
 url: ""

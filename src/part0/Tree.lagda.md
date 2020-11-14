@@ -51,7 +51,7 @@ instance
     go : ∀ s t → Dec (s ≡ t)
     go* : ∀ as bs → Dec (as ≡ bs)
 
-    go Nil Nil = yes (refl)
+    go Nil Nil = yes refl
     go Nil (Node _ _) = no (λ ())
     go (Node _ _) Nil = no (λ ())
     go (Node a as) (Node b bs)
@@ -65,7 +65,7 @@ instance
     -- need an extra case analysis to satisfy the termination checker
     -- (essentially reproving decidability of list equality);
     -- alternative: define "go" by well-founded induction on the size of the tree...
-    go* ε ε = yes (refl)
+    go* ε ε = yes refl
     go* ε (_ ∷ _) = no (λ ())
     go* (_ ∷ _) ε = no (λ ())
     go* (a ∷ as) (b ∷ bs)

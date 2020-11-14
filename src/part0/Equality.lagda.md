@@ -119,7 +119,7 @@ instance
     go (right x) (left x₁) = no λ ()
     go (right b) (right b')
       with b ≡? b'
-    ... | yes refl = yes (refl)
+    ... | yes refl = yes refl
     ... | no b≢b' = no λ{refl → b≢b' refl}
 ```
 

@@ -1,6 +1,7 @@
-personal_ws-1.1 en 298 
+personal_ws-1.1 en 314 
 APAL
 Agda
+Agda's
 Antisymmetry
 Archimedean
 Asser
@@ -74,6 +75,7 @@ NormalForms
 PDA
 Peirce's
 Prieto
+PropName
 Rosser
 Satisfiability
 Schönfinkel
@@ -82,6 +84,8 @@ Sheffer
 Sheffer's
 Skolem
 Sobocinski
+Sublist
+Subword
 Suppes
 Suprema
 Szelepcsényi
@@ -143,6 +147,7 @@ colours
 commutativity
 complementation
 computable
+concatMap
 conjunctively
 constructible
 contrapositive
@@ -151,6 +156,7 @@ countability
 cref
 csl
 darkblue
+dec
 decidability
 definability
 differentiable
@@ -164,8 +170,10 @@ distributivity
 dualisation
 dualise
 dually
+duplications
 elementarily
 entailments
+eq
 equalities
 equisatisfiability
 equisatisfiable
@@ -189,7 +197,9 @@ inequivalent
 inexpressibility
 infinitary
 infiniteness
+inj
 injective
+injectively
 injectivity
 instantiation
 interpolant
@@ -197,6 +207,7 @@ interpolants
 intuitionism
 intuitionistic
 intuitionistically
+invariance
 involutive
 irreflexive
 irreflexivity
@@ -217,6 +228,7 @@ mx
 n'y
 nand
 nat
+naïve
 neighbouring
 nonaxiomatisability
 nonaxiomatisable
@@ -259,6 +271,7 @@ relativisations
 relativise
 relativised
 relativising
+remoteRef
 satifiable
 satisfiability
 satisfiable
@@ -271,6 +284,7 @@ sequents
 showonlyrefs
 skolemisation
 solvability
+stackoverflow
 subcases
 subcollection
 subformula
@@ -287,11 +301,13 @@ th
 tilings
 todo
 tricoloured
+tt
 ukasiewicz
 unary
 undirected
 univariate
 unprovable
+unranked
 unreferenced
 unsatisfiable
 unselected

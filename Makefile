@@ -92,6 +92,9 @@ $(OUTDIR):
 # $(PART_DIRS): $(OUTDIR)/%:
 # 	@mkdir -p $@
 
+check: build
+	$(HTMLPROOFER) ./_site
+
 build: markdown
 	$(JEKYLL) build --incremental --trace
 

@@ -16,11 +16,18 @@ In this section we introduce *Boolean values*.
 data 𝔹 : Set where
   ff : 𝔹
   tt : 𝔹
+```
 
-erase : ∀ {ℓ} {A : Set ℓ} → Dec A → 𝔹
-erase (yes _) = tt
-erase (no _) = ff
+Erasure:
 
+⌊_⌋
+```
+⌞_⌟ : ∀ {ℓ} {A : Set ℓ} → Dec A → 𝔹
+⌞ yes _ ⌟ = tt
+⌞ no _ ⌟ = ff
+```
+
+```
 tt≢ff : tt ≢ ff
 tt≢ff ()
 
@@ -42,10 +49,10 @@ instance
   _≡?_ {{Eq𝔹}} = go where
 
     go : ∀ b c → Dec (b ≡ c)
-    go tt tt = yes (refl)
+    go tt tt = yes refl
     go tt ff = no (λ ())
     go ff tt = no (λ ())
-    go ff ff = yes (refl)
+    go ff ff = yes refl
 ```
 
 ## Truth tables

@@ -16,11 +16,11 @@ inj-fsuc : ∀ {n} {i j : Fin n} → fsuc i ≡ fsuc j → i ≡ j
 inj-fsuc refl = refl
 
 _≟Fin_ : ∀ {n} → Decidable2 (_≡_ {A = Fin n})
-fzero ≟Fin fzero = yes (refl)
+fzero ≟Fin fzero = yes refl
 fzero ≟Fin fsuc _ = no (λ ())
 fsuc _ ≟Fin fzero = no (λ ())
 fsuc x ≟Fin fsuc y with x ≟Fin y
-... | yes refl = yes (refl)
+... | yes refl = yes refl
 ... | no x≢y = no λ{refl → x≢x-elim x≢y}
 
 instance
