@@ -127,9 +127,9 @@ data Formula : Set where
 Note that there is a slight notation overload for variables `` ` p`` w.r.t. the pure mathematical syntax $p$
 since we have to explicitly name the `` `_ `` constructor. The syntax for the other connectives is identical.
 
-We follow standard notational conventions and assume that `¬` is the operator with the highest priority
+We follow standard notational conventions and assume that !ref(Formula)(¬_) is the operator with the highest priority
 (i.e., it binds tighter than any other operator),
-followed by `∧`, `∨` and `⇒`, and `⇔`:
+followed by !ref(Formula)(_∧_), !ref(Formula)(_∨_) and !ref(Formula)(_⇒_), and !ref(Formula)(_⇔_):
 
 ```
 infix 100 `_
@@ -159,7 +159,7 @@ a straightforward structural induction often suffices.
 <!-- as in `props` [above](#occurring-propositions) -->
 However, this is not always the case, and for more complicated recursive definitions
 we need to use other forms of recursion,
-such as [well-founded recursion](/part0/wf).
+such as [well-founded recursion](../../part0/wf). TODO: FIX THIS LINK.
 In such situations, it is useful to have a notion of *size* of a formula in order to show that the size decreases at each step.
 The definition of formula size is given by structural induction on `Formula`:
 
@@ -395,12 +395,12 @@ In this section we introduce the semantics of classical logic.
 ## Valuations
 
 An *valuation* is a mapping that associates a Boolean value !remoteRef(part0)(Booleans)(𝔹) to each propositional variable.
-We use `ϱ`, `ϱ'` for indicating a generic valuation.
+We use !ref(ϱ) and !ref(ϱ′) for indicating a generic valuation.
 
 ```
 Val = PropName → 𝔹
 
-variable ϱ ϱ' : Val
+variable ϱ ϱ′ : Val
 ```
 
 For instance, the valuation !ref(ϱ₀) below
@@ -503,22 +503,22 @@ We say that a proposition `p` is *fresh* w.r.t. `φ`
 if `p` does not occur in `props φ`.
 
 We can now formulate the invariance of the semantics.
-Intuitively, if two valuations `ϱ` and `ϱ'` agree (i.e., have the same value)
+Intuitively, if two valuations `ϱ` and `ϱ′` agree (i.e., have the same value)
 on the propositions `props φ` occurring in `φ`,
 then the semantics is the same:
 
 ```
 invariance : ∀ φ →
-  Agree ϱ ϱ' (props φ) →
+  Agree ϱ ϱ′ (props φ) →
   ------------------
-  ⟦ φ ⟧ ϱ ≡ ⟦ φ ⟧ ϱ'
+  ⟦ φ ⟧ ϱ ≡ ⟦ φ ⟧ ϱ′
 ```
 
 !exercise(#exercise:invariance)(`invariance`)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Prove invariance of the semantics.
-*Hint*: Proceed by structural induction on formulas. In the variable case, use the assumption `Agree ϱ ϱ' (props φ)`.
-In the inductive cases, use the fact that if `ϱ` and `ϱ'` agree on their value on the propositions in `φ ∧ ψ`,
+*Hint*: Proceed by structural induction on formulas. In the variable case, use the assumption `Agree ϱ ϱ′ (props φ)`.
+In the inductive cases, use the fact that if `ϱ` and `ϱ′` agree on their value on the propositions in `φ ∧ ψ`,
 then they do so on `φ`, resp., `ψ`.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -845,9 +845,7 @@ Tautology? φ = ∀?[ ϱ ] ⟦ φ ⟧ ϱ ≡? tt
 
 For instance, we can check by computing that `` ` p₀ ∨ ¬ ` p₀ `` is a tautology,
 and that `` ` p₀ ∨ ` p₁ `` is not a tautology,
-where `p₀` and `p₁` are two concrete propositions [^why-erasure].
-
-[^why-erasure]: We use the erasure mapping !remoteRef(part0)(Decidable)(⌞_⌟) converting a !remoteRef(part0)(Decidable)(Decidable) to the corresponding Boolean value !remoteRef(part0)(Booleans)(𝔹) in order to avoid reasoning about equality of decidability proofs.
+where !ref(p₀) and !ref(p₁) are two concrete propositions.
 
 ```
 _ : n ≡ 3 → ⌞ Tautology? (` p₀ ∨ ¬ ` p₀) ⌟ ≡ tt
@@ -857,10 +855,10 @@ _ : n ≡ 3 → ⌞ Tautology? (` p₀ ∨ ¬ ` p₁) ⌟ ≡ ff
 _ = λ{refl → refl}
 ```
 
-(Note that we need to assume that `n` is some concrete number here,
+(Note that we need to assume that !ref(n) is some concrete number here,
 allowing us to actually enumerate all valuations.
-We added the function `erase` to convert `yes`, resp., `no`, to !remoteRef(part0)(Booleans)(tt), resp., !remoteRef(part0)(Booleans)(ff),
-thus discarding the proof of correctness returned by `Tautology?`.)
+ We use the erasure mapping !remoteRef(part0)(Booleans)(⌞_⌟) to convert !remoteRef(part0)(Decidable)(Dec)(yes), resp., !remoteRef(part0)(Decidable)(Dec)(no), to !remoteRef(part0)(Booleans)(𝔹)(tt), resp., !remoteRef(part0)(Booleans)(𝔹)(ff),
+thus discarding the proof of correctness returned by !ref(Tautology?).)
 
 ### Entailment and equivalence
 
@@ -880,8 +878,8 @@ _⟺_ : Formula → Formula → Set
 ```
 
 (Although typographically similar,
-entailment `_⇛_` shoud not be confused with the formula implication constructor `_⇒_ : Formula → Formula → Formula`;
-the same warning applies to logical equivalence `_⟺_` vs. the bi-implication constructor `_⇔_`.)
+entailment !ref(_⇛_) shoud not be confused with the formula implication constructor [`_⇒_ : Formula → Formula → Formula`](#Formula._⇒_);
+the same warning applies to logical equivalence !ref(_⟺_) vs. the bi-implication constructor !ref(Formula)(_⇔_).)
 For the same reasons as for tautology, entailment and equivalence are decidable:
 
 ```
@@ -922,21 +920,13 @@ trans-⇛ _ _ _ φ⊨ψ ψ⊨ξ ϱ = ψ⊨ξ ϱ ∘ φ⊨ψ ϱ
 ```
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-For instance, we can prove the double negation law with the method of truth tables:
-
-```
-doubleNegationLaw : ∀ φ → ¬ ¬ φ ⟺ φ
-doubleNegationLaw φ ϱ with ⟦ φ ⟧ ϱ
-... | tt = refl
-... | ff = refl
-```
-
 !exercise(#exercise:common-equivalences)(Common equivalences)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Prove the folowing equivalences.
 *Hint:* Use the method of truth tables.
 
 ```
+doubleNegationLaw : ∀ φ → ¬ ¬ φ ⟺ φ
 deMorganAnd : ∀ φ ψ → ¬ (φ ∧ ψ) ⟺ ¬ φ ∨ ¬ ψ
 deMorganOr : ∀ φ ψ → ¬ (φ ∨ ψ) ⟺ ¬ φ ∧ ¬ ψ
 deMorganOr-alt : ∀ φ ψ → φ ∨ ψ ⟺ ¬ (¬ φ ∧ ¬ ψ)
@@ -946,6 +936,10 @@ deMorganIff : ∀ φ ψ → ¬ (φ ⇔ ψ) ⟺ ¬ φ ⇔ ψ
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
+doubleNegationLaw φ ϱ with ⟦ φ ⟧ ϱ
+... | tt = refl
+... | ff = refl
+
 deMorganAnd φ ψ ϱ with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ
 ... | tt | tt = refl
 ... | tt | ff = refl
@@ -980,8 +974,8 @@ deMorganIff φ ψ ϱ with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ
 
 ### Equivalence is a congruence
 
-Logical equivalence is a *congruence*:
-Replacing a formula with an equivalent one preserves the semantics.
+Logical equivalence is a *congruence*,
+in the sense that replacing a formula with an equivalent one preserves the semantics:
 
 ```
 congF : ∀ φ ψ ξ p →
@@ -990,8 +984,11 @@ congF : ∀ φ ψ ξ p →
   ξ F[ p ↦ φ ] ⟺ ξ F[ p ↦ ψ ]
 ```
 
-This is proved with a straightforward structural induction:
-
+!hide
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The proof follows a straightforward structural induction.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
 congF _ _ ⊤ p φ⟺ψ ϱ = refl
 
@@ -1026,6 +1023,7 @@ congF φ ψ (ξ₀ ⇔ ξ₁) p φ⟺ψ ϱ
        congF φ ψ ξ₁ p φ⟺ψ ϱ
 ... | ind₀ | ind₁ rewrite ind₀ | ind₁ = refl
 ```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 !exercise(#exercise:cong2F)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1079,6 +1077,9 @@ cong2F φ₀ φ₁ ψ₀ ψ₁ (ξ₀ ⇔ ξ₁) p₀ p₁ φ₀⟺ψ₀ φ₁�
 ... | ind₀ | ind₁ rewrite ind₀ | ind₁ = refl
 ```
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The congruence properties !ref(congF) and !ref(cong2F) are very convenient to quickly show correctness of many formula transformations
+(such as those in [Functional completeness](#Functional-Completeness) below and in transformations to [normal forms](../../part1/NormalForms).
 
 ## Satisfiability
 
@@ -1147,8 +1148,8 @@ infix 10 ⋀_
 ```
 
 (Despite the typographical similarity,
-`⋀` is a unary function mapping lists of formulas to their logical conjunction,
-while `_∧_ : Formula → Formula → Formula` is a binary formula constructor.)
+!ref(⋀_) is a unary function mapping lists of formulas to their logical conjunction,
+while [`_∧_ : Formula → Formula → Formula`](#Formula._∧_) is a binary formula constructor.)
 For instance, we have
 
 ```
@@ -1172,7 +1173,7 @@ conjProp2 : ∀ φs ϱ →
 
 !exercise(#exercise:long-conjunctions)(Long conjunctions)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Prove the two defining properties `conjProp1` and `conjProp2` of long conjunctions
+Prove the two defining properties !ref(conjProp1) and !ref(conjProp2) of long conjunctions
 *Hint:* Use the corresponding properties for Booleans.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1215,7 +1216,7 @@ disjProp-ff : ∀ φs ϱ →
 
 !exercise(#exercise:long-disjunctions)(Long disjunctions) 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Prove the two defining properties `disjProp-tt` and `disjProp-ff` above.
+Prove the two defining properties !ref(disjProp-tt) and !ref(disjProp-ff) above.
 *Hint:* Use the corresponding properties for Booleans.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1247,8 +1248,8 @@ Context = Formula *
 ```
 
 If `Γ` is a context and `φ` is a formula,
-we can add `φ` to `Γ` and form the new context `Γ · φ`
-(this is just adding an element on a list but written on the right).
+then we can add `φ` to `Γ` and form the new context `Γ · φ`
+(this is just adding an element in front of a list but written on the right).
 
 ```
 infixl 50 _·_  
@@ -1343,11 +1344,11 @@ context2 Γ {φ} ⋀Γ⇛φ ϱ AllΓ = ⋀Γ⇛φ ϱ (conjProp2 Γ ϱ AllΓ)
 
 ### Deduction theorem
 
-The semantic deduction theorem establishes a close connection between the implication connective `_⇒_`,
+The semantic deduction theorem establishes a close connection between the implication connective !ref(Formula)(_⇒_),
 which is a syntactic object,
-and entailment `_⊨_`, which is a semantic one.
+and entailment !ref(_⊨_), which is a semantic one.
 It consists of two halves.
-The first half shows how to move a formula from the context to the right of `_⊨_`:
+The first half shows how to move a formula from the context to the right of !ref(_⊨_):
 
 ```
 semDT1 : ∀ Γ φ ψ →
@@ -1367,7 +1368,7 @@ semDT2 : ∀ Γ φ ψ →
 
 !exercise(#exercise:sem-DT)(Semantic deduction theorem)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Prove the two parts `semDT1` and `semDT2` of the semantic deduction theorem.
+Prove the two parts !ref(semDT1) and !ref(semDT2) of the semantic deduction theorem.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
@@ -1419,25 +1420,33 @@ _ : ∅ · φ₀ · φ₁ Imply ` p₀ ≡ φ₀ ⇒ φ₁ ⇒ ` p₀
 _ = refl
 ```
 
-We can now state and prove the following "long" versions of the semantic deduction theorem.
+We can now state the following "long" versions of the semantic deduction theorem.
 
 ```
 longSemDT1 : ∀ Δ φ →
   Δ ⊨ φ →
   -------------
   ∅ ⊨ Δ Imply φ
-  
-longSemDT1 ε φ ε⊨φ = ε⊨φ
-longSemDT1 (ψ ∷ Δ) φ ψ∷Δ⊨φ = longSemDT1 Δ (ψ ⇒ φ) (semDT1 Δ ψ φ ψ∷Δ⊨φ)
 
 longSemDT2 : ∀ Δ φ →
   ∅ ⊨ Δ Imply φ →
   -----
   Δ ⊨ φ
-  
+```
+
+!hide
+~~~~~~~~~
+The proofs are a straightforward applications of !ref(semDT1) and !ref(semDT2).
+~~~~~~~~~
+~~~~~~~~~
+```
+longSemDT1 ε φ ε⊨φ = ε⊨φ
+longSemDT1 (ψ ∷ Δ) φ ψ∷Δ⊨φ = longSemDT1 Δ (ψ ⇒ φ) (semDT1 Δ ψ φ ψ∷Δ⊨φ)
+
 longSemDT2 ε φ ∅⊨φ ϱ All∅ = ∅⊨φ ϱ All∅
 longSemDT2 (ψ ∷ Δ) φ ∅⊨ΔImplyφ = semDT2 Δ ψ φ (longSemDT2 Δ (ψ ⇒ φ) ∅⊨ΔImplyφ)
 ```
+~~~~~~~~~
 
 # Formula simplification
 
