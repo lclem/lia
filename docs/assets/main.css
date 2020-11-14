@@ -647,6 +647,8 @@ pre.Spec { font-family: 'DejaVu Sans Mono', 'Source Code Pro', 'Bitstream Vera S
 .Record { color: #0000CD; }
 
 /* OtherAspects. */
+.UnsolvedMeta { color: black; background: yellow; }
+
 .UnsolvedConstraint { color: black; background: yellow; }
 
 .TerminationProblem { color: black; background: #FFA07A; }
