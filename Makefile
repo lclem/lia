@@ -9,7 +9,6 @@ SVGS := $(INCLUDES)/svgs
 PARTS := part0
 #part1 part2 part3 part4
 AGDA := agda
-PANDOC := pandoc
 PP := ./pp/pp-macos
 #~/.local/bin/pp
 EPUBCHECK := epubcheck
@@ -23,6 +22,11 @@ ASPELL = aspell
 
 # the citation style
 CSL := natbib.csl
+
+# the bibliography file
+BIB := bibliography.bib
+
+PANDOC := pandoc --citeproc --filter=pandoc-numbering --bibliography=$(BIB) --csl=$(CSL) --metadata link-citations=true --metadata numbersections=true --metadata number-sections=true --number-sections --from markdown --to markdown_phpextra
 
 #$(info PARTS:$(PARTS))
 
@@ -97,6 +101,24 @@ server-start:
 # Stop detached Jekyll server
 server-stop:
 	pkill -f jekyll
+
+# special treatment for the index
+$(OUTDIR)/index.md: $(SRCDIR)/index.md
+	@echo "$(SRCDIR)/index.md --> $(OUTDIR)/index.md\c"
+
+	@$(PANDOC) $(SRCDIR)/index.md -o $(OUTDIR)/index.md
+
+	$(eval LAST_MODIFIED := $(shell stat -f "%Sm" $(SRCDIR)/index.md))
+
+	@gsed -i "1i---" $(OUTDIR)/index.md
+	@gsed -i "2ititle : Table of Contents" $(OUTDIR)/index.md
+	@gsed -i "3ilayout : home" $(OUTDIR)/index.md
+	@gsed -i "4ilast-modified: $(LAST_MODIFIED)" $(OUTDIR)/index.md
+	@gsed -i "5ipermalink: /" $(OUTDIR)/index.md
+	@gsed -i "6i---" $(OUTDIR)/index.md
+#	@gsed -i "6i " $(OUTDIR)/index.md
+
+	@echo " [DONE]"
 
 # don't process refs for now
 # define process_refs
@@ -277,7 +299,7 @@ $(OUTDIR)/$1/$2.md: $(TMPDIR)/$1.$2.md
 
 # STEP 1: process citations
 # Table of contents shows up only with options "--from markdown --to markdown_phpextra"
-	@$(PANDOC) --filter=pandoc-citeproc --filter=pandoc-numbering --bibliography=bibliography.bib --csl=$(CSL) --metadata link-citations=true --metadata numbersections=true --metadata number-sections=true --from markdown --to markdown_phpextra $(TMPDIR)/$1.$2.pp.md -o $(TMPDIR)/$1.$2.pandoc.md --number-sections
+	@$(PANDOC) $(TMPDIR)/$1.$2.pp.md -o $(TMPDIR)/$1.$2.pandoc.md
 # 
 
 # sometimes pandoc transforms <pre class="Agda"> to <pre markdown="1" class="Agda">, we need to undo this 

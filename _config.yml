@@ -49,6 +49,7 @@ toc:
 
 exclude:
   - "Makefile"
+  - "README.md"
   - "*.lagda.md"
   - "*.agdai"
   - "*.agda-lib"

@@ -1,9 +1,9 @@
 ---
-title: Utilities
+title: Utilities 🚧
 ---
   
 ```
-module part0.utils where
+module part0.Utils where
 open import Agda.Primitive public
 
 whatever : Setω
