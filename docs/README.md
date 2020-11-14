@@ -1,3 +1,3 @@
-![build](https://github.com/lclem/lia/workflows/build/badge.svg)
+![build](https://github.com/lclem/lia/workflows/build-macos/badge.svg)
 
 # lia
