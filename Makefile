@@ -83,8 +83,8 @@ markdown: agda refs $(MARKDOWN_MD)
 spellcheck:
 	@echo " [DONE]"
 
-# $(OUTDIR):
-# 	@mkdir -p $(OUTDIR)
+$(OUTDIR):
+	@mkdir -p $(OUTDIR)
 
 # $(TMPDIR):
 # 	@mkdir -p $(TMPDIR)
@@ -112,7 +112,7 @@ server-stop:
 	pkill -f jekyll
 
 # special treatment for the index
-agda: $(OUTDIR)/index.md
+agda: $(OUTDIR) $(OUTDIR)/index.md
 
 $(OUTDIR)/index.md: $(SRCDIR)/index.md
 	@echo "$(SRCDIR)/index.md --> $(OUTDIR)/index.md\c"

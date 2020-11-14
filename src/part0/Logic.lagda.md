@@ -1,4 +1,4 @@
-boo---
+---
 title: The logic of Agda🚧
 ---
 

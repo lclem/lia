@@ -180,8 +180,6 @@ _ = refl
 ```
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-As an exercise, we observe the following two inequalities satisfied by `size`.
-
 !exercise(#exercise:size-neg)(`size-¬`)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -208,7 +206,6 @@ From time to time we need to check whether two formulas are syntactically equal,
 i.e., are the very same formula.
 For example, `` ` p ∨ ` q`` is syntactically equal to itself,
 but it is different from `` ` q ∨ ` p``.
-
 A naïve way to decide equality would be to list all the 8 × 8 = 64 pairs of constructors,
 
     instance eqFormula : Eq (Formula)
@@ -326,7 +323,8 @@ Prove that the mapping `Formula2Tree` is injective.
 Formula2Tree-inj : Injective Formula2Tree
 ```
 
-*Hint:* Exploit the fact that the list constructor `_∷_` is injective on both arguments:
+*Hint:* Exploit the fact that the list constructor `_∷_` is injective on both arguments
+(c.f. !ref(part0.List)(∷-inj-left) and !ref(part0.List)(∷-inj-left)).
 
 ```
 _ = ∷-inj-left , ∷-inj-right
