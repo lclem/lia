@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Utilities 🚧 | Logic in Agda</title><!-- Begin Jekyll SEO tag v2.6.1 -->
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Utilities 🚧" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Propositional and fist-order logic developed with the proof assistant Agda." />
+<meta property="og:description" content="Propositional and fist-order logic developed with the proof assistant Agda." />
+<link rel="canonical" href="/lia/part0/utils/" />
+<meta property="og:url" content="/lia/part0/utils/" />
+<meta property="og:site_name" content="Logic in Agda" />
+<script type="application/ld+json">
+{"url":"/lia/part0/utils/","headline":"Utilities 🚧","description":"Propositional and fist-order logic developed with the proof assistant Agda.","@type":"WebPage","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/lia/assets/main.css">
+  <!-- <link rel="stylesheet" href="/lia/assets/custom.css"> --><!-- Mathjax Support -->
+  <script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+  <!-- Load KaTeX -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1.1/katex.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1.1/katex.min.js"></script>
+</head>
+<body><header class="site-header" role="banner">
+
+    <div class="wrapper">
+
+        <a class="site-title" href="/lia/">Logic in Agda</a>
+
+        <nav class="site-nav">
+            <span class="menu-icon">
+                <svg viewBox="0 0 18 15" width="18px" height="15px">
+                    <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+                    <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+                    <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+                </svg>
+            </span>
+
+            <div class="trigger">
+                <a class="page-link" href="/lia/part0/index/">Part 0</a>
+                <a class="page-link" href="/lia/part1/index/">Part 1</a>
+                <a class="page-link" href="/lia/part2/index/">Part 2</a>
+                <a class="page-link" href="/lia/part3/index/">Part 3</a>
+                <a class="page-link" href="/lia/part4/index/">Part 4</a>
+            </div>
+        </nav>
+
+    </div>
+
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post">
+
+    <header class="post-header">
+        <h1 class="post-title">Utilities 🚧</h1>
+    </header>
+  
+    <p style="text-align:center;">
+    
+    
+    
+    <a alt="Part" href="/lia/part0/index/">Part</a>
+    &bullet;
+    
+    
+    <a alt="Source code" href="https://github.com/lclem/lia/blob/mainsrc/part0/utils.lagda.md">Source</a>
+    
+    
+    
+</p>
+
+  
+    <div class="post-content">
+        <h2>Contents</h2>    
+        <ul class="section-nav">
+</ul><pre class="Agda"><a id="35" class="Keyword">module</a> <a id="42" href="part0.Utils.html" class="Module">part0.Utils</a> <a id="54" class="Keyword">where</a>
+{% raw %}<pre class="Agda"><a id="35" class="Keyword">module</a> <a id="42" href="part0.Utils.html" class="Module">part0.Utils</a> <a id="54" class="Keyword">where</a>
+<a id="60" class="Keyword">open</a> <a id="65" class="Keyword">import</a> <a id="72" href="Agda.Primitive.html" class="Module">Agda.Primitive</a> <a id="87" class="Keyword">public</a>
+
+<a id="whatever"></a><a id="95" href="part0.Utils.html#95" class="Function">whatever</a> <a id="104" class="Symbol">:</a> <a id="106" href="Agda.Primitive.html#787" class="Primitive">Setω</a>
+<a id="111" href="part0.Utils.html#95" class="Function">whatever</a> <a id="120" class="Symbol">=</a> <a id="122" class="Symbol">∀</a> <a id="124" class="Symbol">{</a><a id="125" href="part0.Utils.html#125" class="Bound">ℓ</a><a id="126" class="Symbol">}</a> <a id="128" class="Symbol">{</a><a id="129" href="part0.Utils.html#129" class="Bound">A</a> <a id="131" class="Symbol">:</a> <a id="133" class="PrimitiveType">Set</a> <a id="137" href="part0.Utils.html#125" class="Bound">ℓ</a><a id="138" class="Symbol">}</a> <a id="140" class="Symbol">→</a> <a id="142" href="part0.Utils.html#129" class="Bound">A</a>
+
+<a id="Fn"></a><a id="145" href="part0.Utils.html#145" class="Function">Fn</a> <a id="148" class="Symbol">:</a> <a id="150" class="Symbol">∀</a> <a id="152" class="Symbol">{</a><a id="153" href="part0.Utils.html#153" class="Bound">ℓ</a><a id="154" class="Symbol">}</a> <a id="156" class="Symbol">→</a> <a id="158" class="PrimitiveType">Set</a> <a id="162" href="part0.Utils.html#153" class="Bound">ℓ</a> <a id="164" class="Symbol">→</a> <a id="166" class="PrimitiveType">Set</a> <a id="170" href="part0.Utils.html#153" class="Bound">ℓ</a> <a id="172" class="Symbol">→</a> <a id="174" class="PrimitiveType">Set</a> <a id="178" href="part0.Utils.html#153" class="Bound">ℓ</a>
+<a id="180" href="part0.Utils.html#145" class="Function">Fn</a> <a id="183" href="part0.Utils.html#183" class="Bound">A</a> <a id="185" href="part0.Utils.html#185" class="Bound">B</a> <a id="187" class="Symbol">=</a> <a id="189" href="part0.Utils.html#183" class="Bound">A</a> <a id="191" class="Symbol">→</a> <a id="193" href="part0.Utils.html#185" class="Bound">B</a>
+
+<a id="const"></a><a id="196" href="part0.Utils.html#196" class="Function">const</a> <a id="202" class="Symbol">:</a> <a id="204" class="Symbol">∀</a> <a id="206" class="Symbol">{</a><a id="207" href="part0.Utils.html#207" class="Bound">ℓ</a> <a id="209" href="part0.Utils.html#209" class="Bound">m</a><a id="210" class="Symbol">}</a> <a id="212" class="Symbol">{</a><a id="213" href="part0.Utils.html#213" class="Bound">A</a> <a id="215" class="Symbol">:</a> <a id="217" class="PrimitiveType">Set</a> <a id="221" href="part0.Utils.html#207" class="Bound">ℓ</a><a id="222" class="Symbol">}</a> <a id="224" class="Symbol">{</a><a id="225" href="part0.Utils.html#225" class="Bound">B</a> <a id="227" class="Symbol">:</a> <a id="229" class="PrimitiveType">Set</a> <a id="233" href="part0.Utils.html#209" class="Bound">m</a><a id="234" class="Symbol">}</a> <a id="236" class="Symbol">→</a> <a id="238" href="part0.Utils.html#225" class="Bound">B</a> <a id="240" class="Symbol">→</a> <a id="242" href="part0.Utils.html#213" class="Bound">A</a> <a id="244" class="Symbol">→</a> <a id="246" href="part0.Utils.html#225" class="Bound">B</a>
+<a id="248" href="part0.Utils.html#196" class="Function">const</a> <a id="254" href="part0.Utils.html#254" class="Bound">b</a> <a id="256" class="Symbol">_</a> <a id="258" class="Symbol">=</a> <a id="260" href="part0.Utils.html#254" class="Bound">b</a>
+
+<a id="id"></a><a id="263" href="part0.Utils.html#263" class="Function">id</a> <a id="266" class="Symbol">:</a> <a id="268" class="Symbol">∀</a> <a id="270" class="Symbol">{</a><a id="271" href="part0.Utils.html#271" class="Bound">ℓ</a><a id="272" class="Symbol">}</a> <a id="274" class="Symbol">{</a><a id="275" href="part0.Utils.html#275" class="Bound">A</a> <a id="277" class="Symbol">:</a> <a id="279" class="PrimitiveType">Set</a> <a id="283" href="part0.Utils.html#271" class="Bound">ℓ</a><a id="284" class="Symbol">}</a> <a id="286" class="Symbol">→</a> <a id="288" href="part0.Utils.html#275" class="Bound">A</a> <a id="290" class="Symbol">→</a> <a id="292" href="part0.Utils.html#275" class="Bound">A</a>
+<a id="294" href="part0.Utils.html#263" class="Function">id</a> <a id="297" href="part0.Utils.html#297" class="Bound">x</a> <a id="299" class="Symbol">=</a> <a id="301" href="part0.Utils.html#297" class="Bound">x</a>
+
+<a id="apply"></a><a id="304" href="part0.Utils.html#304" class="Function">apply</a> <a id="310" class="Symbol">:</a> <a id="312" class="Symbol">∀</a> <a id="314" class="Symbol">{</a><a id="315" href="part0.Utils.html#315" class="Bound">ℓ</a> <a id="317" href="part0.Utils.html#317" class="Bound">m</a><a id="318" class="Symbol">}</a> <a id="320" class="Symbol">{</a><a id="321" href="part0.Utils.html#321" class="Bound">A</a> <a id="323" class="Symbol">:</a> <a id="325" class="PrimitiveType">Set</a> <a id="329" href="part0.Utils.html#315" class="Bound">ℓ</a><a id="330" class="Symbol">}</a> <a id="332" class="Symbol">{</a><a id="333" href="part0.Utils.html#333" class="Bound">B</a> <a id="335" class="Symbol">:</a> <a id="337" href="part0.Utils.html#321" class="Bound">A</a> <a id="339" class="Symbol">→</a> <a id="341" class="PrimitiveType">Set</a> <a id="345" href="part0.Utils.html#317" class="Bound">m</a><a id="346" class="Symbol">}</a> <a id="348" class="Symbol">→</a> <a id="350" class="Symbol">(</a><a id="351" href="part0.Utils.html#351" class="Bound">f</a> <a id="353" class="Symbol">:</a> <a id="355" class="Symbol">((</a><a id="357" href="part0.Utils.html#357" class="Bound">a</a> <a id="359" class="Symbol">:</a> <a id="361" href="part0.Utils.html#321" class="Bound">A</a><a id="362" class="Symbol">)</a> <a id="364" class="Symbol">→</a> <a id="366" href="part0.Utils.html#333" class="Bound">B</a> <a id="368" href="part0.Utils.html#357" class="Bound">a</a><a id="369" class="Symbol">))</a> <a id="372" class="Symbol">→</a> <a id="374" class="Symbol">(</a><a id="375" href="part0.Utils.html#375" class="Bound">a</a> <a id="377" class="Symbol">:</a> <a id="379" href="part0.Utils.html#321" class="Bound">A</a><a id="380" class="Symbol">)</a> <a id="382" class="Symbol">→</a> <a id="384" href="part0.Utils.html#333" class="Bound">B</a> <a id="386" href="part0.Utils.html#375" class="Bound">a</a>
+<a id="388" href="part0.Utils.html#304" class="Function">apply</a> <a id="394" href="part0.Utils.html#394" class="Bound">f</a> <a id="396" href="part0.Utils.html#396" class="Bound">a</a> <a id="398" class="Symbol">=</a> <a id="400" href="part0.Utils.html#394" class="Bound">f</a> <a id="402" href="part0.Utils.html#396" class="Bound">a</a>
+
+<a id="405" class="Keyword">infixr</a> <a id="412" class="Number">12</a> <a id="415" href="part0.Utils.html#638" class="Function Operator">_∘_</a>
+
+<a id="420" class="Comment">-- function application</a>
+<a id="444" class="Keyword">infixr</a> <a id="451" class="Number">100</a> <a id="455" href="part0.Utils.html#459" class="Function Operator">_$_</a>
+<a id="_$_"></a><a id="459" href="part0.Utils.html#459" class="Function Operator">_$_</a> <a id="463" class="Symbol">:</a> <a id="465" class="Symbol">∀</a> <a id="467" class="Symbol">{</a><a id="468" href="part0.Utils.html#468" class="Bound">ℓ</a> <a id="470" href="part0.Utils.html#470" class="Bound">m</a><a id="471" class="Symbol">}</a> <a id="473" class="Symbol">{</a><a id="474" href="part0.Utils.html#474" class="Bound">A</a> <a id="476" class="Symbol">:</a> <a id="478" class="PrimitiveType">Set</a> <a id="482" href="part0.Utils.html#468" class="Bound">ℓ</a><a id="483" class="Symbol">}</a> <a id="485" class="Symbol">{</a><a id="486" href="part0.Utils.html#486" class="Bound">B</a> <a id="488" class="Symbol">:</a> <a id="490" class="PrimitiveType">Set</a> <a id="494" href="part0.Utils.html#470" class="Bound">m</a><a id="495" class="Symbol">}</a> <a id="497" class="Symbol">→</a> <a id="499" class="Symbol">(</a><a id="500" href="part0.Utils.html#474" class="Bound">A</a> <a id="502" class="Symbol">→</a> <a id="504" href="part0.Utils.html#486" class="Bound">B</a><a id="505" class="Symbol">)</a> <a id="507" class="Symbol">→</a> <a id="509" href="part0.Utils.html#474" class="Bound">A</a> <a id="511" class="Symbol">→</a> <a id="513" href="part0.Utils.html#486" class="Bound">B</a>
+<a id="515" href="part0.Utils.html#515" class="Bound">f</a> <a id="517" href="part0.Utils.html#459" class="Function Operator">$</a> <a id="519" href="part0.Utils.html#519" class="Bound">x</a> <a id="521" class="Symbol">=</a> <a id="523" href="part0.Utils.html#515" class="Bound">f</a> <a id="525" href="part0.Utils.html#519" class="Bound">x</a>
+
+<a id="DFn"></a><a id="528" href="part0.Utils.html#528" class="Function">DFn</a> <a id="532" class="Symbol">:</a> <a id="534" class="Symbol">∀</a> <a id="536" class="Symbol">{</a><a id="537" href="part0.Utils.html#537" class="Bound">ℓ</a> <a id="539" href="part0.Utils.html#539" class="Bound">m</a><a id="540" class="Symbol">}</a> <a id="542" class="Symbol">→</a> <a id="544" class="Symbol">(</a><a id="545" href="part0.Utils.html#545" class="Bound">A</a> <a id="547" class="Symbol">:</a> <a id="549" class="PrimitiveType">Set</a> <a id="553" href="part0.Utils.html#537" class="Bound">ℓ</a><a id="554" class="Symbol">)</a> <a id="556" class="Symbol">→</a> <a id="558" class="Symbol">(</a><a id="559" href="part0.Utils.html#559" class="Bound">B</a> <a id="561" class="Symbol">:</a> <a id="563" href="part0.Utils.html#545" class="Bound">A</a> <a id="565" class="Symbol">→</a> <a id="567" class="PrimitiveType">Set</a> <a id="571" href="part0.Utils.html#539" class="Bound">m</a><a id="572" class="Symbol">)</a> <a id="574" class="Symbol">→</a> <a id="576" class="PrimitiveType">Set</a> <a id="580" class="Symbol">(</a><a id="581" href="part0.Utils.html#537" class="Bound">ℓ</a> <a id="583" href="Agda.Primitive.html#636" class="Primitive Operator">⊔</a> <a id="585" href="part0.Utils.html#539" class="Bound">m</a><a id="586" class="Symbol">)</a>
+<a id="588" href="part0.Utils.html#528" class="Function">DFn</a> <a id="592" href="part0.Utils.html#592" class="Bound">A</a> <a id="594" href="part0.Utils.html#594" class="Bound">B</a> <a id="596" class="Symbol">=</a> <a id="598" class="Symbol">(</a><a id="599" href="part0.Utils.html#599" class="Bound">a</a> <a id="601" class="Symbol">:</a> <a id="603" href="part0.Utils.html#592" class="Bound">A</a><a id="604" class="Symbol">)</a> <a id="606" class="Symbol">→</a> <a id="608" href="part0.Utils.html#594" class="Bound">B</a> <a id="610" href="part0.Utils.html#599" class="Bound">a</a>
+
+<a id="613" class="Comment">-- dependent composition</a>
+<a id="_∘_"></a><a id="638" href="part0.Utils.html#638" class="Function Operator">_∘_</a> <a id="642" class="Symbol">:</a> <a id="644" class="Symbol">∀</a> <a id="646" class="Symbol">{</a><a id="647" href="part0.Utils.html#647" class="Bound">ℓ</a> <a id="649" href="part0.Utils.html#649" class="Bound">m</a> <a id="651" href="part0.Utils.html#651" class="Bound">o</a><a id="652" class="Symbol">}</a> <a id="654" class="Symbol">{</a><a id="655" href="part0.Utils.html#655" class="Bound">A</a> <a id="657" class="Symbol">:</a> <a id="659" class="PrimitiveType">Set</a> <a id="663" href="part0.Utils.html#647" class="Bound">ℓ</a><a id="664" class="Symbol">}</a> <a id="666" class="Symbol">{</a><a id="667" href="part0.Utils.html#667" class="Bound">B</a> <a id="669" class="Symbol">:</a> <a id="671" href="part0.Utils.html#655" class="Bound">A</a> <a id="673" class="Symbol">→</a> <a id="675" class="PrimitiveType">Set</a> <a id="679" href="part0.Utils.html#649" class="Bound">m</a><a id="680" class="Symbol">}</a> <a id="682" class="Symbol">{</a><a id="683" href="part0.Utils.html#683" class="Bound">C</a> <a id="685" class="Symbol">:</a> <a id="687" href="part0.Utils.html#655" class="Bound">A</a> <a id="689" class="Symbol">→</a> <a id="691" class="PrimitiveType">Set</a> <a id="695" href="part0.Utils.html#651" class="Bound">o</a><a id="696" class="Symbol">}</a> <a id="698" class="Symbol">→</a>
+  <a id="702" class="Symbol">(</a><a id="703" href="part0.Utils.html#703" class="Bound">f</a> <a id="705" class="Symbol">:</a> <a id="707" class="Symbol">{</a><a id="708" href="part0.Utils.html#708" class="Bound">a</a> <a id="710" class="Symbol">:</a> <a id="712" href="part0.Utils.html#655" class="Bound">A</a><a id="713" class="Symbol">}</a> <a id="715" class="Symbol">→</a> <a id="717" href="part0.Utils.html#667" class="Bound">B</a> <a id="719" href="part0.Utils.html#708" class="Bound">a</a> <a id="721" class="Symbol">→</a> <a id="723" href="part0.Utils.html#683" class="Bound">C</a> <a id="725" href="part0.Utils.html#708" class="Bound">a</a><a id="726" class="Symbol">)</a> <a id="728" class="Symbol">→</a> <a id="730" class="Symbol">(</a><a id="731" href="part0.Utils.html#731" class="Bound">g</a> <a id="733" class="Symbol">:</a> <a id="735" class="Symbol">(</a><a id="736" href="part0.Utils.html#736" class="Bound">a</a> <a id="738" class="Symbol">:</a> <a id="740" href="part0.Utils.html#655" class="Bound">A</a><a id="741" class="Symbol">)</a> <a id="743" class="Symbol">→</a> <a id="745" href="part0.Utils.html#667" class="Bound">B</a> <a id="747" href="part0.Utils.html#736" class="Bound">a</a><a id="748" class="Symbol">)</a> <a id="750" class="Symbol">→</a> <a id="752" class="Symbol">(</a><a id="753" href="part0.Utils.html#753" class="Bound">a</a> <a id="755" class="Symbol">:</a> <a id="757" href="part0.Utils.html#655" class="Bound">A</a><a id="758" class="Symbol">)</a> <a id="760" class="Symbol">→</a> <a id="762" href="part0.Utils.html#683" class="Bound">C</a> <a id="764" href="part0.Utils.html#753" class="Bound">a</a>
+<a id="766" class="Symbol">(</a><a id="767" href="part0.Utils.html#767" class="Bound">f</a> <a id="769" href="part0.Utils.html#638" class="Function Operator">∘</a> <a id="771" href="part0.Utils.html#771" class="Bound">g</a><a id="772" class="Symbol">)</a> <a id="774" href="part0.Utils.html#774" class="Bound">x</a> <a id="776" class="Symbol">=</a> <a id="778" href="part0.Utils.html#767" class="Bound">f</a> <a id="780" class="Symbol">(</a><a id="781" href="part0.Utils.html#771" class="Bound">g</a> <a id="783" href="part0.Utils.html#774" class="Bound">x</a><a id="784" class="Symbol">)</a>
+
+<a id="787" class="Comment">-- composition with the arguments swapped</a>
+<a id="_﹔_"></a><a id="829" href="part0.Utils.html#829" class="Function Operator">_﹔_</a> <a id="833" class="Symbol">:</a> <a id="835" class="Symbol">∀</a> <a id="837" class="Symbol">{</a><a id="838" href="part0.Utils.html#838" class="Bound">ℓ</a> <a id="840" href="part0.Utils.html#840" class="Bound">m</a> <a id="842" href="part0.Utils.html#842" class="Bound">o</a><a id="843" class="Symbol">}</a> <a id="845" class="Symbol">{</a><a id="846" href="part0.Utils.html#846" class="Bound">A</a> <a id="848" class="Symbol">:</a> <a id="850" class="PrimitiveType">Set</a> <a id="854" href="part0.Utils.html#838" class="Bound">ℓ</a><a id="855" class="Symbol">}</a> <a id="857" class="Symbol">{</a><a id="858" href="part0.Utils.html#858" class="Bound">B</a> <a id="860" class="Symbol">:</a> <a id="862" class="PrimitiveType">Set</a> <a id="866" href="part0.Utils.html#840" class="Bound">m</a><a id="867" class="Symbol">}</a> <a id="869" class="Symbol">{</a><a id="870" href="part0.Utils.html#870" class="Bound">C</a> <a id="872" class="Symbol">:</a> <a id="874" class="PrimitiveType">Set</a> <a id="878" href="part0.Utils.html#842" class="Bound">o</a><a id="879" class="Symbol">}</a> <a id="881" class="Symbol">→</a>  <a id="884" class="Symbol">(</a><a id="885" href="part0.Utils.html#846" class="Bound">A</a> <a id="887" class="Symbol">→</a> <a id="889" href="part0.Utils.html#858" class="Bound">B</a><a id="890" class="Symbol">)</a> <a id="892" class="Symbol">→</a> <a id="894" class="Symbol">(</a><a id="895" href="part0.Utils.html#858" class="Bound">B</a> <a id="897" class="Symbol">→</a> <a id="899" href="part0.Utils.html#870" class="Bound">C</a><a id="900" class="Symbol">)</a> <a id="902" class="Symbol">→</a> <a id="904" href="part0.Utils.html#846" class="Bound">A</a> <a id="906" class="Symbol">→</a> <a id="908" href="part0.Utils.html#870" class="Bound">C</a>
+<a id="910" href="part0.Utils.html#910" class="Bound">f</a> <a id="912" href="part0.Utils.html#829" class="Function Operator">﹔</a> <a id="914" href="part0.Utils.html#914" class="Bound">g</a> <a id="916" class="Symbol">=</a> <a id="918" href="part0.Utils.html#914" class="Bound">g</a> <a id="920" href="part0.Utils.html#638" class="Function Operator">∘</a> <a id="922" href="part0.Utils.html#910" class="Bound">f</a>
+
+<a id="925" class="Comment">-- guest the argument!</a>
+<a id="auto"></a><a id="948" href="part0.Utils.html#948" class="Function">auto</a> <a id="953" class="Symbol">:</a> <a id="955" class="Symbol">∀</a> <a id="957" class="Symbol">{</a><a id="958" href="part0.Utils.html#958" class="Bound">ℓ</a> <a id="960" href="part0.Utils.html#960" class="Bound">m</a><a id="961" class="Symbol">}</a> <a id="963" class="Symbol">{</a><a id="964" href="part0.Utils.html#964" class="Bound">A</a> <a id="966" class="Symbol">:</a> <a id="968" class="PrimitiveType">Set</a> <a id="972" href="part0.Utils.html#958" class="Bound">ℓ</a><a id="973" class="Symbol">}</a> <a id="975" class="Symbol">{</a><a id="976" href="part0.Utils.html#976" class="Bound">B</a> <a id="978" class="Symbol">:</a> <a id="980" href="part0.Utils.html#964" class="Bound">A</a> <a id="982" class="Symbol">→</a> <a id="984" class="PrimitiveType">Set</a> <a id="988" href="part0.Utils.html#960" class="Bound">m</a><a id="989" class="Symbol">}</a> <a id="991" class="Symbol">→</a> <a id="993" class="Symbol">((</a><a id="995" href="part0.Utils.html#995" class="Bound">a</a> <a id="997" class="Symbol">:</a> <a id="999" href="part0.Utils.html#964" class="Bound">A</a><a id="1000" class="Symbol">)</a> <a id="1002" class="Symbol">→</a> <a id="1004" href="part0.Utils.html#976" class="Bound">B</a> <a id="1006" href="part0.Utils.html#995" class="Bound">a</a><a id="1007" class="Symbol">)</a> <a id="1009" class="Symbol">→</a> <a id="1011" class="Symbol">{</a><a id="1012" href="part0.Utils.html#1012" class="Bound">a</a> <a id="1014" class="Symbol">:</a> <a id="1016" href="part0.Utils.html#964" class="Bound">A</a><a id="1017" class="Symbol">}</a> <a id="1019" class="Symbol">→</a> <a id="1021" href="part0.Utils.html#976" class="Bound">B</a> <a id="1023" href="part0.Utils.html#1012" class="Bound">a</a>
+<a id="1025" href="part0.Utils.html#948" class="Function">auto</a> <a id="1030" href="part0.Utils.html#1030" class="Bound">f</a> <a id="1032" class="Symbol">{</a><a id="1033" href="part0.Utils.html#1033" class="Bound">a</a><a id="1034" class="Symbol">}</a> <a id="1036" class="Symbol">=</a> <a id="1038" href="part0.Utils.html#1030" class="Bound">f</a> <a id="1040" href="part0.Utils.html#1033" class="Bound">a</a>
+</pre>
+</pre>
+
+    </div>
+  
+    <p style="text-align:center;">
+    
+    
+    
+    <a alt="Part" href="/lia/part0/index/">Part</a>
+    &bullet;
+    
+    
+    <a alt="Source code" href="https://github.com/lclem/lia/blob/mainsrc/part0/utils.lagda.md">Source</a>
+    
+    
+    
+</p>
+
+    <p class="p-name"> Last-modified: Nov 14 11:41:56 2020 </p>
+  </article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/lia/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Logic in Agda</h2><div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Lorenzo Clemente</li>
+          <li><a class="u-email" href="mailto:clementelorenzo@gmail.com">clementelorenzo@gmail.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/lclem"><svg class="svg-icon"><use xlink:href="/lia/assets/minima-social-icons.svg#github"></use></svg> <span class="username">lclem</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3"></div>
+    </div>This work is licensed under a <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>
+  </div>
+</footer>
+
+<!-- Parse the Latex divs with Katex
+<script type="text/javascript">
+  $("script[type='math/tex']").replaceWith(
+    function(){
+      var tex = $(this).text();
+      return katex.renderToString(tex, {displayMode: false});
+  });
+  
+  $("script[type='math/tex; mode=display']").replaceWith(
+    function(){
+      var tex = $(this).text();
+      return katex.renderToString(tex.replace(/%.*/g, ''), {displayMode: true});
+  });
+</script>
+-->
+
+<script type="text/javascript" src="/lia/assets/hidebox.js"></script>
+</body>
+
+</html>
