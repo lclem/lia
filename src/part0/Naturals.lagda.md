@@ -18,12 +18,12 @@ suc-inj : ∀ {m n : ℕ} → suc m ≡ suc n → m ≡ n
 suc-inj refl = refl
 
 _≟ℕ_ : Decidable2 (_≡_ {A = ℕ})
-zero ≟ℕ zero  = yes {proof = refl}
-zero ≟ℕ suc _ = no {proof = λ ()}
-suc x ≟ℕ zero = no {proof = λ ()}
+zero ≟ℕ zero  = yes (refl)
+zero ≟ℕ suc _ = no (λ ())
+suc x ≟ℕ zero = no (λ ())
 suc x ≟ℕ suc y with x ≟ℕ y
-... | yes {refl} = yes {proof = refl}
-... | no {x≢y} = no {proof = λ sucx≡sucy → x≢y (suc-inj sucx≡sucy)}
+... | yes refl = yes (refl)
+... | no x≢y = no (λ sucx≡sucy → x≢y (suc-inj sucx≡sucy))
 
 instance
   eqℕ : Eq ℕ
@@ -56,8 +56,8 @@ postulate _≤?_ : ∀ (m n : ℕ) → Dec (m ≤ n)
 
 max : ℕ → ℕ → ℕ
 max m n with m ≤? n
-... | yes = n
-... | no = m
+... | yes _ = n
+... | no _ = m
 
 _≥_ _<_ _>_ : ℕ → ℕ → Set
 m ≥ n = n ≤ m

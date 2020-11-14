@@ -143,24 +143,24 @@ Thus we use `a ∈1? as` here...
 ```
 enum∈ : ∀ {ℓ} {A : Set ℓ} {{_ : Eq A}} (a : A) (as : A *) → (a ∈ as) *
 enum∈ a as with a ∈1? as
-... | no = ε
-enum∈ a (a ∷ as) | yes {here} = here ∷ map there (enum∈ a as)
-enum∈ a (_ ∷ as) | yes {there _ _} = map there (enum∈ a as)
+... | no _ = ε
+enum∈ a (a ∷ as) | yes here = here ∷ map there (enum∈ a as)
+enum∈ a (_ ∷ as) | yes (there _ _) = map there (enum∈ a as)
 
 find∈ : ∀ {ℓ} {A : Set ℓ} {{_ : Eq A}} (a : A) (as : A *) (a∈as : a ∈ as) → a∈as ∈ enum∈ a as
 find∈ a as a∈as with a ∈1? as
 
 -- contradiction
-... | no {a∉1as} = F-elim (a∉1as (∈→∈1 a∈as)) 
+... | no a∉1as = F-elim (a∉1as (∈→∈1 a∈as)) 
 
-find∈ a (a ∷ _) here | yes {here} = here
-find∈ a (a ∷ as) (there a∈as) | yes {here} = there (map-∈ there (find∈ a as a∈as))
+find∈ a (a ∷ _) here | yes here = here
+find∈ a (a ∷ as) (there a∈as) | yes here = there (map-∈ there (find∈ a as a∈as))
 
 -- contradiction
 -- here we use the fact that a ∈? as returns the first occurrence of a in as
-find∈ a _ here | yes {there a≢a _} = x≢x-elim a≢a
+find∈ a _ here | yes (there a≢a _) = x≢x-elim a≢a
 
-find∈ a (_ ∷ as) (there a∈as) | yes {there _ _} = map-∈ there (find∈ a as a∈as)
+find∈ a (_ ∷ as) (there a∈as) | yes (there _ _) = map-∈ there (find∈ a as a∈as)
 
 instance
   Enum∈ : ∀ {ℓ} {A : Set ℓ} {{_ : Eq A}} {a : A} {as : A *} → Enum (a ∈ as)
@@ -193,9 +193,9 @@ then we can also decide decidable properties over them.
   with All? P? enumA
 -- in the positive case, use the find function to create a witness that "a" is in the enumeration,
 -- and then use the fact that every element in the enumeration satisfies the property
-... | yes {∀P} = yes {proof = λ a → ∀P (findA a)}
+... | yes ∀P = yes λ a → ∀P (findA a)
 -- in the negative case, go the other way around (even easier, no need for "findA")
-... | no {~∀P} = no {proof = λ ∀aP → ~∀P (λ {a} a∈enumA → ∀aP a)}
+... | no ~∀P = no λ ∀aP → ~∀P λ{ {a} a∈enumA →  ∀aP a} 
 
 forAll? : ∀ {ℓ m} {A : Set ℓ} {P : A → Set m} {{_ : Enum A}} → Decidable P → Dec (∀[ a ] P a)
 forAll? {A = A} P? = Π? A P?
@@ -204,8 +204,8 @@ forAll? {A = A} P? = Π? A P?
 Σ? : ∀ {ℓ m} (A : Set ℓ) {P : A → Set m} {{_ : Enum A}} → Decidable P → Dec (∃[ a ] P a)
 Σ? A {{enumA , findA}} P?
   with Any? P? enumA
-... | yes {∃P} = yes {proof = dfst ∃P , snd (dsnd ∃P)} -- can't pattern match on ∃P here since the first projection is implicit
-... | no {~∃P} = no {proof = λ{ (a , Pa) → ~∃P (a , findA a , Pa)}}
+... | yes ∃P = yes (dfst ∃P , snd (dsnd ∃P)) -- can't pattern match on ∃P here since the first projection is implicit
+... | no ~∃P = no λ{ (a , Pa) → ~∃P (a , findA a , Pa)}
 
 thereExists? : ∀ {ℓ m} {A : Set ℓ} {P : A → Set m} {{_ : Enum A}} → Decidable P → Dec (∃[ a ] P a)
 thereExists? {A = A} P? = Σ? A P?
@@ -239,8 +239,8 @@ deMorgan-~∀~→∃ {A = A} {B} (enumA , findA) B? ~∀~B = go enumA ε refl wh
       
   go (a ∷ as) ~Bs enumA≡
     with B? a
-  ... | yes {Ba} = a , Ba
-  ... | no {~Ba} = go as (~Bs ++ [ (a , ~Ba) ]) enumA≡' where
+  ... | yes Ba = a , Ba
+  ... | no ~Ba = go as (~Bs ++ [ (a , ~Ba) ]) enumA≡' where
 
     enumA≡' : enumA ≡ map dfst (~Bs ++ [ (a , ~Ba) ]) ++ as
     enumA≡' = begin

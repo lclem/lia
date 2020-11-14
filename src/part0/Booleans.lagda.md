@@ -18,8 +18,8 @@ data 𝔹 : Set where
   tt : 𝔹
 
 erase : ∀ {ℓ} {A : Set ℓ} → Dec A → 𝔹
-erase yes = tt
-erase no = ff
+erase (yes _) = tt
+erase (no _) = ff
 
 tt≢ff : tt ≢ ff
 tt≢ff ()
@@ -42,10 +42,10 @@ instance
   _≡?_ {{Eq𝔹}} = go where
 
     go : ∀ b c → Dec (b ≡ c)
-    go tt tt = yes {proof = refl}
-    go tt ff = no {proof = λ ()}
-    go ff tt = no {proof = λ ()}
-    go ff ff = yes {proof = refl}
+    go tt tt = yes (refl)
+    go tt ff = no (λ ())
+    go ff tt = no (λ ())
+    go ff ff = yes (refl)
 ```
 
 ## Truth tables

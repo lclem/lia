@@ -51,28 +51,28 @@ instance
     go : ∀ s t → Dec (s ≡ t)
     go* : ∀ as bs → Dec (as ≡ bs)
 
-    go Nil Nil = yes {proof = refl}
-    go Nil (Node _ _) = no {proof = λ ()}
-    go (Node _ _) Nil = no {proof = λ ()}
+    go Nil Nil = yes (refl)
+    go Nil (Node _ _) = no (λ ())
+    go (Node _ _) Nil = no (λ ())
     go (Node a as) (Node b bs)
       with a ≡? b
-    ... | no {a≢b} = no {proof = λ{ refl → ~x≢x a≢b}}
-    ... | yes {refl}
+    ... | no a≢b = no λ{refl → ~x≢x a≢b}
+    ... | yes refl
       with go* as bs
-    ... | no {as≢bs} = no {proof = λ{ refl → ~x≢x as≢bs}}
-    ... | yes {refl}= yes {proof = refl}
+    ... | no as≢bs = no λ{refl → ~x≢x as≢bs}
+    ... | yes refl = yes refl
 
     -- need an extra case analysis to satisfy the termination checker
     -- (essentially reproving decidability of list equality);
     -- alternative: define "go" by well-founded induction on the size of the tree...
-    go* ε ε = yes {proof = refl}
-    go* ε (_ ∷ _) = no {proof = λ ()}
-    go* (_ ∷ _) ε = no {proof = λ ()}
+    go* ε ε = yes (refl)
+    go* ε (_ ∷ _) = no (λ ())
+    go* (_ ∷ _) ε = no (λ ())
     go* (a ∷ as) (b ∷ bs)
       with a ≡? b
-    ... | no {a≢b} = no {proof = λ{ refl → ~x≢x a≢b}}
-    ... | yes {refl}
+    ... | no a≢b = no λ{refl → ~x≢x a≢b}
+    ... | yes refl
       with go* as bs
-    ... | no {as≢bs} = no {proof = λ{ refl → ~x≢x as≢bs}}
-    ... | yes {refl}= yes {proof = refl}
+    ... | no as≢bs = no λ{refl → ~x≢x as≢bs}
+    ... | yes refl = yes refl
 ```

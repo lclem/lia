@@ -16,12 +16,12 @@ inj-fsuc : ∀ {n} {i j : Fin n} → fsuc i ≡ fsuc j → i ≡ j
 inj-fsuc refl = refl
 
 _≟Fin_ : ∀ {n} → Decidable2 (_≡_ {A = Fin n})
-fzero ≟Fin fzero = yes {proof = refl}
-fzero ≟Fin fsuc _ = no {proof = λ ()}
-fsuc _ ≟Fin fzero = no {proof = λ ()}
+fzero ≟Fin fzero = yes (refl)
+fzero ≟Fin fsuc _ = no (λ ())
+fsuc _ ≟Fin fzero = no (λ ())
 fsuc x ≟Fin fsuc y with x ≟Fin y
-... | yes {refl} = yes {proof = refl}
-... | no {x≢y} = no {proof = λ{ refl → x≢x-elim x≢y}}
+... | yes refl = yes (refl)
+... | no x≢y = no λ{refl → x≢x-elim x≢y}
 
 instance
   eqFin : ∀ {n} → Eq (Fin n)
@@ -31,12 +31,12 @@ instance
 If a proposition is pointwise decidable, then it is decidable on the interval.
 ```
 Fin-Dec : ∀ {ℓ n} {P : Fin n → Set ℓ} → ∀[ k ] Dec (P k) → Dec (∃[ k ] P k)
-Fin-Dec {n = zero} P? = no {proof = λ{()}}
+Fin-Dec {n = zero} P? = no (λ{()})
 Fin-Dec {n = suc n} P? with P? fzero
-... | yes {yes-fzero} = yes {proof = fzero , yes-fzero}
-... | no {proof = no-fzero} with Fin-Dec {n = n} λ k → P? (fsuc k)
-... | yes {proof = k , yes-fsuc} =  yes {proof = fsuc k , yes-fsuc}
-... | no {proof = no-fsuc} = no {proof = λ{(fzero , Pk) → no-fzero Pk; (fsuc k , Pk) → no-fsuc (k , Pk)}}
+... | yes yes-fzero = yes (fzero , yes-fzero)
+... | no no-fzero with Fin-Dec {n = n} λ k → P? (fsuc k)
+... | yes (k , yes-fsuc) =  yes (fsuc k , yes-fsuc)
+... | no no-fsuc = no λ{(fzero , Pk) → no-fzero Pk; (fsuc k , Pk) → no-fsuc (k , Pk)}
 ```
 
 ```

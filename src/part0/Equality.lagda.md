@@ -92,10 +92,10 @@ record Eq {ℓ} (A : Set ℓ) : Set ℓ where
 
 open Eq {{...}} public
 
-refl-≡? : ∀ {ℓ} {A : Set ℓ} {{_ : Eq A}} (x : A) → x ≡? x ≡ yes
+refl-≡? : ∀ {ℓ} {A : Set ℓ} {{_ : Eq A}} (x : A) → x ≡? x ≡ yes _
 refl-≡? x with x ≡? x
-... | yes {refl} = refl
-... | no {x≢x} = x≢x-elim x≢x
+... | yes refl = refl
+... | no x≢x = x≢x-elim x≢x
 
 -- refl-≡?  is not a legal rewrite rule, since the left-hand side is neither a defined symbol nor a constructor when checking the pragma REWRITE refl-≡?
 -- {-# REWRITE refl-≡? #-}
@@ -113,14 +113,14 @@ instance
     go : ∀ x y → Dec (x ≡ y)
     go (left a) (left a')
       with a ≡? a'
-    ... | yes {refl} = yes {proof = refl}
-    ... | no {a≢a'} = no {proof = λ{refl → a≢a' refl}}
-    go (left _) (right _) = no {proof = λ ()}
-    go (right x) (left x₁) = no {proof = λ ()}
+    ... | yes refl = yes refl
+    ... | no a≢a' = no λ{refl → a≢a' refl}
+    go (left _) (right _) = no λ ()
+    go (right x) (left x₁) = no λ ()
     go (right b) (right b')
       with b ≡? b'
-    ... | yes {refl} = yes {proof = refl}
-    ... | no {b≢b'} = no {proof = λ{refl → b≢b' refl}}
+    ... | yes refl = yes (refl)
+    ... | no b≢b' = no λ{refl → b≢b' refl}
 ```
 
 ### Dependent pairs
@@ -129,10 +129,10 @@ instance
 instance
   eqΣ : ∀ {ℓ m} {A : Set ℓ} {B : A → Set m} {{_ : Eq A}} {{_ : ∀ {a} → Eq (B a)}} → Eq (Σ A B)
   _≡?_ {{eqΣ}} (a1 , b1) (a2 , b2) with a1 ≡? a2
-  ... | no {a1≢a2} = no {proof = λ{ refl → a1≢a2 refl}}
-  ... | yes {refl} with b1 ≡? b2
-  ... | no {b1≢b2} = no {proof =  λ{ refl → b1≢b2 refl}}
-  ... | yes {refl} = yes {proof = refl}
+  ... | no a1≢a2 = no λ{refl → a1≢a2 refl}
+  ... | yes refl with b1 ≡? b2
+  ... | no b1≢b2 = no λ{refl → b1≢b2 refl}
+  ... | yes refl = yes refl
 ```
 
 

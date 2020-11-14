@@ -59,10 +59,10 @@ they inherit all the properties of the latter.
 In particular, they enjoy decidable equality as initially required,
 
 ```
-_ : p₀ ≡? p₀ ≡ yes
+_ : p₀ ≡? p₀ ≡ yes _
 _  = refl
 
-_ : p₀ ≡? p₁ ≡ no
+_ : p₀ ≡? p₁ ≡ no _
 _  = refl
 ```
 
@@ -211,9 +211,9 @@ A naïve way to decide equality would be to list all the 8 × 8 = 64 pairs of co
     instance eqFormula : Eq (Formula)
     _≡?_ {{eqFormula}} = go where
       go : ∀ φ ψ → Dec (φ ≡ ψ)
-      go ⊤ ⊤ = yes {proof = refl}
-      go ⊤ ⊥ = no {proof = λ ()}
-      go ⊤ (` _) = no {proof = λ ()}
+      go ⊤ ⊤ = yes (refl)
+      go ⊤ ⊥ = no (λ ())
+      go ⊤ (` _) = no (λ ())
     ...
 
 which is not practical [^no-split-on-catchall].
@@ -232,8 +232,8 @@ for which decidable equality is easier to prove [^dec-eq-reference].
         instance eqFormula : Eq (Formula)
         _≡?_ {{eqFormula}} = go where
           go : ∀ φ ψ → Dec (φ ≡ ψ)
-          go ⊤ ⊤ = yes {proof = refl}
-          go ⊤ _ = no {proof = λ ()}
+          go ⊤ ⊤ = yes (refl)
+          go ⊤ _ = no (λ ())
         ...
     This seems to be an often-made [complaint](https://github.com/agda/agda/issues/4804) about Agda.
 
@@ -287,9 +287,9 @@ _≡?_ {{eqConnective}} = go where
   go : ∀ C1 C2 → Dec (C1 ≡ C2)
   go C1 C2 with c2ℕ C1 ≡? c2ℕ C2
   -- by injectivity
-  ... | yes {eq} = yes {proof = c2ℕ-inj C1 C2 eq}
+  ... | yes eq = yes (c2ℕ-inj C1 C2 eq)
   -- by functionality
-  ... | no {neq} = no {proof = λ{refl → neq refl}}
+  ... | no neq = no λ{refl → neq refl}
 ```
 
 **Step 2**.
@@ -354,7 +354,7 @@ Formula2Tree-inj (φ ⇔ ψ) (φ' ⇔ ψ') eql
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 With this ingredients in hand,
-we can finally show that `Formula` has decidable equality.
+we can show that `Formula` has decidable equality:
 
 ```
 instance eqFormula : Eq Formula
@@ -362,8 +362,8 @@ _≡?_ {{eqFormula}} = go where
   
     go : ∀ φ ψ → Dec (φ ≡ ψ)
     go φ ψ with Formula2Tree φ ≡? Formula2Tree ψ
-    ... | yes {eq} = yes {proof = Formula2Tree-inj _ _ eq}
-    ... | no {neq} = no {proof = λ{refl → neq refl}}
+    ... | yes eq = yes (Formula2Tree-inj _ _ eq)
+    ... | no neq = no λ{refl → neq refl}
 ```
 
 !example(#example:equality)
@@ -371,14 +371,14 @@ _≡?_ {{eqFormula}} = go where
 We demonstrate decidability of formula equality. We have
 
 ```
-_ : (` p₀ ∨ ` p₁ ≡? ` p₀ ∨ ` p₁) ≡ yes
+_ : (` p₀ ∨ ` p₁ ≡? ` p₀ ∨ ` p₁) ≡ yes _
 _ = refl
 ```
 
 but
 
 ```
-_ : (` p₀ ∨ ` p₁ ≡? ` p₁ ∨ ` p₀) ≡ no
+_ : (` p₀ ∨ ` p₁ ≡? ` p₁ ∨ ` p₀) ≡ no _
 _ = refl
 ```
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -406,8 +406,8 @@ assigns `ff` to `p₀` and `p₁`, and `tt` to every other variable:
 ϱ₀ = const tt [ p₀ ↦ ff ] [ p₁ ↦ ff ]
 ```
 
-Since both propositions `PropName` and Boolean values `B` can be enumerated,
-the same holds true for valuations `Val`,
+Since both propositions !ref(PropName) and Boolean values !remoteRef(part0)(Booleans)(𝔹) can be enumerated,
+the same holds true for valuations !ref(Val),
 which will be very useful to show that propositional logic is decidable.
 
 ```
@@ -583,8 +583,8 @@ is reserved for function updates.
 ⊤ F[ _ ↦ ξ ] = ⊤
 ⊥ F[ p ↦ ξ ] = ⊥
 (` q) F[ p ↦ ξ ] with p ≡? q
-... | yes = ξ
-... | no = ` q
+... | yes _ = ξ
+... | no _ = ` q
 (¬ φ) F[ p ↦ ξ ] = ¬ φ F[ p ↦ ξ ]
 (φ ∧ ψ) F[ p ↦ ξ ] = φ F[ p ↦ ξ ] ∧ ψ F[ p ↦ ξ ]
 (φ ∨ ψ) F[ p ↦ ξ ] = φ F[ p ↦ ξ ] ∨ ψ F[ p ↦ ξ ]
@@ -627,11 +627,11 @@ What happens if `p ≡ q` ?
 
 (` r) F2[ p , q ↦ ψ , ξ ]
   with p ≡? r
-... | yes = ψ
-... | no
+... | yes _ = ψ
+... | no _
   with q ≡? r
-... | yes = ξ
-... | no = ` r
+... | yes _ = ξ
+... | no _ = ` r
 
 (¬ φ) F2[ p , q ↦ ψ , ξ ] = ¬ φ F2[ p , q ↦ ψ , ξ ]
 
@@ -663,8 +663,8 @@ Prove the substitution lemma.
 substitution ⊤ p ξ ϱ = refl
 substitution ⊥ p ξ ϱ = refl
 substitution (` q) p ξ ϱ with p ≡? q
-... | yes {refl} = refl
-... | no = refl
+... | yes refl = refl
+... | no _ = refl
 substitution (¬ φ) p ξ ϱ rewrite substitution φ p ξ ϱ = refl
 substitution (φ ∧ ψ) p ξ ϱ rewrite substitution φ p ξ ϱ | substitution ψ p ξ ϱ = refl
 substitution (φ ∨ ψ) p ξ ϱ rewrite substitution φ p ξ ϱ | substitution ψ p ξ ϱ = refl
@@ -705,8 +705,8 @@ subst-id ⊤ p ξ p~∈φ = refl
 subst-id ⊥ p ξ p~∈φ = refl
 subst-id (` q) p ξ p~∈φ with p ≡? q
 -- contradiction
-... | yes {refl} = F-elim (p~∈φ here)
-... | no = refl 
+... | yes refl = F-elim (p~∈φ here)
+... | no _ = refl 
 subst-id (¬ φ) p ξ p~∈φ
   rewrite subst-id φ p ξ p~∈φ = refl
 subst-id (φ ∧ ψ) p ξ p~∈φ
@@ -761,11 +761,11 @@ rename-undo (` r) p q (notThere q≢r _)
   with refl-≡? q
 ... | q≡?q≡yes
   with p ≡? r
-... | yes {refl} rewrite q≡?q≡yes = refl 
-... | no
+... | yes refl rewrite q≡?q≡yes = refl 
+... | no _
   with q ≡? r
-... | yes {refl} = x≢x-elim q≢r
-... | no = refl 
+... | yes refl = x≢x-elim q≢r
+... | no _ = refl 
 
 rename-undo (¬ φ) p q q∉φ
   rewrite rename-undo φ p q q∉φ = refl
@@ -985,8 +985,8 @@ congF _ _ ⊥ p φ⟺ψ ϱ = refl
 
 congF _ _ (` q) p φ⟺ψ ϱ
   with p ≡? q
-... | yes = φ⟺ψ ϱ
-... | no = refl
+... | yes _ = φ⟺ψ ϱ
+... | no _ = refl
 
 congF φ ψ (¬ ξ) p φ⟺ψ ϱ
   with congF φ ψ ξ p φ⟺ψ ϱ
@@ -1034,11 +1034,11 @@ cong2F φ₀ φ₁ ψ₀ ψ₁ ⊤ p₀ p₁ φ₀⟺ψ₀ φ₁⟺ψ₁ ϱ = re
 
 cong2F φ₀ φ₁ ψ₀ ψ₁ (` p) p₀ p₁ φ₀⟺ψ₀ φ₁⟺ψ₁ ϱ
   with p₀ ≡? p
-... | yes = φ₀⟺ψ₀ ϱ
-... | no
+... | yes _ = φ₀⟺ψ₀ ϱ
+... | no _
   with p₁ ≡? p
-... | yes = φ₁⟺ψ₁ ϱ
-... | no = refl
+... | yes _ = φ₁⟺ψ₁ ϱ
+... | no _ = refl
 
 cong2F φ₀ φ₁ ψ₀ ψ₁ (¬ ξ) p₀ p₁ φ₀⟺ψ₀ φ₁⟺ψ₁ ϱ
   with cong2F φ₀ φ₁ ψ₀ ψ₁ ξ p₀ p₁ φ₀⟺ψ₀ φ₁⟺ψ₁ ϱ

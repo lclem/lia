@@ -56,14 +56,14 @@ cons-≡2 refl refl = refl
 -- equality is decidable on A *, if it is on A}
 instance
   eqList : ∀ {ℓ} {A : Set ℓ} → {{Eq A}} → Eq (A *)
-  _≡?_ {{eqList}} ε ε = yes {proof = refl}
-  _≡?_ {{eqList}} ε (_ ∷ _) = no {proof = λ ()}
-  _≡?_ {{eqList}} (_ ∷ _) ε  = no {proof = λ ()}
+  _≡?_ {{eqList}} ε ε = yes (refl)
+  _≡?_ {{eqList}} ε (_ ∷ _) = no (λ ())
+  _≡?_ {{eqList}} (_ ∷ _) ε  = no (λ ())
   _≡?_ {{eqList}} (a ∷ as) (b ∷ bs) with a ≡? b
-  ... | no {proof} = no {proof = λ p → proof (fst (cons-≡1 p))}
-  ... | yes {refl} with as ≡? bs
-  ... | yes {refl} = yes {proof = refl}
-  ... | no {proof} = no {proof = λ p → proof (snd (cons-≡1 p))}
+  ... | no proof = no (λ p → proof (fst (cons-≡1 p)))
+  ... | yes refl with as ≡? bs
+  ... | yes refl = yes (refl)
+  ... | no proof = no (λ p → proof (snd (cons-≡1 p)))
 
 Fun : ∀ {ℓ} (A : Set ℓ) (B : Set ℓ) (n : ℕ) → Set ℓ
 Fun A B zero = B
@@ -198,8 +198,8 @@ concatMap f = concat ∘ map f
 filter : ∀ {ℓ m} {A : Set ℓ} {P : A → Set m} → Decidable P → A * → A *
 filter _ ε = ε
 filter P? (a ∷ as) with P? a
-... | yes = a ∷ filter P? as
-... | no = filter P? as
+... | yes _ = a ∷ filter P? as
+... | no _ = filter P? as
 ```
 
 ## Remove
@@ -220,13 +220,13 @@ remove-map {f = f} inj b (a ∷ as)
 ... | ind
   with a ≡? b | f a ≡? f b
 -- both equal, by induction
-... | yes | yes rewrite ind = refl
+... | yes _ | yes _ rewrite ind = refl
 -- both unequal, by induction
-... | no | no rewrite ind = refl
+... | no _ | no _ rewrite ind = refl
 -- contradiction, just by functionality
-... | yes {refl} | no {fa≢fa} = x≢x-elim fa≢fa
+... | yes refl | no fa≢fa = x≢x-elim fa≢fa
 -- contradiction, by injectivity
-... | no {a≢b} | yes {fa≡fb} = F-elim (a≢b a≡b) where
+... | no a≢b | yes fa≡fb = F-elim (a≢b a≡b) where
 
   a≡b : a ≡ b
   a≡b = inj a b fa≡fb
@@ -327,12 +327,12 @@ a ~∈ as = ~ (a ∈ as)
 ~∈-∷-right a~∈b∷as a∈as = a~∈b∷as (there a∈as)
 
 _∈?_ : ∀ {ℓ} {A : Set ℓ} {{_ : Eq A}} (a : A) (as : A *) → Dec (a ∈ as)
-a ∈? ε = no {proof = λ ()}
+a ∈? ε = no (λ ())
 a ∈? b ∷ as with a ≡? b
-... | yes {refl} = yes {proof = here}
-... | no {a≢b} with a ∈? as
-... | yes {a∈as} = yes {proof = there a∈as}
-... | no {~a∈as} = no {proof = goal} where
+... | yes refl = yes (here)
+... | no a≢b with a ∈? as
+... | yes a∈as = yes (there a∈as)
+... | no ~a∈as = no (goal) where
   goal : ~ (a ∈ b ∷ as)
   goal here = a≢b refl
   goal (there a∈as) = ~a∈as a∈as
@@ -375,9 +375,9 @@ _ = λ A as b → _ , here , tt
   go (b ∷ bs) cs inv refl
     with P? b
   -- if the current element b does not satisfy P, then we are done
-  ... | no {~Pb} = b , ∈→∈++-right _ here , ~Pb
+  ... | no ~Pb = b , ∈→∈++-right _ here , ~Pb
   -- otherwise, b satisfies ~ ~ P (i.e., P since it is decidable)
-  ... | yes {Pb} = go bs (cs ++ [ b ]) inv' refl where
+  ... | yes Pb = go bs (cs ++ [ b ]) inv' refl where
 
     inv' : ∀[ a ∈ cs ++ [ b ] ] P a
     inv' {a} a∈cs++b
@@ -387,23 +387,23 @@ _ = λ A as b → _ , here , tt
 
 -- decide whether every element in a list satisfies a decidable property
 All? : ∀ {ℓ m} {A : Set ℓ} {P : A → Set m} → Decidable P → (as : A *) → Dec (∀[ a ∈ as ] P a)
-All? P? ε = yes {proof = λ ()}
+All? P? ε = yes (λ ())
 All? P? (a ∷ as)
   with P? a
-... | no {~P?a} = no {proof = λ z → ~P?a (z here)}
-... | yes {P?a}
+... | no ~P?a = no (λ z → ~P?a (z here))
+... | yes P?a
   with All? P? as
-... | no {~All?as} = no {proof = λ z → ~All?as (λ z₁ → z (there z₁))}
-... | yes {All?as} = yes {proof = λ{ here → P?a ; (there a∈as) → All?as a∈as}}
+... | no ~All?as = no λ z → ~All?as λ z₁ → z (there z₁)
+... | yes All?as = yes λ{here → P?a ; (there a∈as) → All?as a∈as}
 
 -- use All?, ~∀∈→∃∈~, and the fact that the double negation law holds for decidable properties
 Any? : ∀ {ℓ m} {A : Set ℓ} {P : A → Set m} → Decidable P → (as : A *) → Dec (∃[ a ∈ as ] P a)
 Any? P? as
   with All? (~?_ ∘ P?) as
-... | yes {~p} = no {proof = λ{ (a , a∈as , Pa) → ~p a∈as Pa}}
-... | no {~~p}
+... | yes ~p = no λ{ (a , a∈as , Pa) → ~p a∈as Pa}
+... | no ~~p
   with ~∀∈→∃∈~ (~?_ ∘ P?) as ~~p
-... | a , a∈as , ~~Pa = yes {proof = a , a∈as , doublenegation (P? a) ~~Pa}
+... | a , a∈as , ~~Pa = yes (a , a∈as , doublenegation (P? a) ~~Pa)
 
 infix 0 All? Any?
 syntax All? (λ a → P) as = ∀?[ a ∈ as ] P
@@ -415,12 +415,12 @@ head (a ∷ _) = right (a , here)
 
 instance
   eq∈ : ∀ {ℓ} {A : Set ℓ} {a : A} {as : A *} → Eq (a ∈ as)
-  _≡?_ {{eq∈}} here here = yes {proof = refl}
-  _≡?_ {{eq∈}} here (there _) = no {proof = λ ()}
-  _≡?_ {{eq∈}} (there _) here = no {proof = λ ()}
+  _≡?_ {{eq∈}} here here = yes (refl)
+  _≡?_ {{eq∈}} here (there _) = no (λ ())
+  _≡?_ {{eq∈}} (there _) here = no (λ ())
   _≡?_ {{eq∈}} (there a∈as1) (there a∈as2) with a∈as1 ≡? a∈as2
-  ... | yes {refl} = yes {proof = refl}
-  ... | no {a∈as1≢a∈as2} = no {proof = λ{ refl → x≢x-elim a∈as1≢a∈as2}}
+  ... | yes refl = yes refl
+  ... | no a∈as1≢a∈as2 = no λ{refl → x≢x-elim a∈as1≢a∈as2}
 ```
 
 ### Filter
@@ -437,8 +437,8 @@ filter-∈2 : ∀ {ℓ m} {A : Set ℓ} {P : A → Set m} {P? : Decidable P} {a 
   a ∈ filter P? as ⊎ ~ P a
 filter-∈2 {P? = P?} {a} a∈as
   with P? a
-... | yes {Pa} = left (filter-∈ a∈as Pa)
-... | no {~Pa} = right ~Pa
+... | yes Pa = left (filter-∈ a∈as Pa)
+... | no ~Pa = right ~Pa
 
 filter-∈-inv : ∀ {ℓ m} {A : Set ℓ} {P : A → Set m} {P? : Decidable P} {a : A} (as : A *) →
   a ∈ filter P? as →
@@ -475,15 +475,15 @@ remove-∈ : ∀ {ℓ} {A : Set ℓ} {{_ : Eq A}} {a : A} {as : A *} (b : A) →
   a ∈ remove b as ⊎ a ≡ b
 remove-∈ {a = a} b here
   with a ≡? b
-... | yes {a≡b} = right a≡b
-... | no {a≢b} = left here
+... | yes a≡b = right a≡b
+... | no a≢b = left here
 remove-∈ {a = a} {c ∷ as} b (there a∈as)
   with remove-∈ b a∈as
 ... | right a≡b = right a≡b
 ... | left a∈rem
   with c ≡? b
-... | yes {c≡b} = left a∈rem
-... | no {c≢b} = left (there a∈rem)
+... | yes c≡b = left a∈rem
+... | no c≢b = left (there a∈rem)
 
 remove-∈-inv : ∀ {ℓ} {A : Set ℓ} {{_ : Eq A}} {b : A} {a : A} {as : A *} → b ∈ remove a as → b ∈ as × b ≢ a
 remove-∈-inv = {!!}
@@ -626,8 +626,8 @@ maximum : ℕ * → ℕ → ℕ
 maximum ε default = default
 maximum (n ∷ ns) default with maximum ns default
 ... | max with n ≤? max
-... | yes = max
-... | no = n
+... | yes _ = max
+... | no _ = n
 
 postulate maximumFlip : ∀ (m n : ℕ) (ns : ℕ *) → maximum (m ∷ n ∷ ns) zero ≡ maximum (n ∷ m ∷ ns) zero
 
@@ -650,8 +650,8 @@ maximumStep m (n ∷ ns) with maximumStep m ns
 maximumLemma : ∀ {n} {ns} → n ∈ ns → n ≤ maximum ns zero
 maximumLemma {.n} {n ∷ ns} here with maximum ns zero
 ... | max with n ≤? max
-... | yes {p} = p
-... | no = n≤n n
+... | yes p = p
+... | no _ = n≤n n
 maximumLemma {n} {m ∷ ns} (there n∈ns) with maximumLemma {n} {ns} n∈ns
 ... | p = trans-≤ p (maximumStep m ns)
 
@@ -699,13 +699,13 @@ AgreeUpdate : ∀ {ℓ m} {A : Set ℓ} {B : Set m} {{_ : Eq A}} (ρ τ : A → 
 AgreeUpdate ρ τ ε ()
 AgreeUpdate ρ τ (x ∷ xs) here
   with x ≡? x
-... | yes {refl} = refl
-... | no {proof = x≢x} = x≢x-elim x≢x
+... | yes refl = refl
+... | no (x≢x) = x≢x-elim x≢x
 AgreeUpdate ρ τ (x ∷ xs) {a} (there a∈xs)
   with AgreeUpdate ρ τ xs {a} a∈xs
 ... | ρa≡τ[xs↦mapρxs]a with x ≡? a
-... | yes {proof = refl} = refl
-... | no {proof = x≢x} = ρa≡τ[xs↦mapρxs]a
+... | yes (refl) = refl
+... | no (x≢x) = ρa≡τ[xs↦mapρxs]a
 
 Agree-∘ : ∀ {ℓ m o} {A : Set ℓ} {B : Set m} {C : Set o} {{_ : Eq A}} (f : B → C) (g h : A → B) → (as : A *) → Agree g h as → Agree (f ∘ g) (f ∘ h) as
 Agree-∘ f g h as agree a∈as = cong f (agree a∈as)
@@ -724,8 +724,8 @@ Agree-update-~∈ : ∀ {ℓ m} {A : Set ℓ} {B : Set m} {{_ : Eq A}} {ρ : A �
   Agree ρ (ρ [ a ↦ b ]) as
 Agree-update-~∈ {a = a} a~∈as {a'} a'∈as
   with a ≡? a'
-... | yes {refl} = F-elim (a~∈as a'∈as)
-... | no {a≢a'} = refl
+... | yes refl = F-elim (a~∈as a'∈as)
+... | no a≢a' = refl
 ```
 
 ## Sublist
@@ -808,17 +808,19 @@ infix 30 _∩_
 _∩_ : ∀ {ℓ} {A : Set ℓ} {{_ : Eq A}} → A * → A * → A *
 ε ∩ _ = ε
 (a ∷ as) ∩ bs with a ∈? bs
-... | yes = a ∷ (as ∩ bs)
-... | no = as ∩ bs
+... | yes _ = a ∷ (as ∩ bs)
+... | no _ = as ∩ bs
 
 ∈∩-Lemma1 : ∀ {ℓ} {A : Set ℓ} {{_ : Eq A}} (a : A) (as bs : A *) → a ∈ as ∩ bs → a ∈ as × a ∈ bs
 
 ∈∩-Lemma1 a (a1 ∷ as) bs a∈as∩bs with a1 ∈? bs
-∈∩-Lemma1 a (a ∷ as) bs here | yes {a∈bs} = here , a∈bs
-∈∩-Lemma1 a (_ ∷ as) bs (there a∈as∩bs) | yes with ∈∩-Lemma1 a as bs a∈as∩bs
+∈∩-Lemma1 a (a ∷ as) bs here | yes a∈bs = here , a∈bs
+∈∩-Lemma1 a (_ ∷ as) bs (there a∈as∩bs) | yes _
+  with ∈∩-Lemma1 a as bs a∈as∩bs
 ... | (a∈as , a∈bs) = there a∈as , a∈bs
 
-∈∩-Lemma1 a (a1 ∷ as) bs a∈as∩bs | no with ∈∩-Lemma1 a as bs a∈as∩bs
+∈∩-Lemma1 a (a1 ∷ as) bs a∈as∩bs | no _
+  with ∈∩-Lemma1 a as bs a∈as∩bs
 ... | (a∈as , a∈bs) = there a∈as , a∈bs
 
 -- with a ∈? as
@@ -847,8 +849,8 @@ infixl 30 _\\_
 _\\_ : ∀ {ℓ} {A : Set ℓ} {{_ : Eq A}} (_ _ : A *) → A *
 ε \\ bs = ε
 (a ∷ as) \\ bs with a ∈? bs
-... | yes = as \\ bs
-... | no = a ∷ (as \\ bs)
+... | yes _ = as \\ bs
+... | no _ = a ∷ (as \\ bs)
 
 -- ∃[ cs ] (∀[ c ] (c ∈ cs → c ∉ bs))
 -- ∀ {ℓ} {A : Set ℓ} {{_ : Eq A}} (as : A *) (bs : A *) →  ∃[ cs ] cs ⊆ as × (∀[ a ] (a ∈ as → (a )))
@@ -865,11 +867,11 @@ _\\_ : ∀ {ℓ} {A : Set ℓ} {{_ : Eq A}} (_ _ : A *) → A *
 \\-∈-inv : ∀ {ℓ} {A : Set ℓ} {{_ : Eq A}} (as bs : A *) → ∀[ a ∈ as \\ bs ] a ∈ as × a ~∈ bs
 \\-∈-inv (c ∷ as) bs a∈as\\bs
   with c ∈? bs
-\\-∈-inv (c ∷ as) bs here | no {c~∈bs} = here , c~∈bs
-\\-∈-inv (c ∷ as) bs (there a∈as\\bs) | no
+\\-∈-inv (c ∷ as) bs here | no c~∈bs = here , c~∈bs
+\\-∈-inv (c ∷ as) bs (there a∈as\\bs) | no _
   with \\-∈-inv as bs a∈as\\bs
 ... | (a∈as , a~∈bs) = there a∈as , a~∈bs
-\\-∈-inv (c ∷ as) bs a∈as\\bs | yes
+\\-∈-inv (c ∷ as) bs a∈as\\bs | yes _
   with \\-∈-inv as bs a∈as\\bs
 ... | (a∈as , a~∈bs) = there a∈as , a~∈bs
 
@@ -929,22 +931,22 @@ xs ⊂ ys = xs ⊆ ys × ~ (ys ⊆ xs)
 support : ∀ {ℓ} {A : Set ℓ} {{_ : Eq A}} → A * → A *
 support ε = ε
 support (a ∷ as) with a ∈? as
-... | yes = support as
-... | no = a ∷ support as
+... | yes _ = support as
+... | no _ = a ∷ support as
 
 ⊆-support-1 : ∀ {ℓ} {A : Set ℓ} {{_ : Eq A}} (as : A *) → as ⊆ support as
 ⊆-support-1 (a ∷ as) here with a ∈? as
-... | yes {a∈as} = ⊆-support-1 as a∈as
-... | no = here
+... | yes a∈as = ⊆-support-1 as a∈as
+... | no _ = here
 ⊆-support-1 (a ∷ as) (there {b} b∈as) with a ∈? as
-... | yes = ⊆-support-1 as b∈as
-... | no = there (⊆-support-1 as b∈as)
+... | yes _ = ⊆-support-1 as b∈as
+... | no _ = there (⊆-support-1 as b∈as)
 
 ⊆-support-2 : ∀ {ℓ} {A : Set ℓ} {{_ : Eq A}} (as : A *) → support as ⊆ as
 ⊆-support-2 (a ∷ as) {b} b∈supas with a ∈? as
-... | yes = there (⊆-support-2 as b∈supas)
-⊆-support-2 (a ∷ as) {a} here | no = here
-⊆-support-2 (a ∷ as) {b} (there b∈supas) | no = there (⊆-support-2 as b∈supas)
+... | yes _ = there (⊆-support-2 as b∈supas)
+⊆-support-2 (a ∷ as) {a} here | no _ = here
+⊆-support-2 (a ∷ as) {b} (there b∈supas) | no _ = there (⊆-support-2 as b∈supas)
 
 ⊆-support-⊆-1 :  ∀ {ℓ} {A : Set ℓ} {{_ : Eq A}} (as bs : A *) →
   support as ⊆ support bs →
@@ -963,11 +965,11 @@ support (a ∷ as) with a ∈? as
 distinct-support : ∀ {ℓ} {A : Set ℓ} {{_ : Eq A}} (as : A *) → distinct (support as)
 distinct-support (a ∷ as) i j b x y
   with a ∈? as
-... | yes = distinct-support as i j b x y
-distinct-support (a ∷ as) .0 .0 .a here here | no = refl
-distinct-support (a ∷ as) 0 (suc _) a here (there y) | no {a~∈as} = F-elim (a~∈as (⊆-support-2 _ (∈!→∈ _ _ _ y)))
-distinct-support (a ∷ as) (suc _) 0 a (there x) here | no {a~∈as} = F-elim (a~∈as (⊆-support-2 _ (∈!→∈ _ _ _ x)))
-distinct-support (a ∷ as) (suc i) (suc j) b (there x) (there y) | no = cong suc (distinct-support as i j b x y)
+... | yes _ = distinct-support as i j b x y
+distinct-support (a ∷ as) .0 .0 .a here here | no _ = refl
+distinct-support (a ∷ as) 0 (suc _) a here (there y) | no a~∈as = F-elim (a~∈as (⊆-support-2 _ (∈!→∈ _ _ _ y)))
+distinct-support (a ∷ as) (suc _) 0 a (there x) here | no a~∈as = F-elim (a~∈as (⊆-support-2 _ (∈!→∈ _ _ _ x)))
+distinct-support (a ∷ as) (suc i) (suc j) b (there x) (there y) | no _ = cong suc (distinct-support as i j b x y)
 
 -- more generally, support is the identity on lists without repeating elements
 idempotent-support : ∀ {ℓ} {A : Set ℓ} {{_ : Eq A}} (as : A *) →
@@ -985,8 +987,8 @@ idempotent-support = {!!}
   length (support as) ≤ length bs
 ⊆-len-support1 {as = ε} as⊆bs = 0≤n
 ⊆-len-support1 {as = a ∷ as} {bs} a∷as⊆bs with a ∈? as 
-... | yes = ⊆-len-support1 (⊆-cons-2 a∷as⊆bs)
-... | no {a~∈as} = goal where
+... | yes _ = ⊆-len-support1 (⊆-cons-2 a∷as⊆bs)
+... | no a~∈as = goal where
 
   ind : length (support as) ≤ length (remove a bs)
   ind = ⊆-len-support1 {as = as} {remove a bs} (⊆-~∈-remove as⊆bs a~∈as)
@@ -1028,8 +1030,8 @@ idempotent-support = {!!}
   length (support as) < length (support bs)
 ⊂-len-support {as = as} {bs} (as⊆bs , ~bs⊆as)
   with length (support as) <? length (support bs)
-... | yes {goal} = goal
-... | no {~goal} = F-elim (~bs⊆as (⊆-len-support-⊆ as⊆bs (~<→≥ ~goal))) where
+... | yes goal = goal
+... | no ~goal = F-elim (~bs⊆as (⊆-len-support-⊆ as⊆bs (~<→≥ ~goal))) where
 
   lensupas≤lensupbs : length (support as) ≤ length (support bs)
   lensupas≤lensupbs = ⊆-len-support as⊆bs
@@ -1163,8 +1165,8 @@ filter-⊑ P? (a ∷ as)
   with filter-⊑ P? as
 ... | filter⊑as
   with P? a
-... | yes = match filter⊑as
-... | no = skip filter⊑as
+... | yes _ = match filter⊑as
+... | no _ = skip filter⊑as
 
 -- from the above
 filter-⊆ : ∀ {ℓ m} {A : Set ℓ} {P : A → Set m} {{_ : Eq A}} →
@@ -1341,12 +1343,12 @@ data _∈1_ {ℓ} {A : Set ℓ} : A → A * → Set ℓ where
     there : ∀ {x y} {xs : A *} → x ≢ y → x ∈1 xs → x ∈1 (y ∷ xs)
 
 _∈1?_ : ∀ {ℓ} {A : Set ℓ} {{_ : Eq A}} (a : A) (as : A *) → Dec (a ∈1 as)
-a ∈1? ε = no {proof = λ ()}
+a ∈1? ε = no (λ ())
 a ∈1? b ∷ as with a ≡? b
-... | yes {refl} = yes {proof = here}
-... | no {a≢b} with a ∈1? as
-... | yes {a∈1as} = yes {proof = there a≢b a∈1as}
-... | no {~a∈1as} = no {proof = goal} where
+... | yes refl = yes (here)
+... | no a≢b with a ∈1? as
+... | yes a∈1as = yes (there a≢b a∈1as)
+... | no ~a∈1as = no (goal) where
   goal : ~ (a ∈1 b ∷ as)
   goal here = a≢b refl
   goal (there _ a∈1as) = ~a∈1as a∈1as
@@ -1358,8 +1360,8 @@ a ∈1? b ∷ as with a ≡? b
 ∈→∈1 : ∀ {ℓ} {A : Set ℓ} {{_ : Eq A}} {a : A} {as : A *} → a ∈ as → a ∈1 as
 ∈→∈1 {a = a} {a ∷ _} here = here
 ∈→∈1 {a = a} {b ∷ as} (there a∈as) with a ≡? b
-... | yes {refl} = here
-... | no {a≢b} = there a≢b (∈→∈1 a∈as)
+... | yes refl = here
+... | no a≢b = there a≢b (∈→∈1 a∈as)
 ```
 
 ```
