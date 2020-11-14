@@ -20,6 +20,21 @@ A nice quote about the spirit of formalisation:
 Simon (1956) wrote to Russell in late 1956 and described the work of the LT (Logic Theorist).
 Russell (1956) replied, "I am delighted to know that Principia Mathematica can now be done by machinery. I wish Whitehead and I had known of this possibility before we wasted ten years doing it by hand. I am quite willing to believe that everything in deductive logic can be done by machinery."
 
+Agda resources:
+
+* [@Stump:ACM:2016]
+* [@Norell:AFP:2008]
+* [@agda-dybjer:2018]
+* [@BoveDybjer:LerNet:2008]
+
+Other dependent types resources
+
+* [@Chlipala:MIT:2013]
+
+Logic resources:
+
+* [@Harrison:CUP:2009]
+
 ## Part 0: Programming in Agda 🚧
 
 - [Natural numbers](/part0/Naturals.md) 🚧 .
