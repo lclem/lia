@@ -5,7 +5,7 @@ title: Syntax and semantics of propositional logic 🚧
 In this chapter we introduce the syntax of propositional logic.
 
 ```
-{-# OPTIONS --allow-unsolved-metas  #-}
+{-# OPTIONS --allow-unsolved-metas #-}
 open import part0.Naturals using (ℕ)
 
 module part1.Semantics (n′ : ℕ) where
@@ -895,6 +895,109 @@ refl-⇛ φ _ = id
 trans-⇛ _ _ _ φ⊨ψ ψ⊨ξ ϱ = ψ⊨ξ ϱ ∘ φ⊨ψ ϱ
 ```
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The fact that entailment is a preodrer implies immediately that logical equivalence is also a prerorder.
+
+```
+refl-⟺ : ∀ φ → φ ⟺ φ
+trans-⟺ : ∀ φ ψ ξ → φ ⟺ ψ → ψ ⟺ ξ → φ ⟺ ξ
+```
+
+!hide
+~~~~~~~~
+
+~~~~~~~~
+~~~~~~~~
+```
+refl-⟺ = {!!}
+trans-⟺ = {!!}
+```
+~~~~~~~~
+
+There is a simple reprhasing of tautology in terms of logical equivalence.
+A formula `φ` is a tautology iff it is logically equivalent to !ref(Formula)(⊤):
+
+```
+tautology-equivalence : ∀ φ → Tautology φ ↔ φ ⟺ ⊤
+tautology-equivalence φ = (λ tau ϱ → tau ϱ) , λ φ⟺⊤ ϱ → φ⟺⊤ ϱ
+```
+
+While quite evident by itself, the equivalence above does find its applications,
+such as in !remoteRef(part1)(CharacteristicFormulas)(duality-tautology).
+The following exercise explores a converse relationship between entailment/equivalnce and tautology.
+
+!exercise(#exercise:entailment-implication)(Entailment and implication)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+The typographic similarity betwee entailment and implication,
+and similarly for equivalence and bi-implication,
+is explained by the following connection with tautology:
+
+```
+entailment-implication : ∀ φ ψ → φ ⇛ ψ ↔ Tautology (φ ⇒ ψ)
+entailment-equivalence : ∀ φ ψ → φ ⟺ ψ ↔ Tautology (φ ⇔ ψ)
+```
+
+Prove the two properties above.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We begin with !ref(entailment-implication).
+We break it up into two directions, which are proved separately:
+
+```
+entailment-implication-1 : ∀ φ ψ →
+  φ ⇛ ψ →
+  ------------------
+  Tautology (φ ⇒ ψ)
+
+entailment-implication-1 φ ψ φ⇛ψ ϱ
+  with inspect (⟦ φ ⟧ ϱ)
+... | it tt ⟦φ⟧ϱ=tt
+  rewrite ⟦φ⟧ϱ=tt | φ⇛ψ ϱ ⟦φ⟧ϱ=tt = refl
+... | it ff ⟦φ⟧ϱ=ff
+  rewrite ⟦φ⟧ϱ=ff = refl
+```
+
+```
+entailment-implication-2 : ∀ φ ψ →
+  Tautology (φ ⇒ ψ) →
+  ------------------
+  φ ⇛ ψ
+ 
+entailment-implication-2 φ ψ tau ϱ ⟦φ⟧ϱ≡tt = ⟦ψ⟧ϱ≡tt where
+
+  have : ⟦ φ ⟧ ϱ ⇒𝔹 ⟦ ψ ⟧ ϱ ≡ tt
+  have = tau ϱ
+
+  equiv : ⟦ φ ⟧ ϱ ⇒𝔹 ⟦ ψ ⟧ ϱ ≡ ⟦ ψ ⟧ ϱ
+  equiv = 𝔹implProp2 (⟦ φ ⟧ ϱ) (⟦ ψ ⟧ ϱ) ⟦φ⟧ϱ≡tt
+
+  ⟦ψ⟧ϱ≡tt : ⟦ ψ ⟧ ϱ ≡ tt
+  ⟦ψ⟧ϱ≡tt rewrite sym equiv = have
+```
+
+We put the two directions together:
+
+```
+entailment-implication φ ψ = entailment-implication-1 φ ψ , entailment-implication-2 φ ψ
+```
+
+The treatment for equivalence:
+
+```
+entailment-equivalence φ ψ = {!!}
+```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Some equivalences require to computation at all:
+
+```
+¬¬⊤⟺⊤ : ¬ ¬ ⊤ ⟺ ⊤
+¬¬⊤⟺⊤ ϱ = refl
+```
+
+More elaborate equivalences require marginally more work,
+as shown in the next exercise.
 
 !exercise(#exercise:common-equivalences)(Common equivalences)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

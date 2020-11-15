@@ -116,6 +116,13 @@ in order to allow short-circuit evaluation even w.r.t. the second argument.
 ∧𝔹-rewrite2 ff = refl
 
 {-# REWRITE ∧𝔹-rewrite ∧𝔹-rewrite2 #-}
+
+⇒𝔹-rewrite-tt : ∀ a → tt ⇒𝔹 a ≡ a
+⇒𝔹-rewrite-tt tt = refl
+⇒𝔹-rewrite-tt ff = refl
+
+{-# REWRITE ⇒𝔹-rewrite-tt #-}
+
 ```
 
 ## Inter-definability

@@ -26,7 +26,6 @@
 !define(exercise)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
 ::::: {.exercisebox}
 
 !ifne(!4)()(Exercise (!2) !1)(Exercise !1)

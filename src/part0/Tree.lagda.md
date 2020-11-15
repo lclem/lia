@@ -13,13 +13,13 @@ module part0.Tree where
 open import part0.Naturals public
 open import part0.List public
 
-variable
+private
+  variable
+    ℓ : Level
+    A : Set ℓ
 
-  ℓ : Level
-  A : Set ℓ
-
-  a a' : A
-  as as' : A *
+    a a' : A
+    as as' : A *
 
 data Tree {ℓ} (A : Set ℓ) : Set ℓ where
     Nil : Tree A

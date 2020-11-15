@@ -9,10 +9,22 @@ title: Functions 🚧
 module part0.Functions where
 open import part0.Equality public
 
+private
+  variable
+    ℓ m n : Level
+    A : Set ℓ
+    B : A → Set m
+    C : Set m
+    D : Set n
+
+-- dependent flip!
+flip : ∀ {D : A → C → Set n} → ((a : A) → (c : C) → D a c) → (c : C) → (a : A) → D a c
+flip f c a = f a c
+
 -- updating a function
 infixl 300 _[_↦_]
 
-update : ∀ {ℓ m} {A : Set ℓ} {B : A → Set m} {{_ : Eq A}} → Π A B → (a : A) → B a → Π A B
+update : {{_ : Eq A}} → Π A B → (a : A) → B a → Π A B
 update f a b c with a ≡? c
 ... | yes refl = b
 ... | no _ = f c
@@ -124,8 +136,8 @@ Injective f = ∀[ a0 ] ∀[ a1 ] (f a0 ≡ f a1 → a0 ≡ a1)
 
 ```
 infix  1 begin→_
-infixr 2 _→⟨⟩_ _→⟨_⟩_ -- _→≡⟨_⟩_
-infix  3 _∎→
+infixr 2 _→⟨⟩_ _→⟨_⟩_ _by⟨_⟩_  -- _→≡⟨_⟩_
+infix  3 _∎→ _QED
 
 begin→_ : ∀ {ℓ m} {A : Set ℓ} {B : Set m} → (A → B) → A → B
 begin→ f = f
@@ -136,6 +148,25 @@ A →⟨⟩ A→B = A→B
 _→⟨_⟩_ : ∀ {ℓ m n} (A : Set ℓ) {B : Set m} {C : Set n} → (A → B) → (B → C) → A → C
 A →⟨ A→B ⟩ B→C = λ a → B→C (A→B a)
 
+_by⟨_⟩_ = _→⟨_⟩_
+
+--: ∀ {ℓ m n} (A : Set ℓ) {B : Set m} {C : Set n} → (A → B) → (B → C) → A → C
+--A by⟨ A→B ⟩ B→C =
+
 _∎→ : ∀ {ℓ} (A : Set ℓ) → A → A
 A ∎→ = λ a → a
+
+_QED = _∎→
+
+
+```
+
+Use case:
+
+```
+fcomp : ∀ (A B C : Set) → (A → B) → (B → C) → A → C
+fcomp A B C f g =
+    A by⟨ f ⟩
+    B by⟨ g ⟩
+    C QED 
 ```

@@ -27,6 +27,16 @@ thereExists : ∀ {ℓ m} {A : Set ℓ} (B : A → Set m) → Set (ℓ ⊔ m)
 thereExists {A = A} B = Σ A B
 
 -- We make the first component implicit, since it can often be recovered from the second one
+
+--Π' : ∀ {ℓ m} {A : Set ℓ} → (B : A → Set m) → Set (ℓ ⊔ m)
+--Π' {A} B = (a : A) → B a
+
+--forAll' : ∀ {ℓ m} {A : Set ℓ} → (B : A → Set m) → Set (ℓ ⊔ m)
+--forAll' {A = A} B = Π A B
+
+forAll← : ∀ {ℓ m n} {A : Set ℓ} (B : A → Set m) (C : (a : A) → {b : B a} → Set n) → Set (ℓ ⊔ m ⊔ n)
+forAll← {A = A} B C = (a : A) → {b : B a} → C a {b}
+
 infix 10 [[_]]
 record Σ' {ℓ m} (A : Set ℓ) (B : A → Set m) : Set (ℓ ⊔ m) where
   constructor [[_]]
@@ -39,9 +49,10 @@ open Σ' public
 thereExists' : ∀ {ℓ m} {A : Set ℓ} (B : A → Set m) → Set (ℓ ⊔ m)
 thereExists' {A = A} B = Σ' A B
 
-infix 0 forAll thereExists thereExists'
+infix 0 forAll thereExists thereExists' forAll←
 syntax forAll (λ x → B) = ∀[ x ] B
 syntax thereExists (λ x → B) = ∃[ x ] B
+syntax forAll← B (λ x → C) = ∀[ x ← B ] C
 syntax thereExists' (λ x → B) = ∃[[ x ]] B
 
 infixr 2 _×_
