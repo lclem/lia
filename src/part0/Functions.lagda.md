@@ -170,3 +170,10 @@ fcomp A B C f g =
     B by⟨ g ⟩
     C QED 
 ```
+
+# Currying
+
+```
+curry : ∀ {B : Set m} {C : Set n} → (A × B → C) → A → B → C
+curry f a b = f (a , b)
+```

@@ -10,7 +10,7 @@
 
 !define(chapterRef)
 ~~~~~~~~~~~~
-[!1/!2](../../!1/!2).
+[Ch. !1/!2](../../!1/!2)
 ~~~~~~~~~~~~
 
 !define(refExercise)
@@ -79,6 +79,17 @@ Example !1
 ::::: {.lemmabox}
 
 !ifne(!3)()(Lemma (!2))(Lemma) !1
+: !ifne(!3)()(!3)(!2)
+<span class="hidden">∎</span>
+<span class="right-aligned">∎</span>
+:::::
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+!define(remark)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+::::: {.remarkbox}
+
+!ifne(!3)()(Remark (!2))(Remark) !1
 : !ifne(!3)()(!3)(!2)
 <span class="hidden">∎</span>
 <span class="right-aligned">∎</span>

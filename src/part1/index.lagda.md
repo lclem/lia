@@ -1,5 +1,5 @@
 ---
-title: "Part 1: Classical propositional logic 🚧"
+title: Part 1: Classical propositional logic 🚧
 ---
 
 ```
@@ -9,7 +9,7 @@ module part1.index where
 
 open import part1.Semantics
 open import part1.CharacteristicFormulas
---open import part1.NormalForms
+open import part1.NormalForms
 --open import part1.Completeness
 --open import part1.Resolution
 --open import part1.Resolution-Completeness

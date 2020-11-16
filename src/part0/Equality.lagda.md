@@ -8,6 +8,11 @@ title: Equality🚧
 module part0.Equality where
 open import part0.Decidable public
 
+private
+  variable
+    ℓ m : Level
+    A : Set ℓ
+
 infix 4 _≡_ _≢_
 data _≡_ {ℓ} {A : Set ℓ} (x : A) : A → Set where
     refl : x ≡ x
@@ -123,11 +128,23 @@ instance
     ... | no b≢b' = no λ{refl → b≢b' refl}
 ```
 
+### Pairs
+
+```
+instance
+  eq-× : ∀ {B : Set m} {{_ : Eq A}} {{_ : Eq B}} → Eq (A × B)
+  _≡?_ {{eq-×}} (a1 , b1) (a2 , b2) with a1 ≡? a2
+  ... | no a1≢a2 = no λ{refl → a1≢a2 refl}
+  ... | yes refl with b1 ≡? b2
+  ... | no b1≢b2 = no λ{refl → b1≢b2 refl}
+  ... | yes refl = yes refl
+```
+
 ### Dependent pairs
 
 ```
 instance
-  eqΣ : ∀ {ℓ m} {A : Set ℓ} {B : A → Set m} {{_ : Eq A}} {{_ : ∀ {a} → Eq (B a)}} → Eq (Σ A B)
+  eqΣ : ∀ {B : A → Set m} {{_ : Eq A}} {{_ : ∀ {a} → Eq (B a)}} → Eq (Σ A B)
   _≡?_ {{eqΣ}} (a1 , b1) (a2 , b2) with a1 ≡? a2
   ... | no a1≢a2 = no λ{refl → a1≢a2 refl}
   ... | yes refl with b1 ≡? b2
@@ -140,9 +157,9 @@ instance
 # Inspection idiom
 
 ```
-data Inspect {ℓ} {A : Set ℓ} (x : A) : Set ℓ where
+data Inspect {A : Set ℓ} (x : A) : Set ℓ where
   it : (y : A) → x ≡ y → Inspect x
 
-inspect : ∀ {ℓ} {A : Set ℓ} (x : A) → Inspect x
+inspect : ∀ (x : A) → Inspect x
 inspect x = it x refl
 ```

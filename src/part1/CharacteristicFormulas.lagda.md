@@ -6,12 +6,10 @@ In this chapter we study characteristic formulas and their application to functi
 
 ```
 {-# OPTIONS --allow-unsolved-metas  #-}
-open import part0.Naturals using (ℕ)
+open import part0.index
 
 module part1.CharacteristicFormulas (n′ : ℕ) where
-open import part0.index
 open import part1.Semantics n′
-open import part1.Simplification n′
 ```
 
 # Characteristic formulas {#characteristic-formulas}
@@ -38,18 +36,19 @@ For instance, consider the valuation
 ϱ₁ = const tt [ p₀ ↦ ff ] [ p₁ ↦ ff ]
 ```
 
-that assigns value !remoteRef(part0)(Booleans)(tt) to every proposition,
+that assigns value !remoteRef(part0)(Booleans)(𝔹)(tt) to every proposition,
 except for `p₀` and `p₁`.
 Under the assumption that there are only three propositions `p₀, p₁, p₂` in the universe,
 a characteristic formula for `ϱ₁` is, e.g.,
 
 ```
+ψ₁ : Formula
 ψ₁ = ¬ ` p₀ ∧ ¬ ` p₁ ∧ ` p₂
 ```
 
 In order to show `ψ₁ CharFormulaOf ϱ₁`, we use appropriate Boolean inversion properties
 to enforce that every valuation `ϱ′` satisfying `ψ₁`
-necessarily assigns !remoteRef(part0)(Booleans)(ff) to `p₀, p₁`, and !remoteRef(part0)(Booleans)(tt) to `p₂`.
+necessarily assigns !remoteRef(part0)(Booleans)(𝔹)(ff) to `p₀, p₁`, and !remoteRef(part0)(Booleans)(𝔹)(tt) to `p₂`.
 We then use function extensionality to conclude `ϱ′ ≡ ϱ₁`, as required:
 
 ```
@@ -58,17 +57,17 @@ We then use function extensionality to conclude `ϱ′ ≡ ϱ₁`, as required:
 
   goal : ∀ ϱ′ → ⟦ ψ₁ ⟧ ϱ′ ≡ tt → ϱ′ ≡ ϱ₁
   goal ϱ′ eval
-    with 𝔹conjProp1 (⟦ ¬ ` p₀ ⟧ ϱ′) _ eval |
+    with 𝔹conjProp1 (⟦ ¬ ` p₀ ⟧ ϱ′) (⟦ ¬ ` p₁ ∧ ` p₂ ⟧ ϱ′) eval |
          𝔹conjProp1 (⟦ ¬ ` p₁ ⟧ ϱ′) _ (𝔹conjProp2 (⟦ ¬ ` p₀ ⟧ ϱ′) _ eval) |
          𝔹conjProp2 (⟦ ¬ ` p₁ ⟧ ϱ′) _ (𝔹conjProp2 (⟦ ¬ ` p₀ ⟧ ϱ′) _ eval)
   ... | eval1 | eval2 | eval3
-    with ¬𝔹-inv _ eval1 |
-         ¬𝔹-inv _ eval2
+    with ¬𝔹-inv (ϱ′ p₀) eval1 |
+         ¬𝔹-inv (ϱ′ p₁) eval2
   ... | eval1' | eval2' = extensionality go where
 
     go : ∀[ p ] ϱ′ p ≡ ϱ₁ p
-    go fzero rewrite eval1' = refl
-    go (fsuc fzero) rewrite eval2' = refl
+    go fzero rewrite eval1' = refl 
+    go (fsuc fzero) rewrite eval2' =  refl 
     go (fsuc (fsuc fzero)) rewrite eval3 = refl
 ```
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -121,7 +120,7 @@ into a corresponding *characteristic literal* `「 p 」 ϱ` depending on whethe
 ... | ff = ¬ ` p
 ```
 
-In the first case (i.e., if `ϱ p` is !remoteRef(part0)(Booleans)(tt))
+In the first case (i.e., if `ϱ p` is !remoteRef(part0)(Booleans)(𝔹)(tt))
 we say that the characteristic literal of `「 p 」 ϱ` is *positive*,
 and in the other case that it is *negative*.
 There are two fundamental properties satisfied by `「 p 」 ϱ`.
@@ -140,7 +139,7 @@ charLit-sound ϱ p with inspect (ϱ p)
 (Notice that we need to rewrite twice in each case.
 For example in the first case we need to rewrite twice accoriding to the same equality `ϱp≡tt : ϱ p ≡ tt`:
 The first rewrite transforms `⟦ 「 p 」 ϱ ⟧ ϱ` into ``⟦ ` p ⟧ ϱ``,
-and the second rewrite transforms the latter into !remoteRef(part0)(Booleans)(tt), as required.
+and the second rewrite transforms the latter into !remoteRef(part0)(Booleans)(𝔹)(tt), as required.
 A single rewrite does not suffice.
 For this reason, the simpler solution
 
@@ -220,7 +219,7 @@ charFormula-sound : ∀ ϱ →
   ------------------
   ⟦ 〔 ϱ 〕 ⟧ ϱ ≡ tt
   
-charFormula-sound ϱ  = conjProp2 literals ϱ go where
+charFormula-sound ϱ = conjProp2 literals ϱ go where
 
   open CharFormula ϱ
 
@@ -236,7 +235,7 @@ charFormula-sound ϱ  = conjProp2 literals ϱ go where
     ⟦φ⟧ϱ≡tt rewrite φ≡「p」ϱ | ⟦「p」ϱ⟧ϱ≡tt = refl
 ```
 
-Notice how we open the local module `CharFormula` in order to use the definition of `literals` from `〔_〕`.
+(We open the local module `CharFormula` in order to use the definition of `literals` from `〔_〕`.)s
 Completeness says that, if any valuation `ϱ′` satisfies the characteristic formula `〔 ϱ 〕` of a valuation `ϱ`,
 then `ϱ′ ≡ ϱ`.
 
@@ -254,7 +253,7 @@ charFormula-complete ϱ ϱ′ ⟦φ⟧ϱ′≡tt = extensionality go where
     open CharFormula ϱ
 
     ∈literals : 「 p 」 ϱ ∈ literals
-    ∈literals = map-∈ (「_」 ϱ) (find p)
+    ∈literals = map-∈ (「_」 ϱ) (findPropName p)
 ```
 
 Soundness and completeness taken together ensure that `〔 ϱ 〕` is a characteristic formula of `ϱ`:
@@ -307,15 +306,7 @@ Thus, w.r.t. the full syntax of propositional formulas,
 we do not allow either implication `⇒`, or bi-implication `⇔`.
 Formally, this fragment is defined as the following inductive datatype:
    
-```
-data Formula[⊥,⊤,¬,∨,∧] : Formula → Set where
-  ⊥ : Formula[⊥,⊤,¬,∨,∧] ⊥
-  ⊤ : Formula[⊥,⊤,¬,∨,∧] ⊤
-  `_ : ∀ p → Formula[⊥,⊤,¬,∨,∧] (` p)
-  ¬_ : ∀ {φ} → Formula[⊥,⊤,¬,∨,∧] φ → Formula[⊥,⊤,¬,∨,∧] (¬ φ)
-  _∧_ : ∀ {φ ψ} → Formula[⊥,⊤,¬,∨,∧] φ → Formula[⊥,⊤,¬,∨,∧] ψ → Formula[⊥,⊤,¬,∨,∧] (φ ∧ ψ)
-  _∨_ : ∀ {φ ψ} → Formula[⊥,⊤,¬,∨,∧] φ → Formula[⊥,⊤,¬,∨,∧] ψ → Formula[⊥,⊤,¬,∨,∧] (φ ∨ ψ)
-```
+
 
 In the following, fix an arbitrary Boolean function `f : 𝔹Fun`.
 We want to build a formula `φ` in the fragment whose semantics equals that of `f`:
@@ -460,7 +451,7 @@ then we need to show that `fun→formula f` also evaluates to true:
   goal : ⟦ fun→formula f ⟧ ϱ ≡ tt
 ```
 
-We begin by finding the occurrence `findVal ϱ` of `ϱ` in the list of all valuations !ref(vals) and then, knowing that `f ϱ` evaluates to !remoteRef(part0)(Booleans)(tt) by assumption,
+We begin by finding the occurrence `findVal ϱ` of `ϱ` in the list of all valuations !ref(vals) and then, knowing that `f ϱ` evaluates to !remoteRef(part0)(Booleans)(𝔹)(tt) by assumption,
 we find a witness `ϱ∈ttVals` that `ϱ` belongs to !ref(𝔹Fun→Formula)(ttVals):
 
 ```
@@ -554,6 +545,18 @@ funCompl[⊥,⊤,¬,∨,∧] f =
   fun→formula f , ∈fragment f , extensionality (fun→formula-correct f)
 ```
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+!remark(#remark:funComplFalseTrueNegAndOr)
+~~~~~~~~~~~~
+The formula computed by !ref(fun→formula) enjoys stronger structural properties than being in the `{∨, ∧, ¬, ⊤, ⊥}` fragment.
+In fact, it always produces formulas of the form $$\bigvee_i \bigwedge_j l_{i,j}$$
+where $l_{i,j}$ is a literal. Such formulas are said to be in *disjunctive normal form* (DNF).
+We will come back to DNF formulas in !chapterRef(part1)(NormalForms) where we will study this and other normal forms.
+
+Regarding efficiency, !ref(fun→formula) iterates over all valuations
+and thus invariably produces formulas of exponential size $\Theta(2^n)$.
+This will be (partially) addressed also in !chapterRef(part1)(NormalForms) with a syntactic construction.
+~~~~~~~~~~~~
 
 ## Fragment `{∨, ∧, ¬}`
 
@@ -807,8 +810,9 @@ funCompl[⇒,⊥] f
 ```
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-## Fragment `{⊥, ⊤, ∨, ∧}`
+## Fragment `{⊥, ⊤, ∨, ∧}` {#sec:monotone-fragment}
 
+At this point one may get the impression that most set of connectives are semantically complete.
 In this section we explore the fragment where we only allow conjunction and disjunction,
 i.e., no negation, implication, or bi-implication:
 
@@ -873,7 +877,7 @@ f¬ ϱ = ¬𝔹 ϱ p₀
 
 The first observation is that this fragment can only encode monotone Boolean functions.
 (We have here in mind the natural ordering `ff ≤𝔹 tt` on `𝔹`.)
-Intuitively, a Boolean function is monotone iff flipping one input from !remoteRef(part0)(Booleans)(ff) to !remoteRef(part0)(Booleans)(tt) can only increase the output.
+Intuitively, a Boolean function is monotone iff flipping one input from !remoteRef(part0)(Booleans)(𝔹)(ff) to !remoteRef(part0)(Booleans)(𝔹)(tt) can only increase the output.
 Formally, we define a partial order `_≤V_` on valuation by lifting `_≤𝔹_` point-wise in the expected way:
 
 ```
@@ -1167,9 +1171,8 @@ For the second part, we aim at reaching a contradiction impinging on monotonicit
     ... | fϱ′≤fϱ rewrite fϱ′≡tt | fϱ≡ff = tt≤𝔹ff-elim fϱ′≤fϱ
 ```
 
-## Fragment `{⊤, ∨, ∧, ⇒, ⇔}`
+## Fragment `{⊤, ∨, ∧, ⇒, ⇔}` {#section:big-incomplete-fragment}
 
-At this point one may get the impression that most set of connectives are semantically complete.
 Let's now consider all standard connectives,
 except the "negative" connectives !remoteRef(part1)(Semantics)(Formula)(⊥) and !remoteRef(part1)(Semantics)(Formula)(¬_):
 
@@ -1177,10 +1180,14 @@ except the "negative" connectives !remoteRef(part1)(Semantics)(Formula)(⊥) and
 data Formula[⊤,∨,∧,⇒,⇔] : Formula → Set where
   ⊤ : Formula[⊤,∨,∧,⇒,⇔] ⊤
   `_ : ∀ p → Formula[⊤,∨,∧,⇒,⇔] (` p)
-  _∧_ : ∀ {φ ψ} → Formula[⊤,∨,∧,⇒,⇔] φ → Formula[⊤,∨,∧,⇒,⇔] ψ → Formula[⊤,∨,∧,⇒,⇔] (φ ∧ ψ)
-  _∨_ : ∀ {φ ψ} → Formula[⊤,∨,∧,⇒,⇔] φ → Formula[⊤,∨,∧,⇒,⇔] ψ → Formula[⊤,∨,∧,⇒,⇔] (φ ∨ ψ)
-  _⇒_ : ∀ {φ ψ} → Formula[⊤,∨,∧,⇒,⇔] φ → Formula[⊤,∨,∧,⇒,⇔] ψ → Formula[⊤,∨,∧,⇒,⇔] (φ ⇒ ψ)
-  _⇔_ : ∀ {φ ψ} → Formula[⊤,∨,∧,⇒,⇔] φ → Formula[⊤,∨,∧,⇒,⇔] ψ → Formula[⊤,∨,∧,⇒,⇔] (φ ⇔ ψ)
+  _∧_ : ∀ {φ ψ} → Formula[⊤,∨,∧,⇒,⇔] φ → Formula[⊤,∨,∧,⇒,⇔] ψ →
+    Formula[⊤,∨,∧,⇒,⇔] (φ ∧ ψ)
+  _∨_ : ∀ {φ ψ} → Formula[⊤,∨,∧,⇒,⇔] φ → Formula[⊤,∨,∧,⇒,⇔] ψ →
+    Formula[⊤,∨,∧,⇒,⇔] (φ ∨ ψ)
+  _⇒_ : ∀ {φ ψ} → Formula[⊤,∨,∧,⇒,⇔] φ → Formula[⊤,∨,∧,⇒,⇔] ψ →
+    Formula[⊤,∨,∧,⇒,⇔] (φ ⇒ ψ)
+  _⇔_ : ∀ {φ ψ} → Formula[⊤,∨,∧,⇒,⇔] φ → Formula[⊤,∨,∧,⇒,⇔] ψ →
+    Formula[⊤,∨,∧,⇒,⇔] (φ ⇔ ψ)
 ```
 
 !exercise(#exercise:positive-connective)(The `{⊤, ∨, ∧, ⇒, ⇔}` fragment)
@@ -1243,275 +1250,158 @@ however, positive formulas necessarily evaluate to true under the all-true valua
 
 ## Fragment `{⇑}` -- Sheffer's stroke {#Sheffer}
 
-Since we cannot add a new connective,
-we will define `⇑` in terms of previous connectives.
+In this section we consider whether it is possible for a *single* connective to be semantically complete w.r.t. all Boolean functions.
+Clearly the connective cannot be unary,
+since formulas built from a single unary connective can only depend on the Boolean value of one fixed input variable.
+Thus the connective must be binary. There are $2^{2^2} = 16$ Boolean functions of two arguments.
+By !refSection(#section:monotone-fragment) it cannot be monotone.
+This already excludes $D(2) = 6$ functions,
+where $D(n)$ is the $n$-th *Dedekind number* [@Dedekind:1897] which counts the number of Boolean functions of $n$ arguments (c.f. [OEIS A000372](https://oeis.org/A000372) for its first 9 known values).
+Even more strongly, by !refSection(#section:big-incomplete-fragment) it must map !remoteRef(part1)(Semantics)(ϱff) to true,
+and by a symmetric argument it must map !remoteRef(part1)(Semantics)(ϱtt) to false.
+This means that we can only choose the output for the "intermediate inputs" `(ff , tt)` and `( tt , ff )`,
+thus there are only four options left:
+
+```
+g₀ g₁ g₂ g₃  : 𝔹 × 𝔹 → 𝔹
+g₀ = const tt
+  [ ff , ff ↦ tt ]
+  [ ff , tt ↦ ff ]
+  [ tt , ff ↦ ff ]
+  [ tt , tt ↦ ff ]
+
+g₁ = const tt
+  [ ff , ff ↦ tt ]
+  [ ff , tt ↦ ff ]
+  [ tt , ff ↦ tt ]
+  [ tt , tt ↦ ff ]
+
+g₂ = const tt
+  [ ff , ff ↦ tt ]
+  [ ff , tt ↦ tt ]
+  [ tt , ff ↦ ff ]
+  [ tt , tt ↦ ff ]
+
+g₃ = const tt
+  [ ff , ff ↦ tt ]
+  [ ff , tt ↦ tt ]
+  [ tt , ff ↦ tt ]
+  [ tt , tt ↦ ff ]
+```
+
+The two functions !ref(g₁) and !ref(g₂) can be discarded since they compute just the negation of the second, resp., first argument,
+and thus do not depend on both arguments.
+Each of the two remaining functions !ref(g₀) and !ref(g₃) is suitable as a basis.
+For this reason, they deserve a name:
+
+```
+_nor𝔹_ _nand𝔹_ : 𝔹 → 𝔹 → 𝔹
+b₀ nor𝔹 b₁ = ¬𝔹 (b₀ ∨𝔹 b₁)  -- g₀
+b₀ nand𝔹 b₁ = ¬𝔹 (b₀ ∧𝔹 b₁) -- g₃
+```
+
+Sheffer showed that !ref(_nor𝔹_) can be taken as a basis and he denotes it with a *stroke* (vertical bar) `_|_` [Theorem 1, @Sheffer:AMS:1913].
+We show the analogous result for !ref(_nand𝔹_),
+and in honor of Sheffer we will call it the *Sheffer's stroke*:
 
 ```
 _⇑_ : Formula → Formula → Formula
 φ ⇑ ψ = ¬ (φ ∧ ψ)
+```
 
+(Since we cannot add a new connective to formulas,
+we have to define the stroke in terms of existing connectives.)
+The corresponding class of formulas is defined as follows:
+
+```
 data Formula[⇑] : Formula → Set where
   `_ : ∀ p → Formula[⇑] (` p)
-  _⟰_ : ∀ {φ ψ} → Formula[⇑] φ → Formula[⇑] ψ → Formula[⇑] (φ ⇑ ψ)
+  _nand_ : ∀ {φ ψ} → Formula[⇑] φ → Formula[⇑] ψ → Formula[⇑] (φ ⇑ ψ)
+```
 
+Unfortunately, since !ref(_⇑_) is not a constructor,
+we cannot homonymously name the corresponding constructor in !ref(Formula[⇑]),
+hence !ref(Formula[⇑])(_nand_). 
+
+!exercise(#exercise:sheffer-fun)
+~~~~~~~~~~~~~~~
+Show how to encode negation and conjunction in terms of Sheffer's stroke:
+
+```
 [∧,¬]→[⇑] : ∀ {φ} → Formula[¬∧] φ → Formula
+```
+~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
+```
 [∧,¬]→[⇑] (` p) = ` p
-[∧,¬]→[⇑] (¬ viewφ) with [∧,¬]→[⇑] viewφ
-... | ψ = ψ ⇑ ψ
-[∧,¬]→[⇑] (viewφ ∧ viewψ) with [∧,¬]→[⇑] viewφ | [∧,¬]→[⇑] viewψ
-... | φ' | ψ' = let ξ = φ' ⇑ ψ' in ξ ⇑ ξ
 
-[∧,¬]→[⇑]-fragment : ∀ {φ} (viewφ : Formula[¬∧] φ) →
+[∧,¬]→[⇑] (¬ viewφ)
+  with [∧,¬]→[⇑] viewφ
+... | ψ = ψ ⇑ ψ
+
+[∧,¬]→[⇑] (viewφ ∧ viewψ)
+  with [∧,¬]→[⇑] viewφ |
+       [∧,¬]→[⇑] viewψ
+... | φ' | ψ' = let ξ = φ' ⇑ ψ' in ξ ⇑ ξ
+```
+~~~~~~~~~~~~~~~
+
+!exercise(#exercise:sheffer-fragment)
+~~~~~~~~~~~~~~~
+Show that the encoding from !refExercise(#exercise:sheffer-fun) produces a formula in !ref(Formula[⇑]):
+
+```
+[∧,¬]→[⇑]-fragment : ∀ {φ} →
+  (viewφ : Formula[¬∧] φ) →
+  -----------------------------
   Formula[⇑] ([∧,¬]→[⇑] viewφ)
+```
+~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
+```
 [∧,¬]→[⇑]-fragment (` p) = ` p
+
 [∧,¬]→[⇑]-fragment (¬ viewφ)
   with [∧,¬]→[⇑]-fragment viewφ
-... | viewψ = viewψ ⟰ viewψ
+  
+... | viewψ = viewψ nand viewψ
 [∧,¬]→[⇑]-fragment (viewφ ∧ viewψ)
-  with [∧,¬]→[⇑]-fragment viewφ | [∧,¬]→[⇑]-fragment viewψ
-... | viewφ' | viewψ' = let viewξ = viewφ' ⟰ viewψ' in viewξ ⟰ viewξ
+  with [∧,¬]→[⇑]-fragment viewφ |
+       [∧,¬]→[⇑]-fragment viewψ
+... | viewφ' | viewψ' = let viewξ = viewφ' nand viewψ' in
+                        viewξ nand viewξ
+```
+~~~~~~~~~~~~~~~
 
-[∧,¬]→[⇑]-sound : ∀ {φ} (viewφ : Formula[¬∧] φ) →
+!exercise(#exercise:sheffer-sound)
+~~~~~~~~~~~~~~~
+Show that the encoding from !refExercise(#exercise:sheffer-fun) is sound:
+
+```
+[∧,¬]→[⇑]-sound : ∀ {φ} →
+  (viewφ : Formula[¬∧] φ) →
+  ---------------------
   φ ⟺ [∧,¬]→[⇑] viewφ
+```
+~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
+```
 [∧,¬]→[⇑]-sound (` p) ϱ = refl
+
 [∧,¬]→[⇑]-sound (¬ viewφ) ϱ
   rewrite [∧,¬]→[⇑]-sound viewφ ϱ
   with ⟦ [∧,¬]→[⇑] viewφ ⟧ ϱ
 ... | tt = refl
 ... | ff = refl
+
 [∧,¬]→[⇑]-sound (viewφ ∧ viewψ) ϱ
-  rewrite [∧,¬]→[⇑]-sound viewφ ϱ | [∧,¬]→[⇑]-sound viewψ ϱ
-  with ⟦ [∧,¬]→[⇑] viewφ ⟧ ϱ | ⟦ [∧,¬]→[⇑] viewψ ⟧ ϱ
+  rewrite [∧,¬]→[⇑]-sound viewφ ϱ |
+          [∧,¬]→[⇑]-sound viewψ ϱ
+  with ⟦ [∧,¬]→[⇑] viewφ ⟧ ϱ |
+       ⟦ [∧,¬]→[⇑] viewψ ⟧ ϱ
 ... | tt | tt = refl
 ... | tt | ff = refl
 ... | ff | tt = refl
 ... | ff | ff = refl
 ```
-
-# Duality
-
-The connectives in the fragment `{⊥,⊤,¬,∨,∧}` have a fundamental duality:
-
-* The two constants !remoteRef(part1)(Semantics)(Formula)(⊥) and !remoteRef(part1)(Semantics)(Formula)(⊤) are dual to each other.
-* Negation !remoteRef(part1)(Semantics)(Formula)(¬_) is dual to itself.
-* Conjunction !remoteRef(part1)(Semantics)(Formula)(_∧_) and disjunction !remoteRef(part1)(Semantics)(Formula)(_∨_) are dual to each other.
-
-This captured by the following definition,
-which given a formula `φ` constructs its *dual* `φ ⁻`
-by recursively swaping each constructor with its dual:
-
-```
-infix 200 _⁻
-_⁻ : Formula → Formula
-⊥ ⁻ = ⊤
-⊤ ⁻ = ⊥
-(` p) ⁻ = ` p
-(¬ φ) ⁻ = ¬ φ ⁻
-(φ ∧ ψ) ⁻ = φ ⁻ ∨ ψ ⁻
-(φ ∨ ψ) ⁻ = φ ⁻ ∧ ψ ⁻
-φ ⁻ = φ
-```
-
-(In the last catch-all case we do not do anything,
-since we do not apply dualisation outside the `{⊥,⊤,¬,∨,∧}` fragment.)
-
-!example(#example:dualisation)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-```
-_ : ∀ {φ ψ} → (φ ∨ ¬ ψ) ⁻ ≡ φ ⁻ ∧ ¬ ψ ⁻
-_ = refl
-```
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-!exercise(#exercise:dual-involution)
-~~~~~~
-Show that dualisation is an involutive operator,
-in the sense that applying it twice leaves the formula unchanged:
-
-```
-dual-involutive : ∀ {φ} →
-  Formula[⊥,⊤,¬,∨,∧] φ →
-  ---------
-  φ ⁻ ⁻  ≡ φ
-```
-~~~~~~
-~~~~~~
-```
-dual-involutive ⊥ = refl
-dual-involutive ⊤ = refl
-dual-involutive (` p) = refl
-dual-involutive (¬ φ)
-  rewrite dual-involutive φ = refl
-dual-involutive (φ ∧ ψ)
-  rewrite dual-involutive φ |
-          dual-involutive ψ = refl
-dual-involutive (φ ∨ ψ)
-  rewrite dual-involutive φ |
-          dual-involutive ψ = refl
-```
-~~~~~~
-
-Dualisation satisfies a key semantic property.
-For a valuation !ref(ϱ), let `- ϱ` be the *opposite valuation*,
-which is obtained by negating the output of !ref(ϱ):
-
-```
--_ : Val → Val
-(- ϱ) p = ¬𝔹 ϱ p
-```
-
-The fundamental semantic property of dualisation is the following:
-
-!lemma(#lemma:duality)(Duality lemma)
-~~~~~~~~~~~~~~~~~~~~
-```
-duality : ∀ {φ} ϱ →
-  Formula[⊥,⊤,¬,∨,∧] φ →
-  -------------------------
-  ⟦ φ ⁻ ⟧ ϱ ≡ ¬𝔹 ⟦ φ ⟧ (- ϱ)
-```
-~~~~~~~~~~~~~~~~~~~~
-
-!hide
-~~~~~~~~~~~
-The proof follows a straightforward structural induction,
-relying on de Morgan's laws !remoteRef(part1)(Semantics)(deMorganAnd) and !remoteRef(part1)(Semantics)(deMorganOr) for conjunction, resp., disjunction.
-~~~~~~~~~~~
-~~~~~~~~~~~
-```
-duality _ ⊥ = refl
-duality _ ⊤ = refl
-duality {` p} ϱ (` p)
-  with ϱ p
-... | tt = refl
-... | ff = refl
-duality ϱ (¬ φ)
-  rewrite duality ϱ φ = refl
-duality {φ ∧ ψ} ϱ (view-φ ∧ view-ψ)
-  rewrite duality ϱ view-φ |
-          duality ϱ view-ψ = sym (deMorganAnd φ ψ (- ϱ))
-duality {φ ∨ ψ} ϱ (view-φ ∨ view-ψ)
-  rewrite duality ϱ view-φ |
-          duality ϱ view-ψ = sym (deMorganOr φ ψ (- ϱ))
-```
-~~~~~~~~~~~
-
-The next exercises explore some consequences of the duality lemma.
-
-!exercise(#exercise:duality-equivalence-1)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Prove that dualisation preserves logical equivalence:
-
-```
-duality-equivalence-1 : ∀ φ ψ →
-  Formula[⊥,⊤,¬,∨,∧] φ →
-  Formula[⊥,⊤,¬,∨,∧] ψ →
-  φ ⟺ ψ →
-  ----------
-  φ ⁻ ⟺ ψ ⁻
-```
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-```
-duality-equivalence-1 φ ψ view-φ view-ψ φ⟺ψ ϱ
-  rewrite duality ϱ view-φ |
-          duality ϱ view-ψ |
-          φ⟺ψ (- ϱ) = refl
-```
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-!exercise(#exercise:duality-equivalence-2)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-```
-duality-equivalence-2 : ∀ φ ψ →
-  Formula[⊥,⊤,¬,∨,∧] φ →
-  Formula[⊥,⊤,¬,∨,∧] ψ →
-  φ ⁻ ⟺ ψ ⁻ →
-  -------
-  φ ⟺ ψ
-```
-
-*Hint:* Use !ref(duality-equivalence-1) and the fact that dualisation preserves `{⊥,⊤,¬,∨,∧}` formulas:
-
-```
-dual-preservation : ∀ {φ} →
-  Formula[⊥,⊤,¬,∨,∧] φ →
-  ------------------------
-  Formula[⊥,⊤,¬,∨,∧] (φ ⁻)
-```
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-We begin by proving that dualisation preserves `{⊥,⊤,¬,∨,∧}` formulas:
-
-```
-dual-preservation ⊥ = ⊤
-dual-preservation ⊤ = ⊥
-dual-preservation (` p) = ` p
-dual-preservation (¬ view-φ)
-  = ¬ dual-preservation view-φ
-dual-preservation (view-φ ∧ view-ψ)
-  = dual-preservation view-φ ∨ dual-preservation view-ψ
-dual-preservation (view-φ ∨ view-ψ)
-  = dual-preservation view-φ ∧ dual-preservation view-ψ
-```
-
-With !ref(dual-preservation) in hand,
-we can show !ref(duality-equivalence-2) by appealing to !ref(duality-equivalence-1):
-
-```
-duality-equivalence-2 φ ψ view-φ view-ψ φ⁻⟺ψ⁻ ϱ = ⟦φ⟧ϱ≡⟦ψ⟧ϱ where
-
-  ⟦φ⁻⁻⟧ϱ≡⟦ψ⁻⁻⟧ϱ : ⟦ φ ⁻ ⁻ ⟧ ϱ ≡ ⟦ ψ ⁻ ⁻ ⟧ ϱ
-  ⟦φ⁻⁻⟧ϱ≡⟦ψ⁻⁻⟧ϱ
-    rewrite duality-equivalence-1 (φ ⁻) (ψ ⁻)
-      (dual-preservation view-φ)
-      (dual-preservation view-ψ) φ⁻⟺ψ⁻ ϱ = refl
-
-  ⟦φ⟧ϱ≡⟦ψ⟧ϱ : ⟦ φ ⟧ ϱ ≡ ⟦ ψ ⟧ ϱ
-  ⟦φ⟧ϱ≡⟦ψ⟧ϱ
-    rewrite sym (dual-involutive view-φ) |
-            sym (dual-involutive view-ψ) = ⟦φ⁻⁻⟧ϱ≡⟦ψ⁻⁻⟧ϱ
-```
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-!exercise(#exercise:duality-tautology)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Show that, if `φ` is a tautology,
-then the negation of its dual `¬ φ ⁻` is also a tautology:
-
-```
-duality-tautology : ∀ {φ} →
-  Formula[⊥,⊤,¬,∨,∧] φ →
-  Tautology φ →
-  -----------------
-  Tautology (¬ φ ⁻)
-```
-
-*Hint*: Use the fact that a tautology is logically equivalent to !remoteRef(part1)(Semantics)(Formula)(⊤);
-c.f. !remoteRef(part1)(Semantics)(tautology-equivalence).
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-```
-duality-tautology {φ} view-φ tau-φ ϱ = goal tau-φ where
-  goal = Tautology φ       {-1-} by⟨ fst (tautology-equivalence φ) ⟩
-         φ ⟺ ⊤             {-2-} by⟨ duality-equivalence-1 φ ⊤ view-φ ⊤ ⟩
-         φ ⁻ ⟺ ¬ ⊤         {-3-} by⟨ congF (φ ⁻) (¬ ⊤) (¬ ` p₀) p₀ ⟩
-         ¬ φ ⁻ ⟺ ¬ ¬ ⊤     {-4-} by⟨ flip (trans-⟺ (¬ φ ⁻) (¬ ¬ ⊤) ⊤) ¬¬⊤⟺⊤ ⟩
-         ¬ φ ⁻ ⟺ ⊤         {-5-} by⟨ flip (snd (tautology-equivalence (¬ φ ⁻))) ϱ ⟩
-         ¬𝔹 ⟦ φ ⁻ ⟧ ϱ ≡ tt QED
-```
-
-We comment on each step of the proof:
-
-1) We begin by applying the left-to-right direction of !remoteRef(part1)(Semantics)(tautology-equivalence).
-2) By !ref(duality-equivalence-1) we lift the equivalence to the dual formula `φ ⁻`.
-3) By simple reasoning based on the fact that !remoteRef(part1)(Semantics)(_⟺_) is a congruence,
-we have that `¬ φ ⁻` is logically equivalent to `¬ ¬ ⊤`
-4) Thanks to !remoteRef(part1)(Semantics)(¬¬⊤⟺⊤), `¬ φ ⁻` is logically equivalent to !remoteRef(part1)(Semantics)(Formula)(⊤).
-5) The proof is concluded by applying the right-to-left direction of !remoteRef(part1)(Semantics)(tautology-equivalence).
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-# Solutions
-
-!solutions
+~~~~~~~~~~~~~~~

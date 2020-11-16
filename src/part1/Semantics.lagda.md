@@ -766,7 +766,7 @@ rename-undo (φ ⇔ ψ) p q q∉φ
 
 ### Tautology
 
-A *tautology* is a formula that evaluates to !remoteRef(part0)(Booleans)(tt) under every valuation:
+A *tautology* is a formula that evaluates to !remoteRef(part0)(Booleans)(𝔹)(tt) under every valuation:
 
 ```
 Tautology : Formula → Set
@@ -774,7 +774,7 @@ Tautology φ = ∀[ ϱ ] ⟦ φ ⟧ ϱ ≡ tt
 ```
 
 For instance the *law of excluded middle* `` ` p ∨ ¬ ` p ``,
-which amounts to say that the propositional variable `p` has either the value !remoteRef(part0)(Booleans)(tt) or !remoteRef(part0)(Booleans)(ff),
+which amounts to say that the propositional variable `p` has either the value !remoteRef(part0)(Booleans)(𝔹)(tt) or !remoteRef(part0)(Booleans)(𝔹)(ff),
 is a tautology of classical logic:
 
 ```
@@ -784,7 +784,7 @@ LEM {p} ϱ with ϱ p
 ... | ff = refl
 ```
 
-On the other hand, `` ` p `` is not a tautology since the (any) valuation that maps `p` to !remoteRef(part0)(Booleans)(ff), such as `const ff`, does not satisfy it:
+On the other hand, `` ` p `` is not a tautology since the (any) valuation that maps `p` to !remoteRef(part0)(Booleans)(𝔹)(ff), such as `const ff`, does not satisfy it:
 
 ```
 _ : ~ Tautology (` p)
@@ -1891,6 +1891,258 @@ simplify-correct (φ ⇔ ψ) ϱ
 ```
 ~~~~
 
-# Solutions
+# Duality
 
-!solutions
+The connectives in the fragment `{⊥,⊤,¬,∨,∧}` have a fundamental duality:
+
+* The two constants !remoteRef(part1)(Semantics)(Formula)(⊥) and !remoteRef(part1)(Semantics)(Formula)(⊤) are dual to each other.
+* Negation !remoteRef(part1)(Semantics)(Formula)(¬_) is dual to itself.
+* Conjunction !remoteRef(part1)(Semantics)(Formula)(_∧_) and disjunction !remoteRef(part1)(Semantics)(Formula)(_∨_) are dual to each other.
+
+This captured by the following definition,
+which given a formula `φ` constructs its *dual* `φ ⁻`
+by recursively swaping each constructor with its dual:
+
+```
+infix 200 _⁻
+_⁻ : Formula → Formula
+⊥ ⁻ = ⊤
+⊤ ⁻ = ⊥
+(` p) ⁻ = ` p
+(¬ φ) ⁻ = ¬ φ ⁻
+(φ ∧ ψ) ⁻ = φ ⁻ ∨ ψ ⁻
+(φ ∨ ψ) ⁻ = φ ⁻ ∧ ψ ⁻
+φ ⁻ = φ
+```
+
+(In the last catch-all case we do not do anything,
+since we will not apply dualisation outside the `{⊥,⊤,¬,∨,∧}` fragment.)
+
+!example(#example:dualisation)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+```
+_ : ∀ {φ ψ} → (φ ∨ ¬ ψ) ⁻ ≡ φ ⁻ ∧ ¬ ψ ⁻
+_ = refl
+```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In the proofs that follow,
+we want to capture the fact that a formula does not contain implications or bi-implications.
+To this end, we define the following view:
+
+```
+data Formula[⊥,⊤,¬,∨,∧] : Formula → Set where
+  ⊥ : Formula[⊥,⊤,¬,∨,∧] ⊥
+  ⊤ : Formula[⊥,⊤,¬,∨,∧] ⊤
+  `_ : ∀ p → Formula[⊥,⊤,¬,∨,∧] (` p)
+  ¬_ : ∀ {φ} → Formula[⊥,⊤,¬,∨,∧] φ → Formula[⊥,⊤,¬,∨,∧] (¬ φ)
+  _∧_ : ∀ {φ ψ} → Formula[⊥,⊤,¬,∨,∧] φ → Formula[⊥,⊤,¬,∨,∧] ψ
+    → Formula[⊥,⊤,¬,∨,∧] (φ ∧ ψ)
+  _∨_ : ∀ {φ ψ} → Formula[⊥,⊤,¬,∨,∧] φ → Formula[⊥,⊤,¬,∨,∧] ψ
+    → Formula[⊥,⊤,¬,∨,∧] (φ ∨ ψ)
+```
+
+Notice that this view is *recursive*,
+since we need to have views of subformulas in order to construct views of compound formulas.
+We will not actually compute this view here,
+but just use it as an additional assumption to the properties in the rest of the section
+in order to exclude from consideration formulas involving implication or bi-impication.
+(We will come back to this view in !chapterRef(part1)(CharacteristicFormulas) as part of functional completeness,
+where we will provide a way to compute it; c.f. !remoteRef(part1)(CharacteristicFormulas)(funCompl[⊥,⊤,¬,∨,∧]).)
+
+!exercise(#exercise:dual-involution)
+~~~~~~
+Show that dualisation is an involutive operator,
+in the sense that applying it twice leaves the formula unchanged:
+
+```
+dual-involutive : ∀ {φ} →
+  Formula[⊥,⊤,¬,∨,∧] φ →
+  ----------
+  φ ⁻ ⁻  ≡ φ
+```
+
+The extra assumption `Formula[⊥,⊤,¬,∨,∧] φ` dispenses us from considering formulas with implication or bi-implication.
+~~~~~~
+~~~~~~
+```
+dual-involutive ⊥ = refl
+dual-involutive ⊤ = refl
+dual-involutive (` p) = refl
+dual-involutive (¬ φ)
+  rewrite dual-involutive φ = refl
+dual-involutive (φ ∧ ψ)
+  rewrite dual-involutive φ |
+          dual-involutive ψ = refl
+dual-involutive (φ ∨ ψ)
+  rewrite dual-involutive φ |
+          dual-involutive ψ = refl
+```
+~~~~~~
+
+## Duality lemma
+
+Dualisation satisfies a key semantic property.
+For a valuation !ref(ϱ), let `- ϱ` be the *opposite valuation*,
+which is obtained by negating the output of !ref(ϱ):
+
+```
+-_ : Val → Val
+(- ϱ) p = ¬𝔹 ϱ p
+```
+
+The fundamental semantic property of dualisation is the following:
+
+!lemma(#lemma:duality)(Duality lemma)
+~~~~~~~~~~~~~~~~~~~~
+```
+duality : ∀ {φ} ϱ →
+  Formula[⊥,⊤,¬,∨,∧] φ →
+  --------------------------
+  ⟦ φ ⁻ ⟧ ϱ ≡ ¬𝔹 ⟦ φ ⟧ (- ϱ)
+```
+~~~~~~~~~~~~~~~~~~~~
+
+!hide
+~~~~~~~~~~~
+The proof follows a straightforward structural induction,
+relying on de Morgan's laws !remoteRef(part1)(Semantics)(deMorganAnd) and !remoteRef(part1)(Semantics)(deMorganOr) for conjunction, resp., disjunction.
+~~~~~~~~~~~
+~~~~~~~~~~~
+```
+duality _ ⊥ = refl
+duality _ ⊤ = refl
+duality {` p} ϱ (` p)
+  with ϱ p
+... | tt = refl
+... | ff = refl
+duality ϱ (¬ φ)
+  rewrite duality ϱ φ = refl
+duality {φ ∧ ψ} ϱ (view-φ ∧ view-ψ)
+  rewrite duality ϱ view-φ |
+          duality ϱ view-ψ = sym (deMorganAnd φ ψ (- ϱ))
+duality {φ ∨ ψ} ϱ (view-φ ∨ view-ψ)
+  rewrite duality ϱ view-φ |
+          duality ϱ view-ψ = sym (deMorganOr φ ψ (- ϱ))
+```
+~~~~~~~~~~~
+
+## Consequences
+
+The next exercises explore some consequences of the duality lemma.
+
+!exercise(#exercise:duality-equivalence-1)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Prove that dualisation preserves logical equivalence:
+
+```
+duality-equivalence-1 : ∀ φ ψ →
+  Formula[⊥,⊤,¬,∨,∧] φ →
+  Formula[⊥,⊤,¬,∨,∧] ψ →
+  φ ⟺ ψ →
+  ---------
+  φ ⁻ ⟺ ψ ⁻
+```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
+duality-equivalence-1 φ ψ view-φ view-ψ φ⟺ψ ϱ
+  rewrite duality ϱ view-φ |
+          duality ϱ view-ψ |
+          φ⟺ψ (- ϱ) = refl
+```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+!exercise(#exercise:duality-equivalence-2)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
+duality-equivalence-2 : ∀ φ ψ →
+  Formula[⊥,⊤,¬,∨,∧] φ →
+  Formula[⊥,⊤,¬,∨,∧] ψ →
+  φ ⁻ ⟺ ψ ⁻ →
+  -------
+  φ ⟺ ψ
+```
+
+*Hint:* Use !ref(duality-equivalence-1) and the fact that dualisation preserves `{⊥,⊤,¬,∨,∧}` formulas:
+
+```
+dual-preservation : ∀ {φ} →
+  Formula[⊥,⊤,¬,∨,∧] φ →
+  ------------------------
+  Formula[⊥,⊤,¬,∨,∧] (φ ⁻)
+```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+We begin by proving that dualisation preserves `{⊥,⊤,¬,∨,∧}` formulas:
+
+```
+dual-preservation ⊥ = ⊤
+dual-preservation ⊤ = ⊥
+dual-preservation (` p) = ` p
+dual-preservation (¬ view-φ)
+  = ¬ dual-preservation view-φ
+dual-preservation (view-φ ∧ view-ψ)
+  = dual-preservation view-φ ∨ dual-preservation view-ψ
+dual-preservation (view-φ ∨ view-ψ)
+  = dual-preservation view-φ ∧ dual-preservation view-ψ
+```
+
+With !ref(dual-preservation) in hand,
+we can show !ref(duality-equivalence-2) by appealing to !ref(duality-equivalence-1):
+
+```
+duality-equivalence-2 φ ψ view-φ view-ψ φ⁻⟺ψ⁻ ϱ = ⟦φ⟧ϱ≡⟦ψ⟧ϱ where
+
+  ⟦φ⁻⁻⟧ϱ≡⟦ψ⁻⁻⟧ϱ : ⟦ φ ⁻ ⁻ ⟧ ϱ ≡ ⟦ ψ ⁻ ⁻ ⟧ ϱ
+  ⟦φ⁻⁻⟧ϱ≡⟦ψ⁻⁻⟧ϱ
+    rewrite duality-equivalence-1 (φ ⁻) (ψ ⁻)
+      (dual-preservation view-φ)
+      (dual-preservation view-ψ) φ⁻⟺ψ⁻ ϱ = refl
+
+  ⟦φ⟧ϱ≡⟦ψ⟧ϱ : ⟦ φ ⟧ ϱ ≡ ⟦ ψ ⟧ ϱ
+  ⟦φ⟧ϱ≡⟦ψ⟧ϱ
+    rewrite sym (dual-involutive view-φ) |
+            sym (dual-involutive view-ψ) = ⟦φ⁻⁻⟧ϱ≡⟦ψ⁻⁻⟧ϱ
+```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+!exercise(#exercise:duality-tautology)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Show that, if `φ` is a tautology,
+then the negation of its dual `¬ φ ⁻` is also a tautology:
+
+```
+duality-tautology : ∀ {φ} →
+  Formula[⊥,⊤,¬,∨,∧] φ →
+  Tautology φ →
+  -----------------
+  Tautology (¬ φ ⁻)
+```
+
+*Hint*: Use the fact that a tautology is logically equivalent to !remoteRef(part1)(Semantics)(Formula)(⊤);
+c.f. !remoteRef(part1)(Semantics)(tautology-equivalence).
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
+duality-tautology {φ} view-φ tau-φ ϱ = goal tau-φ where
+  goal = Tautology φ       {-1-} by⟨ fst (tautology-equivalence φ) ⟩
+         φ ⟺ ⊤             {-2-} by⟨ duality-equivalence-1 φ ⊤ view-φ ⊤ ⟩
+         φ ⁻ ⟺ ¬ ⊤         {-3-} by⟨ congF (φ ⁻) (¬ ⊤) (¬ ` p₀) p₀ ⟩
+         ¬ φ ⁻ ⟺ ¬ ¬ ⊤     {-4-} by⟨ flip (trans-⟺ (¬ φ ⁻) (¬ ¬ ⊤) ⊤) ¬¬⊤⟺⊤ ⟩
+         ¬ φ ⁻ ⟺ ⊤         {-5-} by⟨ flip (snd (tautology-equivalence (¬ φ ⁻))) ϱ ⟩
+         ¬𝔹 ⟦ φ ⁻ ⟧ ϱ ≡ tt QED
+```
+
+TODO: provide somewhere an introduction to !remoteRef(part0)(Functions)(_by⟨_⟩_).
+
+We comment on each step of the proof:
+
+1) We begin by applying the left-to-right direction of !remoteRef(part1)(Semantics)(tautology-equivalence).
+2) By !ref(duality-equivalence-1) we lift the equivalence to the dual formula `φ ⁻`.
+3) By simple reasoning based on the fact that !remoteRef(part1)(Semantics)(_⟺_) is a congruence,
+we have that `¬ φ ⁻` is logically equivalent to `¬ ¬ ⊤`
+4) Thanks to !remoteRef(part1)(Semantics)(¬¬⊤⟺⊤), `¬ φ ⁻` is logically equivalent to !remoteRef(part1)(Semantics)(Formula)(⊤).
+5) The proof is concluded by applying the right-to-left direction of !remoteRef(part1)(Semantics)(tautology-equivalence).
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
