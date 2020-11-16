@@ -54,7 +54,7 @@ AGDA_MODULES := $(patsubst %.lagda.md,%,$(notdir $(AGDA_SOURCES)))
 #AGDA_MD := $(patsubst $(SRCDIR)/%.lagda.md,$(OUTDIR)/%.md,$(AGDA_SOURCES))
 #$(info AGDA_MD:$(AGDA_MD))
 
-MARKDOWN_SOURCES := $(shell find $(SRCDIR) -name '*.md' -and -not -name '*.lagda.md' -and -not -name '*\#*')
+MARKDOWN_SOURCES := $(shell find $(SRCDIR) -name '*.md' -and -not -name '*.lagda.md' -and -not -name '*\#*' -and -not -name 'footer.md')
 #$(info MARKDOWN_SOURCES:$(MARKDOWN_SOURCES))
 
 MARKDOWN_MD := $(patsubst $(SRCDIR)/%.md,$(OUTDIR)/%.md,$(MARKDOWN_SOURCES))
