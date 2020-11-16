@@ -1493,69 +1493,23 @@ c.f. !remoteRef(part1)(Semantics)(tautology-equivalence).
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
-duality-tautology {φ} view-φ tau-φ ϱ = goal where
+duality-tautology {φ} view-φ tau-φ ϱ = goal tau-φ where
+  goal = Tautology φ       {-1-} by⟨ fst (tautology-equivalence φ) ⟩
+         φ ⟺ ⊤             {-2-} by⟨ duality-equivalence-1 φ ⊤ view-φ ⊤ ⟩
+         φ ⁻ ⟺ ¬ ⊤         {-3-} by⟨ congF (φ ⁻) (¬ ⊤) (¬ ` p₀) p₀ ⟩
+         ¬ φ ⁻ ⟺ ¬ ¬ ⊤     {-4-} by⟨ flip (trans-⟺ (¬ φ ⁻) (¬ ¬ ⊤) ⊤) ¬¬⊤⟺⊤ ⟩
+         ¬ φ ⁻ ⟺ ⊤         {-5-} by⟨ flip (snd (tautology-equivalence (¬ φ ⁻))) ϱ ⟩
+         ¬𝔹 ⟦ φ ⁻ ⟧ ϱ ≡ tt QED
 ```
 
-We begin by applying the left-to-right direction of !remoteRef(part1)(Semantics)(tautology-equivalence):
-```
-  φ⟺⊤ : φ ⟺ ⊤
-  φ⟺⊤ = fst (tautology-equivalence φ) tau-φ
-```
+We comment on each step of the proof:
 
-By !ref(duality-equivalence-1) we lift the equivalence to the dual formula `φ ⁻`:
-
-```
-  φ⁻⟺¬⊤ : φ ⁻ ⟺ ¬ ⊤
-  φ⁻⟺¬⊤ = duality-equivalence-1 φ ⊤ view-φ ⊤ φ⟺⊤
-```
-
-By simple reasoning based on the fact that !remoteRef(part1)(Semantics)(_⟺_) is a congruence,
-we have that `¬ φ ⁻` is logically equivalent to !remoteRef(part1)(Semantics)(Formula)(⊤):
-
-```
-  ¬φ⁻⟺¬¬⊤ : ¬ φ ⁻ ⟺ ¬ ¬ ⊤
-  ¬φ⁻⟺¬¬⊤ = congF (φ ⁻) (¬ ⊤) (¬ ` p₀) p₀ φ⁻⟺¬⊤
-
-  equiv : ¬ φ ⁻ ⟺ ⊤
-  equiv = trans-⟺ (¬ φ ⁻) (¬ ¬ ⊤) ⊤ ¬φ⁻⟺¬¬⊤ ¬¬⊤⟺⊤
-```
-
-The proof is concluded by applying the right-to-left direction of !remoteRef(part1)(Semantics)(tautology-equivalence):
-
-```
-  goal : ¬𝔹 ⟦ φ ⁻ ⟧ ϱ ≡ tt
-  goal = snd (tautology-equivalence (¬ φ ⁻)) equiv ϱ
-```
-
-
-
-```
-duality-tautology′ : ∀ {φ} →
-  Formula[⊥,⊤,¬,∨,∧] φ →
-  Tautology φ →
-  -----------------
-  Tautology (¬ φ ⁻)
-```
-
-*Hint*: Use the fact that a tautology is logically equivalent to !remoteRef(part1)(Semantics)(Formula)(⊤);
-c.f. !remoteRef(part1)(Semantics)(tautology-equivalence).
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-```
-duality-tautology′ {φ} view-φ tau-φ ϱ = goal tau-φ where
-
-  goal : Tautology φ → ¬𝔹 ⟦ φ ⁻ ⟧ ϱ ≡ tt
-  goal =
-    Tautology φ       by⟨ fst (tautology-equivalence φ) ⟩
-    φ ⟺ ⊤             by⟨ duality-equivalence-1 φ ⊤ view-φ ⊤ ⟩
-    φ ⁻ ⟺ ¬ ⊤         by⟨ congF (φ ⁻) (¬ ⊤) (¬ ` p₀) p₀ ⟩
-    ¬ φ ⁻ ⟺ ¬ ¬ ⊤     by⟨ flip (trans-⟺ (¬ φ ⁻) (¬ ¬ ⊤) ⊤) ¬¬⊤⟺⊤ ⟩
-    ¬ φ ⁻ ⟺ ⊤         by⟨ flip (snd (tautology-equivalence (¬ φ ⁻))) ϱ ⟩
-    ¬𝔹 ⟦ φ ⁻ ⟧ ϱ ≡ tt QED
-```
-
-
-
+1) We begin by applying the left-to-right direction of !remoteRef(part1)(Semantics)(tautology-equivalence).
+2) By !ref(duality-equivalence-1) we lift the equivalence to the dual formula `φ ⁻`.
+3) By simple reasoning based on the fact that !remoteRef(part1)(Semantics)(_⟺_) is a congruence,
+we have that `¬ φ ⁻` is logically equivalent to `¬ ¬ ⊤`
+4) Thanks to !remoteRef(part1)(Semantics)(¬¬⊤⟺⊤), `¬ φ ⁻` is logically equivalent to !remoteRef(part1)(Semantics)(Formula)(⊤).
+5) The proof is concluded by applying the right-to-left direction of !remoteRef(part1)(Semantics)(tautology-equivalence).
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # Solutions

@@ -85,7 +85,8 @@ tt ⇒𝔹 ff = ff
 _⇔𝔹_ : 𝔹 → 𝔹 → 𝔹
 tt ⇔𝔹 tt = tt
 ff ⇔𝔹 ff = tt
-_ ⇔𝔹 _ = ff
+tt ⇔𝔹 ff = ff
+ff ⇔𝔹 tt = ff
 ```
 
 ## Short-circuit evaluation
@@ -95,6 +96,12 @@ The we add the following rewrite directives
 in order to allow short-circuit evaluation even w.r.t. the second argument.
 
 ```
+¬¬𝔹-rewrite : ∀ a → ¬𝔹 ¬𝔹 a ≡ a
+¬¬𝔹-rewrite tt = refl
+¬¬𝔹-rewrite ff = refl
+
+{-# REWRITE ¬¬𝔹-rewrite #-}
+
 ∨𝔹-rewrite : ∀ a → a ∨𝔹 tt ≡ tt
 ∨𝔹-rewrite tt = refl
 ∨𝔹-rewrite ff = refl
@@ -105,7 +112,11 @@ in order to allow short-circuit evaluation even w.r.t. the second argument.
 ∨𝔹-rewrite-ff tt = refl
 ∨𝔹-rewrite-ff ff = refl
 
-{-# REWRITE ∨𝔹-rewrite-ff #-}
+∨𝔹-rewrite-ff-2 : ∀ a → a ∨𝔹 ff ≡ a
+∨𝔹-rewrite-ff-2 tt = refl
+∨𝔹-rewrite-ff-2 ff = refl
+
+{-# REWRITE ∨𝔹-rewrite-ff ∨𝔹-rewrite-ff-2 #-}
 
 ∧𝔹-rewrite : ∀ a → a ∧𝔹 ff ≡ ff
 ∧𝔹-rewrite tt = refl
@@ -115,14 +126,43 @@ in order to allow short-circuit evaluation even w.r.t. the second argument.
 ∧𝔹-rewrite2 tt = refl
 ∧𝔹-rewrite2 ff = refl
 
-{-# REWRITE ∧𝔹-rewrite ∧𝔹-rewrite2 #-}
+∧𝔹-rewrite3 : ∀ a → tt ∧𝔹 a ≡ a
+∧𝔹-rewrite3 tt = refl
+∧𝔹-rewrite3 ff = refl
+
+{-# REWRITE ∧𝔹-rewrite ∧𝔹-rewrite2 ∧𝔹-rewrite3 #-}
 
 ⇒𝔹-rewrite-tt : ∀ a → tt ⇒𝔹 a ≡ a
 ⇒𝔹-rewrite-tt tt = refl
 ⇒𝔹-rewrite-tt ff = refl
 
-{-# REWRITE ⇒𝔹-rewrite-tt #-}
+⇒𝔹-rewrite-tt-right : ∀ a → a ⇒𝔹 tt ≡ tt
+⇒𝔹-rewrite-tt-right tt = refl
+⇒𝔹-rewrite-tt-right ff = refl
 
+⇒𝔹-rewrite-ff : ∀ a → a ⇒𝔹 ff ≡ ¬𝔹 a
+⇒𝔹-rewrite-ff tt = refl
+⇒𝔹-rewrite-ff ff = refl
+
+{-# REWRITE ⇒𝔹-rewrite-tt ⇒𝔹-rewrite-tt-right ⇒𝔹-rewrite-ff #-}
+
+⇔𝔹-rewrite-ff-left : ∀ a → ff ⇔𝔹 a ≡ ¬𝔹 a
+⇔𝔹-rewrite-ff-left tt = refl
+⇔𝔹-rewrite-ff-left ff = refl
+
+⇔𝔹-rewrite-ff-right : ∀ a → a ⇔𝔹 ff ≡ ¬𝔹 a
+⇔𝔹-rewrite-ff-right tt = refl
+⇔𝔹-rewrite-ff-right ff = refl
+
+⇔𝔹-rewrite-tt-left : ∀ a → tt ⇔𝔹 a ≡ a
+⇔𝔹-rewrite-tt-left tt = refl
+⇔𝔹-rewrite-tt-left ff = refl
+
+⇔𝔹-rewrite-tt-right : ∀ a → a ⇔𝔹 tt ≡ a
+⇔𝔹-rewrite-tt-right tt = refl
+⇔𝔹-rewrite-tt-right ff = refl
+
+{-# REWRITE ⇔𝔹-rewrite-ff-left ⇔𝔹-rewrite-ff-right ⇔𝔹-rewrite-tt-left ⇔𝔹-rewrite-tt-right #-}
 ```
 
 ## Inter-definability

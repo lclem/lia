@@ -23,6 +23,7 @@ Russell (1956) replied, "I am delighted to know that Principia Mathematica can n
 Agda resources:
 
 * [@Stump:ACM:2016]
+* [@McBride:2013]
 * [@Norell:AFP:2008]
 * [@agda-dybjer:2018]
 * [@BoveDybjer:LerNet:2008]

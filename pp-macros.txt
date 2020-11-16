@@ -58,11 +58,8 @@
 !define(example)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ::::: {.examplebox}
-
 Example !1
-: !2
-<span class="hidden">∎</span>
-<span class="right-aligned">∎</span>
+: !2 <span class="hidden">∎</span><span class="right-aligned">∎</span>
 :::::
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

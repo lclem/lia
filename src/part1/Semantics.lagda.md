@@ -5,7 +5,7 @@ title: Syntax and semantics of propositional logic 🚧
 In this chapter we introduce the syntax of propositional logic.
 
 ```
-{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --allow-unsolved-metas --confluence-check --rewriting #-}
 open import part0.Naturals using (ℕ)
 
 module part1.Semantics (n′ : ℕ) where
@@ -121,7 +121,7 @@ data Formula : Set where
     ⊥ ⊤ : Formula
     `_ : (p : PropName) → Formula
     ¬_ : (φ : Formula) → Formula
-    _∧_ _∨_ _⇒_ _⇔_ : (φ ψ : Formula) → Formula
+    _∨_ _∧_ _⇒_ _⇔_ : (φ ψ : Formula) → Formula
 ```
 
 Note that there is a slight notation overload for variables `` ` p`` w.r.t. the pure mathematical syntax $p$
@@ -261,8 +261,8 @@ Formula2Tree ⊤ = Node (left True) ε
 Formula2Tree ⊥ = Node (left False) ε
 Formula2Tree (` p) = Node (right p) ε
 Formula2Tree (¬ φ) = Node (left Not) ([ (Formula2Tree φ) ])
-Formula2Tree (φ ∧ ψ) = Node (left And) ([ (Formula2Tree φ) (Formula2Tree ψ) ])
 Formula2Tree (φ ∨ ψ) = Node (left Or) ([ (Formula2Tree φ) (Formula2Tree ψ) ])
+Formula2Tree (φ ∧ ψ) = Node (left And) ([ (Formula2Tree φ) (Formula2Tree ψ) ])
 Formula2Tree (φ ⇒ ψ) = Node (left Implies) ([ (Formula2Tree φ) (Formula2Tree ψ) ])
 Formula2Tree (φ ⇔ ψ) = Node (left Iff) ([ (Formula2Tree φ) (Formula2Tree ψ) ])
 ```
@@ -900,6 +900,7 @@ The fact that entailment is a preodrer implies immediately that logical equivale
 
 ```
 refl-⟺ : ∀ φ → φ ⟺ φ
+sym-⟺ : ∀ φ ψ → φ ⟺ ψ → ψ ⟺ φ
 trans-⟺ : ∀ φ ψ ξ → φ ⟺ ψ → ψ ⟺ ξ → φ ⟺ ξ
 ```
 
@@ -911,6 +912,7 @@ trans-⟺ : ∀ φ ψ ξ → φ ⟺ ψ → ψ ⟺ ξ → φ ⟺ ξ
 ```
 refl-⟺ = {!!}
 trans-⟺ = {!!}
+sym-⟺ = {!!}
 ```
 ~~~~~~~~
 
@@ -1526,6 +1528,368 @@ longSemDT2 ε φ ∅⊨φ ϱ All∅ = ∅⊨φ ϱ All∅
 longSemDT2 (ψ ∷ Δ) φ ∅⊨ΔImplyφ = semDT2 Δ ψ φ (longSemDT2 Δ (ψ ⇒ φ) ∅⊨ΔImplyφ)
 ```
 ~~~~~~~~~
+
+# Formula simplification
+
+In this section we present a procedure to simplify formulas.
+We start with a simple use case to illustrate some practical difficulties that naturally arise.
+Suppose we want to remove a single outmost double negation `¬ ¬ φ` in a formula.
+A natural definition would be the following:
+
+```
+remove-¬¬1 : Formula → Formula
+remove-¬¬1 (¬ ¬ φ) = φ
+remove-¬¬1 φ = φ
+```
+
+The next step is to prove that the definition above is correct:
+
+```
+remove-¬¬1-correctness : ∀ φ → φ ⟺ remove-¬¬1 φ
+```
+
+Due to the nature of pattern matching in Agda,
+the following does not work as expected:
+
+    remove-¬¬1-correctness (¬ ¬ φ) ϱ = refl
+    remove-¬¬1-correctness φ ϱ = refl
+
+The interpreter is not able to expand `remove-¬¬1 φ` into `φ` in the second clause.
+In order to trigger evaluation, we need to convince the interpreter that `φ` is not of the form `¬ ¬ ψ`,
+requiring us to list many more cases that we may like to:
+
+!hide
+~~~~~~
+```
+remove-¬¬1-correctness (¬ ¬ φ) ϱ = refl
+remove-¬¬1-correctness ⊥ ϱ = refl
+remove-¬¬1-correctness ⊤ ϱ = refl
+{- ... and many more ... -}
+```
+~~~~~~
+~~~~~~
+```
+remove-¬¬1-correctness (` p) ϱ = refl
+remove-¬¬1-correctness (¬ ⊥) ϱ = refl
+remove-¬¬1-correctness (¬ ⊤) ϱ = refl
+remove-¬¬1-correctness (¬ ` p) ϱ = refl
+remove-¬¬1-correctness (¬ (φ ∨ ψ)) ϱ = refl
+remove-¬¬1-correctness (¬ (φ ∧ ψ)) ϱ = refl
+remove-¬¬1-correctness (¬ (φ ⇒ ψ)) ϱ = refl
+remove-¬¬1-correctness (¬ (φ ⇔ ψ)) ϱ = refl
+remove-¬¬1-correctness (φ ∨ ψ) ϱ = refl
+remove-¬¬1-correctness (φ ∧ ψ) ϱ = refl
+remove-¬¬1-correctness (φ ⇒ ψ) ϱ = refl
+remove-¬¬1-correctness (φ ⇔ ψ) ϱ = refl
+```
+~~~~~~
+
+## Views
+
+The standard solution in a case like this is to use *views* [@Wadler:POPL:1987;@McBrideMcKinna:JFL:2004].
+
+An inductive definition such as !ref(Formula) provides what we may call the "default view",
+i.e., whether a formula is !ref(Formula)(⊥), !ref(Formula)(⊤), and so on.
+A definition by structural recursion on !ref(Formula) such as !ref(⟦_⟧_) is using this default view.
+
+When the default view is not adequate, we can define alternative views (presentations) of the same data.
+In our use case, the view should reflect the recursive structure of !ref(remove-¬¬1).
+We may thus say that a view is a means to encode recursion into data.
+In our example, we will have two constructors,
+depending on whether the formula is a double negation or not:
+
+```
+data Remove-¬¬-View : Formula → Set where
+  go-¬¬ : ∀ ψ → Remove-¬¬-View (¬ ¬ ψ)
+  stop : ∀ ψ → Remove-¬¬-View ψ
+```
+
+A view for formulas has the general type `Formula → Set`,
+and can thus be thought of as a property of formulas.
+The peculiar things about views is that every formula will have a view for it
+(after all we are encoding total functions).
+The following unsurprising function computes the view corresponding to the input formula:
+
+```
+remove-¬¬-View : ∀ φ → Remove-¬¬-View φ
+remove-¬¬-View (¬ ¬ φ) = go-¬¬ φ
+remove-¬¬-View φ = stop φ
+```
+
+The function !ref(remove-¬¬-View) is as simple as it gets.
+In particular, we can use the catch-all pattern in the second case to already decide that the output will be `stop φ`.
+Once we have a way of computing the view of interest,
+we can use it to encode !ref(remove-¬¬) and its correctness proof !ref(remove-¬¬-correctness):
+
+```
+remove-¬¬ : Formula → Formula
+remove-¬¬ φ with remove-¬¬-View φ
+... | go-¬¬ ψ = ψ
+... | stop ψ = ψ
+```
+
+```
+remove-¬¬-correctness : ∀ φ → φ ⟺ remove-¬¬ φ
+remove-¬¬-correctness φ ϱ with remove-¬¬-View φ
+... | go-¬¬ ψ = refl
+... | stop ψ = refl
+```
+
+It is instructive to compare !ref(remove-¬¬-correctness) with !ref(remove-¬¬1-correctness) w.r.t. size.
+
+Views may look a little roundabout at first.
+One may wonder whether the following simpler datatype may work too:
+
+```
+data Remove-¬¬-View′ : Set where
+  go-¬¬′ : Remove-¬¬-View′
+  stop′ : Remove-¬¬-View′
+
+remove-¬¬-View′ : Formula → Remove-¬¬-View′
+remove-¬¬-View′ (¬ ¬ φ) = go-¬¬′
+remove-¬¬-View′ φ = stop′
+```
+
+However, the simpler !ref(Remove-¬¬-View′) is insufficient
+since we lose track of the connection between the view and the formula it is a view of.
+For instance, we immediately run into trouble when defining `remove-¬¬′`:
+
+    remove-¬¬′ : Formula → Formula
+    remove-¬¬′ φ with remove-¬¬-View′ φ
+    remove-¬¬′ (¬ ¬ ψ) | go-¬¬′ = ψ
+    remove-¬¬′ φ | stop′ = φ
+
+The interpreter complains that there are missing cases,
+such as `remove-¬¬′ ⊥ | go-¬¬′`, `remove-¬¬′ ⊤ | go-¬¬′`, and so on.
+The additional power of views is that the interpeter knows from the constructor to which formula does the view correspond,
+and thus it is able to figure out that the definition in !ref(remove-¬¬) is complete.
+
+## Full fledged simplification
+
+After this introduction on views,
+we can present a more powerful simplification procedure.
+Our aim is to
+
+- remove the constants !ref(Formula)(⊥) and !ref(Formula)(⊤) (unless this is all what the formula is), and
+- remove double negations `¬ ¬ φ`.
+
+To this end, we define the following view:
+
+```
+data SimplifyView : Formula → Set where
+
+  ¬⊥ : SimplifyView (¬ ⊥)
+  ¬⊤ : SimplifyView (¬ ⊤)
+  ¬¬_ : ∀ ψ → SimplifyView (¬ ¬ ψ)
+
+  ⊥∨_ : ∀ ψ → SimplifyView (⊥ ∨ ψ)
+  _∨⊥ : ∀ ψ → SimplifyView (ψ ∨ ⊥)
+  ⊤∨_ : ∀ ψ → SimplifyView (⊤ ∨ ψ)
+  _∨⊤ : ∀ ψ → SimplifyView (ψ ∨ ⊤)
+  
+  ⊥∧_ : ∀ ψ → SimplifyView (⊥ ∧ ψ)
+  _∧⊥ : ∀ ψ → SimplifyView (ψ ∧ ⊥)
+  ⊤∧_ : ∀ ψ → SimplifyView (⊤ ∧ ψ)
+  _∧⊤ : ∀ ψ → SimplifyView (ψ ∧ ⊤)
+  
+  ⊥⇒_ : ∀ ψ → SimplifyView (⊥ ⇒ ψ)
+  _⇒⊥ : ∀ ψ → SimplifyView (ψ ⇒ ⊥)
+  ⊤⇒_ : ∀ ψ → SimplifyView (⊤ ⇒ ψ)
+  _⇒⊤ : ∀ ψ → SimplifyView (ψ ⇒ ⊤)
+  
+  ⊥⇔_ : ∀ ψ → SimplifyView (⊥ ⇔ ψ)
+  _⇔⊥ : ∀ ψ → SimplifyView (ψ ⇔ ⊥)
+  ⊤⇔_ : ∀ ψ → SimplifyView (⊤ ⇔ ψ)
+  _⇔⊤ : ∀ ψ → SimplifyView (ψ ⇔ ⊤)
+  
+  stop : ∀ ψ → SimplifyView ψ  
+```
+
+We have one constructor for each kind of subformula that we want to reduce.
+The view `⊥∨ ψ` is designed to look typographically similar to the underlying formula `⊥ ∨ ψ` for suggestive purposes,
+and similarly for the others.
+However, it is important to keep in mind that the latter is of type !ref(Formula),
+while the former is of type `SimplifyView (⊥ ∨ ψ)`.
+The last constructor `stop φ` signals that no further simplification is available.
+The following function computes the view:
+
+```
+simplifyView : ∀ φ → SimplifyView φ
+```
+
+!hide
+~~~~~~~~
+Its definition is unimaginative.
+~~~~~~~~
+~~~~~~~~
+```
+simplifyView (¬ ⊥) = ¬⊥
+simplifyView (¬ ⊤) = ¬⊤
+simplifyView (¬ ¬ φ) = ¬¬ φ
+
+simplifyView (⊥ ∨ φ) = ⊥∨ φ
+simplifyView (φ ∨ ⊥) = φ ∨⊥
+simplifyView (⊤ ∨ φ) = ⊤∨ φ
+simplifyView (φ ∨ ⊤) = φ ∨⊤
+
+simplifyView (⊥ ∧ φ) = ⊥∧ φ
+simplifyView (φ ∧ ⊥) = φ ∧⊥
+simplifyView (⊤ ∧ φ) = ⊤∧ φ
+simplifyView (φ ∧ ⊤) = φ ∧⊤
+
+simplifyView (⊥ ⇒ φ) = ⊥⇒ φ
+simplifyView (φ ⇒ ⊥) = φ ⇒⊥
+simplifyView (⊤ ⇒ φ) = ⊤⇒ φ
+simplifyView (φ ⇒ ⊤) = φ ⇒⊤
+
+simplifyView (⊥ ⇔ φ) = ⊥⇔ φ
+simplifyView (φ ⇔ ⊥) = φ ⇔⊥
+simplifyView (⊤ ⇔ φ) = ⊤⇔ φ
+simplifyView (φ ⇔ ⊤) = φ ⇔⊤
+
+simplifyView φ = stop φ
+```
+~~~~~~~~
+
+It is convenient to define the simplification procedure in two separate functions,
+
+```
+simplify1 simplify : Formula → Formula
+```
+
+The first function !ref(simplify1) is non-recursive and it defines a single simplification step
+in terms of the view of the formula:
+
+```
+simplify1 φ
+  with simplifyView φ
+... | ¬⊥ = ⊤
+... | ¬⊤ = ⊥
+... | ¬¬ ψ = ψ
+... | ⊥∨ ψ = ψ
+... | ψ ∨⊥ = ψ
+... | ⊤∨ ψ = ⊤
+... | ψ ∨⊤ = ⊤
+... | ⊥∧ ψ = ⊥
+... | ψ ∧⊥ = ⊥
+... | ⊤∧ ψ = ψ
+... | ψ ∧⊤ = ψ
+... | ⊥⇒ ψ = ⊤
+... | ψ ⇒⊥ = ¬ ψ
+... | ⊤⇒ ψ = ψ
+... | ψ ⇒⊤ = ⊤
+... | ⊥⇔ ψ = ¬ ψ
+... | ψ ⇔⊥ = ¬ ψ
+... | ⊤⇔ ψ = ψ
+... | ψ ⇔⊤ = ψ
+... | stop ψ = ψ
+```
+
+The second function !ref(simplify) takes care of the recursive structure of the formula in order to apply !ref(simplify1) "deeply"
+(no view is used here):
+
+```
+simplify ⊥ = ⊥
+simplify ⊤ = ⊤
+simplify (` p) = ` p
+simplify (¬ φ) = simplify1 (¬ simplify φ)
+simplify (φ ∨ ψ) = simplify1 (simplify φ ∨ simplify ψ)
+simplify (φ ∧ ψ) = simplify1 (simplify φ ∧ simplify ψ)
+simplify (φ ⇒ ψ) = simplify1 (simplify φ ⇒ simplify ψ)
+simplify (φ ⇔ ψ) = simplify1 (simplify φ ⇔ simplify ψ)
+```
+
+!example(#example:simplify)
+~~~~~
+We can see our simplification procedure in action on some simple examples:
+
+```
+_ : simplify (¬ ¬ ¬ ¬ ` p₀) ≡ ` p₀
+_ = refl
+
+_ : simplify (¬ (⊤ ∧ ¬ ` p₀)) ≡ ` p₀
+_ = refl
+
+_ : simplify (⊤ ∧ ¬ ¬ (¬ ` p₀ ∨ ¬ ¬ ` p₁)) ≡ ¬ ` p₀ ∨ ` p₁
+_ = refl
+```
+
+Notice how applying simplification deeply in the formula enables further simplification.
+~~~~~
+
+## Correctness
+
+We show that the simplification procedure preserves the meaning of the formula:
+
+```
+simplify1-correct : ∀ φ → simplify1 φ ⟺ φ
+simplify-correct : ∀ φ → simplify φ ⟺ φ
+```
+
+!hide
+~~~~
+The definition of !ref(simplify1-correct) is in terms of !ref(SimplifyView).
+The use of the `--rewriting` option triggers automatic Boolean rewrites in the background
+(such as `ff ∨𝔹 b ≡ b`; c.f. [Booleans](../../part0/Booleans)),
+which makes the proof straightforward.
+~~~~
+~~~~
+```
+simplify1-correct φ ϱ
+  with simplifyView φ
+... | ¬⊥ = refl
+... | ¬⊤ = refl
+... | ¬¬ ψ = refl
+... | ⊥∨ ψ = refl
+... | ψ ∨⊥ = refl
+... | ⊤∨ ψ = refl
+... | ψ ∨⊤ = refl
+... | ⊥∧ ψ = refl
+... | ψ ∧⊥ = refl
+... | ⊤∧ ψ = refl
+... | ψ ∧⊤ = refl
+... | ⊥⇒ ψ = refl
+... | ψ ⇒⊥ = refl
+... | ⊤⇒ ψ = refl
+... | ψ ⇒⊤ = refl
+... | ⊥⇔ ψ = refl
+... | ψ ⇔⊥ = refl
+... | ⊤⇔ ψ = refl
+... | ψ ⇔⊤ = refl
+... | stop ψ = refl
+```
+~~~~
+
+!hide
+~~~~
+The definition of !ref(simplify-correct) relies on !ref(simplify1-correct) and is by a routine structural induction.
+~~~~
+~~~~
+```
+simplify-correct ⊥ ϱ = refl
+simplify-correct ⊤ ϱ = refl
+simplify-correct (` p) ϱ = refl
+simplify-correct (¬ φ) ϱ
+  rewrite simplify1-correct (¬ simplify φ) ϱ |
+          simplify-correct φ ϱ = refl
+simplify-correct (φ ∨ ψ) ϱ
+  rewrite simplify1-correct (simplify φ ∨ simplify ψ) ϱ |
+          simplify-correct φ ϱ |
+          simplify-correct ψ ϱ = refl
+simplify-correct (φ ∧ ψ) ϱ
+  rewrite simplify1-correct (simplify φ ∧ simplify ψ) ϱ |
+          simplify-correct φ ϱ |
+          simplify-correct ψ ϱ = refl
+simplify-correct (φ ⇒ ψ) ϱ
+  rewrite simplify1-correct (simplify φ ⇒ simplify ψ) ϱ |
+          simplify-correct φ ϱ |
+          simplify-correct ψ ϱ = refl
+simplify-correct (φ ⇔ ψ) ϱ
+  rewrite simplify1-correct (simplify φ ⇔ simplify ψ) ϱ |
+          simplify-correct φ ϱ |
+          simplify-correct ψ ϱ = refl
+```
+~~~~
 
 # Solutions
 

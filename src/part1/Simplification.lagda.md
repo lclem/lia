@@ -13,6 +13,9 @@ open import part0.index
 open import part1.Semantics n′
 ```
 
+
+
+
 # Formula size
 
 When defining functions on formulas,
@@ -67,24 +70,7 @@ size-¬¬ φ = trans-≤ (size-¬ φ) (size-¬ (¬ φ))
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-# Formula simplification
 
-
-```
-simplify : Formula → Formula
-simplify (⊥ ∧ φ) = ⊥
-simplify (φ ∧ ⊥) = ⊥
-simplify (⊤ ∧ φ) = simplify φ
-simplify (φ ∧ ⊤) = simplify φ
-simplify (⊥ ∨ φ) = simplify φ
-simplify (φ ∨ ⊥) = simplify φ
-simplify (⊤ ∨ φ) = ⊤
-simplify (φ ∨ ⊤) = ⊤
-simplify (¬ φ) = ¬ simplify φ
-simplify (φ ∧ ψ) = simplify φ ∧ simplify ψ
-simplify (φ ∨ ψ) = simplify φ ∨ simplify ψ
-simplify φ = φ
-```
 
 # Solutions
 
