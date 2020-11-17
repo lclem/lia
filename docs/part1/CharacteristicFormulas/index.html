@@ -127,7 +127,7 @@ to functionally complete set of connectives.</p>
     <dd>For instance, consider the valuation</dd>
   </dl>
 
-  <pre class="Agda"><a id="ϱ₁"></a><a id="867" href="/lia/part1/CharacteristicFormulas/#867" class="Function">ϱ₁</a> <a id="870" class="Symbol">=</a> <a id="872" href="part0.Utils.html#196" class="Function">const</a> <a id="878" href="/lia/part0/Booleans/#236" class="InductiveConstructor">tt</a> <a id="881" href="/lia/part0/Functions/#568" class="Function Operator">[</a> <a id="883" href="/lia/part1/Semantics/#1229" class="Function">p₀</a> <a id="886" href="/lia/part0/Functions/#568" class="Function Operator">↦</a> <a id="888" href="/lia/part0/Booleans/#227" class="InductiveConstructor">ff</a> <a id="891" href="/lia/part0/Functions/#568" class="Function Operator">]</a> <a id="893" href="/lia/part0/Functions/#568" class="Function Operator">[</a> <a id="895" href="/lia/part1/Semantics/#1232" class="Function">p₁</a> <a id="898" href="/lia/part0/Functions/#568" class="Function Operator">↦</a> <a id="900" href="/lia/part0/Booleans/#227" class="InductiveConstructor">ff</a> <a id="903" href="/lia/part0/Functions/#568" class="Function Operator">]</a></pre>
+  <pre class="Agda"><a id="ϱ₁"></a><a id="867" href="/lia/part1/CharacteristicFormulas/#867" class="Function">ϱ₁</a> <a id="870" class="Symbol">=</a> <a id="872" href="/lia/part0/Utils/#196" class="Function">const</a> <a id="878" href="/lia/part0/Booleans/#236" class="InductiveConstructor">tt</a> <a id="881" href="/lia/part0/Functions/#568" class="Function Operator">[</a> <a id="883" href="/lia/part1/Semantics/#1229" class="Function">p₀</a> <a id="886" href="/lia/part0/Functions/#568" class="Function Operator">↦</a> <a id="888" href="/lia/part0/Booleans/#227" class="InductiveConstructor">ff</a> <a id="891" href="/lia/part0/Functions/#568" class="Function Operator">]</a> <a id="893" href="/lia/part0/Functions/#568" class="Function Operator">[</a> <a id="895" href="/lia/part1/Semantics/#1232" class="Function">p₁</a> <a id="898" href="/lia/part0/Functions/#568" class="Function Operator">↦</a> <a id="900" href="/lia/part0/Booleans/#227" class="InductiveConstructor">ff</a> <a id="903" href="/lia/part0/Functions/#568" class="Function Operator">]</a></pre>
 
   <p>that assigns value <a href="../../part0/Booleans#%F0%9D%94%B9.tt"><code class="language-plaintext highlighter-rouge">tt</code></a> to every
 proposition, except for <code class="language-plaintext highlighter-rouge">p₀</code> and <code class="language-plaintext highlighter-rouge">p₁</code>. Under the assumption that there
@@ -1202,7 +1202,7 @@ fixed input variable. Thus the connective must be binary. There are
 2<sup>2<sup>2</sup></sup> = 16 Boolean functions of two arguments. By
 <a href="#section:monotone-fragment" title="Section %g">this section</a> it cannot be
 monotone. This already excludes <em>D</em>(2) = 6 functions, where <em>D</em>(<em>n</em>) is
-the <em>n</em>-th <em>Dedekind number</em> [Dedekind(<a href="#ref-Dedekind:1897">1897</a>)]
+the <em>n</em>-th <em>Dedekind number</em> [<a href="#ref-Dedekind:1897">Dedekind(1897)</a>]
 which counts the number of Boolean functions of <em>n</em> arguments (c.f.
 <a href="https://oeis.org/A000372">OEIS A000372</a> for its first 9 known values).
 Even more strongly, by <a href="#section:big-incomplete-fragment" title="Section %g">this
@@ -1213,25 +1213,25 @@ we can only choose the output for the “intermediate inputs” <code class="lan
 and <code class="language-plaintext highlighter-rouge">( tt , ff )</code>, thus there are only four options left:</p>
 
 <pre class="Agda"><a id="g₀"></a><a id="40451" href="/lia/part1/CharacteristicFormulas/#40451" class="Function">g₀</a> <a id="g₁"></a><a id="40454" href="/lia/part1/CharacteristicFormulas/#40454" class="Function">g₁</a> <a id="g₂"></a><a id="40457" href="/lia/part1/CharacteristicFormulas/#40457" class="Function">g₂</a> <a id="g₃"></a><a id="40460" href="/lia/part1/CharacteristicFormulas/#40460" class="Function">g₃</a>  <a id="40464" class="Symbol">:</a> <a id="40466" href="/lia/part0/Booleans/#211" class="Datatype">𝔹</a> <a id="40468" href="/lia/part0/Logic/#1548" class="Record Operator">×</a> <a id="40470" href="/lia/part0/Booleans/#211" class="Datatype">𝔹</a> <a id="40472" class="Symbol">→</a> <a id="40474" href="/lia/part0/Booleans/#211" class="Datatype">𝔹</a>
-<a id="40476" href="/lia/part1/CharacteristicFormulas/#40451" class="Function">g₀</a> <a id="40479" class="Symbol">=</a> <a id="40481" href="part0.Utils.html#196" class="Function">const</a> <a id="40487" href="/lia/part0/Booleans/#236" class="InductiveConstructor">tt</a>
+<a id="40476" href="/lia/part1/CharacteristicFormulas/#40451" class="Function">g₀</a> <a id="40479" class="Symbol">=</a> <a id="40481" href="/lia/part0/Utils/#196" class="Function">const</a> <a id="40487" href="/lia/part0/Booleans/#236" class="InductiveConstructor">tt</a>
   <a id="40492" href="/lia/part0/Functions/#568" class="Function Operator">[</a> <a id="40494" href="/lia/part0/Booleans/#227" class="InductiveConstructor">ff</a> <a id="40497" href="/lia/part0/Logic/#1616" class="InductiveConstructor Operator">,</a> <a id="40499" href="/lia/part0/Booleans/#227" class="InductiveConstructor">ff</a> <a id="40502" href="/lia/part0/Functions/#568" class="Function Operator">↦</a> <a id="40504" href="/lia/part0/Booleans/#236" class="InductiveConstructor">tt</a> <a id="40507" href="/lia/part0/Functions/#568" class="Function Operator">]</a>
   <a id="40511" href="/lia/part0/Functions/#568" class="Function Operator">[</a> <a id="40513" href="/lia/part0/Booleans/#227" class="InductiveConstructor">ff</a> <a id="40516" href="/lia/part0/Logic/#1616" class="InductiveConstructor Operator">,</a> <a id="40518" href="/lia/part0/Booleans/#236" class="InductiveConstructor">tt</a> <a id="40521" href="/lia/part0/Functions/#568" class="Function Operator">↦</a> <a id="40523" href="/lia/part0/Booleans/#227" class="InductiveConstructor">ff</a> <a id="40526" href="/lia/part0/Functions/#568" class="Function Operator">]</a>
   <a id="40530" href="/lia/part0/Functions/#568" class="Function Operator">[</a> <a id="40532" href="/lia/part0/Booleans/#236" class="InductiveConstructor">tt</a> <a id="40535" href="/lia/part0/Logic/#1616" class="InductiveConstructor Operator">,</a> <a id="40537" href="/lia/part0/Booleans/#227" class="InductiveConstructor">ff</a> <a id="40540" href="/lia/part0/Functions/#568" class="Function Operator">↦</a> <a id="40542" href="/lia/part0/Booleans/#227" class="InductiveConstructor">ff</a> <a id="40545" href="/lia/part0/Functions/#568" class="Function Operator">]</a>
   <a id="40549" href="/lia/part0/Functions/#568" class="Function Operator">[</a> <a id="40551" href="/lia/part0/Booleans/#236" class="InductiveConstructor">tt</a> <a id="40554" href="/lia/part0/Logic/#1616" class="InductiveConstructor Operator">,</a> <a id="40556" href="/lia/part0/Booleans/#236" class="InductiveConstructor">tt</a> <a id="40559" href="/lia/part0/Functions/#568" class="Function Operator">↦</a> <a id="40561" href="/lia/part0/Booleans/#227" class="InductiveConstructor">ff</a> <a id="40564" href="/lia/part0/Functions/#568" class="Function Operator">]</a>
 
-<a id="40567" href="/lia/part1/CharacteristicFormulas/#40454" class="Function">g₁</a> <a id="40570" class="Symbol">=</a> <a id="40572" href="part0.Utils.html#196" class="Function">const</a> <a id="40578" href="/lia/part0/Booleans/#236" class="InductiveConstructor">tt</a>
+<a id="40567" href="/lia/part1/CharacteristicFormulas/#40454" class="Function">g₁</a> <a id="40570" class="Symbol">=</a> <a id="40572" href="/lia/part0/Utils/#196" class="Function">const</a> <a id="40578" href="/lia/part0/Booleans/#236" class="InductiveConstructor">tt</a>
   <a id="40583" href="/lia/part0/Functions/#568" class="Function Operator">[</a> <a id="40585" href="/lia/part0/Booleans/#227" class="InductiveConstructor">ff</a> <a id="40588" href="/lia/part0/Logic/#1616" class="InductiveConstructor Operator">,</a> <a id="40590" href="/lia/part0/Booleans/#227" class="InductiveConstructor">ff</a> <a id="40593" href="/lia/part0/Functions/#568" class="Function Operator">↦</a> <a id="40595" href="/lia/part0/Booleans/#236" class="InductiveConstructor">tt</a> <a id="40598" href="/lia/part0/Functions/#568" class="Function Operator">]</a>
   <a id="40602" href="/lia/part0/Functions/#568" class="Function Operator">[</a> <a id="40604" href="/lia/part0/Booleans/#227" class="InductiveConstructor">ff</a> <a id="40607" href="/lia/part0/Logic/#1616" class="InductiveConstructor Operator">,</a> <a id="40609" href="/lia/part0/Booleans/#236" class="InductiveConstructor">tt</a> <a id="40612" href="/lia/part0/Functions/#568" class="Function Operator">↦</a> <a id="40614" href="/lia/part0/Booleans/#227" class="InductiveConstructor">ff</a> <a id="40617" href="/lia/part0/Functions/#568" class="Function Operator">]</a>
   <a id="40621" href="/lia/part0/Functions/#568" class="Function Operator">[</a> <a id="40623" href="/lia/part0/Booleans/#236" class="InductiveConstructor">tt</a> <a id="40626" href="/lia/part0/Logic/#1616" class="InductiveConstructor Operator">,</a> <a id="40628" href="/lia/part0/Booleans/#227" class="InductiveConstructor">ff</a> <a id="40631" href="/lia/part0/Functions/#568" class="Function Operator">↦</a> <a id="40633" href="/lia/part0/Booleans/#236" class="InductiveConstructor">tt</a> <a id="40636" href="/lia/part0/Functions/#568" class="Function Operator">]</a>
   <a id="40640" href="/lia/part0/Functions/#568" class="Function Operator">[</a> <a id="40642" href="/lia/part0/Booleans/#236" class="InductiveConstructor">tt</a> <a id="40645" href="/lia/part0/Logic/#1616" class="InductiveConstructor Operator">,</a> <a id="40647" href="/lia/part0/Booleans/#236" class="InductiveConstructor">tt</a> <a id="40650" href="/lia/part0/Functions/#568" class="Function Operator">↦</a> <a id="40652" href="/lia/part0/Booleans/#227" class="InductiveConstructor">ff</a> <a id="40655" href="/lia/part0/Functions/#568" class="Function Operator">]</a>
 
-<a id="40658" href="/lia/part1/CharacteristicFormulas/#40457" class="Function">g₂</a> <a id="40661" class="Symbol">=</a> <a id="40663" href="part0.Utils.html#196" class="Function">const</a> <a id="40669" href="/lia/part0/Booleans/#236" class="InductiveConstructor">tt</a>
+<a id="40658" href="/lia/part1/CharacteristicFormulas/#40457" class="Function">g₂</a> <a id="40661" class="Symbol">=</a> <a id="40663" href="/lia/part0/Utils/#196" class="Function">const</a> <a id="40669" href="/lia/part0/Booleans/#236" class="InductiveConstructor">tt</a>
   <a id="40674" href="/lia/part0/Functions/#568" class="Function Operator">[</a> <a id="40676" href="/lia/part0/Booleans/#227" class="InductiveConstructor">ff</a> <a id="40679" href="/lia/part0/Logic/#1616" class="InductiveConstructor Operator">,</a> <a id="40681" href="/lia/part0/Booleans/#227" class="InductiveConstructor">ff</a> <a id="40684" href="/lia/part0/Functions/#568" class="Function Operator">↦</a> <a id="40686" href="/lia/part0/Booleans/#236" class="InductiveConstructor">tt</a> <a id="40689" href="/lia/part0/Functions/#568" class="Function Operator">]</a>
   <a id="40693" href="/lia/part0/Functions/#568" class="Function Operator">[</a> <a id="40695" href="/lia/part0/Booleans/#227" class="InductiveConstructor">ff</a> <a id="40698" href="/lia/part0/Logic/#1616" class="InductiveConstructor Operator">,</a> <a id="40700" href="/lia/part0/Booleans/#236" class="InductiveConstructor">tt</a> <a id="40703" href="/lia/part0/Functions/#568" class="Function Operator">↦</a> <a id="40705" href="/lia/part0/Booleans/#236" class="InductiveConstructor">tt</a> <a id="40708" href="/lia/part0/Functions/#568" class="Function Operator">]</a>
   <a id="40712" href="/lia/part0/Functions/#568" class="Function Operator">[</a> <a id="40714" href="/lia/part0/Booleans/#236" class="InductiveConstructor">tt</a> <a id="40717" href="/lia/part0/Logic/#1616" class="InductiveConstructor Operator">,</a> <a id="40719" href="/lia/part0/Booleans/#227" class="InductiveConstructor">ff</a> <a id="40722" href="/lia/part0/Functions/#568" class="Function Operator">↦</a> <a id="40724" href="/lia/part0/Booleans/#227" class="InductiveConstructor">ff</a> <a id="40727" href="/lia/part0/Functions/#568" class="Function Operator">]</a>
   <a id="40731" href="/lia/part0/Functions/#568" class="Function Operator">[</a> <a id="40733" href="/lia/part0/Booleans/#236" class="InductiveConstructor">tt</a> <a id="40736" href="/lia/part0/Logic/#1616" class="InductiveConstructor Operator">,</a> <a id="40738" href="/lia/part0/Booleans/#236" class="InductiveConstructor">tt</a> <a id="40741" href="/lia/part0/Functions/#568" class="Function Operator">↦</a> <a id="40743" href="/lia/part0/Booleans/#227" class="InductiveConstructor">ff</a> <a id="40746" href="/lia/part0/Functions/#568" class="Function Operator">]</a>
 
-<a id="40749" href="/lia/part1/CharacteristicFormulas/#40460" class="Function">g₃</a> <a id="40752" class="Symbol">=</a> <a id="40754" href="part0.Utils.html#196" class="Function">const</a> <a id="40760" href="/lia/part0/Booleans/#236" class="InductiveConstructor">tt</a>
+<a id="40749" href="/lia/part1/CharacteristicFormulas/#40460" class="Function">g₃</a> <a id="40752" class="Symbol">=</a> <a id="40754" href="/lia/part0/Utils/#196" class="Function">const</a> <a id="40760" href="/lia/part0/Booleans/#236" class="InductiveConstructor">tt</a>
   <a id="40765" href="/lia/part0/Functions/#568" class="Function Operator">[</a> <a id="40767" href="/lia/part0/Booleans/#227" class="InductiveConstructor">ff</a> <a id="40770" href="/lia/part0/Logic/#1616" class="InductiveConstructor Operator">,</a> <a id="40772" href="/lia/part0/Booleans/#227" class="InductiveConstructor">ff</a> <a id="40775" href="/lia/part0/Functions/#568" class="Function Operator">↦</a> <a id="40777" href="/lia/part0/Booleans/#236" class="InductiveConstructor">tt</a> <a id="40780" href="/lia/part0/Functions/#568" class="Function Operator">]</a>
   <a id="40784" href="/lia/part0/Functions/#568" class="Function Operator">[</a> <a id="40786" href="/lia/part0/Booleans/#227" class="InductiveConstructor">ff</a> <a id="40789" href="/lia/part0/Logic/#1616" class="InductiveConstructor Operator">,</a> <a id="40791" href="/lia/part0/Booleans/#236" class="InductiveConstructor">tt</a> <a id="40794" href="/lia/part0/Functions/#568" class="Function Operator">↦</a> <a id="40796" href="/lia/part0/Booleans/#236" class="InductiveConstructor">tt</a> <a id="40799" href="/lia/part0/Functions/#568" class="Function Operator">]</a>
   <a id="40803" href="/lia/part0/Functions/#568" class="Function Operator">[</a> <a id="40805" href="/lia/part0/Booleans/#236" class="InductiveConstructor">tt</a> <a id="40808" href="/lia/part0/Logic/#1616" class="InductiveConstructor Operator">,</a> <a id="40810" href="/lia/part0/Booleans/#227" class="InductiveConstructor">ff</a> <a id="40813" href="/lia/part0/Functions/#568" class="Function Operator">↦</a> <a id="40815" href="/lia/part0/Booleans/#236" class="InductiveConstructor">tt</a> <a id="40818" href="/lia/part0/Functions/#568" class="Function Operator">]</a>
@@ -1249,7 +1249,7 @@ reason, they deserve a name:</p>
 
 <p>Sheffer showed that <a href="#_nor%F0%9D%94%B9_"><code class="language-plaintext highlighter-rouge">_nor𝔹_</code></a> can be taken as a basis and he
 denotes it with a <em>stroke</em> (vertical bar) <code class="language-plaintext highlighter-rouge">_|_</code> [Theorem 1,
-Sheffer(<a href="#ref-Sheffer:AMS:1913">1913</a>)]. We show the analogous result
+<a href="#ref-Sheffer:AMS:1913">Sheffer(1913)</a>]. We show the analogous result
 for <a href="#_nand%F0%9D%94%B9_"><code class="language-plaintext highlighter-rouge">_nand𝔹_</code></a> , and in honor of Sheffer we will call it the
 <em>Sheffer’s stroke</em>:</p>
 
@@ -1336,16 +1336,16 @@ stroke:</dd>
 
 </div>
 
-<div id="refs" class="references hanging-indent">
+<div id="refs" class="references csl-bib-body hanging-indent">
 
-  <div id="ref-Dedekind:1897">
+  <div id="ref-Dedekind:1897" class="csl-entry">
 
     <p>[Dedekind(1897)] R Dedekind. <em>Über zerlegung von zahlen durch ihre
 grössten gemeinsamen theiler</em>. Vieweg, Braunschweig, 1897.</p>
 
   </div>
 
-  <div id="ref-Sheffer:AMS:1913">
+  <div id="ref-Sheffer:AMS:1913" class="csl-entry">
 
     <p>[Sheffer(1913)] H M Sheffer. A set of five independent postulates for
 boolean algebras, with application to logical constants. <em>Transactions
@@ -1371,7 +1371,7 @@ of the American Mathematical Society</em>. 14(4):481–488, 1913.</p>
     
 </p>
 
-    <p class="p-name"> Last-modified: Nov 17 10:42:07 2020 </p>
+    <p class="p-name"> Last-modified: Nov 17 15:48:35 2020 </p>
   </article>
       </div>
     </main><footer class="site-footer h-card">

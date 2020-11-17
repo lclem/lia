@@ -126,7 +126,7 @@
 <p>The main building blocks of propositional logic are <em>propositional
 variables</em> <em>p</em>, <em>q</em>, … (a.k.a. propositions), and logical connectives
 (to be introduced in the next section). Propositional variables can be
-implemented in a variety of ways, such as strings “p”, “q”,…; numbers 0,
+implemented in a variety of ways, such as strings “p,” “q,”…; numbers 0,
 1, …; and many more. Any such concrete representation will do, provided
 that</p>
 
@@ -409,8 +409,8 @@ equality:</p>
 assign a constant truth value to every proposition:</p>
 
 <pre class="Agda"><a id="ϱtt"></a><a id="10742" href="/lia/part1/Semantics/#10742" class="Function">ϱtt</a> <a id="ϱff"></a><a id="10746" href="/lia/part1/Semantics/#10746" class="Function">ϱff</a> <a id="10750" class="Symbol">:</a> <a id="10752" href="/lia/part1/Semantics/#10568" class="Function">Val</a>
-<a id="10756" href="/lia/part1/Semantics/#10742" class="Function">ϱtt</a> <a id="10760" class="Symbol">=</a> <a id="10762" href="part0.Utils.html#196" class="Function">const</a> <a id="10768" href="/lia/part0/Booleans/#236" class="InductiveConstructor">tt</a>
-<a id="10771" href="/lia/part1/Semantics/#10746" class="Function">ϱff</a> <a id="10775" class="Symbol">=</a> <a id="10777" href="part0.Utils.html#196" class="Function">const</a> <a id="10783" href="/lia/part0/Booleans/#227" class="InductiveConstructor">ff</a></pre>
+<a id="10756" href="/lia/part1/Semantics/#10742" class="Function">ϱtt</a> <a id="10760" class="Symbol">=</a> <a id="10762" href="/lia/part0/Utils/#196" class="Function">const</a> <a id="10768" href="/lia/part0/Booleans/#236" class="InductiveConstructor">tt</a>
+<a id="10771" href="/lia/part1/Semantics/#10746" class="Function">ϱff</a> <a id="10775" class="Symbol">=</a> <a id="10777" href="/lia/part0/Utils/#196" class="Function">const</a> <a id="10783" href="/lia/part0/Booleans/#227" class="InductiveConstructor">ff</a></pre>
 
 <p>As marginally more interesting example, the valuation <a href="#%CF%B1%E2%82%80"><code class="language-plaintext highlighter-rouge">ϱ₀</code></a> below
 assigns <a href="../../part0/Booleans#%F0%9D%94%B9.ff"><code class="language-plaintext highlighter-rouge">ff</code></a> to <code class="language-plaintext highlighter-rouge">p₀</code> and <code class="language-plaintext highlighter-rouge">p₁</code>, and
@@ -772,7 +772,7 @@ valuation that maps <code class="language-plaintext highlighter-rouge">p</code> 
 <code class="language-plaintext highlighter-rouge">const ff</code>, does not satisfy it:</p>
 
 <pre class="Agda"><a id="24718" href="/lia/part1/Semantics/#24718" class="Function">_</a> <a id="24720" class="Symbol">:</a> <a id="24722" href="/lia/part0/Logic/#2114" class="Function Operator">~</a> <a id="24724" href="/lia/part1/Semantics/#24141" class="Function">Tautology</a> <a id="24734" class="Symbol">(</a><a id="24735" href="/lia/part1/Semantics/#3623" class="InductiveConstructor Operator">`</a> <a id="24737" href="/lia/part1/Semantics/#1724" class="Generalizable">p</a><a id="24738" class="Symbol">)</a>
-<a id="24740" class="Symbol">_</a> <a id="24742" class="Symbol">=</a> <a id="24744" class="Symbol">λ</a> <a id="24746" href="/lia/part1/Semantics/#24746" class="Bound">tau</a> <a id="24750" class="Symbol">→</a> <a id="24752" class="Keyword">let</a> <a id="24756" href="/lia/part1/Semantics/#24756" class="Bound">ff≡tt</a> <a id="24762" class="Symbol">=</a> <a id="24764" href="/lia/part1/Semantics/#24746" class="Bound">tau</a> <a id="24768" class="Symbol">(</a><a id="24769" href="part0.Utils.html#196" class="Function">const</a> <a id="24775" href="/lia/part0/Booleans/#227" class="InductiveConstructor">ff</a><a id="24777" class="Symbol">)</a> <a id="24779" class="Keyword">in</a> <a id="24782" href="/lia/part0/Booleans/#366" class="Function">ff≢tt</a> <a id="24788" href="/lia/part1/Semantics/#24756" class="Bound">ff≡tt</a></pre>
+<a id="24740" class="Symbol">_</a> <a id="24742" class="Symbol">=</a> <a id="24744" class="Symbol">λ</a> <a id="24746" href="/lia/part1/Semantics/#24746" class="Bound">tau</a> <a id="24750" class="Symbol">→</a> <a id="24752" class="Keyword">let</a> <a id="24756" href="/lia/part1/Semantics/#24756" class="Bound">ff≡tt</a> <a id="24762" class="Symbol">=</a> <a id="24764" href="/lia/part1/Semantics/#24746" class="Bound">tau</a> <a id="24768" class="Symbol">(</a><a id="24769" href="/lia/part0/Utils/#196" class="Function">const</a> <a id="24775" href="/lia/part0/Booleans/#227" class="InductiveConstructor">ff</a><a id="24777" class="Symbol">)</a> <a id="24779" class="Keyword">in</a> <a id="24782" href="/lia/part0/Booleans/#366" class="Function">ff≢tt</a> <a id="24788" href="/lia/part1/Semantics/#24756" class="Bound">ff≡tt</a></pre>
 
 <p>Since we can enumerate all valuations <code class="language-plaintext highlighter-rouge">ϱ : Val</code> and the equality
 <code class="language-plaintext highlighter-rouge">⟦ φ ⟧ ϱ ≡ tt</code> is decidable, we can <em>decide</em> whether <code class="language-plaintext highlighter-rouge">φ</code> is a tautology:</p>
@@ -1430,11 +1430,11 @@ many more cases that we may like to:</p>
 <a class="anchor" href="#views" aria-hidden="true"><span class="octicon octicon-link"></span></a>Views</h2>
 
 <p>The standard solution in a case like this is to use <em>views</em>
-[Wadler(<a href="#ref-Wadler:POPL:1987">1987</a>), McBride and
-McKinna(<a href="#ref-McBrideMcKinna:JFL:2004">2004</a>)].</p>
+[<a href="#ref-Wadler:POPL:1987">Wadler(1987)</a>, <a href="#ref-McBrideMcKinna:JFL:2004">McBride and
+McKinna(2004)</a>].</p>
 
 <p>An inductive definition such as <a href="#Formula"><code class="language-plaintext highlighter-rouge">Formula</code></a> provides what we
-may call the “default view”, i.e., whether a formula is
+may call the “default view,” i.e., whether a formula is
 <a href="#Formula.%E2%8A%A5"><code class="language-plaintext highlighter-rouge">⊥</code></a> , <a href="#Formula.%E2%8A%A4"><code class="language-plaintext highlighter-rouge">⊤</code></a> , and so on. A definition by
 structural recursion on <a href="#Formula"><code class="language-plaintext highlighter-rouge">Formula</code></a> such as <a href="#%E2%9F%A6_%E2%9F%A7_"><code class="language-plaintext highlighter-rouge">⟦_⟧_</code></a> is
 using this default view.</p>
@@ -2039,9 +2039,9 @@ the fact that dualisation preserves <code class="language-plaintext highlighter-
 
 </div>
 
-<div id="refs" class="references hanging-indent">
+<div id="refs" class="references csl-bib-body hanging-indent">
 
-  <div id="ref-McBrideMcKinna:JFL:2004">
+  <div id="ref-McBrideMcKinna:JFL:2004" class="csl-entry">
 
     <p>[McBride and McKinna(2004)] C McBride and J McKinna. The view from the
 left. <em>J. Funct. Program.</em> 14(1):69–111, January 2004. doi:
@@ -2049,10 +2049,10 @@ left. <em>J. Funct. Program.</em> 14(1):69–111, January 2004. doi:
 
   </div>
 
-  <div id="ref-Wadler:POPL:1987">
+  <div id="ref-Wadler:POPL:1987" class="csl-entry">
 
     <p>[Wadler(1987)] P Wadler. Views: A way for pattern matching to cohabit
-with data abstraction. <em>Proc. Of popl’87</em> (New York, NY, USA, 1987),
+with data abstraction. <em>Proc. Of POPL’87</em> (New York, NY, USA, 1987),
 307–313.</p>
 
   </div>
@@ -2120,7 +2120,7 @@ function updates. <a href="#fnref:5" class="reversefootnote" role="doc-backlink
     
 </p>
 
-    <p class="p-name"> Last-modified: Nov 17 10:42:07 2020 </p>
+    <p class="p-name"> Last-modified: Nov 17 15:48:35 2020 </p>
   </article>
       </div>
     </main><footer class="site-footer h-card">
