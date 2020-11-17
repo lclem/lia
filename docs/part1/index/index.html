@@ -3,17 +3,17 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Part 0: Basic programming in Agda 🚧 | Logic in Agda</title><!-- Begin Jekyll SEO tag v2.6.1 -->
+  <title>Part 1: Classical propositional logic 🚧 | Logic in Agda</title><!-- Begin Jekyll SEO tag v2.6.1 -->
 <meta name="generator" content="Jekyll v3.9.0" />
-<meta property="og:title" content="Part 0: Basic programming in Agda 🚧" />
+<meta property="og:title" content="Part 1: Classical propositional logic 🚧" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="Propositional and fist-order logic developed with the proof assistant Agda." />
 <meta property="og:description" content="Propositional and fist-order logic developed with the proof assistant Agda." />
-<link rel="canonical" href="/lia/part0/index/" />
-<meta property="og:url" content="/lia/part0/index/" />
+<link rel="canonical" href="/lia/part1/index/" />
+<meta property="og:url" content="/lia/part1/index/" />
 <meta property="og:site_name" content="Logic in Agda" />
 <script type="application/ld+json">
-{"url":"/lia/part0/index/","headline":"Part 0: Basic programming in Agda 🚧","description":"Propositional and fist-order logic developed with the proof assistant Agda.","@type":"WebPage","@context":"https://schema.org"}</script>
+{"url":"/lia/part1/index/","headline":"Part 1: Classical propositional logic 🚧","description":"Propositional and fist-order logic developed with the proof assistant Agda.","@type":"WebPage","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/lia/assets/main.css">
   <!-- <link rel="stylesheet" href="/lia/assets/custom.css"> --><!-- Mathjax Support -->
@@ -56,18 +56,18 @@
         <article class="post">
 
     <header class="post-header">
-        <h1 class="post-title">Part 0: Basic programming in Agda 🚧</h1>
+        <h1 class="post-title">Part 1: Classical propositional logic 🚧</h1>
     </header>
   
     <p style="text-align:center;">
     
     
     
-    <a alt="Part" href="/lia/part0/index/">Part</a>
+    <a alt="Part" href="/lia/part1/index/">Part</a>
     &bullet;
     
     
-    <a alt="Source code" href="https://github.com/lclem/lia/blob/main/src/part0/index.lagda.md">Source</a>
+    <a alt="Source code" href="https://github.com/lclem/lia/blob/main/src/part1/index.lagda.md">Source</a>
     
     
     
@@ -78,45 +78,51 @@
         <h2>Contents</h2>    
         <ul class="section-nav">
 <li class="toc-entry toc-h1"><a href="#references">References</a></li>
-</ul><pre class="Agda"><a id="59" class="Keyword">module</a> <a id="66" href="/lia/part0/index/" class="Module">part0.index</a> <a id="78" class="Keyword">where</a>
-<a id="84" class="Keyword">open</a> <a id="89" class="Keyword">import</a> <a id="96" href="part0.Utils.html" class="Module">part0.Utils</a> <a id="108" class="Keyword">public</a>
-<a id="115" class="Keyword">open</a> <a id="120" class="Keyword">import</a> <a id="127" href="/lia/part0/Equality/" class="Module">part0.Equality</a> <a id="142" class="Keyword">public</a>
-<a id="149" class="Keyword">open</a> <a id="154" class="Keyword">import</a> <a id="161" href="/lia/part0/Logic/" class="Module">part0.Logic</a> <a id="173" class="Keyword">public</a>
-<a id="180" class="Keyword">open</a> <a id="185" class="Keyword">import</a> <a id="192" href="/lia/part0/Decidable/" class="Module">part0.Decidable</a> <a id="208" class="Keyword">public</a>
-<a id="215" class="Keyword">open</a> <a id="220" class="Keyword">import</a> <a id="227" href="/lia/part0/Booleans/" class="Module">part0.Booleans</a> <a id="242" class="Keyword">public</a>
-<a id="249" class="Keyword">open</a> <a id="254" class="Keyword">import</a> <a id="261" href="/lia/part0/List/" class="Module">part0.List</a> <a id="272" class="Keyword">public</a>
-<a id="279" class="Keyword">open</a> <a id="284" class="Keyword">import</a> <a id="291" href="/lia/part0/Finite/" class="Module">part0.Finite</a> <a id="304" class="Keyword">public</a>
-<a id="311" class="Keyword">open</a> <a id="316" class="Keyword">import</a> <a id="323" href="/lia/part0/Enumerable/" class="Module">part0.Enumerable</a> <a id="340" class="Keyword">public</a>
-<a id="347" class="Keyword">open</a> <a id="352" class="Keyword">import</a> <a id="359" href="/lia/part0/Tree/" class="Module">part0.Tree</a> <a id="370" class="Keyword">public</a></pre>
+<li class="toc-entry toc-h1"><a href="#solutions">Solutions</a></li>
+</ul><pre class="Agda"><a id="63" class="Symbol">{-#</a> <a id="67" class="Keyword">OPTIONS</a> <a id="75" class="Pragma">--allow-unsolved-metas</a> <a id="98" class="Symbol">#-}</a>
 
-<p>An example citation to [Craig(<a href="#ref-Craig:JSL:1957">1957</a>)] and
-another to the same [Craig(<a href="#ref-Craig:JSL:1957">1957</a>)], then Craig
-[(<a href="#ref-Craig:JSL:1957">1957</a>)], or even just (Craig
-[(<a href="#ref-Craig:JSL:1957">1957</a>)]), finally another one
-[Langford(<a href="#ref-Langford:AM:1926:B">1926</a>)], and then Craig again
-[Craig(<a href="#ref-Craig:JSL:1957">1957</a>)].</p>
+<a id="103" class="Keyword">module</a> <a id="110" href="/lia/part1/index/" class="Module">part1.index</a> <a id="122" class="Keyword">where</a>
+
+<a id="129" class="Keyword">open</a> <a id="134" class="Keyword">import</a> <a id="141" href="/lia/part1/Semantics/" class="Module">part1.Semantics</a>
+<a id="157" class="Keyword">open</a> <a id="162" class="Keyword">import</a> <a id="169" href="/lia/part1/CharacteristicFormulas/" class="Module">part1.CharacteristicFormulas</a>
+<a id="198" class="Keyword">open</a> <a id="203" class="Keyword">import</a> <a id="210" href="/lia/part1/NormalForms/" class="Module">part1.NormalForms</a>
+<a id="228" class="Comment">--open import part1.Completeness</a>
+<a id="261" class="Comment">--open import part1.Resolution</a>
+<a id="292" class="Comment">--open import part1.Resolution-Completeness</a>
+<a id="336" class="Comment">--open import part1.Interpolation</a>
+<a id="370" class="Comment">--open import part1.Compactness</a></pre>
+
+<ul>
+  <li>Mention the library [Prieto-Cubides, Garzón, and
+Sicard-Ramı́rez(<a href="#ref-Prieto-CubidesGarzonSicard-Ramirez:zenodo:2018">2018</a>)].
+Interesting points: normal forms NNF, DNF, and CNF are defined and
+it is shown that the normal form transformations preserve
+provability. In this way there is no need to resort to the
+semantics. In our approach, we would use soundness of the
+transformation (which is easier to establish) and then use the
+completeness theorem (which is a powerful property to have anyway).</li>
+</ul>
 
 <div id="refs" class="references hanging-indent">
 
   <h1 id="references">
 <a class="anchor" href="#references" aria-hidden="true"><span class="octicon octicon-link"></span></a>References</h1>
 
-  <div id="ref-Craig:JSL:1957">
+  <div id="ref-Prieto-CubidesGarzonSicard-Ramirez:zenodo:2018">
 
-    <p>[Craig(1957)] W Craig. Three uses of the herbrand-gentzen theorem in
-relating model theory and proof theory. <em>The Journal of Symbolic Logic</em>.
-22(3):269–285, 1957.</p>
-
-  </div>
-
-  <div id="ref-Langford:AM:1926:B">
-
-    <p>[Langford(1926)] C H Langford. Theorems on deducibility. <em>Annals of
-Mathematics</em>. 28(1/4):459–471, 1926.</p>
+    <p>[Prieto-Cubides et al.(2018)] J Prieto-Cubides et al. <em>A library for
+classical propositional logic in agda</em>. Zenodo, October 2018.</p>
 
   </div>
 
 </div>
+
+<h1 id="solutions">
+<a class="anchor" href="#solutions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Solutions</h1>
+
+<p>!solutions</p>
+
+<hr>
 
     </div>
   
@@ -124,11 +130,11 @@ Mathematics</em>. 28(1/4):459–471, 1926.</p>
     
     
     
-    <a alt="Part" href="/lia/part0/index/">Part</a>
+    <a alt="Part" href="/lia/part1/index/">Part</a>
     &bullet;
     
     
-    <a alt="Source code" href="https://github.com/lclem/lia/blob/main/src/part0/index.lagda.md">Source</a>
+    <a alt="Source code" href="https://github.com/lclem/lia/blob/main/src/part1/index.lagda.md">Source</a>
     
     
     
