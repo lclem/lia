@@ -31,7 +31,7 @@ imp-free φ = {!!}
 # Negation normal form {#NNF}
 
 A *literal* is either a propositional variable `p` (positive literal)
-or a negation `¬ p` thereof (negated literal).
+or a negation `¬ p` thereof (negative literal).
 A propositional formula `φ` is in *negation normal form* (NNF) if it uses only the connectives
 !remoteRef(part1)(Semantics)(Formula)(⊥),
 !remoteRef(part1)(Semantics)(Formula)(⊤),
@@ -110,8 +110,7 @@ NNF? (_ ⇔ _) = no λ ()
 
 ::::::::::::: {.inlinecode}
 
-Thanks to decidability of !ref(NNF),
-we can automatically check that 
+For instance, the formulas
 ```
 ψ₀ = ⊤
 ```
@@ -135,7 +134,7 @@ are in NNF, while
 ```
 ψ₅ = ¬ (` p₀ ∨ ` p₁)
 ```
-are not:
+are not, as we automatically check:
 
 :::::::::::::
 
