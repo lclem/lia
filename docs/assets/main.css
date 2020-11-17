@@ -719,6 +719,12 @@ h6 { font-size: 0.9em; }
 
 .examplebox { position: relative; }
 
+.inlinecode { display: block; }
+
+.inlinecode p { display: inline !important; }
+
+.inlinecode pre { display: inline !important; background: transparent; border: none; white-space: nowrap; padding: 2px 3px; word-spacing: -3px; }
+
 .solutionbox { position: relative; }
 
 .exercisebox { position: relative; }
