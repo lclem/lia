@@ -1,5 +1,3 @@
 ![build](https://github.com/lclem/lia/workflows/build-macos/badge.svg)
 
-# lia
-
- 🚧
+https://lclem.github.io/lia/ 🚧
