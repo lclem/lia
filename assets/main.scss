@@ -221,6 +221,28 @@ div .lemmabox:after {
     position: relative;
 }
 
+.inlinecode {
+//    padding: 0.5em;
+    display: block
+}
+
+.inlinecode p {
+    display: inline !important;
+}
+
+.inlinecode pre {
+    display: inline !important;
+    background: transparent;
+    border: none;
+    white-space: nowrap; //prevents breaking the code across lines
+    padding: 2px 3px;
+    word-spacing: -3px;
+}
+
+// pre {
+//     display: block;
+// }
+
 // .solutionbox pre:last-of-type {
 //     margin-bottom: 0em;
 // }

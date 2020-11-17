@@ -289,58 +289,69 @@ $(TMPDIR)/$1.$2.md.dep: $(TMPDIR)/$1.$2.md
 
 # MAIN WORKHORSE
 $(OUTDIR)/$1/$2.md: $(TMPDIR)/$1.$2.md
-	@echo "$(TMPDIR)/$1.$2.md --> $(OUTDIR)/$1/$2.md\c"
+	@echo "$(TMPDIR)/$1.$2.md --> $(OUTDIR)/$1/$2.md \c"
 
 	$(eval LAST_MODIFIED := $(shell stat -f "%Sm" $(SRCDIR)/$1/$2.lagda.md))
 
 	@mkdir -p $(OUTDIR)/$1
 
-	@cat $(TMPDIR)/$1.$2.md > $(TMPDIR)/$1.$2.headers.md
+	@cat $(TMPDIR)/$1.$2.md > $(TMPDIR)/$1.$2.1.md
 
-	@gsed -i "3isrc: $(SRCDIR)/$1/$2.lagda.md" $(TMPDIR)/$1.$2.headers.md
-	@gsed -i "4ilayout: page" $(TMPDIR)/$1.$2.headers.md
-	@gsed -i "5ipermalink: /$(1)/$(2)/" $(TMPDIR)/$1.$2.headers.md
-	@gsed -i "6ilast-modified: $(LAST_MODIFIED)" $(TMPDIR)/$1.$2.headers.md
-	@gsed -i "7ipart: /$(1)/index/" $(TMPDIR)/$1.$2.headers.md
-	@gsed -i "8itoc: true" $(TMPDIR)/$1.$2.headers.md
-	@gsed -i "9inumbersections: true" $(TMPDIR)/$1.$2.headers.md
-#	@gsed -i "10ipandoc-numbering:" $(TMPDIR)/$1.$2.headers.md
-#	@gsed -i "11i\    exercise:" $(TMPDIR)/$1.$2.headers.md
-#	@gsed -i "12i\        general:" $(TMPDIR)/$1.$2.headers.md
-#	@gsed -i "13i\            listing-title: List of exercises" $(TMPDIR)/$1.$2.headers.md
-#	@gsed -i "14i\            listing-identifier: False" $(TMPDIR)/$1.$2.headers.md
+	@gsed -i "3isrc: $(SRCDIR)/$1/$2.lagda.md" $(TMPDIR)/$1.$2.1.md
+	@gsed -i "4ilayout: page" $(TMPDIR)/$1.$2.1.md
+	@gsed -i "5ipermalink: /$(1)/$(2)/" $(TMPDIR)/$1.$2.1.md
+	@gsed -i "6ilast-modified: $(LAST_MODIFIED)" $(TMPDIR)/$1.$2.1.md
+	@gsed -i "7ipart: /$(1)/index/" $(TMPDIR)/$1.$2.1.md
+	@gsed -i "8itoc: true" $(TMPDIR)/$1.$2.1.md
+	@gsed -i "9inumbersections: true" $(TMPDIR)/$1.$2.1.md
+#	@gsed -i "10ipandoc-numbering:" $(TMPDIR)/$1.$2.1.md
+#	@gsed -i "11i\    exercise:" $(TMPDIR)/$1.$2.1.md
+#	@gsed -i "12i\        general:" $(TMPDIR)/$1.$2.1.md
+#	@gsed -i "13i\            listing-title: List of exercises" $(TMPDIR)/$1.$2.1.md
+#	@gsed -i "14i\            listing-identifier: False" $(TMPDIR)/$1.$2.1.md
 
 # WARNING: the number of added lines will affect the following!
 
+	@echo "1 \c"
 # STEP 0: expand solution entries
 
-	@$(PP) -import pp-macros.txt $(TMPDIR)/$1.$2.headers.md > $(TMPDIR)/$1.$2.pp.md
+	@$(PP) -import pp-macros.txt $(TMPDIR)/$1.$2.1.md > $(TMPDIR)/$1.$2.2.md
+	@echo "2 \c"
 
 # 2>/dev/null || true
 
 # STEP 1: process citations
 # Table of contents shows up only with options "--from markdown --to markdown_phpextra"
-	@$(PANDOC) $(TMPDIR)/$1.$2.pp.md -o $(TMPDIR)/$1.$2.pandoc.md
-# 
+	@$(PANDOC) $(TMPDIR)/$1.$2.2.md -o $(TMPDIR)/$1.$2.3.md
 
 # sometimes pandoc transforms <pre class="Agda"> to <pre markdown="1" class="Agda">, we need to undo this 
-	@sed -i "" 's|<pre markdown="1" class="Agda">|<pre class="Agda">|g' $(TMPDIR)/$1.$2.pandoc.md
+	@sed -i "" 's|<pre markdown="1" class="Agda">|<pre class="Agda">|g' $(TMPDIR)/$1.$2.3.md
 
 # sometimes pandoc adds section references such as {#an-unreferenced-section .unnumbered}, but we need to remove .unnumbered
-	@sed -i "" 's| .unnumbered||g' $(TMPDIR)/$1.$2.pandoc.md
+	@sed -i "" 's| .unnumbered||g' $(TMPDIR)/$1.$2.3.md
+	@echo "3 \c"
 
 # re-copy the headers
-	@head -n11 $(TMPDIR)/$1.$2.headers.md > $(OUTDIR)/$1/$2.md
+	@head -n11 $(TMPDIR)/$1.$2.1.md > $(OUTDIR)/$1/$2.md
 
 # add an horizontal separator
 #	@echo "\n\n---\n\n" >> $(OUTDIR)/$1/$2.md
 
-	@cat $(TMPDIR)/$1.$2.pandoc.md >> $(OUTDIR)/$1/$2.md
+	@cat $(TMPDIR)/$1.$2.3.md >> $(OUTDIR)/$1/$2.md
 
 #	@cp -f $(TMPDIR)/$1.$2.md $(OUTDIR)/$1/$2.md
 
 	@sed -i "" 's|<pre class="Agda">|{% raw %}<pre class="Agda">|g' $(OUTDIR)/$1/$2.md
 	@sed -i "" 's|</pre>|</pre>{% endraw %}|g' $(OUTDIR)/$1/$2.md
+
+# this removes the newline before </pre>, 
+# additionally remove the newline between </a> and </pre> (useful for formatting) in inline code)
+	@./scripts/fix_newlines.sh $(OUTDIR)/$1/$2.md
+	@./scripts/fix_newlines.sh $(OUTDIR)/$1/$2.md
+	@./scripts/fix_newlines.sh $(OUTDIR)/$1/$2.md
+
+#	cp $(OUTDIR)/$1/$2.md $(OUTDIR)/$1/$2.md.sed
+
 
 #{% include markdown_file.md %}
 

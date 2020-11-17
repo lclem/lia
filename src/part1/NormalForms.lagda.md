@@ -2,31 +2,29 @@
 title: Normal forms
 ---
 
+```
+{-# OPTIONS --allow-unsolved-metas #-}
+open import part0.index
+
+module part1.NormalForms (n : ℕ) where
+open import part1.Semantics n hiding (∅)
+```
+
 In this chapter we study normal forms for classical propositional logic, namely
 
 * [negation normal form (NNF)](#NNF) and its extension [ENNF](#ENNF),
 * [disjunctive normal form (DNF)](#DNF), and its dual
 * [conjunctive normal form (CNF)](#CNF).
 
+# Negation normal form {#NNF}
+
 A *literal* is either a propositional variable `p` (positive literal)
 or a negation `¬ p` thereof (negated literal).
-The notion of literal will be useful in the rest of the chapter.
-
-```
-{-# OPTIONS --allow-unsolved-metas #-}
-open import part0.index -- renaming (ℕ to Nat)
-
-module part1.NormalForms (n : ℕ) where
-open import part1.Semantics n hiding (∅)
-```
-
-## Negation normal form {#NNF}
-
 A propositional formula `φ` is in *negation normal form* (NNF)
 if negation appears only in front of propositional variables, i.e., inside literals.
 Since negation is implicitly present in implication `⇒` and bi-implication `⇔`,
 those are forbidden too.
-This is captured by the following inductive dependent type.
+This is captured by the following definition:
 
 ```
 data NNF : Formula → Set where
@@ -38,7 +36,93 @@ data NNF : Formula → Set where
   _∨_ : ∀ {φ ψ} → NNF φ → NNF ψ → NNF (φ ∨ ψ)
 ```
 
+Given a formula `φ`, we can decide whether it is in NNF or not:
+
+```
+NNF? : ∀ φ → Dec (NNF φ)
+```
+
+!hide
+~~~
+The proof works by inspecting `φ` sufficiently deeply.
+~~~
+~~~
+```
+NNF? ⊥ = yes ⊥
+NNF? ⊤ = yes ⊤
+NNF? (` p) = yes (` p)
+
+NNF? (¬ ⊥) = no λ ()
+NNF? (¬ ⊤) = no λ ()
+NNF? (¬ (` p)) = yes (¬` p)
+NNF? (¬ (¬ _)) = no λ ()
+NNF? (¬ (_ ∨ _)) = no λ ()
+NNF? (¬ (_ ∧ _)) = no λ ()
+NNF? (¬ (_ ⇒ _)) = no λ ()
+NNF? (¬ (_ ⇔ _)) = no λ ()
+
+NNF? (φ ∨ ψ)
+  with NNF? φ |
+       NNF? ψ
+... | yes nnfφ | yes nnfψ = yes (nnfφ ∨ nnfψ)
+... | no ¬nnfφ | _ = no λ{ (nnfφ ∨ _) → ¬nnfφ nnfφ}
+... | _ | no ¬nnfψ = no λ{ (_ ∨ nnfψ) → ¬nnfψ nnfψ}
+
+NNF? (φ ∧ ψ)
+  with NNF? φ |
+       NNF? ψ
+... | yes nnfφ | yes nnfψ = yes (nnfφ ∧ nnfψ)
+... | no ¬nnfφ | _ = no λ{ (nnfφ ∧ _) → ¬nnfφ nnfφ}
+... | _ | no ¬nnfψ = no λ{ (_ ∧ nnfψ) → ¬nnfψ nnfψ}
+
+NNF? (_ ⇒ _) = no λ ()
+NNF? (_ ⇔ _) = no λ ()
+```
+~~~
+
+```
+ψ₀ ψ₁ ψ₂ ψ₃ ψ₄ ψ₅ : Formula
+```
+
+::::::::::::: {.inlinecode}
+
+Thanks of decidability of !ref(NNF),
+we can automatically check that 
+```
+ψ₀ = ⊤
+```
+,
+```
+ψ₁ = ¬ ` p₀ ∨ ` p₁
+```
+, and
+```
+ψ₂ = ¬ ` p₀ ∧ (` p₁ ∨ ¬ ` p₂)
+```
+are in NNF, while
+```
+ψ₃ = ¬ ⊤
+```
+,
+```
+ψ₄ = ¬ ¬ ` p₀
+```
+, and
+```
+ψ₅ = ¬ (` p₀ ∨ ` p₁)
+```
+are not:
+
+:::::::::::::
+
+```
+_ : All? NNF? ([ ψ₀ ψ₁ ψ₂ ]) ×? All? (~?_ ∘ NNF?) ([ ψ₃ ψ₄ ψ₅ ]) ≡ yes _
+_ = refl
+```
+
+
 Transformation to NNF and its correctness proof.
+
 In order to avoid a termination issue,
 we use two mutually recursive functions [`nnf`](#nnf) and [`nnf¬`](#nnf¬)
 
