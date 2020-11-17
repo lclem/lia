@@ -715,6 +715,8 @@ h6 { font-size: 0.9em; }
 
 .lemmabox { position: relative; }
 
+.remarkbox { position: relative; }
+
 .examplebox { position: relative; }
 
 .solutionbox { position: relative; }
