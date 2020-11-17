@@ -8,6 +8,10 @@ open import part0.index
 
 module part1.NormalForms (n : ℕ) where
 open import part1.Semantics n hiding (∅)
+
+private
+  variable
+    φ ψ : Formula
 ```
 
 In this chapter we study normal forms for classical propositional logic, namely
@@ -16,15 +20,35 @@ In this chapter we study normal forms for classical propositional logic, namely
 * [disjunctive normal form (DNF)](#DNF), and its dual
 * [conjunctive normal form (CNF)](#CNF).
 
+
+# Implication-free form
+
+```
+imp-free : ∀ φ → Formula[⊥,⊤,¬,∨,∧] φ
+imp-free φ = {!!}
+```
+
 # Negation normal form {#NNF}
 
 A *literal* is either a propositional variable `p` (positive literal)
 or a negation `¬ p` thereof (negated literal).
-A propositional formula `φ` is in *negation normal form* (NNF)
-if negation appears only in front of propositional variables, i.e., inside literals.
-Since negation is implicitly present in implication `⇒` and bi-implication `⇔`,
-those are forbidden too.
-This is captured by the following definition:
+A propositional formula `φ` is in *negation normal form* (NNF) if it uses only the connectives
+!remoteRef(part1)(Semantics)(Formula)(⊥),
+!remoteRef(part1)(Semantics)(Formula)(⊤),
+!remoteRef(part1)(Semantics)(Formula)(¬_),
+!remoteRef(part1)(Semantics)(Formula)(_∨_), and
+!remoteRef(part1)(Semantics)(Formula)(_∧_),
+and negation appears only in front of propositional variables, i.e., inside literals.
+In particular, a NNF formula does not contain the implication `⇒` and bi-implication `⇔` connectives.
+This is captured by the following definition[^NNF-departure]:
+
+[^NNF-departure]: We slightly depart from a more standard definition of NNF,
+whereby !remoteRef(part1)(Semantics)(Formula)(⊥) and !remoteRef(part1)(Semantics)(Formula)(⊤) are not allowed as proper subformulas of an NNF formula.
+In other words, according to our definition `` ` p₀ ∨ ⊥ `` is in NNF, while it is not according to the more restrictive one.
+By applying !remoteRef(part1)(Semantics)(simplify) as a preprocessing step we can remove such occurrences of !remoteRef(part1)(Semantics)(Formula)(⊥), !remoteRef(part1)(Semantics)(Formula)(⊤).
+Formally proving that the resulting formulas do not contain !remoteRef(part1)(Semantics)(Formula)(⊥), !remoteRef(part1)(Semantics)(Formula)(⊤) as proper subformulas, while possible, would introduce an extra overhead obscuring the main point about NNF,
+which is the handling of negation.
+For this reason, we stick here to our slightly more relaxed NNF definition.
 
 ```
 data NNF : Formula → Set where
@@ -32,8 +56,8 @@ data NNF : Formula → Set where
   ⊥ : NNF ⊥
   `_ : (p : PropName) → NNF (` p)
   ¬`_ : (p : PropName) → NNF (¬ ` p)
-  _∧_ : ∀ {φ ψ} → NNF φ → NNF ψ → NNF (φ ∧ ψ)
-  _∨_ : ∀ {φ ψ} → NNF φ → NNF ψ → NNF (φ ∨ ψ)
+  _∧_ : NNF φ → NNF ψ → NNF (φ ∧ ψ)
+  _∨_ : NNF φ → NNF ψ → NNF (φ ∨ ψ)
 ```
 
 Given a formula `φ`, we can decide whether it is in NNF or not:
@@ -86,7 +110,7 @@ NNF? (_ ⇔ _) = no λ ()
 
 ::::::::::::: {.inlinecode}
 
-Thanks of decidability of !ref(NNF),
+Thanks to decidability of !ref(NNF),
 we can automatically check that 
 ```
 ψ₀ = ⊤
@@ -120,127 +144,157 @@ _ : All? NNF? ([ ψ₀ ψ₁ ψ₂ ]) ×? All? (~?_ ∘ NNF?) ([ ψ₃ ψ₄ ψ�
 _ = refl
 ```
 
+## Transformation to NNF
 
-Transformation to NNF and its correctness proof.
-
-In order to avoid a termination issue,
-we use two mutually recursive functions [`nnf`](#nnf) and [`nnf¬`](#nnf¬)
+Naive NNF definition:
 
 ```
-nnf : ∀ (φ : Formula) → Σ Formula λ ψ → NNF ψ × φ ⟺ ψ
-nnf¬ : ∀ (φ : Formula) → Σ Formula λ ψ → NNF ψ × ¬ φ ⟺ ψ
+nnf : Formula[⊥,⊤,¬,∨,∧] φ → Formula
+nnf ⊥ = ⊥
+nnf ⊤ = ⊤
+nnf (` p) = ` p
+nnf (¬ ⊥) = ⊤
+nnf (¬ ⊤) = ⊥
+nnf (¬ ` p) = ¬ ` p
+nnf (¬ ¬ φ) = nnf φ
+nnf (¬ (φ ∨ ψ)) = nnf (¬ φ) ∧ nnf (¬ ψ)
+nnf (¬ (φ ∧ ψ)) = nnf (¬ φ) ∨ nnf (¬ ψ)
+nnf (φ ∨ ψ) = nnf φ ∨ nnf ψ
+nnf (φ ∧ ψ) = nnf φ ∧ nnf ψ
 
-nnf ⊤ = ⊤ , ⊤ , λ ρ → refl 
-nnf ⊥ =  ⊥  , ⊥ , λ ρ → refl 
-nnf (` x) = ` x , ` x , λ ρ → refl
-nnf (¬ φ) = nnf¬ φ
+nnf-NNF : (view : Formula[⊥,⊤,¬,∨,∧] φ) → NNF (nnf view)
+nnf-NNF ⊥ = ⊥
+nnf-NNF ⊤ = ⊤
+nnf-NNF (` p) = ` p
+nnf-NNF (¬ ⊥) = ⊤
+nnf-NNF (¬ ⊤) = ⊥
+nnf-NNF (¬ (` p)) = ¬` p
+nnf-NNF (¬ (¬ φ)) = nnf-NNF φ
+nnf-NNF (¬ (φ ∨ ψ)) = nnf-NNF (¬ φ) ∧ nnf-NNF (¬ ψ)
+nnf-NNF (¬ (φ ∧ ψ)) = nnf-NNF (¬ φ) ∨ nnf-NNF (¬ ψ)
+nnf-NNF (φ ∨ ψ) = nnf-NNF φ ∨ nnf-NNF ψ
+nnf-NNF (φ ∧ ψ) = nnf-NNF φ ∧ nnf-NNF ψ
 
-nnf (φ ∧ ψ) with nnf φ | nnf ψ
-... | nnfφ , NNFφ , φ⟺nnfφ
-    | nnfψ , NNFψ , ψ⟺nnfψ = nnfφ ∧ nnfψ , NNFφ ∧ NNFψ , correctness where
+nnf-sound : (view-φ : Formula[⊥,⊤,¬,∨,∧] φ) → φ ⟺ nnf view-φ
+nnf¬′-sound : (view-φ : Formula[⊥,⊤,¬,∨,∧] φ) → ¬ φ ⟺ nnf (¬ view-φ)
 
-    correctness : φ ∧ ψ ⟺ nnfφ ∧ nnfψ
-    correctness ρ = cong2 _∧𝔹_ (φ⟺nnfφ ρ) (ψ⟺nnfψ ρ)
+nnf-sound ⊥ ϱ = refl
+nnf-sound ⊤ ϱ = refl
+nnf-sound (` p) ϱ = refl
+nnf-sound (¬ φ) = nnf¬′-sound φ
+nnf-sound (φ ∨ ψ) ϱ
+  rewrite nnf-sound φ ϱ |
+          nnf-sound ψ ϱ = refl
+nnf-sound (φ ∧ ψ) ϱ
+  rewrite nnf-sound φ ϱ |
+          nnf-sound ψ ϱ = refl
 
-nnf (φ ∨ ψ) with nnf φ | nnf ψ
-... | nnfφ , NNFφ , φ⟺nnfφ
-    | nnfψ , NNFψ , ψ⟺nnfψ = nnfφ ∨ nnfψ , NNFφ ∨ NNFψ , correctness where
+-- nnf-sound ⊥ ϱ = refl
+-- nnf-sound ⊤ ϱ = refl
+-- nnf-sound (` p) ϱ = refl
+-- nnf-sound (¬ ⊥) ϱ = refl
+-- nnf-sound (¬ ⊤) ϱ = refl
+-- nnf-sound (¬ (` p)) ϱ = refl
 
-    correctness : φ ∨ ψ ⟺ nnfφ ∨ nnfψ
-    correctness ρ = cong2 _∨𝔹_ (φ⟺nnfφ ρ) (ψ⟺nnfψ ρ)
+-- nnf-sound (¬ (¬ φ)) ϱ = {!!}
+-- --  rewrite nnf-sound φ ϱ = {!!} -- doubleNegationLaw φ ϱ
+  
+-- nnf-sound {¬ (φ′ ∨ ψ′)} (¬ (φ ∨ ψ)) = goal where -- termination issue!
 
-nnf (φ ⇒ ψ) with nnf¬ φ | nnf ψ
-... | nnf¬φ , NNF¬φ , ¬φ⟺nnf¬φ
-    | nnfψ , NNFψ , ψ⟺nnfψ = nnf¬φ ∨ nnfψ , NNF¬φ ∨ NNFψ , correctness where
+--   indφ :  ¬ φ′ ⟺ nnf (¬ φ)
+--   indφ = nnf-sound (¬ φ)
+  
+--   indψ : ¬ ψ′ ⟺ nnf (¬ ψ)
+--   indψ = nnf-sound (¬ ψ)
 
-    correctness : φ ⇒ ψ ⟺ nnf¬φ ∨ nnfψ
-    correctness ρ = begin
-      ⟦ φ ⇒ ψ ⟧ ρ ≡⟨ semantics⇒𝔹 _ _ ⟩
-      ⟦ ¬ φ ∨ ψ ⟧ ρ ≡⟨ cong2 _∨𝔹_ (¬φ⟺nnf¬φ ρ) (ψ⟺nnfψ ρ) ⟩
-      ⟦ nnf¬φ ∨ nnfψ ⟧ ρ ∎
+--   have : ¬ φ′ ∧ ¬ ψ′ ⟺ nnf (¬ φ) ∧ nnf (¬ ψ)
+--   have = cong2F (¬ φ′) (¬ ψ′) (nnf (¬ φ)) (nnf (¬ ψ)) (` p₀ ∧ ` p₁) p₀ p₁ indφ indψ
+  
+--   goal : ¬ (φ′ ∨ ψ′) ⟺ nnf (¬ φ) ∧ nnf (¬ ψ)
+--   goal = trans-⟺ (¬ (φ′ ∨ ψ′)) (¬ φ′ ∧ ¬ ψ′) (nnf (¬ φ) ∧ nnf (¬ ψ)) (deMorganOr φ′ ψ′) have
+          
+-- nnf-sound (¬ (φ ∧ ψ)) ϱ = {!!}
+-- nnf-sound (φ ∨ ψ) ϱ = {!!}
+-- nnf-sound (φ ∧ ψ) ϱ = {!!}
 
-nnf (φ ⇔ ψ) with nnf φ | nnf¬ φ | nnf ψ | nnf¬ ψ
-... | nnfφ , NNFφ , φ⟺nnfφ
-    | nnf¬φ , NNF¬φ , ¬φ⟺nnf¬φ
-    | nnfψ , NNFψ , ψ⟺nnfψ
-    | nnf¬ψ , NNF¬ψ , ¬ψ⟺nnf¬ψ =  (nnf¬φ ∨ nnfψ) ∧ (nnfφ ∨ nnf¬ψ) , (NNF¬φ ∨ NNFψ) ∧ (NNFφ ∨ NNF¬ψ) , correctness where
-
-    correctness : φ ⇔ ψ ⟺ (nnf¬φ ∨ nnfψ) ∧ (nnfφ ∨ nnf¬ψ)
-    correctness ρ = begin
-      ⟦ φ ⇔ ψ ⟧ ρ ≡⟨ semantics⇔𝔹 _ _ ⟩
-      ⟦ (¬ φ ∨ ψ) ∧ (φ ∨ ¬ ψ) ⟧ ρ ≡⟨ cong2 _∧𝔹_ (cong2 _∨𝔹_ (¬φ⟺nnf¬φ ρ) (ψ⟺nnfψ ρ)) (cong2 _∨𝔹_ (φ⟺nnfφ ρ) (¬ψ⟺nnf¬ψ ρ)) ⟩
-      ⟦ (nnf¬φ ∨ nnfψ) ∧ (nnfφ ∨ nnf¬ψ) ⟧ ρ ∎
+nnf¬′-sound ⊥ ϱ = refl
+nnf¬′-sound ⊤ ϱ = refl
+nnf¬′-sound (` p) ϱ = refl
+nnf¬′-sound (¬ φ) ϱ
+  rewrite nnf-sound φ ϱ = doubleNegationLaw (nnf φ) ϱ
+  
+nnf¬′-sound {φ₀ ∨ ψ₀} (φ ∨ ψ) ϱ
+  rewrite deMorganOr φ₀ ψ₀ ϱ |
+          nnf¬′-sound φ ϱ |
+          nnf¬′-sound ψ ϱ = refl
+          
+nnf¬′-sound {φ₀ ∧ ψ₀} (φ ∧ ψ) ϱ
+  rewrite deMorganAnd φ₀ ψ₀ ϱ |
+          nnf¬′-sound φ ϱ |
+          nnf¬′-sound ψ ϱ = refl
 ```
 
-
+It works with internal correctness:
 
 ```
-nnf¬ ⊤ =  ⊥ , ⊥ , λ ρ → refl
-nnf¬ ⊥ =  ⊤ , ⊤ , λ ρ → refl
-nnf¬ (` p) =  ¬ ` p , ¬` p , λ ρ → refl
+nnf′ : Formula[⊥,⊤,¬,∨,∧] φ → ∃[ ψ ] NNF ψ × φ ⟺ ψ
+nnf′ ⊥ = ⊥ , ⊥ , λ a → refl
+nnf′ ⊤ = ⊤ , ⊤ , λ a → refl
+nnf′ (` p) = ` p , ` p , λ a → refl
+nnf′ (¬ ⊥) = ⊤ , ⊤ , λ a → refl
+nnf′ (¬ ⊤) = ⊥ , ⊥ , λ a → refl
+nnf′ (¬ (` p)) = ¬ ` p , ¬` p , λ a → refl
 
-nnf¬ (¬ φ) with nnf φ
-... | nnfφ , NNFnnfφ , φ⟺nnfφ = nnfφ , NNFnnfφ , correctness where
+nnf′ {¬ ¬ φ′} (¬ (¬ φ)) with nnf′ φ
+... | ψ , NNFψ , ind = ψ , NNFψ , correctness where
 
-  correctness : ¬ ¬ φ ⟺ nnfφ
-  correctness ρ = begin
-    ⟦ ¬ ¬ φ ⟧ ρ ≡⟨ doubleNegationLaw φ ρ ⟩
-    ⟦ φ ⟧ ρ ≡⟨ φ⟺nnfφ ρ ⟩
-    ⟦ nnfφ ⟧ ρ ∎
+  correctness : ¬ ¬ φ′ ⟺ ψ
+  correctness = trans-⟺  (¬ ¬ φ′) φ′ ψ (doubleNegationLaw φ′) ind 
 
-nnf¬ (φ ∧ ψ) with nnf¬ φ | nnf¬ ψ
-... | nnf¬φ , NNF¬φ , ¬φ⟺nnf¬φ
-    | nnf¬ψ , NNF¬ψ , ¬ψ⟺nnf¬ψ = nnf¬φ ∨ nnf¬ψ , NNF¬φ ∨ NNF¬ψ , correctness where
+nnf′ {¬ (φ₀′ ∨ φ₁′)} (¬ (φ₀ ∨ φ₁))
+  with nnf′ (¬ φ₀) |
+       nnf′ (¬ φ₁)
+... | ψ₀ , NNFψ₀ , ind-ψ₀ | ψ₁ , NNFψ₁ , ind-ψ₁ = ψ₀ ∧ ψ₁ , NNFψ₀ ∧ NNFψ₁ , correctness where
 
-    correctness : ¬ (φ ∧ ψ) ⟺ nnf¬φ ∨ nnf¬ψ
-    correctness ρ = begin
-      ⟦ ¬ (φ ∧ ψ) ⟧ ρ ≡⟨ deMorganAnd φ ψ ρ ⟩
-      ⟦ ¬ φ ∨ ¬ ψ ⟧ ρ ≡⟨⟩
-      ⟦ ¬ φ ⟧ ρ ∨𝔹 ⟦ ¬ ψ ⟧ ρ ≡⟨ cong2 _∨𝔹_ (¬φ⟺nnf¬φ ρ) (¬ψ⟺nnf¬ψ ρ) ⟩
-      ⟦ nnf¬φ ⟧ ρ ∨𝔹 ⟦ nnf¬ψ ⟧ ρ ≡⟨⟩
-      ⟦ nnf¬φ ∨ nnf¬ψ ⟧ ρ ∎
+  have : ¬ φ₀′ ∧ ¬ φ₁′ ⟺ ψ₀ ∧ ψ₁
+  have = cong2F (¬ φ₀′) (¬ φ₁′) ψ₀ ψ₁ (` p₀ ∧ ` p₁) p₀ p₁ ind-ψ₀ ind-ψ₁ 
+  
+  correctness : ¬ (φ₀′ ∨ φ₁′) ⟺ ψ₀ ∧ ψ₁
+  correctness = trans-⟺ (¬ (φ₀′ ∨ φ₁′)) (¬ φ₀′ ∧ ¬ φ₁′) (ψ₀ ∧ ψ₁) (deMorganOr φ₀′ φ₁′) have
 
-nnf¬ (φ ∨ ψ) with nnf¬ φ | nnf¬ ψ
-... | nnf¬φ , NNF¬φ , ¬φ⟺nnf¬φ
-    | nnf¬ψ , NNF¬ψ , ¬ψ⟺nnf¬ψ = nnf¬φ ∧ nnf¬ψ , NNF¬φ ∧ NNF¬ψ , correctness where
+nnf′ {¬ (φ₀′ ∧ φ₁′)} (¬ (φ₀ ∧ φ₁))
+  with nnf′ (¬ φ₀) |
+       nnf′ (¬ φ₁)
+... | ψ₀ , NNFψ₀ , ind-ψ₀ | ψ₁ , NNFψ₁ , ind-ψ₁ = ψ₀ ∨ ψ₁ , NNFψ₀ ∨ NNFψ₁ , correctness where
 
-    correctness : ¬ (φ ∨ ψ) ⟺ nnf¬φ ∧ nnf¬ψ
-    correctness ρ = begin
-      ⟦ ¬ (φ ∨ ψ) ⟧ ρ ≡⟨ deMorganOr φ ψ ρ ⟩
-      ⟦ ¬ φ ∧ ¬ ψ ⟧ ρ ≡⟨⟩
-      ⟦ ¬ φ ⟧ ρ ∧𝔹 ⟦ ¬ ψ ⟧ ρ ≡⟨ cong2 _∧𝔹_ (¬φ⟺nnf¬φ ρ) (¬ψ⟺nnf¬ψ ρ) ⟩
-      ⟦ nnf¬φ ⟧ ρ ∧𝔹 ⟦ nnf¬ψ ⟧ ρ ≡⟨⟩
-      ⟦ nnf¬φ ∧ nnf¬ψ ⟧ ρ ∎
+  have : ¬ φ₀′ ∨ ¬ φ₁′ ⟺ ψ₀ ∨ ψ₁
+  have = cong2F (¬ φ₀′) (¬ φ₁′) ψ₀ ψ₁ (` p₀ ∨ ` p₁) p₀ p₁ ind-ψ₀ ind-ψ₁ 
+  
+  correctness : ¬ (φ₀′ ∧ φ₁′) ⟺ ψ₀ ∨ ψ₁
+  correctness = trans-⟺ (¬ (φ₀′ ∧ φ₁′)) (¬ φ₀′ ∨ ¬ φ₁′) (ψ₀ ∨ ψ₁) (deMorganAnd φ₀′ φ₁′) have
+  
+nnf′ {φ₀′ ∨ φ₁′} (φ₀ ∨ φ₁)
+  with nnf′ φ₀ |
+       nnf′ φ₁
+... | ψ₀ , NNFψ₀ , ind-ψ₀ | ψ₁ , NNFψ₁ , ind-ψ₁ = ψ₀ ∨ ψ₁ , NNFψ₀ ∨ NNFψ₁ , correctness where
 
-nnf¬ (φ ⇒ ψ) with nnf φ | nnf¬ ψ
-... | nnfφ , NNFφ , φ⟺nnfφ
-    | nnf¬ψ , NNF¬ψ , ¬ψ⟺nnf¬ψ = nnfφ ∧ nnf¬ψ , NNFφ ∧ NNF¬ψ , correctness where
+  correctness : φ₀′ ∨ φ₁′ ⟺ ψ₀ ∨ ψ₁
+  correctness = cong2F φ₀′ φ₁′ ψ₀ ψ₁ (` p₀ ∨ ` p₁) p₀ p₁ ind-ψ₀ ind-ψ₁
 
-    correctness : ¬ (φ ⇒ ψ) ⟺ nnfφ ∧ nnf¬ψ
-    correctness ρ = begin
-      ⟦ ¬ (φ ⇒ ψ) ⟧ ρ ≡⟨ semantics¬⇒𝔹 _ _ ⟩
-      ⟦ φ ∧ ¬ ψ ⟧ ρ ≡⟨ cong2 _∧𝔹_ (φ⟺nnfφ ρ) (¬ψ⟺nnf¬ψ ρ) ⟩
-      ⟦ nnfφ ∧ nnf¬ψ ⟧ ρ ∎
+nnf′ {φ₀′ ∧ φ₁′} (φ₀ ∧ φ₁)
+  with nnf′ φ₀ |
+       nnf′ φ₁
+... | ψ₀ , NNFψ₀ , ind-ψ₀ | ψ₁ , NNFψ₁ , ind-ψ₁ = ψ₀ ∧ ψ₁ , NNFψ₀ ∧ NNFψ₁ , correctness where
 
-nnf¬ (φ ⇔ ψ) with nnf φ | nnf¬ φ | nnf ψ | nnf¬ ψ
-... | nnfφ , NNFφ , φ⟺nnfφ
-    | nnf¬φ , NNF¬φ , ¬φ⟺nnf¬φ
-    | nnfψ , NNFψ , ψ⟺nnfψ
-    | nnf¬ψ , NNF¬ψ , ¬ψ⟺nnf¬ψ = nnfφ ∧ nnf¬ψ ∨ nnf¬φ ∧ nnfψ , NNFφ ∧ NNF¬ψ ∨ NNF¬φ ∧ NNFψ , correctness where
-
-    correctness : ¬ (φ ⇔ ψ) ⟺ nnfφ ∧ nnf¬ψ ∨ nnf¬φ ∧ nnfψ
-    correctness ρ = begin
-      ⟦ ¬ (φ ⇔ ψ) ⟧ ρ ≡⟨ semantics¬⇔𝔹 _ _ ⟩
-      ⟦ φ ∧ ¬ ψ ∨ ¬ φ ∧ ψ ⟧ ρ ≡⟨ cong2 _∨𝔹_ (cong2 _∧𝔹_ (φ⟺nnfφ ρ) (¬ψ⟺nnf¬ψ ρ)) (cong2 _∧𝔹_ (¬φ⟺nnf¬φ ρ) (ψ⟺nnfψ ρ)) ⟩
-      ⟦ nnfφ ∧ nnf¬ψ ∨ nnf¬φ ∧ nnfψ ⟧ ρ ∎
+  correctness : φ₀′ ∧ φ₁′ ⟺ ψ₀ ∧ ψ₁
+  correctness = cong2F φ₀′ φ₁′ ψ₀ ψ₁ (` p₀ ∧ ` p₁) p₀ p₁ ind-ψ₀ ind-ψ₁
 ```
-
 
 Example:
 
 ```
-_ : dfst (nnf (¬ ¬ (` p₀ ⇒ ¬ (` p₁ ∧ ` p₂)))) ≡ ¬ ` p₀ ∨ ¬ ` p₁ ∨ ¬ ` p₂
-_ = refl 
+--_ : dfst (nnf (¬ ¬ (` p₀ ⇒ ¬ (` p₁ ∧ ` p₂)))) ≡ ¬ ` p₀ ∨ ¬ ` p₁ ∨ ¬ ` p₂
+--_ = refl 
 ```
 
 ## Extended negation normal form {#ENNF}

@@ -122,6 +122,10 @@ data Formula : Set where
     `_ : (p : PropName) → Formula
     ¬_ : (φ : Formula) → Formula
     _∨_ _∧_ _⇒_ _⇔_ : (φ ψ : Formula) → Formula
+
+private
+  variable
+    φ ψ : Formula
 ```
 
 Note that there is a slight notation overload for variables `` ` p`` w.r.t. the pure mathematical syntax $p$
@@ -1259,7 +1263,7 @@ Prove the two defining properties !ref(conjProp1) and !ref(conjProp2) of long co
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
-conjProp1 _ ϱ ⟦φs⟧≡tt here = 𝔹conjProp1 _ _ ⟦φs⟧≡tt
+conjProp1 (ψ ∷ φs) ϱ ⟦φs⟧≡tt here = 𝔹conjProp1 (⟦ ψ ⟧ ϱ) _ ⟦φs⟧≡tt 
 conjProp1 (ψ ∷ φs) ϱ ⟦ψ∧φs⟧≡tt {φ} (there φ∈φs) = conjProp1 φs ϱ (𝔹conjProp2 (⟦ ψ ⟧ ϱ) _ ⟦ψ∧φs⟧≡tt) φ∈φs
 
 conjProp2 ε ϱ ass = refl
@@ -1457,7 +1461,7 @@ semDT1 Γ ψ φ Γ·ψ⊨φ = Δ⊨ψ⇒φ where
 
   Δ⊨ψ⇒φ : Γ ⊨ ψ ⇒ φ
   Δ⊨ψ⇒φ ϱ ⟦Γ⟧ with inspect (⟦ ψ ⟧ ϱ)
-  ... | it ff ⟦ψ⟧ϱ≡ff = 𝔹implProp1 _ _ ⟦ψ⟧ϱ≡ff
+  ... | it ff ⟦ψ⟧ϱ≡ff rewrite ⟦ψ⟧ϱ≡ff = refl
   ... | it tt ⟦ψ⟧ϱ≡tt rewrite ⟦ψ⟧ϱ≡tt = trans eql ⟦φ⟧ϱ≡tt where
 
     eql : tt ⇒𝔹 ⟦ φ ⟧ ϱ ≡ ⟦ φ ⟧ ϱ
@@ -1822,13 +1826,18 @@ Notice how applying simplification deeply in the formula enables further simplif
 We show that the simplification procedure preserves the meaning of the formula:
 
 ```
-simplify1-correct : ∀ φ → simplify1 φ ⟺ φ
-simplify-correct : ∀ φ → simplify φ ⟺ φ
+simplify1-correct : ∀ φ →
+  ----------------
+  simplify1 φ ⟺ φ
+
+simplify-correct : ∀ φ →
+  ---------------
+  simplify φ ⟺ φ
 ```
 
 !hide
 ~~~~
-The definition of !ref(simplify1-correct) is in terms of !ref(SimplifyView).
+The definition of !ref(simplify1-correct) is by a case analysis based on !ref(simplifyView).
 The use of the `--rewriting` option triggers automatic Boolean rewrites in the background
 (such as `ff ∨𝔹 b ≡ b`; c.f. [Booleans](../../part0/Booleans)),
 which makes the proof straightforward.
@@ -1891,6 +1900,49 @@ simplify-correct (φ ⇔ ψ) ϱ
 ```
 ~~~~
 
+<!--
+
+## Structure
+
+We prove that !ref(simplify) produces a formula not containing the zero-ary connectives !ref(Formula)(⊥) and !ref(Formula)(⊤), unless this is all that there is in the formula.
+
+-- data No[⊤,⊥] : Formula → Set where
+--   `_ : ∀ p → No[⊤,⊥] (` p)
+--   ¬_ : No[⊤,⊥] φ → No[⊤,⊥] (¬ φ)
+--   _∨_ : No[⊤,⊥] φ → No[⊤,⊥] ψ → No[⊤,⊥] (φ ∨ ψ)
+--   _∧_ : No[⊤,⊥] φ → No[⊤,⊥] ψ → No[⊤,⊥] (φ ∧ ψ)
+--   _⇒_ : No[⊤,⊥] φ → No[⊤,⊥] ψ → No[⊤,⊥] (φ ⇒ ψ)
+--   _⇔_ : No[⊤,⊥] φ → No[⊤,⊥] ψ → No[⊤,⊥] (φ ⇔ ψ)
+
+-- data Simplified : Formula → Set where
+--   ⊥ : Simplified ⊥
+--   ⊤ : Simplified ⊤
+--   no-⊤⊥ : No[⊤,⊥] φ → Simplified φ
+
+-- simplified1-¬ : Simplified φ → Simplified (simplify1 (¬ φ))
+-- simplified1-¬ {φ} simp-φ = {!!}
+
+-- simplified1-∨ : Simplified φ → Simplified ψ → Simplified (simplify1 (φ ∨ ψ))
+-- simplified1-∨ {φ} {ψ} simp-φ simp-ψ
+--   with simplifyView (φ ∨ ψ)
+-- ... | ⊥∨ .ψ = simp-ψ
+-- ... | .φ ∨⊥ = simp-φ
+-- ... | ⊤∨ .ψ = simp-φ
+-- ... | .φ ∨⊤ = simp-ψ
+-- ... | stop .(φ ∨ ψ) = {! !} -- no information here, need to improve the view to be more precise
+
+-- simplified : ∀ φ → Simplified (simplify φ)
+-- simplified ⊥ = ⊥
+-- simplified ⊤ = ⊤
+-- simplified (` p) = no-⊤⊥ (` p)
+-- simplified (¬ φ) = simplified1-¬ (simplified φ) 
+-- simplified (φ ∨ ψ) = simplified1-∨ (simplified φ) (simplified ψ)
+-- simplified (φ ∧ φ₂) = {!!}
+-- simplified (φ ⇒ φ₂) = {!!}
+-- simplified (φ ⇔ φ₂) = {!!}
+
+-->
+
 # Duality
 
 The connectives in the fragment `{⊥,⊤,¬,∨,∧}` have a fundamental duality:
@@ -1937,10 +1989,10 @@ data Formula[⊥,⊤,¬,∨,∧] : Formula → Set where
   ⊤ : Formula[⊥,⊤,¬,∨,∧] ⊤
   `_ : ∀ p → Formula[⊥,⊤,¬,∨,∧] (` p)
   ¬_ : ∀ {φ} → Formula[⊥,⊤,¬,∨,∧] φ → Formula[⊥,⊤,¬,∨,∧] (¬ φ)
-  _∧_ : ∀ {φ ψ} → Formula[⊥,⊤,¬,∨,∧] φ → Formula[⊥,⊤,¬,∨,∧] ψ
-    → Formula[⊥,⊤,¬,∨,∧] (φ ∧ ψ)
   _∨_ : ∀ {φ ψ} → Formula[⊥,⊤,¬,∨,∧] φ → Formula[⊥,⊤,¬,∨,∧] ψ
     → Formula[⊥,⊤,¬,∨,∧] (φ ∨ ψ)
+  _∧_ : ∀ {φ ψ} → Formula[⊥,⊤,¬,∨,∧] φ → Formula[⊥,⊤,¬,∨,∧] ψ
+    → Formula[⊥,⊤,¬,∨,∧] (φ ∧ ψ)
 ```
 
 Notice that this view is *recursive*,

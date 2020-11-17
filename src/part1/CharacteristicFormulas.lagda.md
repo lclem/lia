@@ -304,9 +304,7 @@ In this section we explore which set of connectives is functionally complete.
 We consider the fragment consisting only of conjunction, disjunction, negation, true, and false.
 Thus, w.r.t. the full syntax of propositional formulas,
 we do not allow either implication `⇒`, or bi-implication `⇔`.
-Formally, this fragment is defined as the following inductive datatype:
-   
-
+In fact, we have already encountered this fragment in !remoteRef(part1)(Semantics)(Formula[⊥,⊤,¬,∨,∧]).
 
 In the following, fix an arbitrary Boolean function `f : 𝔹Fun`.
 We want to build a formula `φ` in the fragment whose semantics equals that of `f`:
@@ -576,6 +574,9 @@ We show that this fragment is functionally complete:
 ```
 funCompl[¬∨∧] : FunctionallyComplete Formula[¬∨∧]
 ```
+
+TODO: Explain that `remove⊥⊤` is written using the "implicit verification" approach.
+First occurrence of this in part 1.
 
 Thanks to the fact that !ref(Formula[⊥,⊤,¬,∨,∧]) is functionally complete (c.f. !ref(funCompl[⊥,⊤,¬,∨,∧]))
 it suffices to remove the two logical constants `⊥` and `⊤`:
