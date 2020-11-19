@@ -6,7 +6,7 @@ SRCDIR := src
 BUILDDIR := $(SRCDIR)/_build
 INCLUDES := _includes
 SVGS := $(INCLUDES)/svgs
-PARTS := part0 part1
+PARTS := part0 part1 part2
 #part1 part2 part3 part4
 AGDA := agda
 PP := ./pp/pp-macos

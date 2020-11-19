@@ -1055,6 +1055,9 @@ refl-⊑ : ∀ {ℓ} {A : Set ℓ} {as : A *} → as ⊑ as
 refl-⊑ {as = ε} = stop
 refl-⊑ {as = a ∷ as} = match refl-⊑
 
+trans-⊑ :  ∀ {ℓ} {A : Set ℓ} {as  bs cs : A *} → as ⊑ bs → bs ⊑ cs → as ⊑ cs
+trans-⊑ = {!!}
+
 antisym-⊑ : ∀ {ℓ} {A : Set ℓ} {as bs : A *} →
   as ⊑ bs →
   bs ⊑ as →

@@ -1,15 +1,14 @@
 ---
-title: Syntax and semantics of propositional logic 🚧
+title: "Syntax and semantics of propositional logic 🚧"
 ---
 
 In this chapter we introduce the syntax of propositional logic.
 
 ```
 {-# OPTIONS --allow-unsolved-metas --confluence-check --rewriting #-}
-open import part0.Naturals using (ℕ)
-
-module part1.Semantics (n′ : ℕ) where
 open import part0.index
+
+module part1.Semantics (n' : ℕ) where
 ```
 
 # Syntax
@@ -28,11 +27,11 @@ provided that
 * We can enumerate all propositions.
 
 Our choice is to represent propositional variables with the datatype !remoteRef(part0)(Finite)(Fin).
-The module parameter `n′ : ℕ` allows us to name a fixed but arbitrary number of distinct propositions,
+The module parameter `n' : ℕ` allows us to name a fixed but arbitrary number of distinct propositions,
 leading to the following definition (we omit the type annotation `Set`).
 
 ```
-n = 3 + n′
+n = 3 + n'
 PropName = Fin n
 ```
 
