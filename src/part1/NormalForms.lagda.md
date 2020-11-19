@@ -16,22 +16,618 @@ private
 
 In this chapter we study normal forms for classical propositional logic, namely
 
-* [negation normal form (NNF)](#NNF) and its extension [ENNF](#ENNF),
+* [weak negation normal form (WNNF)](#WNNF),
+* [negation normal form (NNF)](#NNF),
 * [disjunctive normal form (DNF)](#DNF), and its dual
 * [conjunctive normal form (CNF)](#CNF).
 
 
-# Implication-free form
-
-```
-imp-free : ∀ φ → Formula[⊥,⊤,¬,∨,∧] φ
-imp-free φ = {!!}
-```
-
-# Negation normal form {#NNF}
+# Weak negation normal form {#WNNF}
 
 A *literal* is either a propositional variable `p` (positive literal)
 or a negation `¬ p` thereof (negative literal).
+A formula is in *weak negation normal form* (WNNF) if negation can appear only in literals,
+i.e., in front of propositional variables:
+
+```
+data WNNF : Formula → Set where
+  ⊤ : WNNF ⊤
+  ⊥ : WNNF ⊥
+  `_ : (p : PropName) → WNNF (` p)
+  ¬`_ : (p : PropName) → WNNF (¬ ` p)
+  _∧_ : WNNF φ → WNNF ψ → WNNF (φ ∧ ψ)
+  _∨_ : WNNF φ → WNNF ψ → WNNF (φ ∨ ψ)
+  _⇒_ : WNNF φ → WNNF ψ → WNNF (φ ⇒ ψ)
+  _⇔_ : WNNF φ → WNNF ψ → WNNF (φ ⇔ ψ)
+```
+
+In this section we show that every formula can be transformed to a logically equivalent formula in WNNF.
+This is a preparatory step towards the stronger [NNF](#NNF).
+
+Given a formula `φ`, we can decide whether it is in WNNF or not:
+
+```
+WNNF? : ∀ φ → Dec (WNNF φ)
+```
+
+!hide
+~~~
+The proof works by inspecting `φ` sufficiently deeply.
+~~~
+~~~
+```
+WNNF? ⊥ = yes ⊥
+WNNF? ⊤ = yes ⊤
+WNNF? (` p) = yes (` p)
+
+WNNF? (¬ ⊥) = no λ ()
+WNNF? (¬ ⊤) = no λ ()
+WNNF? (¬ (` p)) = yes (¬` p)
+WNNF? (¬ (¬ _)) = no λ ()
+WNNF? (¬ (_ ∨ _)) = no λ ()
+WNNF? (¬ (_ ∧ _)) = no λ ()
+WNNF? (¬ (_ ⇒ _)) = no λ ()
+WNNF? (¬ (_ ⇔ _)) = no λ ()
+
+WNNF? (φ ∨ ψ)
+  with WNNF? φ |
+       WNNF? ψ
+... | yes wnnfφ | yes wnnfψ = yes (wnnfφ ∨ wnnfψ)
+... | no ¬wnnfφ | _ = no λ{ (wnnfφ ∨ _) → ¬wnnfφ wnnfφ}
+... | _ | no ¬wnnfψ = no λ{ (_ ∨ wnnfψ) → ¬wnnfψ wnnfψ}
+
+WNNF? (φ ∧ ψ)
+  with WNNF? φ |
+       WNNF? ψ
+... | yes wnnfφ | yes wnnfψ = yes (wnnfφ ∧ wnnfψ)
+... | no ¬wnnfφ | _ = no λ{ (wnnfφ ∧ _) → ¬wnnfφ wnnfφ}
+... | _ | no ¬wnnfψ = no λ{ (_ ∧ wnnfψ) → ¬wnnfψ wnnfψ}
+
+WNNF? (φ ⇒ ψ)
+  with WNNF? φ |
+       WNNF? ψ
+... | yes wnnfφ | yes wnnfψ = yes (wnnfφ ⇒ wnnfψ)
+... | no ¬wnnfφ | _ = no λ{ (wnnfφ ⇒ _) → ¬wnnfφ wnnfφ}
+... | _ | no ¬wnnfψ = no λ{ (_ ⇒ wnnfψ) → ¬wnnfψ wnnfψ}
+
+WNNF? (φ ⇔ ψ)
+  with WNNF? φ |
+       WNNF? ψ
+... | yes wnnfφ | yes wnnfψ = yes (wnnfφ ⇔ wnnfψ)
+... | no ¬wnnfφ | _ = no λ{ (wnnfφ ⇔ _) → ¬wnnfφ wnnfφ}
+... | _ | no ¬wnnfψ = no λ{ (_ ⇔ wnnfψ) → ¬wnnfψ wnnfψ}
+
+```
+~~~
+
+```
+ψ₀ ψ₁ ψ₂ ψ₃ ψ₄ ψ₅ ψ₇ ψ₈ : Formula
+```
+
+::::::::::::: {.inlinecode}
+
+For instance, the formulas
+```
+ψ₀ = ⊤
+```
+,
+```
+ψ₁ = ¬ ` p₀ ∨ ` p₁
+```
+, and
+```
+ψ₂ = ¬ ` p₀ ⇒ (` p₁ ⇔ ¬ ` p₂)
+```
+are in WNNF, while the formulas
+```
+ψ₃ = ¬ ⊤
+```
+,
+```
+ψ₄ = ¬ ¬ ` p₀
+```
+, and
+```
+ψ₅ = ¬ (` p₀ ∨ ` p₁)
+```
+are not in WNNF (negation not in front of a propositional variable),
+which we can automaticalally check thanks to !ref(WNNF?):
+
+:::::::::::::
+
+```
+_ : All? WNNF? ([ ψ₀ ψ₁ ψ₂ ]) ×? All? (~?_ ∘ WNNF?) ([ ψ₃ ψ₄ ψ₅ ]) ≡ yes _
+_ = refl
+```
+
+## Transformation
+
+The transformation of a formula to WNNF operates by "pushing inside" negations.
+This is achieved by the function
+
+```
+wnnf : Formula → Formula
+```
+
+which is defined as follows:
+
+* In the atomic cases the formula is unchanged:
+
+```
+wnnf ⊥ = ⊥
+wnnf ⊤ = ⊤
+wnnf (` p) = ` p
+```
+
+* In the case of binary connectives we just proceed recursively on the subformulas:
+
+```
+wnnf (φ ∨ ψ) = wnnf φ ∨ wnnf ψ
+wnnf (φ ∧ ψ) = wnnf φ ∧ wnnf ψ
+wnnf (φ ⇒ ψ) = wnnf φ ⇒ wnnf ψ
+wnnf (φ ⇔ ψ) = wnnf φ ⇔ wnnf ψ
+```
+
+* In the case of a negation, we push it inside.
+If it is in front of the constants !remoteRef(part1)(Semantics)(Formula)(⊥) and !remoteRef(part1)(Semantics)(Formula)(⊥),
+then we just flip it to the other constant:
+
+```
+wnnf (¬ ⊥) = ⊤
+wnnf (¬ ⊤) = ⊥
+```
+
+* If it is in front of a propositional variable,
+then we leave it unchanged:
+
+```
+wnnf (¬ ` p) = ¬ ` p
+```
+
+* Double negations are just removed (thanks to the law of double negation):
+  
+```
+wnnf (¬ ¬ φ) = wnnf φ
+```
+
+* If negation is in front of a binary connective,
+then we push it inside according to the corresponding de Morgan's law:
+  
+```
+wnnf (¬ (φ ∨ ψ)) = wnnf (¬ φ) ∧ wnnf (¬ ψ)
+wnnf (¬ (φ ∧ ψ)) = wnnf (¬ φ) ∨ wnnf (¬ ψ)
+wnnf (¬ (φ ⇒ ψ)) = wnnf φ ∧ wnnf (¬ ψ)
+wnnf (¬ (φ ⇔ ψ)) = wnnf φ ⇔ wnnf (¬ ψ)
+```
+
+!hide
+~~~~~~~
+<div class="inlinecode"> For example, the WNNF of
+```
+ψ₇ = ¬ ¬ (` p₀ ⇒ ¬ (` p₁ ∧ ` p₂))
+```
+is
+```
+ψ₈ = ` p₀ ⇒ ¬ ` p₁ ∨ ¬ ` p₂
+```
+as we can automatically check. </div>
+~~~~~~~
+~~~~~~~
+```
+_ : wnnf ψ₇ ≡ ψ₈
+_ = refl 
+```
+~~~~~~~
+
+## Correctness
+
+Now that we have a tentative definition of a function !ref(wnnf) purportedly transforming a formula to an equivalent one in WNNF,
+we have to prove that this is the case.
+There are two things that we need to prove.
+First, we need to prove that `wnnf φ` is indeed in WNNF,
+and second that it is logically equivalent to `φ`.
+
+### Structure
+
+!hide
+~~~~~~~~~
+```
+wnnf-WNNF : ∀ φ → WNNF (wnnf φ)
+```
+
+The proof that `wnnf φ` is in WNNF is by a customary structural induction,
+where in the case `φ = ¬ (` p)` the !ref(WNNF) given by the constructor `` ¬` p ``
+(no space between `¬` and the following backtick character).
+~~~~~~~~~
+~~~~~~~~~
+```
+wnnf-WNNF ⊥ = ⊥
+wnnf-WNNF ⊤ = ⊤
+wnnf-WNNF (` p) = ` p
+wnnf-WNNF (¬ ⊥) = ⊤
+wnnf-WNNF (¬ ⊤) = ⊥
+wnnf-WNNF (¬ (` p)) = ¬` p
+wnnf-WNNF (¬ (¬ φ)) = wnnf-WNNF φ
+wnnf-WNNF (¬ (φ ∨ ψ)) = wnnf-WNNF (¬ φ) ∧ wnnf-WNNF (¬ ψ)
+wnnf-WNNF (¬ (φ ∧ ψ)) = wnnf-WNNF (¬ φ) ∨ wnnf-WNNF (¬ ψ)
+wnnf-WNNF (¬ (φ ⇒ ψ)) = wnnf-WNNF φ ∧ wnnf-WNNF (¬ ψ)
+wnnf-WNNF (¬ (φ ⇔ ψ)) = wnnf-WNNF φ ⇔ wnnf-WNNF (¬ ψ)
+wnnf-WNNF (φ ∨ ψ) = wnnf-WNNF φ ∨ wnnf-WNNF ψ
+wnnf-WNNF (φ ∧ ψ) = wnnf-WNNF φ ∧ wnnf-WNNF ψ
+wnnf-WNNF (φ ⇒ ψ) = wnnf-WNNF φ ⇒ wnnf-WNNF ψ
+wnnf-WNNF (φ ⇔ ψ) = wnnf-WNNF φ ⇔ wnnf-WNNF ψ
+```
+~~~~~~~~~
+
+### Soundness
+
+The proof of soundess is conceptually simple and it is based on the double negation and de Morgan's laws.
+The only difficulty is posed by the termination checker.
+
+The most immediate way to prove soundness would be to mimick the recursive structure of !ref(wnnf) as follows:
+
+```
+{-# TERMINATING #-}
+wnnf-sound' : ∀ φ → φ ⟺ wnnf φ
+
+wnnf-sound' ⊥ ϱ = refl
+wnnf-sound' ⊤ ϱ = refl
+wnnf-sound' (` p) ϱ = refl
+wnnf-sound' (¬ ⊥) ϱ = refl
+wnnf-sound' (¬ ⊤) ϱ = refl
+wnnf-sound' (φ ∨ ψ) ϱ
+  rewrite wnnf-sound' φ ϱ |
+          wnnf-sound' ψ ϱ = refl
+          
+wnnf-sound' (φ ∧ ψ) ϱ
+  rewrite wnnf-sound' φ ϱ |
+          wnnf-sound' ψ ϱ = refl
+          
+wnnf-sound' (φ ⇒ ψ) ϱ
+  rewrite wnnf-sound' φ ϱ |
+          wnnf-sound' ψ ϱ = refl
+          
+wnnf-sound' (φ ⇔ ψ) ϱ
+  rewrite wnnf-sound' φ ϱ |
+          wnnf-sound' ψ ϱ = refl
+          
+wnnf-sound' (¬ (` p)) ϱ = refl
+wnnf-sound' (¬ (¬ φ)) ϱ
+  rewrite doubleNegationLaw φ ϱ |
+          wnnf-sound' φ ϱ = refl
+  
+wnnf-sound' (¬ (φ ∨ ψ)) ϱ
+   rewrite deMorganOr φ ψ ϱ |
+           wnnf-sound' (¬ φ) ϱ |
+           wnnf-sound' (¬ ψ) ϱ = refl -- termination issue (*)
+           
+wnnf-sound' (¬ (φ ∧ ψ)) ϱ
+   rewrite deMorganAnd φ ψ ϱ |
+           wnnf-sound' (¬ φ) ϱ |
+           wnnf-sound' (¬ ψ) ϱ = refl
+
+wnnf-sound' (¬ (φ ⇒ ψ)) ϱ
+   rewrite deMorganImplies φ ψ ϱ |
+           wnnf-sound' φ ϱ |
+           wnnf-sound' (¬ ψ) ϱ = refl
+
+wnnf-sound' (¬ (φ ⇔ ψ)) ϱ
+   rewrite deMorganIff-right φ ψ ϱ |
+           wnnf-sound' φ ϱ |
+           wnnf-sound' (¬ ψ) ϱ = refl
+```
+
+The `TERMINATING` pragma instructs Agda to accept this definition even if it is not proved terminating by the termination checker.
+(In this way we do not need to comment out the code.)
+This can be verified by commenting out the pragma,
+wereby the termination checker will complain about the recursive invocation marked by `(*)` above.
+It is surprising that the termination checker cannot establish that !ref(wnnf-sound') is terminating (which indeed it is),
+since it has the same recursive structure as !ref(wnnf), which is established terminating.
+
+We need to find a way to convince the termination checker.
+A simple work-around with negligible notational overhead  is to split the soundness proof in two parts:
+
+```
+wnnf-sound : ∀ φ → φ ⟺ wnnf φ
+wnnf¬-sound : ∀ φ → ¬ φ ⟺ wnnf (¬ φ)
+```
+
+where the second part takes care of negated formulas.
+With this "division of duties" approach,
+we can comfortably write the following mutually recursive definitions:
+
+```
+wnnf-sound ⊥ ϱ = refl
+wnnf-sound ⊤ ϱ = refl
+wnnf-sound (` p) ϱ = refl
+wnnf-sound (¬ φ) = wnnf¬-sound φ
+wnnf-sound (φ ∨ ψ) ϱ
+  rewrite wnnf-sound φ ϱ |
+          wnnf-sound ψ ϱ = refl
+wnnf-sound (φ ∧ ψ) ϱ
+  rewrite wnnf-sound φ ϱ |
+          wnnf-sound ψ ϱ = refl
+wnnf-sound (φ ⇒ ψ) ϱ
+  rewrite wnnf-sound φ ϱ |
+          wnnf-sound ψ ϱ = refl
+wnnf-sound (φ ⇔ ψ) ϱ
+  rewrite wnnf-sound φ ϱ |
+          wnnf-sound ψ ϱ = refl
+```
+
+and
+
+```
+wnnf¬-sound ⊥ ϱ = refl
+wnnf¬-sound ⊤ ϱ = refl
+wnnf¬-sound (` p) ϱ = refl
+wnnf¬-sound (¬ φ) ϱ 
+  rewrite doubleNegationLaw φ ϱ |
+          wnnf-sound φ ϱ = refl
+  
+wnnf¬-sound (φ ∨ ψ) ϱ
+  rewrite deMorganOr φ ψ ϱ |
+          wnnf¬-sound φ ϱ |
+          wnnf¬-sound ψ ϱ = refl
+          
+wnnf¬-sound (φ ∧ ψ) ϱ
+  rewrite deMorganAnd φ ψ ϱ |
+          wnnf¬-sound φ ϱ |
+          wnnf¬-sound ψ ϱ = refl
+
+wnnf¬-sound (φ ⇒ ψ) ϱ
+  rewrite deMorganImplies φ ψ ϱ |
+          wnnf-sound φ ϱ |
+          wnnf¬-sound ψ ϱ = refl
+
+wnnf¬-sound (φ ⇔ ψ) ϱ
+  rewrite deMorganIff-right φ ψ ϱ |
+          wnnf-sound φ ϱ |
+          wnnf¬-sound ψ ϱ = refl
+```
+
+## Internal verification
+
+An alternative approach is to the define the WNNF transformation and its correctness proof as a single recursive definition:
+
+```
+wnnf′ : ∀[ φ ] ∃[ ψ ] WNNF ψ × φ ⟺ ψ
+```
+
+!hide
+~~~~
+This has the advantage of solving the termination problem highlighted above.
+One disadvantage is that in contexts where we need just the WNNF formula,
+but not its correctness proof,
+we cannot write just `wnnf φ`, but we would need to write the less transparent `dfst (wnnf' φ)`.
+For this reason, in this section we have preferred an approach where the definition of WNNF and its correctness proof are given separately,
+however it is interesting to compare it to the case where they are given together.
+This style of programming is sometimes called *internal verification*.
+~~~~
+~~~~
+```
+wnnf′ ⊥ = ⊥ , ⊥ , λ ϱ → refl
+wnnf′ ⊤ = ⊤ , ⊤ , λ ϱ → refl
+wnnf′ (` p) = ` p , ` p , λ ϱ → refl
+wnnf′ (¬ ⊥) = ⊤ , ⊤ , λ ϱ → refl
+wnnf′ (¬ ⊤) = ⊥ , ⊥ , λ ϱ → refl
+wnnf′ (¬ ` p) = ¬ ` p , ¬` p , λ ϱ → refl
+
+wnnf′ (¬ ¬ φ) with wnnf′ φ
+... | ψ , WNNFψ , φ⟺ψ = ψ , WNNFψ , correctness where
+
+  correctness : ¬ ¬ φ ⟺ ψ
+  correctness ϱ rewrite doubleNegationLaw φ ϱ |
+                        φ⟺ψ ϱ = refl
+
+wnnf′ (¬ (φ₀ ∨ φ₁)) with wnnf′ (¬ φ₀) | wnnf′ (¬ φ₁)
+... | ψ₀ , WNNFψ₀ , φ₀⟺ψ₀
+    | ψ₁ , WNNFψ₁ , φ₁⟺ψ₁ = ψ₀ ∧ ψ₁ , WNNFψ₀ ∧ WNNFψ₁ , correctness where
+
+  correctness : ¬ (φ₀ ∨ φ₁) ⟺ ψ₀ ∧ ψ₁
+  correctness ϱ rewrite deMorganOr φ₀ φ₁ ϱ |
+                        φ₀⟺ψ₀ ϱ |
+                        φ₁⟺ψ₁ ϱ = refl
+
+wnnf′ (¬ (φ₀ ∧ φ₁)) with wnnf′ (¬ φ₀) | wnnf′ (¬ φ₁)
+... | ψ₀ , WNNFψ₀ , φ₀⟺ψ₀
+    | ψ₁ , WNNFψ₁ , φ₁⟺ψ₁ = ψ₀ ∨ ψ₁ , WNNFψ₀ ∨ WNNFψ₁ , correctness where
+
+  correctness : ¬ (φ₀ ∧ φ₁) ⟺ ψ₀ ∨ ψ₁
+  correctness ϱ rewrite deMorganAnd φ₀ φ₁ ϱ |
+                        φ₀⟺ψ₀ ϱ |
+                        φ₁⟺ψ₁ ϱ = refl
+            
+wnnf′ (¬ (φ₀ ⇒ φ₁)) with wnnf′ φ₀ | wnnf′ (¬ φ₁)
+... | ψ₀ , WNNFψ₀ , φ₀⟺ψ₀
+    | ψ₁ , WNNFψ₁ , φ₁⟺ψ₁ = ψ₀ ∧ ψ₁ , WNNFψ₀ ∧ WNNFψ₁ , correctness where
+
+  correctness : ¬ (φ₀ ⇒ φ₁) ⟺ ψ₀ ∧ ψ₁
+  correctness ϱ rewrite deMorganImplies φ₀ φ₁ ϱ |
+                        φ₀⟺ψ₀ ϱ |
+                        φ₁⟺ψ₁ ϱ = refl
+            
+wnnf′ (¬ (φ₀ ⇔ φ₁)) with wnnf′ φ₀ | wnnf′ (¬ φ₁)
+... | ψ₀ , WNNFψ₀ , φ₀⟺ψ₀
+    | ψ₁ , WNNFψ₁ , φ₁⟺ψ₁ = ψ₀ ⇔ ψ₁ , WNNFψ₀ ⇔ WNNFψ₁ , correctness where
+
+  correctness : ¬ (φ₀ ⇔ φ₁) ⟺ ψ₀ ⇔ ψ₁
+  correctness ϱ rewrite deMorganIff-right φ₀ φ₁ ϱ |
+                        φ₀⟺ψ₀ ϱ |
+                        φ₁⟺ψ₁ ϱ = refl
+            
+wnnf′ (φ₀ ∨ φ₁) with wnnf′ φ₀ | wnnf′ φ₁
+... | ψ₀ , WNNFψ₀ , φ₀⟺ψ₀
+    | ψ₁ , WNNFψ₁ , φ₁⟺ψ₁ = ψ₀ ∨ ψ₁ , WNNFψ₀ ∨ WNNFψ₁ , correctness where
+
+  correctness : φ₀ ∨ φ₁ ⟺ ψ₀ ∨ ψ₁
+  correctness ϱ rewrite φ₀⟺ψ₀ ϱ |
+                        φ₁⟺ψ₁ ϱ = refl
+
+wnnf′ (φ₀ ∧ φ₁) with wnnf′ φ₀ | wnnf′ φ₁
+... | ψ₀ , WNNFψ₀ , φ₀⟺ψ₀
+    | ψ₁ , WNNFψ₁ , φ₁⟺ψ₁ = ψ₀ ∧ ψ₁ , WNNFψ₀ ∧ WNNFψ₁ , correctness where
+
+  correctness : φ₀ ∧ φ₁ ⟺ ψ₀ ∧ ψ₁
+  correctness ϱ rewrite φ₀⟺ψ₀ ϱ |
+                        φ₁⟺ψ₁ ϱ = refl
+
+wnnf′ (φ₀ ⇒ φ₁) with wnnf′ φ₀ | wnnf′ φ₁
+... | ψ₀ , WNNFψ₀ , φ₀⟺ψ₀
+    | ψ₁ , WNNFψ₁ , φ₁⟺ψ₁ = ψ₀ ⇒ ψ₁ , WNNFψ₀ ⇒ WNNFψ₁ , correctness where
+
+  correctness : φ₀ ⇒ φ₁ ⟺ ψ₀ ⇒ ψ₁
+  correctness ϱ rewrite φ₀⟺ψ₀ ϱ |
+                        φ₁⟺ψ₁ ϱ = refl
+
+wnnf′ (φ₀ ⇔ φ₁) with wnnf′ φ₀ | wnnf′ φ₁
+... | ψ₀ , WNNFψ₀ , φ₀⟺ψ₀
+    | ψ₁ , WNNFψ₁ , φ₁⟺ψ₁ = ψ₀ ⇔ ψ₁ , WNNFψ₀ ⇔ WNNFψ₁ , correctness where
+
+  correctness : φ₀ ⇔ φ₁ ⟺ ψ₀ ⇔ ψ₁
+  correctness ϱ rewrite φ₀⟺ψ₀ ϱ |
+                        φ₁⟺ψ₁ ϱ = refl
+```
+~~~~
+
+## Formula size
+
+it is useful to have a notion of *size* of a formula in order to show that the size decreases at each step.
+The definition of formula size is given by structural induction on `Formula`:
+
+```
+size : Formula → ℕ
+size ⊤ = 1
+size ⊥ = 1
+size (` _) = 1
+size (¬ φ) = 1 + size φ
+size (φ ∧ ψ) = 1 + size φ + size ψ
+size (φ ∨ ψ) = 1 + size φ + size ψ
+size (φ ⇒ ψ) = 1 + size φ + size ψ
+size (φ ⇔ ψ) = 1 + size φ + size ψ
+```
+
+!example(#example:size)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In the example formula `φ₀`, we have:
+
+```
+_ : size φ₀ ≡ 6
+_ = refl
+```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+!exercise(#exercise:size-neg)(`size-¬`)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Prove that !ref(size) satisfies the following two inequalities:
+
+```
+size-¬ : ∀ φ → size φ ≤ size (¬ φ)
+size-¬¬ : ∀ φ → size φ ≤ size (¬ ¬ φ)
+```
+
+(This will be used in the chapter on [Normal Forms](../../part1/NormalForms).)
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
+size-¬ _ = n≤sucn
+size-¬¬ φ = trans-≤ (size-¬ φ) (size-¬ (¬ φ)) 
+```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We show that the NNF formula produced by [`wnnf`](#wnnf) has size linear in the input.
+
+```
+wnnf-size : ∀ φ → size (wnnf φ) ≤ 2 * size φ
+```
+
+In order to prove [`wnnf-size`](#wnnf-size) above,
+it is useful to have the following stronger invariant for negated formulas.
+
+```
+wnnf-size¬ : ∀ φ → size (wnnf (¬ φ)) ≤ 2 * size φ
+```
+
+We can now proceed to prove [`wnnf-size`](#wnnf-size) and [`wnnf-size¬`](#wnnf-size¬) by mutual induction.
+The last four cases follow a similar pattern.
+We first abstract the pattern and then apply it several times.
+
+```
+size-reasoning : ({a b} c {d} : ℕ) (_ : a ≤ 2 * c) (_ : b ≤ 2 * d) → 1 + a + b ≤ 2 * (1 + c + d)
+```
+
+```
+wnnf-size ⊤ = s≤s 0≤n
+wnnf-size ⊥ = s≤s 0≤n
+wnnf-size (` p) = s≤s 0≤n
+
+wnnf-size (¬ φ) with wnnf-size¬ φ
+... | ind¬φ = begin≤
+  size (wnnf (¬ φ)) ≤⟨ ind¬φ ⟩
+  2 * size φ ≤⟨ cong-≤ (Num 2 *C □) (size-¬ φ) ⟩
+  2 * size (¬ φ) ∎≤
+
+wnnf-size (φ ∧ ψ) with wnnf-size φ | wnnf-size ψ
+... | indφ | indψ = begin≤
+  size (wnnf (φ ∧ ψ)) ≤⟨⟩
+  size (wnnf φ ∧ wnnf ψ) ≤⟨⟩
+  1 + size (wnnf φ) + size (wnnf ψ) ≤⟨ size-reasoning (size φ) indφ indψ ⟩
+  2 * (1 + size φ + size ψ) ≤⟨⟩
+  2 * size (φ ∧ ψ) ∎≤
+```
+
+The last three cases are similar and we give them in a shortened form.
+
+```
+wnnf-size (φ ∨ ψ) = size-reasoning (size φ) (wnnf-size φ) (wnnf-size ψ)
+wnnf-size (φ ⇒ ψ) = size-reasoning (size φ) (wnnf-size φ) (wnnf-size ψ)
+wnnf-size (φ ⇔ ψ) = size-reasoning (size φ) (wnnf-size φ) (wnnf-size ψ)
+```
+
+Proof for negated formulas:
+```
+wnnf-size¬ ⊤ = s≤s 0≤n
+wnnf-size¬ ⊥ = s≤s 0≤n
+wnnf-size¬ (` p) = s≤s (s≤s 0≤n)
+
+-- double negation!
+wnnf-size¬ (¬ φ) with wnnf-size φ
+... | indφ = begin≤
+  size (wnnf (¬ ¬ φ)) ≤⟨⟩
+  size (wnnf φ) ≤⟨ indφ ⟩
+  2 * size φ ≤⟨ cong-≤ (Num 2 *C □) (size-¬ φ) ⟩
+  2 * size (¬ φ) ∎≤
+
+wnnf-size¬ (φ ∧ ψ) = size-reasoning (size φ) (wnnf-size¬ φ) (wnnf-size¬ ψ)
+wnnf-size¬ (φ ∨ ψ) = size-reasoning (size φ) (wnnf-size¬ φ) (wnnf-size¬ ψ)
+wnnf-size¬ (φ ⇒ ψ) = size-reasoning (size φ) (wnnf-size φ) (wnnf-size¬ ψ)
+wnnf-size¬ (φ ⇔ ψ) = size-reasoning (size φ) (wnnf-size φ) (wnnf-size¬ ψ)
+```
+
+We now prove the common workhorse...
+
+```
+size-reasoning {a} {b} c {d} a≤c b≤d = begin≤
+  1 + a + b
+    ≤≡⟨ assoc-+ {1} {a} ⟩
+  1 + ( a + b)
+    ≤⟨ {! cong2-≤ (Num 1 +C (□ fzero +C □ (fsuc fzero))) a≤c b≤d !} ⟩ --alternative: arithmetic expressions with variables
+  1 + (2 * c + 2 * d)
+    ≤≡⟨ cong (_+_ 1) (assocLeft-+* {2} {c}) ⟩
+  1 + 2 * (c + d)
+    ≤⟨ cong-≤ (□ +C Num _) 1≤2*1 ⟩
+  2 * 1 + 2 * (c + d)
+    ≤≡⟨ assocLeft-+* {2} {1} ⟩
+  2 * (1 + c + d) ∎≤
+```
+
+The worst-case behaviour is achieved when a single negation is pushed down to the leaves
+in a negation-free formula consisting of only [`∧`](#_∧_) and [`∨`](#_∨_).
+
+# Negation normal form {#NNF}
+
 A propositional formula `φ` is in *negation normal form* (NNF) if it uses only the connectives
 !remoteRef(part1)(Semantics)(Formula)(⊥),
 !remoteRef(part1)(Semantics)(Formula)(⊤),
@@ -105,466 +701,139 @@ NNF? (_ ⇔ _) = no λ ()
 ~~~
 
 ```
-ψ₀ ψ₁ ψ₂ ψ₃ ψ₄ ψ₅ : Formula
+--ψ₀ ψ₁ ψ₂ ψ₃ ψ₄ ψ₅ : Formula
 ```
 
 ::::::::::::: {.inlinecode}
 
 For instance, the formulas
 ```
-ψ₀ = ⊤
+--ψ₀ = ⊤
 ```
 ,
 ```
-ψ₁ = ¬ ` p₀ ∨ ` p₁
+--ψ₁ = ¬ ` p₀ ∨ ` p₁
 ```
 , and
 ```
-ψ₂ = ¬ ` p₀ ∧ (` p₁ ∨ ¬ ` p₂)
+--ψ₂ = ¬ ` p₀ ∧ (` p₁ ∨ ¬ ` p₂)
 ```
 are in NNF, while
 ```
-ψ₃ = ¬ ⊤
+--ψ₃ = ¬ ⊤
 ```
 ,
 ```
-ψ₄ = ¬ ¬ ` p₀
+--ψ₄ = ¬ ¬ ` p₀
 ```
 , and
 ```
-ψ₅ = ¬ (` p₀ ∨ ` p₁)
+--ψ₅ = ¬ (` p₀ ∨ ` p₁)
 ```
 are not, as we automatically check:
 
 :::::::::::::
 
 ```
-_ : All? NNF? ([ ψ₀ ψ₁ ψ₂ ]) ×? All? (~?_ ∘ NNF?) ([ ψ₃ ψ₄ ψ₅ ]) ≡ yes _
-_ = refl
+--_ : All? NNF? ([ ψ₀ ψ₁ ψ₂ ]) ×? All? (~?_ ∘ NNF?) ([ ψ₃ ψ₄ ψ₅ ]) ≡ yes _
+--_ = refl
+```
+
+## Remove implications and bi-implications
+
+```
+removeImp : Formula → Formula
+removeImp ⊥ = ⊥
+removeImp ⊤ = ⊤
+removeImp (` p) = ` p
+removeImp (¬ φ) = ¬ removeImp φ
+removeImp (φ ∨ ψ) = removeImp φ ∨ removeImp ψ
+removeImp (φ ∧ ψ) = removeImp φ ∧ removeImp ψ
+removeImp (φ ⇒ ψ) = ¬ removeImp φ ∨ removeImp ψ
+removeImp (φ ⇔ ψ) with φ́ ← removeImp φ | ψ́ ← removeImp ψ
+  = (¬ φ́ ∨ ψ́) ∧ (φ́ ∨ ¬ ψ́)
+
+removeImp-sound : ∀ φ → φ ⟺ removeImp φ
+removeImp-sound ⊥ ϱ = refl
+removeImp-sound ⊤ ϱ = refl
+removeImp-sound (` p) ϱ = refl
+removeImp-sound (¬ φ) ϱ
+  rewrite removeImp-sound φ ϱ = refl
+removeImp-sound (φ ∨ ψ) ϱ
+  rewrite removeImp-sound φ ϱ |
+          removeImp-sound ψ ϱ = refl
+removeImp-sound (φ ∧ ψ) ϱ
+  rewrite removeImp-sound φ ϱ |
+          removeImp-sound ψ ϱ = refl
+removeImp-sound (φ ⇒ ψ) ϱ
+  rewrite removeImp-sound φ ϱ |
+          removeImp-sound ψ ϱ |
+          expandImplies (removeImp φ) (removeImp ψ) ϱ = refl
+removeImp-sound (φ ⇔ ψ) ϱ
+  rewrite removeImp-sound φ ϱ |
+          removeImp-sound ψ ϱ |
+          expandIff (removeImp φ) (removeImp ψ) ϱ = refl
+
+removeImp-impFree : ∀ φ → Formula[⊥,⊤,¬,∨,∧] (removeImp φ)
+removeImp-impFree ⊥ = ⊥
+removeImp-impFree ⊤ = ⊤
+removeImp-impFree (` p) = ` p
+removeImp-impFree (¬ φ) = ¬ removeImp-impFree φ
+removeImp-impFree (φ ∨ ψ) = removeImp-impFree φ ∨ removeImp-impFree ψ
+removeImp-impFree (φ ∧ ψ) = removeImp-impFree φ ∧ removeImp-impFree ψ
+removeImp-impFree (φ ⇒ ψ) = (¬ removeImp-impFree φ) ∨ removeImp-impFree ψ
+removeImp-impFree (φ ⇔ ψ) = ((¬ removeImp-impFree φ) ∨ removeImp-impFree ψ) ∧
+                              (removeImp-impFree φ ∨ (¬ removeImp-impFree ψ))
 ```
 
 ## Transformation to NNF
 
-Naive NNF definition:
-
 ```
-nnf : Formula[⊥,⊤,¬,∨,∧] φ → Formula
-nnf ⊥ = ⊥
-nnf ⊤ = ⊤
-nnf (` p) = ` p
-nnf (¬ ⊥) = ⊤
-nnf (¬ ⊤) = ⊥
-nnf (¬ ` p) = ¬ ` p
-nnf (¬ ¬ φ) = nnf φ
-nnf (¬ (φ ∨ ψ)) = nnf (¬ φ) ∧ nnf (¬ ψ)
-nnf (¬ (φ ∧ ψ)) = nnf (¬ φ) ∨ nnf (¬ ψ)
-nnf (φ ∨ ψ) = nnf φ ∨ nnf ψ
-nnf (φ ∧ ψ) = nnf φ ∧ nnf ψ
-
-nnf-NNF : (view : Formula[⊥,⊤,¬,∨,∧] φ) → NNF (nnf view)
-nnf-NNF ⊥ = ⊥
-nnf-NNF ⊤ = ⊤
-nnf-NNF (` p) = ` p
-nnf-NNF (¬ ⊥) = ⊤
-nnf-NNF (¬ ⊤) = ⊥
-nnf-NNF (¬ (` p)) = ¬` p
-nnf-NNF (¬ (¬ φ)) = nnf-NNF φ
-nnf-NNF (¬ (φ ∨ ψ)) = nnf-NNF (¬ φ) ∧ nnf-NNF (¬ ψ)
-nnf-NNF (¬ (φ ∧ ψ)) = nnf-NNF (¬ φ) ∨ nnf-NNF (¬ ψ)
-nnf-NNF (φ ∨ ψ) = nnf-NNF φ ∨ nnf-NNF ψ
-nnf-NNF (φ ∧ ψ) = nnf-NNF φ ∧ nnf-NNF ψ
-
-nnf-sound : (view-φ : Formula[⊥,⊤,¬,∨,∧] φ) → φ ⟺ nnf view-φ
-nnf¬′-sound : (view-φ : Formula[⊥,⊤,¬,∨,∧] φ) → ¬ φ ⟺ nnf (¬ view-φ)
-
-nnf-sound ⊥ ϱ = refl
-nnf-sound ⊤ ϱ = refl
-nnf-sound (` p) ϱ = refl
-nnf-sound (¬ φ) = nnf¬′-sound φ
-nnf-sound (φ ∨ ψ) ϱ
-  rewrite nnf-sound φ ϱ |
-          nnf-sound ψ ϱ = refl
-nnf-sound (φ ∧ ψ) ϱ
-  rewrite nnf-sound φ ϱ |
-          nnf-sound ψ ϱ = refl
-
--- nnf-sound ⊥ ϱ = refl
--- nnf-sound ⊤ ϱ = refl
--- nnf-sound (` p) ϱ = refl
--- nnf-sound (¬ ⊥) ϱ = refl
--- nnf-sound (¬ ⊤) ϱ = refl
--- nnf-sound (¬ (` p)) ϱ = refl
-
--- nnf-sound (¬ (¬ φ)) ϱ = {!!}
--- --  rewrite nnf-sound φ ϱ = {!!} -- doubleNegationLaw φ ϱ
-  
--- nnf-sound {¬ (φ′ ∨ ψ′)} (¬ (φ ∨ ψ)) = goal where -- termination issue!
-
---   indφ :  ¬ φ′ ⟺ nnf (¬ φ)
---   indφ = nnf-sound (¬ φ)
-  
---   indψ : ¬ ψ′ ⟺ nnf (¬ ψ)
---   indψ = nnf-sound (¬ ψ)
-
---   have : ¬ φ′ ∧ ¬ ψ′ ⟺ nnf (¬ φ) ∧ nnf (¬ ψ)
---   have = cong2F (¬ φ′) (¬ ψ′) (nnf (¬ φ)) (nnf (¬ ψ)) (` p₀ ∧ ` p₁) p₀ p₁ indφ indψ
-  
---   goal : ¬ (φ′ ∨ ψ′) ⟺ nnf (¬ φ) ∧ nnf (¬ ψ)
---   goal = trans-⟺ (¬ (φ′ ∨ ψ′)) (¬ φ′ ∧ ¬ ψ′) (nnf (¬ φ) ∧ nnf (¬ ψ)) (deMorganOr φ′ ψ′) have
-          
--- nnf-sound (¬ (φ ∧ ψ)) ϱ = {!!}
--- nnf-sound (φ ∨ ψ) ϱ = {!!}
--- nnf-sound (φ ∧ ψ) ϱ = {!!}
-
-nnf¬′-sound ⊥ ϱ = refl
-nnf¬′-sound ⊤ ϱ = refl
-nnf¬′-sound (` p) ϱ = refl
-nnf¬′-sound (¬ φ) ϱ
-  rewrite nnf-sound φ ϱ = doubleNegationLaw (nnf φ) ϱ
-  
-nnf¬′-sound {φ₀ ∨ ψ₀} (φ ∨ ψ) ϱ
-  rewrite deMorganOr φ₀ ψ₀ ϱ |
-          nnf¬′-sound φ ϱ |
-          nnf¬′-sound ψ ϱ = refl
-          
-nnf¬′-sound {φ₀ ∧ ψ₀} (φ ∧ ψ) ϱ
-  rewrite deMorganAnd φ₀ ψ₀ ϱ |
-          nnf¬′-sound φ ϱ |
-          nnf¬′-sound ψ ϱ = refl
-```
-
-It works with internal correctness:
-
-```
-nnf′ : Formula[⊥,⊤,¬,∨,∧] φ → ∃[ ψ ] NNF ψ × φ ⟺ ψ
-nnf′ ⊥ = ⊥ , ⊥ , λ a → refl
-nnf′ ⊤ = ⊤ , ⊤ , λ a → refl
-nnf′ (` p) = ` p , ` p , λ a → refl
-nnf′ (¬ ⊥) = ⊤ , ⊤ , λ a → refl
-nnf′ (¬ ⊤) = ⊥ , ⊥ , λ a → refl
-nnf′ (¬ (` p)) = ¬ ` p , ¬` p , λ a → refl
-
-nnf′ {¬ ¬ φ′} (¬ (¬ φ)) with nnf′ φ
-... | ψ , NNFψ , ind = ψ , NNFψ , correctness where
-
-  correctness : ¬ ¬ φ′ ⟺ ψ
-  correctness = trans-⟺  (¬ ¬ φ′) φ′ ψ (doubleNegationLaw φ′) ind 
-
-nnf′ {¬ (φ₀′ ∨ φ₁′)} (¬ (φ₀ ∨ φ₁))
-  with nnf′ (¬ φ₀) |
-       nnf′ (¬ φ₁)
-... | ψ₀ , NNFψ₀ , ind-ψ₀ | ψ₁ , NNFψ₁ , ind-ψ₁ = ψ₀ ∧ ψ₁ , NNFψ₀ ∧ NNFψ₁ , correctness where
-
-  have : ¬ φ₀′ ∧ ¬ φ₁′ ⟺ ψ₀ ∧ ψ₁
-  have = cong2F (¬ φ₀′) (¬ φ₁′) ψ₀ ψ₁ (` p₀ ∧ ` p₁) p₀ p₁ ind-ψ₀ ind-ψ₁ 
-  
-  correctness : ¬ (φ₀′ ∨ φ₁′) ⟺ ψ₀ ∧ ψ₁
-  correctness = trans-⟺ (¬ (φ₀′ ∨ φ₁′)) (¬ φ₀′ ∧ ¬ φ₁′) (ψ₀ ∧ ψ₁) (deMorganOr φ₀′ φ₁′) have
-
-nnf′ {¬ (φ₀′ ∧ φ₁′)} (¬ (φ₀ ∧ φ₁))
-  with nnf′ (¬ φ₀) |
-       nnf′ (¬ φ₁)
-... | ψ₀ , NNFψ₀ , ind-ψ₀ | ψ₁ , NNFψ₁ , ind-ψ₁ = ψ₀ ∨ ψ₁ , NNFψ₀ ∨ NNFψ₁ , correctness where
-
-  have : ¬ φ₀′ ∨ ¬ φ₁′ ⟺ ψ₀ ∨ ψ₁
-  have = cong2F (¬ φ₀′) (¬ φ₁′) ψ₀ ψ₁ (` p₀ ∨ ` p₁) p₀ p₁ ind-ψ₀ ind-ψ₁ 
-  
-  correctness : ¬ (φ₀′ ∧ φ₁′) ⟺ ψ₀ ∨ ψ₁
-  correctness = trans-⟺ (¬ (φ₀′ ∧ φ₁′)) (¬ φ₀′ ∨ ¬ φ₁′) (ψ₀ ∨ ψ₁) (deMorganAnd φ₀′ φ₁′) have
-  
-nnf′ {φ₀′ ∨ φ₁′} (φ₀ ∨ φ₁)
-  with nnf′ φ₀ |
-       nnf′ φ₁
-... | ψ₀ , NNFψ₀ , ind-ψ₀ | ψ₁ , NNFψ₁ , ind-ψ₁ = ψ₀ ∨ ψ₁ , NNFψ₀ ∨ NNFψ₁ , correctness where
-
-  correctness : φ₀′ ∨ φ₁′ ⟺ ψ₀ ∨ ψ₁
-  correctness = cong2F φ₀′ φ₁′ ψ₀ ψ₁ (` p₀ ∨ ` p₁) p₀ p₁ ind-ψ₀ ind-ψ₁
-
-nnf′ {φ₀′ ∧ φ₁′} (φ₀ ∧ φ₁)
-  with nnf′ φ₀ |
-       nnf′ φ₁
-... | ψ₀ , NNFψ₀ , ind-ψ₀ | ψ₁ , NNFψ₁ , ind-ψ₁ = ψ₀ ∧ ψ₁ , NNFψ₀ ∧ NNFψ₁ , correctness where
-
-  correctness : φ₀′ ∧ φ₁′ ⟺ ψ₀ ∧ ψ₁
-  correctness = cong2F φ₀′ φ₁′ ψ₀ ψ₁ (` p₀ ∧ ` p₁) p₀ p₁ ind-ψ₀ ind-ψ₁
+nnf : Formula → Formula
+nnf = wnnf ∘ removeImp ∘ simplify
 ```
 
 Example:
 
 ```
---_ : dfst (nnf (¬ ¬ (` p₀ ⇒ ¬ (` p₁ ∧ ` p₂)))) ≡ ¬ ` p₀ ∨ ¬ ` p₁ ∨ ¬ ` p₂
---_ = refl 
-```
-
-## Extended negation normal form {#ENNF}
-
-Put here the one without blowup.
-
-```
-data ENNF : Formula → Set where
-  ⊤ : ENNF ⊤
-  ⊥ : ENNF ⊥
-  `_ : (p : PropName) → ENNF (` p)
-  ¬`_ : (p : PropName) → ENNF (¬ ` p)
-  _∧_ : ∀ {φ ψ} → ENNF φ → ENNF ψ → ENNF (φ ∧ ψ)
-  _∨_ : ∀ {φ ψ} → ENNF φ → ENNF ψ → ENNF (φ ∨ ψ)
-  _⇒_ : ∀ {φ ψ} → ENNF φ → ENNF ψ → ENNF (φ ⇒ ψ)
-  _⇔_ : ∀ {φ ψ} → ENNF φ → ENNF ψ → ENNF (φ ⇔ ψ)
-```
-
-Computation.
-
-```
-ennf : ∀ φ → ∃[ ψ ] ENNF ψ × φ ⟺ ψ
--- nnf¬ : ∀ {n} (φ : Formula n) → Σ (Formula n) λ ψ → NNF ψ × ¬ φ ⟺ ψ
-
-ennf ⊤ = ⊤ , ⊤ , λ ρ → refl 
-ennf ⊥ =  ⊥  , ⊥ , λ ρ → refl 
-ennf (` x) = ` x , ` x , λ ρ → refl
-
-ennf (φ ∧ ψ) with ennf φ | ennf ψ
-... | ennfφ , ENNFφ , φ⟺ennfφ
-    | ennfψ , ENNFψ , ψ⟺ennfψ = ennfφ ∧ ennfψ , ENNFφ ∧ ENNFψ , correctness where
-
-    correctness : φ ∧ ψ ⟺ ennfφ ∧ ennfψ
-    correctness ρ = cong2 _∧𝔹_ (φ⟺ennfφ ρ) (ψ⟺ennfψ ρ)
-
-ennf (φ ∨ ψ) with ennf φ | ennf ψ
-... | nnfφ , NNFφ , φ⟺nnfφ
-    | nnfψ , NNFψ , ψ⟺nnfψ = nnfφ ∨ nnfψ , NNFφ ∨ NNFψ , correctness where
-
-    correctness : φ ∨ ψ ⟺ nnfφ ∨ nnfψ
-    correctness ρ = cong2 _∨𝔹_ (φ⟺nnfφ ρ) (ψ⟺nnfψ ρ)
-
-ennf (φ ⇒ ψ) with ennf φ | ennf ψ
-... | ennfφ , ENNFφ , φ⟺ennfφ
-    | ennfψ , ENNFψ , ψ⟺ennfψ = ennfφ ⇒ ennfψ , ENNFφ ⇒ ENNFψ , correctness where
-
-    correctness : φ ⇒ ψ ⟺ ennfφ ⇒ ennfψ
-    correctness ρ = begin
-      ⟦ φ ⇒ ψ ⟧ ρ ≡⟨ cong2 _⇒𝔹_ (φ⟺ennfφ ρ) (ψ⟺ennfψ ρ) ⟩
-      ⟦ ennfφ ⇒ ennfψ ⟧ ρ ∎
-
-ennf (φ ⇔ ψ) with ennf φ | ennf ψ
-... | ennfφ , ENNFφ , φ⟺ennfφ
-    | ennfψ , ENNFψ , ψ⟺ennfψ = ennfφ ⇔ ennfψ , ENNFφ ⇔ ENNFψ , correctness where
-
-    correctness : φ ⇔ ψ ⟺ ennfφ ⇔ ennfψ
-    correctness ρ = begin
-      ⟦ φ ⇔ ψ ⟧ ρ ≡⟨ cong2 _⇔𝔹_ (φ⟺ennfφ ρ) (ψ⟺ennfψ ρ) ⟩
-      ⟦ ennfφ ⇔ ennfψ ⟧ ρ ∎
-
-ennf (¬ ⊤) =  ⊥ , ⊥ , λ ρ → refl
-ennf (¬ ⊥) =  ⊤ , ⊤ , λ ρ → refl
-ennf (¬ ` p) =  ¬ ` p , ¬` p , λ ρ → refl
-
-ennf (¬ ¬ φ) with ennf φ
-... | ennfφ , ENNFφ , φ⟺ennfφ = ennfφ , ENNFφ , correctness where
-
-  correctness : ¬ ¬ φ ⟺ ennfφ
-  correctness ρ = begin
-    ⟦ ¬ ¬ φ ⟧ ρ ≡⟨ doubleNegationLaw φ ρ ⟩
-    ⟦ φ ⟧ ρ ≡⟨ φ⟺ennfφ ρ ⟩
-    ⟦ ennfφ ⟧ ρ ∎
-
-ennf (¬ (φ ∧ ψ)) with ennf (¬ φ) | ennf (¬ ψ)
-... | ennf¬φ , ENNF¬φ , ¬φ⟺ennf¬φ
-    | ennf¬ψ , ENNF¬ψ , ¬ψ⟺ennf¬ψ = ennf¬φ ∨ ennf¬ψ , ENNF¬φ ∨ ENNF¬ψ , correctness where
-
-    correctness : ¬ (φ ∧ ψ) ⟺ ennf¬φ ∨ ennf¬ψ
-    correctness ρ = begin
-      ⟦ ¬ (φ ∧ ψ) ⟧ ρ ≡⟨ deMorganAnd φ ψ ρ ⟩
-      ⟦ ¬ φ ∨ ¬ ψ ⟧ ρ ≡⟨⟩
-      ⟦ ¬ φ ⟧ ρ ∨𝔹 ⟦ ¬ ψ ⟧ ρ ≡⟨ cong2 _∨𝔹_ (¬φ⟺ennf¬φ ρ) (¬ψ⟺ennf¬ψ ρ) ⟩
-      ⟦ ennf¬φ ⟧ ρ ∨𝔹 ⟦ ennf¬ψ ⟧ ρ ≡⟨⟩
-      ⟦ ennf¬φ ∨ ennf¬ψ ⟧ ρ ∎
-
-ennf (¬ (φ ∨ ψ)) with ennf (¬ φ) | ennf (¬ ψ)
-... | ennf¬φ , ENNF¬φ , ¬φ⟺ennf¬φ
-    | ennf¬ψ , ENNF¬ψ , ¬ψ⟺ennf¬ψ = ennf¬φ ∧ ennf¬ψ , ENNF¬φ ∧ ENNF¬ψ , correctness where
-
-    correctness : ¬ (φ ∨ ψ) ⟺ ennf¬φ ∧ ennf¬ψ
-    correctness ρ = begin
-      ⟦ ¬ (φ ∨ ψ) ⟧ ρ ≡⟨ deMorganOr φ ψ ρ ⟩
-      ⟦ ¬ φ ∧ ¬ ψ ⟧ ρ ≡⟨⟩
-      ⟦ ¬ φ ⟧ ρ ∧𝔹 ⟦ ¬ ψ ⟧ ρ ≡⟨ cong2 _∧𝔹_ (¬φ⟺ennf¬φ ρ) (¬ψ⟺ennf¬ψ ρ) ⟩
-      ⟦ ennf¬φ ⟧ ρ ∧𝔹 ⟦ ennf¬ψ ⟧ ρ ≡⟨⟩
-      ⟦ ennf¬φ ∧ ennf¬ψ ⟧ ρ ∎
-
-ennf (¬ (φ ⇒ ψ)) with ennf φ | ennf (¬ ψ)
-... | ennfφ , ENNFφ , φ⟺ennfφ
-    | ennf¬ψ , ENNF¬ψ , ¬ψ⟺ennf¬ψ = ennfφ ∧ ennf¬ψ , ENNFφ ∧ ENNF¬ψ , correctness where
-
-    correctness : ¬ (φ ⇒ ψ) ⟺ ennfφ ∧ ennf¬ψ
-    correctness ρ = begin
-      ⟦ ¬ (φ ⇒ ψ) ⟧ ρ ≡⟨ semantics¬⇒𝔹 _ _ ⟩
-      ⟦ φ ∧ ¬ ψ ⟧ ρ ≡⟨ cong2 _∧𝔹_ (φ⟺ennfφ ρ) (¬ψ⟺ennf¬ψ ρ) ⟩
-      ⟦ ennfφ ∧ ennf¬ψ ⟧ ρ ∎
-
-ennf (¬ (φ ⇔ ψ)) with ennf (¬ φ) | ennf ψ
-... | ennf¬φ , ENNF¬φ , ¬φ⟺ennf¬φ
-    | ennfψ , ENNFψ , ψ⟺ennfψ = ennf¬φ ⇔ ennfψ , ENNF¬φ ⇔ ENNFψ , correctness where
-
-    correctness : ¬ (φ ⇔ ψ) ⟺ ennf¬φ ⇔ ennfψ
-    correctness ρ = begin
-      ⟦ ¬ (φ ⇔ ψ) ⟧ ρ ≡⟨ push¬⇔𝔹 _ _ ⟩
-      ⟦ (¬ φ ⇔ ψ) ⟧ ρ ≡⟨ cong2 _⇔𝔹_ (¬φ⟺ennf¬φ ρ) (ψ⟺ennfψ ρ) ⟩
-      ⟦ ennf¬φ ⇔ ennfψ ⟧ ρ ∎
-```
-
-Example:
-```
-_ : dfst (ennf (¬ ¬ (` p₀ ⇒ ¬ (` p₁ ∧ ` p₂)))) ≡ ` p₀ ⇒ ¬ ` p₁ ∨ ¬ ` p₂
+_ : nnf (¬ ¬ (` p₀ ⇒ ¬ (` p₁ ∧ ` p₂ ∧ ⊤))) ≡ ¬ ` p₀ ∨ ¬ ` p₁ ∨ ¬ ` p₂
 _ = refl 
 ```
 
-# Formula size
+## Correctness
 
-When defining functions on formulas,
-a straightforward structural induction often suffices.
-<!-- as in `props` [above](#occurring-propositions) -->
-However, this is not always the case, and for more complicated recursive definitions
-we need to use other forms of recursion,
-such as [well-founded recursion](../../part0/wf). TODO: FIX THIS LINK.
-In such situations, it is useful to have a notion of *size* of a formula in order to show that the size decreases at each step.
-The definition of formula size is given by structural induction on `Formula`:
+### Structure
 
 ```
-size : Formula → ℕ
-size ⊤ = 1
-size ⊥ = 1
-size (` _) = 1
-size (¬ φ) = 1 + size φ
-size (φ ∧ ψ) = 1 + size φ + size ψ
-size (φ ∨ ψ) = 1 + size φ + size ψ
-size (φ ⇒ ψ) = 1 + size φ + size ψ
-size (φ ⇔ ψ) = 1 + size φ + size ψ
+wnnf-impFree : ∀ φ → Formula[⊥,⊤,¬,∨,∧] φ → NNF (wnnf φ)
+wnnf-impFree ⊥ ⊥ = ⊥
+wnnf-impFree ⊤ ⊤ = ⊤
+wnnf-impFree (` p) (` p) = ` p
+wnnf-impFree (¬ _) (¬ ⊥) = ⊤
+wnnf-impFree (¬ _) (¬ ⊤) = ⊥
+wnnf-impFree (¬ _) (¬ (` p)) = ¬` p
+wnnf-impFree (¬ ¬ φ) (¬ ¬ view-φ) = wnnf-impFree φ view-φ
+wnnf-impFree (¬ (φ ∨ ψ)) (¬ (view-φ ∨ view-ψ)) = wnnf-impFree (¬ φ) (¬ view-φ) ∧ wnnf-impFree (¬ ψ) (¬ view-ψ)
+wnnf-impFree (¬ (φ ∧ ψ)) (¬ (view-φ ∧ view-ψ)) = wnnf-impFree (¬ φ) (¬ view-φ) ∨ wnnf-impFree (¬ ψ) (¬ view-ψ)
+wnnf-impFree (φ ∨ ψ) (view-φ ∨ view-ψ) = wnnf-impFree φ view-φ ∨ wnnf-impFree ψ view-ψ
+wnnf-impFree (φ ∧ ψ) (view-φ ∧ view-ψ) = wnnf-impFree φ view-φ ∧ wnnf-impFree ψ view-ψ
+
+nnf-NNF : ∀ φ → NNF (nnf φ)
+nnf-NNF φ = wnnf-impFree (removeImp (simplify φ)) (removeImp-impFree (simplify φ))
 ```
 
-!example(#example:size)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In the example formula `φ₀`, we have:
+### Soundness
 
 ```
-_ : size φ₀ ≡ 6
-_ = refl
-```
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-!exercise(#exercise:size-neg)(`size-¬`)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Prove that !ref(size) satisfies the following two inequalities:
-
-```
-size-¬ : ∀ φ → size φ ≤ size (¬ φ)
-size-¬¬ : ∀ φ → size φ ≤ size (¬ ¬ φ)
+nnf-sound : ∀ φ → φ ⟺ nnf φ
+nnf-sound φ ϱ
+  rewrite sym (wnnf-sound (removeImp (simplify φ)) ϱ) |
+          sym (removeImp-sound (simplify φ) ϱ) |
+          sym (simplify-sound φ ϱ) = refl
 ```
 
-(This will be used in the chapter on [Normal Forms](../../part1/NormalForms).)
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-```
-size-¬ _ = n≤sucn
-size-¬¬ φ = trans-≤ (size-¬ φ) (size-¬ (¬ φ)) 
-```
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-
-We show that the NNF formula produced by [`ennf`](#ennf) has size linear in the input.
-
-```
-ennf' : Formula → Formula
-ennf' φ = dfst (ennf φ)
-
-ennf-size  : ∀ φ → size (ennf' φ) ≤ 2 * size φ
-```
-
-In order to prove [`ennf-size`](#ennf-size) above,
-it is useful to have the following stronger invariant for negated formulas.
-
-```
-ennf-size¬ : ∀ φ → size (ennf' (¬ φ)) ≤ 2 * size φ
-```
-
-We can now proceed to prove [`ennf-size`](#ennf-size) and [`ennf-size¬`](#ennf-size¬) by mutual induction.
-The last four cases follow a similar pattern.
-We first abstract the pattern and then apply it several times.
-
-```
-size-reasoning : (a b c d : ℕ) (_ : a ≤ 2 * c) (_ : b ≤ 2 * d) → 1 + a + b ≤ 2 * (1 + c + d)
-```
-
-```
-ennf-size ⊤ = s≤s 0≤n
-ennf-size ⊥ = s≤s 0≤n
-ennf-size (` p) = s≤s 0≤n
-
-ennf-size (¬ φ) with ennf-size¬ φ
-... | ind¬φ = begin≤
-  size (ennf' (¬ φ)) ≤⟨ ind¬φ ⟩
-  2 * size φ ≤⟨ cong-≤ (Num 2 *C □) (size-¬ φ) ⟩
-  2 * size (¬ φ) ∎≤
-
-ennf-size (φ ∧ ψ) with ennf-size φ | ennf-size ψ
-... | indφ | indψ = begin≤
-  size (ennf' (φ ∧ ψ)) ≤⟨⟩
-  size (ennf' φ ∧ ennf' ψ) ≤⟨⟩
-  1 + size (ennf' φ) + size (ennf' ψ) ≤⟨ size-reasoning _ _ (size φ) _ indφ indψ ⟩
-  2 * (1 + size φ + size ψ) ≤⟨⟩
-  2 * size (φ ∧ ψ) ∎≤
-```
-
-The last three cases are similar and we give them in a shortened form.
-
-```
-ennf-size (φ ∨ ψ) = size-reasoning _ _ (size φ) _ (ennf-size φ) (ennf-size ψ)
-ennf-size (φ ⇒ ψ) = size-reasoning _ _ (size φ) _ (ennf-size φ) (ennf-size ψ)
-ennf-size (φ ⇔ ψ) = size-reasoning _ _ (size φ) _ (ennf-size φ) (ennf-size ψ)
-```
-
-Proof for negated formulas:
-```
-ennf-size¬ ⊤ = s≤s 0≤n
-ennf-size¬ ⊥ = s≤s 0≤n
-ennf-size¬ (` p) = s≤s (s≤s 0≤n)
-
--- double negation!
-ennf-size¬ (¬ φ) with ennf-size φ
-... | indφ = begin≤
-  size (ennf' (¬ ¬ φ)) ≤⟨⟩
-  size (ennf' φ) ≤⟨ indφ ⟩
-  2 * size φ ≤⟨ cong-≤ (Num 2 *C □) (size-¬ φ) ⟩
-  2 * size (¬ φ) ∎≤ 
-
-ennf-size¬ (φ ∧ ψ) = size-reasoning _ _ (size φ) _ (ennf-size¬ φ) (ennf-size¬ ψ)
-ennf-size¬ (φ ∨ ψ) = size-reasoning _ _ (size φ) _ (ennf-size¬ φ) (ennf-size¬ ψ)
-ennf-size¬ (φ ⇒ ψ) = size-reasoning _ _ (size φ) _ (ennf-size φ) (ennf-size¬ ψ)
-ennf-size¬ (φ ⇔ ψ) = size-reasoning _ _ (size φ) _ (ennf-size¬ φ) (ennf-size ψ)
-```
-
-We now prove the common workhorse...
-```
-size-reasoning a b c d a≤c b≤d = begin≤
-  1 + a + b
-    ≤≡⟨ assoc-+ {1} {a} ⟩
-  1 + ( a + b)
-    ≤⟨ {! cong2-≤ (Num 1 +C (□ fzero +C □ (fsuc fzero))) a≤c b≤d !} ⟩ --alternative: arithmetic expressions with variables
-  1 + (2 * c + 2 * d)
-    ≤≡⟨ cong (_+_ 1) (assocLeft-+* {2} {c}) ⟩
-  1 + 2 * (c + d)
-    ≤⟨ cong-≤ (□ +C Num _) 1≤2*1 ⟩
-  2 * 1 + 2 * (c + d)
-    ≤≡⟨ assocLeft-+* {2} {1} ⟩
-  2 * (1 + c + d) ∎≤
-```
-
-The worst-case behaviour is achieved when a single negation is pushed down to the leaves
-in a negation-free formula consisting of only [`∧`](#_∧_) and [`∨`](#_∨_)
-
-## Disjunctive normal form {#DNF}
+# Disjunctive normal form {#DNF}
 
 A *clause* `C` is a conjunction of literals `l1 ∧ ⋯ ∧ lm`.
 A formula is in  *disjunctive normal form* (DNF) if it is a disjunction of clauses `C1 ∨ ⋯ ∨ Cn`.
@@ -602,7 +871,7 @@ merge {φ ∧ φ'} {ψ} (Lφ , Cφ') Cψ with merge Cφ' Cψ
   correctness ρ rewrite ξ⟺φ'∧ψ ρ = sym (assoc-∧𝔹 _ _ _)
 ```
 
-### Case 1: DNF of a disjunction
+## Case 1: DNF of a disjunction
 
 ```
 DNF-∨ : ∀ {φ ψ} → DNF φ → DNF ψ → ∃[ ξ ] DNF ξ × ξ ⟺ φ ∨ ψ
@@ -621,7 +890,7 @@ DNF-∨ {φ ∨ ψ} {ξ} (Cφ , DNFψ) DNFξ with DNF-∨ DNFψ DNFξ
   correctness ρ rewrite η⟺ψ∨ξ ρ = sym (assoc-∨𝔹 _ _ _)
 ```
 
-### Case 2: DNF of a conjunction
+## Case 2: DNF of a conjunction
 
 * We first show how to add a single clause.
 
@@ -703,7 +972,7 @@ dnf {φ ∨ ψ} (NNFφ ∨ NNFψ) with dnf NNFφ | dnf NNFψ
   correctness ρ rewrite ξ⟺φ'∨ψ' ρ | φ'⟺φ ρ | ψ'⟺ψ ρ = refl
 ```
 
-## Conjunctive normal form {#CNF}
+# Conjunctive normal form {#CNF}
 
 CNF is dual to DNF.
 Is the exponential CNF transformation useful anywhere?

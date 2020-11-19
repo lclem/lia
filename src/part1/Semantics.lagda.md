@@ -1011,16 +1011,31 @@ Prove the folowing equivalences.
 *Hint:* Use the method of truth tables.
 
 ```
+expandImplies : ∀ φ ψ → φ ⇒ ψ ⟺ ¬ φ ∨ ψ
+expandIff : ∀ φ ψ → φ ⇔ ψ ⟺ (¬ φ ∨ ψ) ∧ (φ ∨ ¬ ψ)
 doubleNegationLaw : ∀ φ → ¬ ¬ φ ⟺ φ
 deMorganAnd : ∀ φ ψ → ¬ (φ ∧ ψ) ⟺ ¬ φ ∨ ¬ ψ
 deMorganOr : ∀ φ ψ → ¬ (φ ∨ ψ) ⟺ ¬ φ ∧ ¬ ψ
 deMorganOr-alt : ∀ φ ψ → φ ∨ ψ ⟺ ¬ (¬ φ ∧ ¬ ψ)
 deMorganImplies : ∀ φ ψ → ¬ (φ ⇒ ψ) ⟺ φ ∧ ¬ ψ
-deMorganIff : ∀ φ ψ → ¬ (φ ⇔ ψ) ⟺ ¬ φ ⇔ ψ
+deMorganIff-left : ∀ φ ψ → ¬ (φ ⇔ ψ) ⟺ ¬ φ ⇔ ψ
+deMorganIff-right : ∀ φ ψ → ¬ (φ ⇔ ψ) ⟺ φ ⇔ ¬ ψ
 ```
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
+expandImplies φ ψ ϱ with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ
+... | tt | tt = refl
+... | tt | ff = refl
+... | ff | tt = refl
+... | ff | ff = refl
+
+expandIff φ ψ ϱ with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ
+... | tt | tt = refl
+... | tt | ff = refl
+... | ff | tt = refl
+... | ff | ff = refl
+
 doubleNegationLaw φ ϱ with ⟦ φ ⟧ ϱ
 ... | tt = refl
 ... | ff = refl
@@ -1049,7 +1064,13 @@ deMorganImplies φ ψ ϱ with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ
 ... | ff | tt = refl
 ... | ff | ff = refl
 
-deMorganIff φ ψ ϱ with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ
+deMorganIff-left φ ψ ϱ with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ
+... | tt | tt = refl
+... | tt | ff = refl
+... | ff | tt = refl
+... | ff | ff = refl
+
+deMorganIff-right φ ψ ϱ with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ
 ... | tt | tt = refl
 ... | tt | ff = refl
 ... | ff | tt = refl
@@ -1826,25 +1847,25 @@ Notice how applying simplification deeply in the formula enables further simplif
 We show that the simplification procedure preserves the meaning of the formula:
 
 ```
-simplify1-correct : ∀ φ →
+simplify1-sound : ∀ φ →
   ----------------
   simplify1 φ ⟺ φ
 
-simplify-correct : ∀ φ →
+simplify-sound : ∀ φ →
   ---------------
   simplify φ ⟺ φ
 ```
 
 !hide
 ~~~~
-The definition of !ref(simplify1-correct) is by a case analysis based on !ref(simplifyView).
+The definition of !ref(simplify1-sound) is by a case analysis based on !ref(simplifyView).
 The use of the `--rewriting` option triggers automatic Boolean rewrites in the background
 (such as `ff ∨𝔹 b ≡ b`; c.f. [Booleans](../../part0/Booleans)),
 which makes the proof straightforward.
 ~~~~
 ~~~~
 ```
-simplify1-correct φ ϱ
+simplify1-sound φ ϱ
   with simplifyView φ
 ... | ¬⊥ = refl
 ... | ¬⊤ = refl
@@ -1871,32 +1892,32 @@ simplify1-correct φ ϱ
 
 !hide
 ~~~~
-The definition of !ref(simplify-correct) relies on !ref(simplify1-correct) and is by a routine structural induction.
+The definition of !ref(simplify-sound) relies on !ref(simplify1-sound) and is by a routine structural induction.
 ~~~~
 ~~~~
 ```
-simplify-correct ⊥ ϱ = refl
-simplify-correct ⊤ ϱ = refl
-simplify-correct (` p) ϱ = refl
-simplify-correct (¬ φ) ϱ
-  rewrite simplify1-correct (¬ simplify φ) ϱ |
-          simplify-correct φ ϱ = refl
-simplify-correct (φ ∨ ψ) ϱ
-  rewrite simplify1-correct (simplify φ ∨ simplify ψ) ϱ |
-          simplify-correct φ ϱ |
-          simplify-correct ψ ϱ = refl
-simplify-correct (φ ∧ ψ) ϱ
-  rewrite simplify1-correct (simplify φ ∧ simplify ψ) ϱ |
-          simplify-correct φ ϱ |
-          simplify-correct ψ ϱ = refl
-simplify-correct (φ ⇒ ψ) ϱ
-  rewrite simplify1-correct (simplify φ ⇒ simplify ψ) ϱ |
-          simplify-correct φ ϱ |
-          simplify-correct ψ ϱ = refl
-simplify-correct (φ ⇔ ψ) ϱ
-  rewrite simplify1-correct (simplify φ ⇔ simplify ψ) ϱ |
-          simplify-correct φ ϱ |
-          simplify-correct ψ ϱ = refl
+simplify-sound ⊥ ϱ = refl
+simplify-sound ⊤ ϱ = refl
+simplify-sound (` p) ϱ = refl
+simplify-sound (¬ φ) ϱ
+  rewrite simplify1-sound (¬ simplify φ) ϱ |
+          simplify-sound φ ϱ = refl
+simplify-sound (φ ∨ ψ) ϱ
+  rewrite simplify1-sound (simplify φ ∨ simplify ψ) ϱ |
+          simplify-sound φ ϱ |
+          simplify-sound ψ ϱ = refl
+simplify-sound (φ ∧ ψ) ϱ
+  rewrite simplify1-sound (simplify φ ∧ simplify ψ) ϱ |
+          simplify-sound φ ϱ |
+          simplify-sound ψ ϱ = refl
+simplify-sound (φ ⇒ ψ) ϱ
+  rewrite simplify1-sound (simplify φ ⇒ simplify ψ) ϱ |
+          simplify-sound φ ϱ |
+          simplify-sound ψ ϱ = refl
+simplify-sound (φ ⇔ ψ) ϱ
+  rewrite simplify1-sound (simplify φ ⇔ simplify ψ) ϱ |
+          simplify-sound φ ϱ |
+          simplify-sound ψ ϱ = refl
 ```
 ~~~~
 
