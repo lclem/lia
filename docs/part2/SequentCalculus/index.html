@@ -3,17 +3,17 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Part 1: Classical propositional logic 🚧 | Logic in Agda</title><!-- Begin Jekyll SEO tag v2.6.1 -->
+  <title>Gentzen's sequent calculus 🚧 | Logic in Agda</title><!-- Begin Jekyll SEO tag v2.6.1 -->
 <meta name="generator" content="Jekyll v3.9.0" />
-<meta property="og:title" content="Part 1: Classical propositional logic 🚧" />
+<meta property="og:title" content="Gentzen’s sequent calculus 🚧" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="Propositional and fist-order logic developed with the proof assistant Agda." />
 <meta property="og:description" content="Propositional and fist-order logic developed with the proof assistant Agda." />
-<link rel="canonical" href="/lia/part1/index/" />
-<meta property="og:url" content="/lia/part1/index/" />
+<link rel="canonical" href="/lia/part2/SequentCalculus/" />
+<meta property="og:url" content="/lia/part2/SequentCalculus/" />
 <meta property="og:site_name" content="Logic in Agda" />
 <script type="application/ld+json">
-{"url":"/lia/part1/index/","headline":"Part 1: Classical propositional logic 🚧","description":"Propositional and fist-order logic developed with the proof assistant Agda.","@type":"WebPage","@context":"https://schema.org"}</script>
+{"url":"/lia/part2/SequentCalculus/","headline":"Gentzen’s sequent calculus 🚧","description":"Propositional and fist-order logic developed with the proof assistant Agda.","@type":"WebPage","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/lia/assets/main.css">
   <!-- <link rel="stylesheet" href="/lia/assets/custom.css"> --><!-- Mathjax Support -->
@@ -56,18 +56,18 @@
         <article class="post">
 
     <header class="post-header">
-        <h1 class="post-title">Part 1: Classical propositional logic 🚧</h1>
+        <h1 class="post-title">Gentzen&#39;s sequent calculus 🚧</h1>
     </header>
   
     <p style="text-align:center;">
     
     
     
-    <a alt="Part" href="/lia/part1/index/">Part</a>
+    <a alt="Part" href="/lia/part2/index/">Part</a>
     &bullet;
     
     
-    <a alt="Source code" href="https://github.com/lclem/lia/blob/main/src/part1/index.lagda.md">Source</a>
+    <a alt="Source code" href="https://github.com/lclem/lia/blob/main/src/part2/SequentCalculus.lagda.md">Source</a>
     
     
     
@@ -77,52 +77,19 @@
     <div class="post-content">
         <h2>Contents</h2>    
         <ul class="section-nav">
-<li class="toc-entry toc-h1"><a href="#references">References</a></li>
-<li class="toc-entry toc-h1"><a href="#solutions">Solutions</a></li>
-</ul><pre class="Agda"><a id="63" class="Symbol">{-#</a> <a id="67" class="Keyword">OPTIONS</a> <a id="75" class="Pragma">--allow-unsolved-metas</a> <a id="98" class="Symbol">#-}</a>
+<li class="toc-entry toc-h1"><a href="#sequents">Sequents</a></li>
+</ul><pre class="Agda"><a id="52" class="Symbol">{-#</a> <a id="56" class="Keyword">OPTIONS</a> <a id="64" class="Pragma">--allow-unsolved-metas</a>  <a id="88" class="Symbol">#-}</a>
 
-<a id="103" class="Keyword">module</a> <a id="110" href="/lia/part1/index/" class="Module">part1.index</a> <a id="122" class="Keyword">where</a>
+<a id="93" class="Keyword">open</a> <a id="98" class="Keyword">import</a> <a id="105" href="/lia/part0/index/" class="Module">part0.index</a>
 
-<a id="129" class="Keyword">open</a> <a id="134" class="Keyword">import</a> <a id="141" href="/lia/part1/Semantics/" class="Module">part1.Semantics</a>
-<a id="157" class="Keyword">open</a> <a id="162" class="Keyword">import</a> <a id="169" href="/lia/part1/CharacteristicFormulas/" class="Module">part1.CharacteristicFormulas</a>
-<a id="198" class="Keyword">open</a> <a id="203" class="Keyword">import</a> <a id="210" href="/lia/part1/NormalForms/" class="Module">part1.NormalForms</a>
-<a id="228" class="Comment">--open import part1.Completeness</a>
-<a id="261" class="Comment">--open import part1.Resolution</a>
-<a id="292" class="Comment">--open import part1.Resolution-Completeness</a>
-<a id="336" class="Comment">--open import part1.Interpolation</a>
-<a id="370" class="Comment">--open import part1.Compactness</a></pre>
+<a id="118" class="Keyword">module</a> <a id="125" href="/lia/part2/SequentCalculus/" class="Module">part2.SequentCalculus</a> <a id="147" class="Symbol">(</a><a id="148" href="/lia/part2/SequentCalculus/#148" class="Bound">n'</a> <a id="151" class="Symbol">:</a> <a id="153" href="/lia/part0/Naturals/#146" class="Datatype">ℕ</a><a id="154" class="Symbol">)</a> <a id="156" class="Keyword">where</a>
+<a id="162" class="Keyword">open</a> <a id="167" class="Keyword">import</a> <a id="174" href="/lia/part2/NaturalDeduction/" class="Module">part2.NaturalDeduction</a> <a id="197" href="/lia/part2/SequentCalculus/#148" class="Bound">n'</a> <a id="200" class="Keyword">public</a> <a id="207" class="Keyword">hiding</a> <a id="214" class="Symbol">(</a>_⊢_<a id="218" class="Symbol">)</a></pre>
 
-<ul>
-  <li>Mention the library [<a href="#ref-Prieto-CubidesGarzonSicard-Ramirez:zenodo:2018">Prieto-Cubides, Garzón, and
-Sicard-Ramı́rez(2018)</a>].
-Interesting points: normal forms NNF, DNF, and CNF are defined and
-it is shown that the normal form transformations preserve
-provability. In this way there is no need to resort to the
-semantics. In our approach, we would use soundness of the
-transformation (which is easier to establish) and then use the
-completeness theorem (which is a powerful property to have anyway).</li>
-</ul>
+<h1 id="sequents">
+<a class="anchor" href="#sequents" aria-hidden="true"><span class="octicon octicon-link"></span></a>Sequents</h1>
 
-<div id="refs" class="references csl-bib-body hanging-indent">
-
-  <h1 id="references">
-<a class="anchor" href="#references" aria-hidden="true"><span class="octicon octicon-link"></span></a>References</h1>
-
-  <div id="ref-Prieto-CubidesGarzonSicard-Ramirez:zenodo:2018" class="csl-entry">
-
-    <p>[Prieto-Cubides et al.(2018)] J Prieto-Cubides et al. <em>A library for
-classical propositional logic in agda</em>. Zenodo, October 2018.</p>
-
-  </div>
-
-</div>
-
-<h1 id="solutions">
-<a class="anchor" href="#solutions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Solutions</h1>
-
-<p>!solutions</p>
-
-<hr>
+<pre class="Agda"><a id="241" class="Keyword">infixr</a> <a id="248" class="Number">5</a> <a id="250" href="/lia/part2/SequentCalculus/#259" class="Datatype Operator">_⊢_</a>
+<a id="254" class="Keyword">data</a> <a id="_⊢_"></a><a id="259" href="/lia/part2/SequentCalculus/#259" class="Datatype Operator">_⊢_</a> <a id="263" class="Symbol">:</a> <a id="265" href="/lia/part2/NaturalDeduction/#2414" class="Function">Context</a> <a id="273" class="Symbol">→</a> <a id="275" href="/lia/part2/NaturalDeduction/#2414" class="Function">Context</a> <a id="283" class="Symbol">→</a> <a id="285" class="PrimitiveType">Set</a> <a id="289" class="Keyword">where</a></pre>
 
     </div>
   
@@ -130,11 +97,11 @@ classical propositional logic in agda</em>. Zenodo, October 2018.</p>
     
     
     
-    <a alt="Part" href="/lia/part1/index/">Part</a>
+    <a alt="Part" href="/lia/part2/index/">Part</a>
     &bullet;
     
     
-    <a alt="Source code" href="https://github.com/lclem/lia/blob/main/src/part1/index.lagda.md">Source</a>
+    <a alt="Source code" href="https://github.com/lclem/lia/blob/main/src/part2/SequentCalculus.lagda.md">Source</a>
     
     
     
