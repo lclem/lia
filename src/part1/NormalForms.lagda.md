@@ -492,8 +492,11 @@ wnnf′ (φ₀ ⇔ φ₁) with wnnf′ φ₀ | wnnf′ φ₁
 
 ## Formula size
 
-it is useful to have a notion of *size* of a formula in order to show that the size decreases at each step.
-The definition of formula size is given by structural induction on `Formula`:
+One of the advantages of the !ref(WNNF) is to simplify the structure of the formula w.r.t. negation without negatively (pun not intended) impacting its size.
+As we will see, stronger normal forms such as !ref(NNF), !ref(DNF), and !ref(CNF) unavoidably cause an exponential blowup in the formula size.
+
+There are many ways to assign a size to a formula.
+We assign size one to atomic formulas !remoteRef(part1)(Semantics)(Formula)(⊥), !remoteRef(part1)(Semantics)(Formula)(⊤), and !remoteRef(part1)(Semantics)(Formula)(`_), and the size of non-atomic formulas is the sum of the sizes of their immediate subformulas increased by one:
 
 ```
 size : Formula → ℕ
@@ -507,12 +510,14 @@ size (φ ⇒ ψ) = 1 + size φ + size ψ
 size (φ ⇔ ψ) = 1 + size φ + size ψ
 ```
 
+In other words, the formula size is the number of nodes of the formula seen as a tree.
+
 !example(#example:size)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In the example formula `φ₀`, we have:
+The size of the previous formula ``ψ₂ = ¬ ` p₀ ⇒ (` p₁ ⇔ ¬ ` p₂) `` is `7`:
 
 ```
-_ : size φ₀ ≡ 6
+_ : size ψ₂ ≡ 7
 _ = refl
 ```
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -527,7 +532,7 @@ size-¬ : ∀ φ → size φ ≤ size (¬ φ)
 size-¬¬ : ∀ φ → size φ ≤ size (¬ ¬ φ)
 ```
 
-(This will be used in the chapter on [Normal Forms](../../part1/NormalForms).)
+(This will be used below.)
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -537,25 +542,78 @@ size-¬¬ φ = trans-≤ (size-¬ φ) (size-¬ (¬ φ))
 ```
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We show that the NNF formula produced by [`wnnf`](#wnnf) has size linear in the input.
+We need to find an estimate of the formula size blowup incurred by !ref(wnnf).
+First of all, an equality of the form `size (wnnf φ) ≡ e` where `e` is some simple arithmetic function of `size φ`
+will not work, since there are formulas of the same size for which the size of their !ref(WNNF) differ,
+such as `` ¬ ¬ ` p₀ `` and `` ` p₀ ∧ ` p₁ `` (both of size 3),
+whose !ref(WNNF) have size 1 and, resp., 3.
+
+We thus need to guess an inequality `size (wnnf φ) ≤ e`.
+We make an "educated guess" and assume that the !ref(WNNF) satisfies an inequality of the form
+
+    size (wnnf φ) ≤ a * size φ + b,
+
+where `a` and `b` are integer parameter whose values have to be found.
+We now setup some constraints on `a` and `b` based on the shape of `φ`.
+When `φ ≡ ⊥` is an atomic formula, we have `size (wnnf ⊥) ≤ a * size ⊥ + b`,
+yielding the constraint (since `wnnf ⊥ = ⊥` and `size ⊥ = 1`)
+
+    1 ≤ a + b.
+
+The same constraint is obtained for the cases `φ ≡ ⊤` and `` φ ≡ ` p ``.
+When `φ ≡ ψ ∨ ξ` is a disjunction, for the l.h.s. we have
+`size (wnnf (ψ ∨ ξ)) = size (wnnf ψ ∨ wnnf ξ) = 1 + size (wnnf ψ) + size (wnnf ξ)`
+which by inductive assumption is `≤ 1 + (a * size ψ + b) + (a * size ξ + b)`,
+and for the r.h.s. we have `a * size (ψ ∨ ξ) + b ≡ a * (1 + size ψ + size ξ) + b`.
+Putting the two together we must have `1 + (a * size ψ + b) + (a * size ξ + b) ≤ a * (1 + size ψ + size ξ) + b`,
+which after some simplification yields
+
+    1 + b ≤ a.
+
+The same constraint is obtained for the other binary connectives.
+When `φ ≡ ¬ (ψ ∨ ξ)`, for the l.h.s. we have
+`size (wnnf (¬ (ψ ∨ ξ))) = size (wnnf (¬ ψ) ∧ wnnf (¬ ξ)) = 1 + size (wnnf (¬ ψ)) + size (wnnf (¬ ξ))`
+which by inductive assumption is `≤ 1 + (a * (1 + size ψ) + b) + (a * (1 + size ξ) + b)`,
+and for the r.h.s. we have `a * size (¬ (ψ ∨ ξ)) + b ≡ a * (2 + size ψ + size ξ) + b`.
+Putting the two together we must have `1 + (a * (1 + size ψ) + b) + (a * (1 + size ξ) + b) ≤ a * (2 + size ψ + size ξ) + b`,
+which after some simplification yields
+
+    1 + b ≤ 0.
+
+The same constraint is obtained in the dual case `φ ≡ ¬ (ψ ∧ ξ)`.
+When `φ ≡ ¬ (ψ ⇒ ξ)`
+
+The same constraint is obtained in the dual case `φ ≡ ¬ (ψ ⇔ ξ)`.
+
+
+The second observation we can make is that sometimes the formula gets smaller (e.g., when removing a double negation `¬ ¬ φ`),
+and sometimes it gets larger,
+e.g., when a negation is pushed inside a conjunction `¬ (φ ∧ ψ)` of size `` (or disjunction),
+then it is pushed inside both subformulas  `¬ φ ∧ ¬ ψ`.
+
+We can now state, and prove, that [`wnnf`](#wnnf) produces an !ref(WNNF) formula with a linear size blowup:
 
 ```
 wnnf-size : ∀ φ → size (wnnf φ) ≤ 2 * size φ
 ```
 
 In order to prove [`wnnf-size`](#wnnf-size) above,
-it is useful to have the following stronger invariant for negated formulas.
+we will need the following stronger invariant for negated formulas:
 
 ```
 wnnf-size¬ : ∀ φ → size (wnnf (¬ φ)) ≤ 2 * size φ
 ```
 
+(This is indeed stronger since `wnnf-size (¬ φ) : size (wnnf (¬ φ)) ≤ 2 * (1 + size φ)`.)
 We can now proceed to prove [`wnnf-size`](#wnnf-size) and [`wnnf-size¬`](#wnnf-size¬) by mutual induction.
-The last four cases follow a similar pattern.
-We first abstract the pattern and then apply it several times.
+During the proof we will use the following simple arithmetic reasoning (which we prove at the end):
 
 ```
-size-reasoning : ({a b} c {d} : ℕ) (_ : a ≤ 2 * c) (_ : b ≤ 2 * d) → 1 + a + b ≤ 2 * (1 + c + d)
+size-reasoning : ∀ {a b} c {d} →
+  a ≤ 2 * c →
+  b ≤ 2 * d →
+  ---------------------------
+  1 + a + b ≤ 2 * (1 + c + d)
 ```
 
 ```
@@ -623,8 +681,11 @@ size-reasoning {a} {b} c {d} a≤c b≤d = begin≤
   2 * (1 + c + d) ∎≤
 ```
 
-The worst-case behaviour is achieved when a single negation is pushed down to the leaves
-in a negation-free formula consisting of only [`∧`](#_∧_) and [`∨`](#_∨_).
+The worst case of the !ref(WNNF) translation is achieved when a single negation is pushed inside a formula of size `2*n` the form `` ¬ (` p₁ ∨ ⋯ ∨ ` pₙ) ``,
+yielding a !ref(WNNF) formula `` ¬ ` p₁ ∨ ⋯ ∨ ¬ ` pₙ `` of size `3*n-1`.
+While this is not quite a doubling in formula size and thus the bound in !ref(wnnf-size) is not tight,
+we stick to the current upper bound for simplicity.
+
 
 # Negation normal form {#NNF}
 
