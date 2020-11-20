@@ -114,7 +114,7 @@
 <pre class="Agda"><a id="134" class="Symbol">{-#</a> <a id="138" class="Keyword">OPTIONS</a> <a id="146" class="Pragma">--allow-unsolved-metas</a> <a id="169" class="Pragma">--confluence-check</a> <a id="188" class="Pragma">--rewriting</a> <a id="200" class="Symbol">#-}</a>
 <a id="204" class="Keyword">open</a> <a id="209" class="Keyword">import</a> <a id="216" href="/lia/part0/index/" class="Module">part0.index</a>
 
-<a id="229" class="Keyword">module</a> <a id="236" href="/lia/part1/Semantics/" class="Module">part1.Semantics</a> <a id="252" class="Symbol">(</a><a id="253" href="/lia/part1/Semantics/#253" class="Bound">n'</a> <a id="256" class="Symbol">:</a> <a id="258" href="/lia/part0/Naturals/#146" class="Datatype">ℕ</a><a id="259" class="Symbol">)</a> <a id="261" class="Keyword">where</a></pre>
+<a id="229" class="Keyword">module</a> <a id="236" href="/lia/part1/Semantics/" class="Module">part1.Semantics</a> <a id="252" class="Symbol">(</a><a id="253" href="/lia/part1/Semantics/#253" class="Bound">n'</a> <a id="256" class="Symbol">:</a> <a id="258" href="/lia/part0/Naturals/#177" class="Datatype">ℕ</a><a id="259" class="Symbol">)</a> <a id="261" class="Keyword">where</a></pre>
 
 <h1 id="syntax">
 <a class="anchor" href="#syntax" aria-hidden="true"><span class="octicon octicon-link"></span></a>Syntax</h1>
@@ -139,7 +139,7 @@ that</p>
 us to name a fixed but arbitrary number of distinct propositions,
 leading to the following definition (we omit the type annotation <code class="language-plaintext highlighter-rouge">Set</code>).</p>
 
-<pre class="Agda"><a id="n"></a><a id="1058" href="/lia/part1/Semantics/#1058" class="Function">n</a> <a id="1060" class="Symbol">=</a> <a id="1062" class="Number">3</a> <a id="1064" href="/lia/part0/Naturals/#3582" class="Function Operator">+</a> <a id="1066" href="/lia/part1/Semantics/#253" class="Bound">n'</a>
+<pre class="Agda"><a id="n"></a><a id="1058" href="/lia/part1/Semantics/#1058" class="Function">n</a> <a id="1060" class="Symbol">=</a> <a id="1062" class="Number">3</a> <a id="1064" href="/lia/part0/Naturals/#3613" class="Function Operator">+</a> <a id="1066" href="/lia/part1/Semantics/#253" class="Bound">n'</a>
 <a id="PropName"></a><a id="1069" href="/lia/part1/Semantics/#1069" class="Function">PropName</a> <a id="1078" class="Symbol">=</a> <a id="1080" href="/lia/part0/Finite/#133" class="Datatype">Fin</a> <a id="1084" href="/lia/part1/Semantics/#1058" class="Function">n</a></pre>
 
 <p>In examples, we use <a href="#p%E2%82%80"><code class="language-plaintext highlighter-rouge">p₀</code></a> , <a href="#p%E2%82%81"><code class="language-plaintext highlighter-rouge">p₁</code></a> , and <a href="#p%E2%82%82"><code class="language-plaintext highlighter-rouge">p₂</code></a> as the
@@ -282,7 +282,7 @@ constructors (connectives).</p>
 <p>We can injectively map elements of <code class="language-plaintext highlighter-rouge">Connective</code> to the natural numbers
 <code class="language-plaintext highlighter-rouge">ℕ</code> in the obvious way.</p>
 
-<pre class="Agda"><a id="c2ℕ"></a><a id="6290" href="/lia/part1/Semantics/#6290" class="Function">c2ℕ</a> <a id="6294" class="Symbol">:</a> <a id="6296" href="/lia/part1/Semantics/#6113" class="Datatype">Connective</a> <a id="6307" class="Symbol">→</a> <a id="6309" href="/lia/part0/Naturals/#146" class="Datatype">ℕ</a>
+<pre class="Agda"><a id="c2ℕ"></a><a id="6290" href="/lia/part1/Semantics/#6290" class="Function">c2ℕ</a> <a id="6294" class="Symbol">:</a> <a id="6296" href="/lia/part1/Semantics/#6113" class="Datatype">Connective</a> <a id="6307" class="Symbol">→</a> <a id="6309" href="/lia/part0/Naturals/#177" class="Datatype">ℕ</a>
 <a id="6311" href="/lia/part1/Semantics/#6290" class="Function">c2ℕ</a> <a id="6315" href="/lia/part1/Semantics/#6138" class="InductiveConstructor">True</a> <a id="6320" class="Symbol">=</a> <a id="6322" class="Number">0</a>
 <a id="6324" href="/lia/part1/Semantics/#6290" class="Function">c2ℕ</a> <a id="6328" href="/lia/part1/Semantics/#6143" class="InductiveConstructor">False</a> <a id="6334" class="Symbol">=</a> <a id="6336" class="Number">1</a>
 <a id="6338" href="/lia/part1/Semantics/#6290" class="Function">c2ℕ</a> <a id="6342" href="/lia/part1/Semantics/#6149" class="InductiveConstructor">Not</a> <a id="6346" class="Symbol">=</a> <a id="6348" class="Number">2</a>
@@ -2122,7 +2122,7 @@ function updates. <a href="#fnref:5" class="reversefootnote" role="doc-backlink
     
 </p>
 
-    <p class="p-name"> Last-modified: Nov 20 11:37:19 2020 </p>
+    <p class="p-name"> Last-modified: Nov 20 16:08:00 2020 </p>
   </article>
       </div>
     </main><footer class="site-footer h-card">
