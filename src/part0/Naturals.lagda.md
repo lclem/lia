@@ -77,6 +77,7 @@ n≤sucn : ∀ {n} → n ≤ suc n
 n≤sucn {zero} = 0≤n
 n≤sucn {suc n} = s≤s n≤sucn
 
+postulate m≤n→m≤sucn : ∀ {m n} → m ≤ n → m ≤ suc n
 postulate n≤sucsucn : ∀ {n} → n ≤ suc (suc n)
 
 suc-< : ∀ {m n : ℕ} → suc m < suc n → m < n
@@ -228,8 +229,26 @@ infixl 6 _∸_
 
 _∸_ : ℕ → ℕ → ℕ
 m     ∸ zero   =  m
-zero  ∸ n  =  zero
+zero  ∸ suc n  =  zero
 suc m ∸ suc n  =  m ∸ n
+
+sucm∸n≤suc[m∸n] : ∀ m n → suc m ∸ n ≤ suc (m ∸ n)
+sucm∸n≤suc[m∸n] zero zero = s≤s 0≤n
+sucm∸n≤suc[m∸n] zero (suc zero) = 0≤n
+sucm∸n≤suc[m∸n] zero (suc (suc n)) = 0≤n
+sucm∸n≤suc[m∸n] (suc m) zero = s≤s (s≤s refl-≤)
+sucm∸n≤suc[m∸n] (suc m) (suc n) = sucm∸n≤suc[m∸n] m n
+
+m∸n≤m : ∀ m n → m ∸ n ≤ m
+m∸n≤m zero zero = 0≤n
+m∸n≤m zero (suc n) = 0≤n
+m∸n≤m (suc m) n
+  with m∸n≤m m n
+... | ind = begin≤
+  suc m ∸ n ≤⟨ sucm∸n≤suc[m∸n] m n ⟩
+  suc (m ∸ n) ≤⟨ s≤s (m∸n≤m m n) ⟩
+  suc m ∎≤
+
 ```
 
 ## Arithmetic expressions
