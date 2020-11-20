@@ -552,7 +552,7 @@ We make an "educated guess" and assume that the !ref(WNNF) satisfies an inequali
 
     size (wnnf φ) ≤ a * size φ + b,
 
-where `a` and `b` are integer parameter whose values have to be found.
+where `a` and `b` are integer parameters whose values have to be found.
 We now setup some constraints on `a` and `b` based on the shape of `φ`.
 When `φ ≡ ⊥` is an atomic formula, we have `size (wnnf ⊥) ≤ a * size ⊥ + b`,
 yielding the constraint (since `wnnf ⊥ ≡ ⊥` and `size ⊥ ≡ 1`)
@@ -610,6 +610,7 @@ wnnf-size-¬ : ∀ φ → size (wnnf (¬ φ)) ≤ 2 * size φ
 
 !hide
 ~~~~
+For negated formulas, !ref(wnnf-size-¬) provides an upper bound stronger than !ref(wnnf-size).
 The proof proceeds by structural induction using some elementary arithmetical facts.
 ~~~~
 ~~~~
@@ -706,10 +707,17 @@ wnnf-size-¬ (φ ⇔ ψ) = size-reasoning-¬2 (size φ) (size ψ) (wnnf-size φ)
 ```
 ~~~~
 
+!exercise(#exercise-wnnf-tight)
+~~~~
+On which kind of formulas does the !ref(WNNF) translation performed by !ref(wnnf) achieve maximal blow-up?
+Is the bound provided by !ref(wnnf-size-¬) tight?
+~~~~
+~~~~
 The worst case of the !ref(WNNF) translation is achieved when a single negation is pushed inside a formula of size `2*n` the form `` ¬ (` p₁ ∨ ⋯ ∨ ` pₙ) ``,
 yielding a !ref(WNNF) formula `` ¬ ` p₁ ∨ ⋯ ∨ ¬ ` pₙ `` of size `3*n-1`.
-Notice that the bound given by !ref(wnnf-size-¬) in this case would be `4*n`,
+The bound given by !ref(wnnf-size-¬) in this case would be `4*n`,
 which thus is not tight in general.
+~~~~
 
 # Negation normal form {#NNF}
 
