@@ -3,12 +3,12 @@ title: "Normal forms 🚧"
 ---
 
 ```
-{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --allow-unsolved-metas --rewriting --confluence-check #-}
 open import part0.index
 
 module part1.NormalForms (n : ℕ) where
 open import part1.Semantics n hiding (∅)
-
+ 
 private
   variable
     φ ψ : Formula
@@ -556,13 +556,13 @@ We make an "educated guess" and assume that the !ref(WNNF) satisfies an inequali
 where `a` and `b` are integer parameter whose values have to be found.
 We now setup some constraints on `a` and `b` based on the shape of `φ`.
 When `φ ≡ ⊥` is an atomic formula, we have `size (wnnf ⊥) ≤ a * size ⊥ + b`,
-yielding the constraint (since `wnnf ⊥ = ⊥` and `size ⊥ = 1`)
+yielding the constraint (since `wnnf ⊥ ≡ ⊥` and `size ⊥ ≡ 1`)
 
     1 ≤ a + b.
 
 The same constraint is obtained for the cases `φ ≡ ⊤` and `` φ ≡ ` p ``.
 When `φ ≡ ψ ∨ ξ` is a disjunction, for the l.h.s. we have
-`size (wnnf (ψ ∨ ξ)) = size (wnnf ψ ∨ wnnf ξ) = 1 + size (wnnf ψ) + size (wnnf ξ)`
+`size (wnnf (ψ ∨ ξ)) ≡ size (wnnf ψ ∨ wnnf ξ) ≡ 1 + size (wnnf ψ) + size (wnnf ξ)`
 which by inductive assumption is `≤ 1 + (a * size ψ + b) + (a * size ξ + b)`,
 and for the r.h.s. we have `a * size (ψ ∨ ξ) + b ≡ a * (1 + size ψ + size ξ) + b`.
 Putting the two together we must have `1 + (a * size ψ + b) + (a * size ξ + b) ≤ a * (1 + size ψ + size ξ) + b`,
@@ -571,8 +571,17 @@ which after some simplification yields
     1 + b ≤ a.
 
 The same constraint is obtained for the other binary connectives.
+When `φ ≡ ¬ ¬ ψ`, for the l.h.s. we have
+`size (wnnf (¬ ¬ ψ)) ≡ size (wnnf ψ)`
+which by inductive assumption is `≤ a * size ψ + b`,
+and for the r.h.s. we have `a * size (¬ ¬ ψ) + b ≡ a * (2 + size ψ) + b`.
+Putting the two together we must have `a * size ψ + b ≤ a * (2 + size ψ) + b`,
+which after some simplification yields
+
+    0 ≤ a * 2.
+
 When `φ ≡ ¬ (ψ ∨ ξ)`, for the l.h.s. we have
-`size (wnnf (¬ (ψ ∨ ξ))) = size (wnnf (¬ ψ) ∧ wnnf (¬ ξ)) = 1 + size (wnnf (¬ ψ)) + size (wnnf (¬ ξ))`
+`size (wnnf (¬ (ψ ∨ ξ))) ≡ size (wnnf (¬ ψ) ∧ wnnf (¬ ξ)) ≡ 1 + size (wnnf (¬ ψ)) + size (wnnf (¬ ξ))`
 which by inductive assumption is `≤ 1 + (a * (1 + size ψ) + b) + (a * (1 + size ξ) + b)`,
 and for the r.h.s. we have `a * size (¬ (ψ ∨ ξ)) + b ≡ a * (2 + size ψ + size ξ) + b`.
 Putting the two together we must have `1 + (a * (1 + size ψ) + b) + (a * (1 + size ξ) + b) ≤ a * (2 + size ψ + size ξ) + b`,
@@ -581,9 +590,121 @@ which after some simplification yields
     1 + b ≤ 0.
 
 The same constraint is obtained in the dual case `φ ≡ ¬ (ψ ∧ ξ)`.
-When `φ ≡ ¬ (ψ ⇒ ξ)`
+When `φ ≡ ¬ (ψ ⇒ ξ)`, for the l.h.s. we have
+`size (wnnf (¬ (ψ ⇒ ξ))) ≡ size (wnnf ψ ∧ wnnf (¬ ξ)) ≡ 1 + size (wnnf ψ) + size (wnnf (¬ ξ))`
+which by inductive assumption is `≤ 1 + (a * size ψ + b) + (a * (1 + size ξ) + b)`,
+and for the r.h.s. we have `a * size (¬ (ψ ⇒ ξ)) + b ≡ a * (2 + size ψ + size ξ) + b`.
+Putting the two together we must have `1 + (a * size ψ + b) + (a * (1 + size ξ) + b) ≤ a * (2 + size ψ + size ξ) + b`,
+which after some simplification yields
 
-The same constraint is obtained in the dual case `φ ≡ ¬ (ψ ⇔ ξ)`.
+    1 + b ≤ a.
+
+The same constraint is obtained in the case `φ ≡ ¬ (ψ ⇔ ξ)`.
+The optimal solution for all the constraints above is `a ≡ 2` and `b ≡ - 1`.
+This yields the following inductive statement:
+
+```
+wnnf-size : ∀ φ → size (wnnf φ) ≤ 2 * size φ ∸ 1
+wnnf-size-¬ : ∀ φ → size (wnnf (¬ φ)) ≤ 2 * size (¬ φ) ∸ 2
+```
+
+!hide
+~~~~
+PROOF
+~~~~
+~~~~
+```
+size-reasoning : ∀ {a b} c d →
+  a ≤ 2 * c ∸ 1 →
+  b ≤ 2 * d ∸ 1 →
+  -------------------------------
+  1 + a + b ≤ 2 * (1 + c + d) ∸ 1
+
+size-reasoning-¬ : ∀ {a b} c d →
+  a ≤ c + suc c →
+  b ≤ d + suc d →
+  -------------------------------
+  1 + a + b ≤ 2 * (2 + c + d) ∸ 1
+
+size-reasoning-¬' : ∀ {a b} c d →
+  a ≤ 2 * c ∸ 1 →
+  b ≤ d + suc d →
+  -------------------------------
+  1 + a + b ≤ 2 * (2 + c + d) ∸ 1
+  
+size-reasoning-¬ = {!!}
+size-reasoning-¬' = {!!}
+
+wnnf-size ⊥ = s≤s 0≤n
+
+wnnf-size ⊤ = s≤s 0≤n
+
+wnnf-size (` p) = s≤s 0≤n
+
+wnnf-size (¬ φ) = {!!}
+
+-- wnnf-size (¬ ⊥) = s≤s 0≤n
+
+-- wnnf-size (¬ ⊤) = s≤s 0≤n
+
+-- wnnf-size (¬ (` p)) = s≤s (s≤s 0≤n)
+
+-- wnnf-size (¬ (¬ φ))
+--   with wnnf-size φ
+-- ... | indφ = begin≤
+--   size (wnnf (¬ ¬ φ)) ≤⟨⟩
+--   size (wnnf φ) ≤⟨ indφ ⟩
+--   2 * size φ ∸ 1 ≤⟨ {! cong-≤ (Num 2 *C □ ∸C 1) (size-¬¬ φ) !} ⟩ -- need contexts with monus in positive positions
+--   2 * size (¬ ¬ φ) ∸ 1 ∎≤
+
+-- wnnf-size (¬ (φ ∨ ψ))
+--   with wnnf-size (¬ φ) | wnnf-size (¬ ψ)
+-- ... | ind¬φ | ind¬ψ = begin≤
+--    size (wnnf (¬ (φ ∨ ψ))) ≤⟨⟩
+--    size (wnnf (¬ φ) ∨ wnnf (¬ ψ)) ≤⟨⟩
+--    1 + size (wnnf (¬ φ)) + size (wnnf (¬ ψ)) ≤⟨ size-reasoning-¬ {size (wnnf (¬ φ))} {size (wnnf (¬ ψ))} (size φ) (size ψ) ind¬φ ind¬ψ ⟩
+--    2 * (2 + size φ + size ψ) ∸ 1 ≤⟨⟩
+--    2 * size (¬ (φ ∨ ψ)) ∸ 1 ∎≤
+
+-- wnnf-size (¬ (φ ∧ ψ))
+--   with wnnf-size (¬ φ) | wnnf-size (¬ ψ)
+-- ... | ind¬φ | ind¬ψ = size-reasoning-¬ {size (wnnf (¬ φ))} {size (wnnf (¬ ψ))} (size φ) (size ψ) ind¬φ ind¬ψ
+
+-- wnnf-size (¬ (φ ⇒ ψ))
+--   with wnnf-size φ | wnnf-size (¬ ψ)
+-- ... | indφ | ind¬ψ = begin≤
+--    size (wnnf (¬ (φ ⇒ ψ))) ≤⟨⟩
+--    size (wnnf φ ⇒ wnnf (¬ ψ)) ≤⟨⟩
+--    1 + size (wnnf φ) + size (wnnf (¬ ψ)) ≤⟨ size-reasoning-¬' {size (wnnf φ)} {size (wnnf (¬ ψ))} (size φ) (size ψ) indφ ind¬ψ ⟩
+--    2 * (2 + size φ + size ψ) ∸ 1 ≤⟨⟩
+--    2 * size (¬ (φ ⇒ ψ)) ∸ 1 ∎≤
+
+-- wnnf-size (¬ (φ ⇔ ψ))
+--    with wnnf-size φ | wnnf-size (¬ ψ)
+-- ... | indφ | ind¬ψ = size-reasoning-¬' {size (wnnf φ)} {size (wnnf (¬ ψ))} (size φ) (size ψ) indφ ind¬ψ
+
+wnnf-size (φ ∨ ψ)
+  with wnnf-size φ | wnnf-size ψ
+... | indφ | indψ = begin≤
+   size (wnnf (φ ∨ ψ)) ≤⟨⟩
+   size (wnnf φ ∨ wnnf ψ) ≤⟨⟩
+   1 + size (wnnf φ) + size (wnnf ψ) ≤⟨ size-reasoning (size φ) (size ψ) indφ indψ ⟩
+   2 * size (φ ∨ ψ) ∸ 1 ∎≤
+
+wnnf-size (φ ∧ ψ) = size-reasoning (size φ) (size ψ) (wnnf-size φ) (wnnf-size ψ)
+wnnf-size (φ ⇒ ψ) = size-reasoning (size φ) (size ψ) (wnnf-size φ) (wnnf-size ψ)
+wnnf-size (φ ⇔ ψ) = size-reasoning (size φ) (size ψ) (wnnf-size φ) (wnnf-size ψ)
+
+wnnf-size-¬ ⊥ = {!!}
+wnnf-size-¬ ⊤ = {!!}
+wnnf-size-¬ (` p) = {!!}
+wnnf-size-¬ (¬ φ) = {!!}
+wnnf-size-¬ (φ ∨ ψ) = {! size-reasoning (size φ) (size ψ) (wnnf-size-¬ φ) (wnnf-size-¬ ψ) !}
+wnnf-size-¬ (φ ∧ ψ) = {!!}
+wnnf-size-¬ (φ ⇒ ψ) = {!!}
+wnnf-size-¬ (φ ⇔ ψ) = {!!}
+```
+~~~~
 
 
 The second observation we can make is that sometimes the formula gets smaller (e.g., when removing a double negation `¬ ¬ φ`),
@@ -594,14 +715,14 @@ then it is pushed inside both subformulas  `¬ φ ∧ ¬ ψ`.
 We can now state, and prove, that [`wnnf`](#wnnf) produces an !ref(WNNF) formula with a linear size blowup:
 
 ```
-wnnf-size : ∀ φ → size (wnnf φ) ≤ 2 * size φ
+-- wnnf-size : ∀ φ → size (wnnf φ) ≤ 2 * size φ
 ```
 
 In order to prove [`wnnf-size`](#wnnf-size) above,
 we will need the following stronger invariant for negated formulas:
 
 ```
-wnnf-size¬ : ∀ φ → size (wnnf (¬ φ)) ≤ 2 * size φ
+-- wnnf-size¬ : ∀ φ → size (wnnf (¬ φ)) ≤ 2 * size φ
 ```
 
 (This is indeed stronger since `wnnf-size (¬ φ) : size (wnnf (¬ φ)) ≤ 2 * (1 + size φ)`.)
@@ -609,76 +730,79 @@ We can now proceed to prove [`wnnf-size`](#wnnf-size) and [`wnnf-size¬`](#wnnf-
 During the proof we will use the following simple arithmetic reasoning (which we prove at the end):
 
 ```
-size-reasoning : ∀ {a b} c {d} →
-  a ≤ 2 * c →
-  b ≤ 2 * d →
-  ---------------------------
-  1 + a + b ≤ 2 * (1 + c + d)
+-- size-reasoning : ∀ {a b} c {d} →
+--   a ≤ 2 * c →
+--   b ≤ 2 * d →
+--   ---------------------------
+--   1 + a + b ≤ 2 * (1 + c + d)
 ```
 
 ```
-wnnf-size ⊤ = s≤s 0≤n
-wnnf-size ⊥ = s≤s 0≤n
-wnnf-size (` p) = s≤s 0≤n
+-- wnnf-size ⊤ = s≤s 0≤n
+-- wnnf-size ⊥ = s≤s 0≤n
+-- wnnf-size (` p) = s≤s 0≤n
 
-wnnf-size (¬ φ) with wnnf-size¬ φ
-... | ind¬φ = begin≤
-  size (wnnf (¬ φ)) ≤⟨ ind¬φ ⟩
-  2 * size φ ≤⟨ cong-≤ (Num 2 *C □) (size-¬ φ) ⟩
-  2 * size (¬ φ) ∎≤
+-- wnnf-size (¬ φ) with wnnf-size¬ φ
+-- ... | ind¬φ = begin≤
+--   size (wnnf (¬ φ)) ≤⟨ ind¬φ ⟩
+--   2 * size φ ≤⟨ cong-≤ (Num 2 *C □) (size-¬ φ) ⟩
+--   2 * size (¬ φ) ∎≤
 
-wnnf-size (φ ∧ ψ) with wnnf-size φ | wnnf-size ψ
-... | indφ | indψ = begin≤
-  size (wnnf (φ ∧ ψ)) ≤⟨⟩
-  size (wnnf φ ∧ wnnf ψ) ≤⟨⟩
-  1 + size (wnnf φ) + size (wnnf ψ) ≤⟨ size-reasoning (size φ) indφ indψ ⟩
-  2 * (1 + size φ + size ψ) ≤⟨⟩
-  2 * size (φ ∧ ψ) ∎≤
+-- wnnf-size (φ ∧ ψ) with wnnf-size φ | wnnf-size ψ
+-- ... | indφ | indψ = begin≤
+--   size (wnnf (φ ∧ ψ)) ≤⟨⟩
+--   size (wnnf φ ∧ wnnf ψ) ≤⟨⟩
+--   1 + size (wnnf φ) + size (wnnf ψ) ≤⟨ size-reasoning (size φ) indφ indψ ⟩
+--   2 * (1 + size φ + size ψ) ≤⟨⟩
+--   2 * size (φ ∧ ψ) ∎≤
 ```
 
 The last three cases are similar and we give them in a shortened form.
 
 ```
-wnnf-size (φ ∨ ψ) = size-reasoning (size φ) (wnnf-size φ) (wnnf-size ψ)
-wnnf-size (φ ⇒ ψ) = size-reasoning (size φ) (wnnf-size φ) (wnnf-size ψ)
-wnnf-size (φ ⇔ ψ) = size-reasoning (size φ) (wnnf-size φ) (wnnf-size ψ)
+-- wnnf-size (φ ∨ ψ) = size-reasoning (size φ) (wnnf-size φ) (wnnf-size ψ)
+-- wnnf-size (φ ⇒ ψ) = size-reasoning (size φ) (wnnf-size φ) (wnnf-size ψ)
+-- wnnf-size (φ ⇔ ψ) = size-reasoning (size φ) (wnnf-size φ) (wnnf-size ψ)
 ```
 
 Proof for negated formulas:
+
 ```
-wnnf-size¬ ⊤ = s≤s 0≤n
-wnnf-size¬ ⊥ = s≤s 0≤n
-wnnf-size¬ (` p) = s≤s (s≤s 0≤n)
+-- wnnf-size¬ ⊤ = s≤s 0≤n
+-- wnnf-size¬ ⊥ = s≤s 0≤n
+-- wnnf-size¬ (` p) = s≤s (s≤s 0≤n)
 
--- double negation!
-wnnf-size¬ (¬ φ) with wnnf-size φ
-... | indφ = begin≤
-  size (wnnf (¬ ¬ φ)) ≤⟨⟩
-  size (wnnf φ) ≤⟨ indφ ⟩
-  2 * size φ ≤⟨ cong-≤ (Num 2 *C □) (size-¬ φ) ⟩
-  2 * size (¬ φ) ∎≤
+-- -- double negation!
+-- wnnf-size¬ (¬ φ) with wnnf-size φ
+-- ... | indφ = begin≤
+--   size (wnnf (¬ ¬ φ)) ≤⟨⟩
+--   size (wnnf φ) ≤⟨ indφ ⟩
+--   2 * size φ ≤⟨ cong-≤ (Num 2 *C □) (size-¬ φ) ⟩
+--   2 * size (¬ φ) ∎≤
 
-wnnf-size¬ (φ ∧ ψ) = size-reasoning (size φ) (wnnf-size¬ φ) (wnnf-size¬ ψ)
-wnnf-size¬ (φ ∨ ψ) = size-reasoning (size φ) (wnnf-size¬ φ) (wnnf-size¬ ψ)
-wnnf-size¬ (φ ⇒ ψ) = size-reasoning (size φ) (wnnf-size φ) (wnnf-size¬ ψ)
-wnnf-size¬ (φ ⇔ ψ) = size-reasoning (size φ) (wnnf-size φ) (wnnf-size¬ ψ)
+-- wnnf-size¬ (φ ∧ ψ) = size-reasoning (size φ) (wnnf-size¬ φ) (wnnf-size¬ ψ)
+-- wnnf-size¬ (φ ∨ ψ) = size-reasoning (size φ) (wnnf-size¬ φ) (wnnf-size¬ ψ)
+-- wnnf-size¬ (φ ⇒ ψ) = size-reasoning (size φ) (wnnf-size φ) (wnnf-size¬ ψ)
+-- wnnf-size¬ (φ ⇔ ψ) = size-reasoning (size φ) (wnnf-size φ) (wnnf-size¬ ψ)
 ```
 
 We now prove the common workhorse...
 
 ```
-size-reasoning {a} {b} c {d} a≤c b≤d = begin≤
-  1 + a + b
-    ≤≡⟨ assoc-+ {1} {a} ⟩
-  1 + ( a + b)
-    ≤⟨ {! cong2-≤ (Num 1 +C (□ fzero +C □ (fsuc fzero))) a≤c b≤d !} ⟩ --alternative: arithmetic expressions with variables
-  1 + (2 * c + 2 * d)
-    ≤≡⟨ cong (_+_ 1) (assocLeft-+* {2} {c}) ⟩
-  1 + 2 * (c + d)
-    ≤⟨ cong-≤ (□ +C Num _) 1≤2*1 ⟩
-  2 * 1 + 2 * (c + d)
-    ≤≡⟨ assocLeft-+* {2} {1} ⟩
-  2 * (1 + c + d) ∎≤
+-- size-reasoning {a} {b} c {d} a≤c b≤d = begin≤
+--   1 + a + b
+--     ≤≡⟨ assoc-+ {1} {a} ⟩
+--   1 + ( a + b)
+--     ≤⟨ {! cong2-≤ (Num 1 +C (□ fzero +C □ (fsuc fzero))) a≤c b≤d !} ⟩ --alternative: arithmetic expressions with variables
+--   1 + (2 * c + 2 * d)
+--     ≤≡⟨ cong (_+_ 1) (assocLeft-+* {2} {c}) ⟩
+--   1 + 2 * (c + d)
+--     ≤⟨ cong-≤ (□ +C Num _) 1≤2*1 ⟩
+--   2 * 1 + 2 * (c + d)
+--     ≤≡⟨ assocLeft-+* {2} {1} ⟩
+--   2 * (1 + c + d) ∎≤
+
+size-reasoning = {!!}
 ```
 
 The worst case of the !ref(WNNF) translation is achieved when a single negation is pushed inside a formula of size `2*n` the form `` ¬ (` p₁ ∨ ⋯ ∨ ` pₙ) ``,

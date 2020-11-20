@@ -62,7 +62,7 @@ fadd (suc m) k = fsuc (fadd m k)
 
 Fin-add-≢ : ∀ {m n} (i : Fin m) (j : Fin n) → Fin-monotone ≤+ i ≢ fadd m j
 Fin-add-≢ {zero} ()
-Fin-add-≢ {suc m} {n} (fsuc i) j eqv = Fin-add-≢ {m} {n} i j (inj-fsuc eqv)
+Fin-add-≢ {suc m} {n} (fsuc i) j eqv = Fin-add-≢ {m} {n} i j {! inj-fsuc eqv !} -- some issue created by REWRITE?
 
 ```
 

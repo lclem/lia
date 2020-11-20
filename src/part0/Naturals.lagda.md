@@ -3,7 +3,7 @@ title: Natural numbers🚧
 ---
 
 ```
-{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --allow-unsolved-metas --rewriting --confluence-check #-}
 
 module part0.Naturals where
 open import part0.Equality public
@@ -181,10 +181,15 @@ suc n + m = suc (n + m)
 
 -- usually the first two arguments are required...
 postulate assoc-+ : {l m n : ℕ} → l + m + n ≡ l + (m + n)
-postulate n+0≡n : {n : ℕ} → n + zero ≡ n
+
+n+0≡n : ∀ n → n + zero ≡ n
+n+0≡n zero = refl
+n+0≡n (suc n) rewrite n+0≡n n = refl
+
+{-# REWRITE n+0≡n #-}
+
 postulate sucm+n≡m+sucn : {m n : ℕ} → suc m + n ≡ m + suc n
 postulate suc-lemma : {m n : ℕ} → m + suc n ≡ suc m + n -- the commuting variant of the above
--- lemma-plus-zero = ?
 
 ≤+ : ∀ {m n} → m ≤ m + n
 ≤+ {zero} {n} = 0≤n
@@ -207,7 +212,8 @@ Examples (these will be useful thorough the book)
 ```
 
 ```
-postulate n*1≡n : ∀ {n} → n * suc zero ≡ n
+postulate n*1≡n : ∀ n → n * 1 ≡ n
+
 -- usually needs the first two arguments
 postulate assocLeft-+* : ∀ {a b c} → a * b + a * c ≡ a * (b + c)
 postulate cong-*< : ∀ {a b c} → a ≥ zero → b < c → a * b < a * c
@@ -215,11 +221,14 @@ postulate cong-*< : ∀ {a b c} → a ≥ zero → b < c → a * b < a * c
 
 postulate comm-+ : ∀ {m n} → m + n ≡ n + m
 
+{-# REWRITE n*1≡n  #-}
+
 -- monus
+infixl 6 _∸_
 
 _∸_ : ℕ → ℕ → ℕ
 m     ∸ zero   =  m
-zero  ∸ suc n  =  zero
+zero  ∸ n  =  zero
 suc m ∸ suc n  =  m ∸ n
 ```
 
