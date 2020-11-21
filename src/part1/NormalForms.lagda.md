@@ -707,7 +707,7 @@ wnnf-size-¬ (φ ⇔ ψ) = size-reasoning-¬2 (size φ) (size ψ) (wnnf-size φ)
 ```
 ~~~~
 
-!exercise(#exercise-wnnf-tight)
+!exercise(#exercise:wnnf-tight)
 ~~~~
 On which kind of formulas does the !ref(WNNF) translation performed by !ref(wnnf) achieve maximal blow-up?
 Is the bound provided by !ref(wnnf-size-¬) tight?
@@ -728,7 +728,7 @@ A propositional formula `φ` is in *negation normal form* (NNF) if it uses only 
 !remoteRef(part1)(Semantics)(Formula)(_∨_), and
 !remoteRef(part1)(Semantics)(Formula)(_∧_),
 and negation appears only in front of propositional variables, i.e., inside literals.
-In particular, a NNF formula does not contain the implication `⇒` and bi-implication `⇔` connectives.
+In other words, a NNF formula is a !ref(WNNF) without the implication !remoteRef(part1)(Semantics)(Formula)(_⇒_) and bi-implication !remoteRef(part1)(Semantics)(Formula)(_⇔_) connectives.
 This is captured by the following definition[^NNF-departure]:
 
 [^NNF-departure]: We slightly depart from a more standard definition of NNF,
@@ -749,7 +749,7 @@ data NNF : Formula → Set where
   _∨_ : NNF φ → NNF ψ → NNF (φ ∨ ψ)
 ```
 
-Given a formula `φ`, we can decide whether it is in NNF or not:
+Given a formula `φ`, we can decide whether it is in !ref(NNF) or not:
 
 ```
 NNF? : ∀ φ → Dec (NNF φ)
@@ -794,48 +794,90 @@ NNF? (_ ⇔ _) = no λ ()
 ~~~
 
 ```
---ψ₀ ψ₁ ψ₂ ψ₃ ψ₄ ψ₅ : Formula
+ξ₀ ξ₁ ξ₂ ξ₃ ξ₄ ξ₅ : Formula
 ```
 
 ::::::::::::: {.inlinecode}
 
 For instance, the formulas
 ```
---ψ₀ = ⊤
+ξ₀ = ⊤
 ```
-,
+and
 ```
---ψ₁ = ¬ ` p₀ ∨ ` p₁
+ξ₁ = ¬ ` p₀ ∨ ` p₁
 ```
-, and
+are in !ref(NNF), while the following formulas are not:
 ```
---ψ₂ = ¬ ` p₀ ∧ (` p₁ ∨ ¬ ` p₂)
+ξ₂ = ¬ ⊤
 ```
-are in NNF, while
+(negation not in front of a propositional variable) and
 ```
---ψ₃ = ¬ ⊤
+ξ₃ = ` p₀ ⇒ ` p₁
 ```
-,
-```
---ψ₄ = ¬ ¬ ` p₀
-```
-, and
-```
---ψ₅ = ¬ (` p₀ ∨ ` p₁)
-```
-are not, as we automatically check:
+(it contains an implication connective), as we automatically check:
 
 :::::::::::::
 
 ```
---_ : All? NNF? ([ ψ₀ ψ₁ ψ₂ ]) ×? All? (~?_ ∘ NNF?) ([ ψ₃ ψ₄ ψ₅ ]) ≡ yes _
---_ = refl
+_ : All? NNF? ([ ξ₀ ξ₁ ]) ×? All? (~?_ ∘ NNF?) ([ ξ₂ ξ₃ ]) ≡ yes _
+_ = refl
 ```
+
+!hide
+~~~
+The only difference between !ref(WNNF) and !ref(NNF) is that in the latter we addionally forbid implications and bi-implications.
+Moreover, if a formula does not contain implications/bi-implications in the first place,
+then !ref(wnnf) does not introduce them and thus it produces an !ref(NNF) formula:
+
+```
+wnnf-impFree : Formula[⊥,⊤,¬,∨,∧] φ → NNF (wnnf φ)
+```
+
+The proof proceeds by induction on the evidence that the formula is in the `Formula[⊥,⊤,¬,∨,∧]` form.
+~~~
+~~~
+```
+wnnf-impFree ⊥ = ⊥
+wnnf-impFree ⊤ = ⊤
+wnnf-impFree (` p) = ` p
+wnnf-impFree (¬ ⊥) = ⊤
+wnnf-impFree (¬ ⊤) = ⊥
+wnnf-impFree (¬ ` p) = ¬` p
+wnnf-impFree (¬ ¬ view-φ) = wnnf-impFree view-φ
+wnnf-impFree (¬ (view-φ ∨ view-ψ)) = wnnf-impFree (¬ view-φ) ∧ wnnf-impFree (¬ view-ψ)
+wnnf-impFree (¬ (view-φ ∧ view-ψ)) = wnnf-impFree (¬ view-φ) ∨ wnnf-impFree (¬ view-ψ)
+wnnf-impFree (view-φ ∨ view-ψ) = wnnf-impFree view-φ ∨ wnnf-impFree view-ψ
+wnnf-impFree (view-φ ∧ view-ψ) = wnnf-impFree view-φ ∧ wnnf-impFree view-ψ
+```
+~~~
+
+In order to transform a formula to !ref(NNF) we can
+
+1) Remove implications and bi-implications, and
+2) Transform the formula to !ref(WNNF).
+
+The second step is achieved by !ref(wnnf).
+In the next section we focus on the first step.
 
 ## Remove implications and bi-implications
 
+The function !ref(removeImp) below removes implications and bi-implications by expanding them according to the tautologies
+(c.f. !remoteRef(part1)(Semantics)(expandImplies), resp., !remoteRef(part1)(Semantics)(expandIff)):
+
+    φ ⇒ ψ ⟺ ¬ φ ∨ ψ
+    φ ⇔ ψ ⟺ (¬ φ ∨ ψ) ∧ (φ ∨ ¬ ψ)
+
+!hide
+~~~~
 ```
 removeImp : Formula → Formula
+removeImp-sound : ∀ φ → φ ⟺ removeImp φ
+```
+Both !ref(removeImp) and its soundness proof !ref(removeImp-sound) are defined by a customary structural induction.
+~~~~
+~~~~
+```
 removeImp ⊥ = ⊥
 removeImp ⊤ = ⊤
 removeImp (` p) = ` p
@@ -843,10 +885,12 @@ removeImp (¬ φ) = ¬ removeImp φ
 removeImp (φ ∨ ψ) = removeImp φ ∨ removeImp ψ
 removeImp (φ ∧ ψ) = removeImp φ ∧ removeImp ψ
 removeImp (φ ⇒ ψ) = ¬ removeImp φ ∨ removeImp ψ
-removeImp (φ ⇔ ψ) with φ́ ← removeImp φ | ψ́ ← removeImp ψ
+removeImp (φ ⇔ ψ)
+  with φ́ ← removeImp φ | ψ́ ← removeImp ψ
   = (¬ φ́ ∨ ψ́) ∧ (φ́ ∨ ¬ ψ́)
+```
 
-removeImp-sound : ∀ φ → φ ⟺ removeImp φ
+```
 removeImp-sound ⊥ ϱ = refl
 removeImp-sound ⊤ ϱ = refl
 removeImp-sound (` p) ϱ = refl
@@ -866,56 +910,80 @@ removeImp-sound (φ ⇔ ψ) ϱ
   rewrite removeImp-sound φ ϱ |
           removeImp-sound ψ ϱ |
           expandIff (removeImp φ) (removeImp ψ) ϱ = refl
+```
+~~~~
 
+!hide
+~~~~
+Unsurprisingly but importantly, `removeImp φ` does not contain either implications or bi-implications
+```
 removeImp-impFree : ∀ φ → Formula[⊥,⊤,¬,∨,∧] (removeImp φ)
+```
+~~~~
+~~~~
+```
 removeImp-impFree ⊥ = ⊥
 removeImp-impFree ⊤ = ⊤
 removeImp-impFree (` p) = ` p
 removeImp-impFree (¬ φ) = ¬ removeImp-impFree φ
 removeImp-impFree (φ ∨ ψ) = removeImp-impFree φ ∨ removeImp-impFree ψ
 removeImp-impFree (φ ∧ ψ) = removeImp-impFree φ ∧ removeImp-impFree ψ
-removeImp-impFree (φ ⇒ ψ) = (¬ removeImp-impFree φ) ∨ removeImp-impFree ψ
-removeImp-impFree (φ ⇔ ψ) = ((¬ removeImp-impFree φ) ∨ removeImp-impFree ψ) ∧
-                              (removeImp-impFree φ ∨ (¬ removeImp-impFree ψ))
+removeImp-impFree (φ ⇒ ψ) = ¬ removeImp-impFree φ ∨ removeImp-impFree ψ
+removeImp-impFree (φ ⇔ ψ) = (¬ removeImp-impFree φ ∨ removeImp-impFree ψ) ∧
+                              (removeImp-impFree φ ∨ ¬ removeImp-impFree ψ)
 ```
+~~~~
 
-## Transformation to NNF
+## Transformation to !ref(NNF)
+
+We are now ready to put the pieces together.
+The transformation to !ref(NNF) proceeds by simplifying the formula (this removes the zero-ary connectives `⊤` and `⊥`, even though we won't formally prove this is the case), by removing implications/bi-implications, and by transforming to !ref(WNNF):
 
 ```
 nnf : Formula → Formula
 nnf = wnnf ∘ removeImp ∘ simplify
 ```
 
-Example:
+::::::::::::: {.inlinecode}
+
+For example, the formula
+```
+ξ₄ = ¬ ¬ (` p₀ ⇒ ¬ (` p₁ ∧ ` p₂ ∧ ⊤))
+```
+is transformed to the !ref(NNF) formula
+```
+ξ₅ = ¬ ` p₀ ∨ ¬ ` p₁ ∨ ¬ ` p₂
+```
+as proved below:
+
+:::::::::::::
 
 ```
-_ : nnf (¬ ¬ (` p₀ ⇒ ¬ (` p₁ ∧ ` p₂ ∧ ⊤))) ≡ ¬ ` p₀ ∨ ¬ ` p₁ ∨ ¬ ` p₂
-_ = refl 
+_ : nnf ξ₄ ≡ ξ₅ × NNF? ξ₅ ≡ yes _
+_ = refl , refl
 ```
+
+!exercise(#exercise:nnf-complexity)
+~~~~
+What is the size blowup of !ref(nnf)? On which kind of formulas is it achieved?
+~~~~
+~~~~
+The !ref(nnf) transformation is exponential on formulas of the form `φ₀ ⇔ φ₁ ⇔ ⋯ ⇔ φₙ`,
+the culprit being !ref(removeImp):
+every time a bi-implication is removed the formula size doubles.
+Avoiding such blow-up is the main advantage of !ref(WNNF) over !ref(NNF), if the weaker form suffices.
+On the other hand, if there are no bi-implications, !ref(nnf) has linear complexity, pretty much like !ref(wnnf).
+~~~~
+
 
 ## Correctness
 
-### Structure
+The correctness of the !ref(NNF) translation follows from the previous considerations:
 
 ```
-wnnf-impFree : ∀ φ → Formula[⊥,⊤,¬,∨,∧] φ → NNF (wnnf φ)
-wnnf-impFree ⊥ ⊥ = ⊥
-wnnf-impFree ⊤ ⊤ = ⊤
-wnnf-impFree (` p) (` p) = ` p
-wnnf-impFree (¬ _) (¬ ⊥) = ⊤
-wnnf-impFree (¬ _) (¬ ⊤) = ⊥
-wnnf-impFree (¬ _) (¬ (` p)) = ¬` p
-wnnf-impFree (¬ ¬ φ) (¬ ¬ view-φ) = wnnf-impFree φ view-φ
-wnnf-impFree (¬ (φ ∨ ψ)) (¬ (view-φ ∨ view-ψ)) = wnnf-impFree (¬ φ) (¬ view-φ) ∧ wnnf-impFree (¬ ψ) (¬ view-ψ)
-wnnf-impFree (¬ (φ ∧ ψ)) (¬ (view-φ ∧ view-ψ)) = wnnf-impFree (¬ φ) (¬ view-φ) ∨ wnnf-impFree (¬ ψ) (¬ view-ψ)
-wnnf-impFree (φ ∨ ψ) (view-φ ∨ view-ψ) = wnnf-impFree φ view-φ ∨ wnnf-impFree ψ view-ψ
-wnnf-impFree (φ ∧ ψ) (view-φ ∧ view-ψ) = wnnf-impFree φ view-φ ∧ wnnf-impFree ψ view-ψ
-
 nnf-NNF : ∀ φ → NNF (nnf φ)
-nnf-NNF φ = wnnf-impFree (removeImp (simplify φ)) (removeImp-impFree (simplify φ))
+nnf-NNF φ = wnnf-impFree (removeImp-impFree (simplify φ))
 ```
-
-### Soundness
 
 ```
 nnf-sound : ∀ φ → φ ⟺ nnf φ
@@ -925,6 +993,8 @@ nnf-sound φ ϱ
           sym (simplify-sound φ ϱ) = refl
 ```
 
+The !ref(NNF) is the most basic normal form of interest.
+In the following sections we will study stronger normal forms.
 
 # Disjunctive normal form {#DNF}
 
