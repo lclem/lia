@@ -46,7 +46,7 @@ jobs:
           path: .stack-work
           key: ${{ runner.os }}-stack-work-${{ hashFiles('stack.yaml') }}-${{ hashFiles('package.yaml') }}-${{ '**/*.hs' }}
       - name: Install deps
-        run: brew install agda pandoc pandoc-citeproc gsed
+        run: brew install agda pandoc pandoc-citeproc pandoc-crossref gsed
       - name: Install pandoc-numbering
         run: pip install pandoc-numbering
       - name: Bundle install

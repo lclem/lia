@@ -1,4 +1,5 @@
-personal_ws-1.1 en 314 
+personal_ws-1.1 en 355 
+AMS
 APAL
 Agda
 Agda's
@@ -16,12 +17,14 @@ Büchi
 CAV
 CNF
 CaiKaposiAltenkirch
+CharacteristicFormulas
 Clemente
 Codd
 Collatz
 ConstableBickford
 CubidesGarzonSicard
 DNF
+DNFClause
 De
 Dosen
 Dudkiewicz
@@ -33,6 +36,9 @@ Elgot
 Erdos
 Eulerian
 FOCS
+FormulaImplFalse
+FormulaNegAnd
+FragmentsAndNeg
 Fraïssé
 Gabbay
 Gabbay's
@@ -72,6 +78,7 @@ Miscellanea
 Möbius
 NNF
 NormalForms
+OEIS
 PDA
 Peirce's
 Prieto
@@ -102,6 +109,8 @@ Unprovable
 Vaught
 Veldman
 WMSO
+WNNF
+Wajsberg's
 Xp
 Yp
 aU
@@ -113,6 +122,8 @@ approximants
 arXiv
 arity
 ary
+assocAnd
+assocOr
 associative
 associativity
 automata
@@ -136,6 +147,7 @@ cardinalities
 cardinality
 categoriciy
 cd
+charFormulaUnique
 chicago
 codomain
 cofinite
@@ -148,6 +160,8 @@ commutativity
 complementation
 computable
 concatMap
+cong
+congF
 conjunctively
 constructible
 contrapositive
@@ -156,12 +170,14 @@ countability
 cref
 csl
 darkblue
+de
 dec
 decidability
 definability
 differentiable
 disequalities
 disequality
+disjProp
 disjunct
 disjunction
 disjunctions
@@ -177,21 +193,31 @@ eq
 equalities
 equisatisfiability
 equisatisfiable
+expandIff
+expandImplies
 extensionality
 finiteness
 fixpoint
 fixpoints
+flexRef
 foundedness
+fragmentAndOr
+fragmentAndOrOnlyMonotone
+fragmentOrAndNeg
+funCompl
+funComplFalseTrueNegAndOr
 gettype
 gray
 herbrandisation
 homomorphism
 homomorphisms
+homonymously
 hypercube
 ib
 iff
 ignoreall
 ij
+impFree
 indegree
 inequivalent
 inexpressibility
@@ -201,6 +227,7 @@ inj
 injective
 injectively
 injectivity
+inlinecode
 instantiation
 interpolant
 interpolants
@@ -218,6 +245,8 @@ lexicographically
 logics
 minimality
 modus
+monCharFormula
+monCharLit
 monadic
 monoid
 monoids
@@ -229,7 +258,9 @@ n'y
 nand
 nat
 naïve
+negNotMonotone
 neighbouring
+nnf
 nonaxiomatisability
 nonaxiomatisable
 nondecreasing
@@ -256,9 +287,11 @@ polygyny
 polynomially
 ponens
 powerset
+pragma
 preinterpolant
 prenex
 preorder
+preprocessing
 projective
 propositionally
 proprerties
@@ -266,12 +299,16 @@ pushdown
 quantifications
 quantificators
 reachability
+refSection
+refl
 reflexivity
 relativisations
 relativise
 relativised
 relativising
 remoteRef
+removeImp
+removeTrueFalse
 satifiable
 satisfiability
 satisfiable
@@ -281,6 +318,7 @@ semigroups
 semilinear
 sequent
 sequents
+sheffer
 showonlyrefs
 skolemisation
 solvability
@@ -302,6 +340,7 @@ tilings
 todo
 tricoloured
 tt
+ttVals
 ukasiewicz
 unary
 undirected
@@ -312,4 +351,6 @@ unreferenced
 unsatisfiable
 unselected
 unshared
+vals
+wnnf
 zenodo

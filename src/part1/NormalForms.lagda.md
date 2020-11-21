@@ -11,7 +11,7 @@ open import part1.Semantics n hiding (∅)
  
 private
   variable
-    φ ψ : Formula
+    φ ψ ξ : Formula
 ```
 
 In this chapter we study normal forms for classical propositional logic, namely
@@ -39,6 +39,8 @@ data WNNF : Formula → Set where
   _∨_ : WNNF φ → WNNF ψ → WNNF (φ ∨ ψ)
   _⇒_ : WNNF φ → WNNF ψ → WNNF (φ ⇒ ψ)
   _⇔_ : WNNF φ → WNNF ψ → WNNF (φ ⇔ ψ)
+
+infix 99 ¬`_
 ```
 
 In this section we show that every formula can be transformed to a logically equivalent formula in WNNF.
@@ -131,7 +133,7 @@ are in WNNF, while the formulas
 ψ₅ = ¬ (` p₀ ∨ ` p₁)
 ```
 are not in WNNF (negation not in front of a propositional variable),
-which we can automaticalally check thanks to !ref(WNNF?):
+which we can automatically check thanks to !ref(WNNF?):
 
 :::::::::::::
 
@@ -261,10 +263,10 @@ wnnf-WNNF (φ ⇔ ψ) = wnnf-WNNF φ ⇔ wnnf-WNNF ψ
 
 ### Soundness
 
-The proof of soundess is conceptually simple and it is based on the double negation and de Morgan's laws.
+The proof of soundness is conceptually simple and it is based on the double negation and de Morgan's laws.
 The only difficulty is posed by the termination checker.
 
-The most immediate way to prove soundness would be to mimick the recursive structure of !ref(wnnf) as follows:
+The most immediate way to prove soundness would be to mimic the recursive structure of !ref(wnnf) as follows:
 
 ```
 {-# TERMINATING #-}
@@ -320,7 +322,7 @@ wnnf-sound' (¬ (φ ⇔ ψ)) ϱ
 The `TERMINATING` pragma instructs Agda to accept this definition even if it is not proved terminating by the termination checker.
 (In this way we do not need to comment out the code.)
 This can be verified by commenting out the pragma,
-wereby the termination checker will complain about the recursive invocation marked by `(*)` above.
+whereby the termination checker will complain about the recursive invocation marked by `(*)` above.
 It is surprising that the termination checker cannot establish that !ref(wnnf-sound') is terminating (which indeed it is),
 since it has the same recursive structure as !ref(wnnf), which is established terminating.
 
@@ -999,7 +1001,8 @@ In the following sections we will study stronger normal forms.
 # Disjunctive normal form {#DNF}
 
 A *clause* `C` is a conjunction of literals `l1 ∧ ⋯ ∧ lm`.
-A formula is in  *disjunctive normal form* (DNF) if it is a disjunction of clauses `C1 ∨ ⋯ ∨ Cn`.
+A formula is in *disjunctive normal form* (DNF) if it is a disjunction of clauses `C1 ∨ ⋯ ∨ Cn`.
+When discussing formulas in DNF it is customary to use a list-like notation[^DNF-middle-constructors]:
 
 ```
 data Literal : Formula → Set where
@@ -1008,132 +1011,398 @@ data Literal : Formula → Set where
   
 data DNFClause : Formula → Set where
   ∅ : DNFClause ⊤
-  _,_ : ∀ {φ ψ} → Literal φ → DNFClause ψ → DNFClause (φ ∧ ψ)
+  _∙ : Literal φ → DNFClause φ
+  _,_ : Literal φ → DNFClause ψ → DNFClause (φ ∧ ψ)
 
 data DNF : Formula  → Set where
   ∅ : DNF ⊥
-  _,_ : ∀ {φ ψ} → DNFClause φ → DNF ψ → DNF (φ ∨ ψ)
+  _∙ : DNFClause φ → DNF φ
+  _,_ : DNFClause φ → DNF ψ → DNF (φ ∨ ψ)
+
+infix 11 _∙
 ```
 
-We warm up and show how we can merge two clauses while preserving the semantics.
-This is essentially list concatenation, with additional code showing that it is semantics-preserving for formulas.
+[^DNF-middle-constructors]: The middle constructors of the form `_∙` allow us to avoid always appending a `⊥` or `⊤` to !ref(DNFClause), resp., !ref(DNF) formulas.
+This introduces a slight overhead in the following code,
+but allows formulas such as `` ` p₀ `` to be already in !ref(DNF),
+instead of considering the more cumbersome `` ` p₀ ∧ ⊤ ∨ ⊥ ``.
+
+!hide
+~~~
+We conventionally allow `⊤` to be a !ref(DNFClause) and similarly `⊥` to be a !ref(DNF), in line with !ref(NNF).
+All the notions of !ref(Literal), !ref(DNFClause), and !ref(DNF) are decidable (proved by a standard inductive argument):
 
 ```
-merge : ∀ {φ ψ} → DNFClause φ → DNFClause ψ → ∃[ ξ ] DNFClause ξ × ξ ⟺ φ ∧ ψ
-merge {⊤} {ψ} ∅ Cψ = ψ , Cψ , correctness where
+Literal? : ∀ φ → Dec (Literal φ)
+DNFClause? : ∀ φ → Dec (DNFClause φ)
+DNF? : ∀ φ → Dec (DNF φ)
+```
+~~~
+~~~
+```
+Literal? ⊥ = no λ ()
+Literal? ⊤ = no λ ()
+Literal? (` p) = yes (Pos p)
+Literal? (¬ ⊥) = no λ ()
+Literal? (¬ ⊤) = no λ ()
+Literal? (¬ (` p)) = yes (Neg p)
+Literal? (¬ (¬ φ)) = no λ ()
+Literal? (¬ (φ ∨ ψ)) = no λ ()
+Literal? (¬ (φ ∧ ψ)) = no λ ()
+Literal? (¬ (φ ⇒ ψ)) = no λ ()
+Literal? (¬ (φ ⇔ ψ)) = no λ ()
+Literal? (φ ∨ ψ) = no λ ()
+Literal? (φ ∧ ψ) = no λ ()
+Literal? (φ ⇒ ψ) = no λ ()
+Literal? (φ ⇔ ψ) = no λ ()
+```
 
-  correctness : ψ ⟺ ⊤ ∧ ψ
-  correctness ρ with ⟦ ψ ⟧ ρ
+```
+DNFClause? ⊥ = no λ{(() ∙)}
+DNFClause? ⊤ = yes ∅
+DNFClause? (` p) = yes (Pos p ∙)
+
+DNFClause? (¬ ⊥) = no λ{(() ∙)}
+DNFClause? (¬ ⊤) = no λ{(() ∙)}
+DNFClause? (¬ (` p)) = yes (Neg p ∙)
+DNFClause? (¬ (¬ φ)) = no λ{(() ∙)}
+DNFClause? (¬ (φ ∨ ψ)) = no λ{(() ∙)}
+DNFClause? (¬ (φ ∧ ψ)) = no λ{(() ∙)}
+DNFClause? (¬ (φ ⇒ ψ)) = no λ{(() ∙)}
+DNFClause? (¬ (φ ⇔ ψ)) = no λ{(() ∙)}
+
+DNFClause? (φ ∨ ψ) = no λ{(() ∙)}
+
+DNFClause? (φ ∧ ψ)
+  with Literal? φ | DNFClause? ψ
+... | yes Literalφ | yes DNFClauseψ = yes (Literalφ , DNFClauseψ)
+... | yes _ | no ~DNFClauseψ = no λ{(_ , DNFClauseψ) → ~DNFClauseψ DNFClauseψ}
+... | no ~Literalφ | _ = no λ{(Literalφ , _) → ~Literalφ Literalφ}
+
+DNFClause? (φ ⇒ ψ) = no λ{(() ∙)}
+DNFClause? (φ ⇔ ψ) = no λ{(() ∙)}
+```
+
+```
+DNF? ⊥ = yes ∅
+DNF? ⊤ = yes (∅ ∙)
+DNF? (` p) = yes (Pos p ∙ ∙)
+DNF? (¬ ⊥) = no λ{(() ∙ ∙)}
+DNF? (¬ ⊤) = no λ{(() ∙ ∙)}
+DNF? (¬ (` p)) = yes (Neg p ∙ ∙)
+DNF? (¬ (¬ φ)) = no λ{(() ∙ ∙)}
+DNF? (¬ (φ ∨ ψ)) = no λ{(() ∙ ∙)}
+DNF? (¬ (φ ∧ ψ)) = no λ{(() ∙ ∙)}
+DNF? (¬ (φ ⇒ ψ)) = no λ{(() ∙ ∙)}
+DNF? (¬ (φ ⇔ ψ)) = no λ{(() ∙ ∙)}
+
+DNF? (φ ∨ ψ)
+  with DNFClause? φ | DNF? ψ
+... | yes DNFClauseφ | yes DNFψ = yes (DNFClauseφ , DNFψ)
+... | yes _ | no ~DNFψ = no λ{ (() ∙ ∙); (_ , DNFψ) → ~DNFψ DNFψ}
+... | no ~DNFClauseφ | _ = no λ{ (() ∙ ∙); (DNFClauseφ , _) → ~DNFClauseφ DNFClauseφ}
+  
+DNF? (φ ∧ ψ) with DNFClause? (φ ∧ ψ)
+... | yes DNFClause = yes (DNFClause ∙)
+... | no ~DNFClause = no λ{ (DNFClause ∙) → ~DNFClause DNFClause}
+
+DNF? (φ ⇒ ψ) = no λ{(() ∙ ∙)}
+DNF? (φ ⇔ ψ) = no λ{(() ∙ ∙)}
+
+ζ₀ ζ₁ ζ₂ : Formula 
+```
+~~~
+
+::::::::::::: {.inlinecode}
+
+Thus a !ref(DNF) formula is an !ref(NNF) formula where we further constrain the way !remoteRef(part0)(Semantics)(Formula)(_∨_) and !remoteRef(part0)(Semantics)(Formula)(_∧_) nest: While in !ref(NNF) there is no restriction on nesting,
+in !ref(DNF) we demand that the formula is a "disjunction of conjunctions".
+For example,
+```
+ζ₀ = (` p₀ ∧ ¬ ` p₁) ∨ ` p₂
+```
+is in !ref(DNF),
+but the following formulas are not:
+```
+ζ₁ = ¬ ¬ ` p₂
+```
+(double negation, not even in !ref(NNF)),
+```
+ζ₂ = ` p₀ ∧ (` p₁ ∨ ` p₂)
+```
+(disjunction inside a conjunction).
+
+:::::::::::::
+
+```
+_ : DNF? ζ₀ ×? All? (~?_ ∘ DNF?) ([ ζ₁ ζ₂ ]) ≡ yes _
+_ = refl
+```
+
+In the rest of the section we show how to convert an arbitrary formula to an equivalent one in !ref(DNF).
+In fact, we have already seen a method achieving this:
+When discussing functional completeness for the fragment containing only
+!flexRef(part1)(CharacteristicFormulas)(sec:fragmentOrAndNeg)(conjunction, disjunction, and negation) we have shown such a method based on characteristic formulas.
+This was performed by !remoteRef(part1)(CharacteristicFormulas)(funCompl[¬∨∧]) and as a matter of fact it produces a formula in !ref(DNF),
+even though we have not proved this.
+The drawback is that the method based on characteristic formulas essentially relies on enumerating all satisfying valuations
+and thus 1) it always takes exponential time to produce the output formula,
+and 2) it produces !ref(DNF) formulas which are as big as the number of their satisfying valuations.
+For instance, in the extreme case of a tautology such as `⊤` (which is already in !ref(DNF)!),
+this will produce a formula of exponential size.
+
+While in general an exponential blow-up is unavoidable when translating a formula to !ref(DNF),
+we will explore here a syntactical approach which avoids the blow-up at least in some "easy" cases.
+
+!exercise(#exercise:merge-DNF-clauses)
+~~~
+As a warm up, show that we can "conjunctively merge" two clauses,
+and similarly "disjunctively merge" two DNF's (as in list concatenation),
+while preserving the semantics:
+
+```
+_+∧+_ : DNFClause φ →
+          DNFClause ψ →
+          -------------------------------
+          ∃[ ξ ] DNFClause ξ × φ ∧ ψ ⟺ ξ
+          
+_+∨+_ : DNF φ →
+          DNF ψ →
+          -------------------------
+          ∃[ ξ ] DNF ξ × φ ∨ ψ ⟺ ξ
+```
+~~~
+~~~
+```
+_+∧+_ {⊤} {ψ} ∅ Cψ = ψ , Cψ , correctness where
+
+  correctness : ⊤ ∧ ψ ⟺ ψ
+  correctness ϱ with ⟦ ψ ⟧ ϱ
   ... | tt = refl
   ... | ff = refl
+
+_+∧+_ {φ} {ψ} (Lφ ∙) Cψ = φ ∧ ψ , (Lφ , Cψ) , λ ϱ → refl
   
-merge {φ ∧ φ'} {ψ} (Lφ , Cφ') Cψ with merge Cφ' Cψ
-... | ξ , Cξ , ξ⟺φ'∧ψ = φ ∧ ξ , (Lφ , Cξ) , correctness where
+_+∧+_ {φ ∧ φ'} {ψ} (Lφ , Cφ') Cψ
+  with Cφ' +∧+ Cψ
+... | ξ , Cξ , φ'∧ψ⟺ξ = φ ∧ ξ , (Lφ , Cξ) , correctness where
 
-  correctness : φ ∧ ξ ⟺ (φ ∧ φ') ∧ ψ
-  correctness ρ rewrite ξ⟺φ'∧ψ ρ = sym (assoc-∧𝔹 _ _ _)
+  correctness : (φ ∧ φ') ∧ ψ ⟺ φ ∧ ξ
+  correctness ϱ rewrite sym (φ'∧ψ⟺ξ ϱ) = assocAnd φ φ' ψ ϱ
 ```
 
-## Case 1: DNF of a disjunction
-
 ```
-DNF-∨ : ∀ {φ ψ} → DNF φ → DNF ψ → ∃[ ξ ] DNF ξ × ξ ⟺ φ ∨ ψ
+_+∨+_ {⊥} {ψ} ∅ DNFψ = ψ , DNFψ , correctness where
 
-DNF-∨ {⊥} {ψ} ∅ DNFψ = ψ , DNFψ , correctness where
-
-  correctness : ψ ⟺ ⊥ ∨ ψ
-  correctness ρ with ⟦ ψ ⟧ ρ
+  correctness : ⊥ ∨ ψ ⟺ ψ
+  correctness ϱ with ⟦ ψ ⟧ ϱ
   ... | tt = refl
   ... | ff = refl
 
-DNF-∨ {φ ∨ ψ} {ξ} (Cφ , DNFψ) DNFξ with DNF-∨ DNFψ DNFξ
-... | η , DNFη , η⟺ψ∨ξ = φ ∨ η , (Cφ , DNFη) , correctness where
+_+∨+_ {φ} {ψ} (Cφ ∙) DNFψ = φ ∨ ψ , (Cφ , DNFψ) , λ ϱ → refl
 
-  correctness : φ ∨ η ⟺ (φ ∨ ψ) ∨ ξ 
-  correctness ρ rewrite η⟺ψ∨ξ ρ = sym (assoc-∨𝔹 _ _ _)
+_+∨+_ {φ ∨ ψ} {ξ} (Cφ , DNFψ) DNFξ
+  with DNFψ +∨+ DNFξ
+... | η , DNFη , ψ∨ξ⟺η = φ ∨ η , (Cφ , DNFη) , correctness where
+
+  correctness : (φ ∨ ψ) ∨ ξ ⟺ φ ∨ η
+  correctness ϱ rewrite assocOr φ ψ ξ ϱ | ψ∨ξ⟺η ϱ = refl
+```
+~~~
+
+We build !ref(DNF) formulas using the distributivity of conjunction over disjunction.
+In the case of a formula distributing over the disjunction of two formulas,
+we have the *left distributivity rule* (c.f. !remoteRef(part1)(Semantics)(distrAndOr-left)):
+
+    φ ∧ (ψ ∨ ξ) ⟺ φ ∧ ψ ∨ φ ∧ ξ.
+
+When `φ` and `ψ` are two clauses and `ξ` is a DNF,
+this gives us a recipe to inductively construct a DNF
+whose first clause is `φ ∧ ψ` (obtained by joining together two clauses with !ref(_+∧+_) and the rest of the DNF is recursively obtained by examining `φ ∧ ξ`:
+
+```
+infixr 9 _++∧++_
+_++∧++_ : DNFClause φ → DNF ψ → ∃[ ξ ] DNF ξ × φ ∧ ψ ⟺ ξ
+_++∧++_ {φ} {⊥} Cφ ∅ = ⊥ , ∅ , λ ϱ → refl
+
+_++∧++_ {φ} {ψ} Cφ (Cψ ∙)
+  with Cφ +∧+ Cψ
+... | φψ , Cφψ , φ∧ψ⟺φψ = φψ , Cφψ ∙ , φ∧ψ⟺φψ
+
+_++∧++_ {φ} {ψ ∨ ξ} Cφ (Cψ , DNFξ)
+  with Cφ +∧+ Cψ |
+       Cφ ++∧++ DNFξ
+... | φψ , Cφψ , φ∧ψ⟺φψ
+    | η , DNFη , φ∧ξ⟺η = φψ ∨ η , (Cφψ , DNFη) , correctness where
+
+  correctness : φ ∧ (ψ ∨ ξ) ⟺ φψ ∨ η
+  correctness ϱ rewrite distrAndOr-left φ ψ ξ ϱ |
+                        φ∧ψ⟺φψ ϱ |
+                        φ∧ξ⟺η ϱ = refl
 ```
 
-## Case 2: DNF of a conjunction
-
-* We first show how to add a single clause.
+For instance,
 
 ```
-DNF-∧-DNFClause : ∀ {φ ψ} → DNFClause φ → DNF ψ → ∃[ ξ ] DNF ξ × ξ ⟺ φ ∧ ψ
-DNF-∧-DNFClause {φ} {⊥} Cφ ∅ =  ⊥ , ∅ , correctness where
+_ : dfst (Pos p₀ , Neg p₁ ∙ ++∧++ (Pos p₁ , Pos p₂ ∙) , (Neg p₀ , Neg p₂ ∙) ∙) ≡
+    ` p₀ ∧ ¬ ` p₁ ∧ ` p₁ ∧ ` p₂ ∨ ` p₀ ∧ ¬ ` p₁ ∧ ¬ ` p₀ ∧ ¬ ` p₂
+_ = refl
+```
 
-  correctness : ⊥ ⟺ φ ∧ ⊥
-  correctness ρ with ⟦ φ ⟧ ρ
-  ... | tt = refl
-  ... | ff = refl
+We want to "upgrade" the previous procedure in order to construct the !ref(DNF) for the conjunction of two DNFs.
+This is achieved by the following *right distributivity rule* (c.f. !remoteRef(part1)(Semantics)(distrAndOr-right)):
+
+    (φ ∨ ψ) ∧ ξ ⟺ φ ∧ ξc ∨ ψ ∧ ξ,
+
+ where `φ` is a clause and `ψ`, `ξ` are DNFs.
+ The rule above gives us a recipe to transform the conjunction of the two DNFs `φ ∨ ψ` and `ξ`
+ into a DNF whose first disjunct is `φ ∨ ψ` (computed according to !ref(_++∧++_)) and the rest of which is recursively computed by examining `ψ ∧ ξ`:
+
+```
+_+++∧+++_ : DNF φ → DNF ψ → ∃[ ξ ] DNF ξ × φ ∧ ψ ⟺ ξ
+_+++∧+++_ {⊥} {ψ} ∅ DNFψ = ⊥ , ∅ , λ ϱ → refl
+
+_+++∧+++_ {φ} {ψ} (Cφ ∙) DNFψ = Cφ ++∧++ DNFψ
+
+_+++∧+++_ {φ ∨ φ'} {ψ} (Cφ , DNFφ') DNFψ
+  with Cφ ++∧++ DNFψ    | DNFφ' +++∧+++ DNFψ
+... | ξ , DNFξ , φ∧ψ⟺ξ | η , DNFη , φ'∧ψ⟺η
+  with DNFξ +∨+ DNFη
+... | μ , DNFμ , ξ∨η⟺μ = μ , DNFμ , correctness where
+
+  correctness : (φ ∨ φ') ∧ ψ ⟺ μ
+  correctness ϱ rewrite
+    distrAndOr-right φ φ' ψ ϱ |
+    φ'∧ψ⟺η ϱ |
+    φ∧ψ⟺ξ ϱ |
+    ξ∨η⟺μ ϱ = refl
+```
+
+We are now ready to present a translation from !ref(NNF) formulas to equivalent !ref(DNF) ones.
+
+```
+dnf1 : NNF φ → ∃[ ψ ] DNF ψ × φ ⟺ ψ
+```
+
+The base cases are immediate:
+
+```
+dnf1 ⊤ = ⊤ , ∅ ∙ , λ ϱ → refl
+dnf1 ⊥ = ⊥ , ∅ , λ ϱ → refl
+dnf1 (` p) = ` p , Pos p ∙ ∙ , λ ϱ → refl
+dnf1 (¬` p) = ¬ ` p , Neg p ∙ ∙ , λ ϱ → refl
+```
+
+In the inductive cases (disjunction or conjunction)
+we first recursively compute the DNFs of the subformulas and then we combine them.
+Disjunctions are easy since DNF formulas are closed under disjunction, with no blowup (c.f. !ref(_+∨+_)):
+
+```
+dnf1 {φ ∨ ψ} (NNFφ ∨ NNFψ)
+  with dnf1 NNFφ          | dnf1 NNFψ
+... | φ' , DNFφ' , φ⟺φ' | ψ' , DNFψ' , ψ⟺ψ'
+  with DNFφ' +∨+ DNFψ'
+... | ξ , DNFξ , φ'∨ψ'⟺ξ = ξ , DNFξ , correctness where
+
+  correctness : φ ∨ ψ ⟺ ξ
+  correctness ϱ rewrite φ⟺φ' ϱ | ψ⟺ψ' ϱ | φ'∨ψ'⟺ξ ϱ = refl
+```
+
+Conjunctions are harder, but !ref(_+++∧+++_) will do the trick:
+
+```
+dnf1 {φ ∧ ψ} (NNFφ ∧ NNFψ)
+  with dnf1 NNFφ | dnf1 NNFψ
+... | φ' , DNFφ' , φ⟺φ' | ψ' , DNFψ' , ψ⟺ψ'
+  with DNFφ' +++∧+++ DNFψ'
+... | ξ , DNFξ , φ'∧ψ'⟺ξ = ξ , DNFξ , correctness where
+
+  correctness : φ ∧ ψ ⟺ ξ
+  correctness ϱ rewrite φ⟺φ' ϱ | ψ⟺ψ' ϱ | φ'∧ψ'⟺ξ ϱ = refl
+```
+
+For example,
+
+```
+_ : dfst (dnf1 (⊥ ∧ ` p₀)) ≡ ⊥        ×
+    dfst (dnf1 (⊤ ∨ ` p₀)) ≡ ⊤ ∨ ` p₀ ×
+    dfst (dnf1 (⊤ ∧ ` p₀)) ≡ ` p₀     ×
+    dfst (dnf1 (` p₀ ∧ (` p₁ ∨ ¬` p₀))) ≡ ` p₀ ∧ ` p₁ ∨ ` p₀ ∧ ¬ ` p₀
+
+_ = refl , refl , refl , refl
+```
+
+We can see that !ref(dnf1) performs some rudimentary form of simplification, e.g., by removing `⊥` in ``⊥ ∧ ` p₀``,
+but not all the simplifications we may desire.
+For instance ``⊤ ∨ ` p₀`` should be transformed into `⊤` (which could be achieved by !remoteRef(part1)(Semantics)(simplify))
+but more significantly `` ` p₀ ∧ ` p₁ ∨ ` p₀ ∧ ¬ ` p₀ ``
+should be transformed to `` ` p₀ ∧ ` p₁ `` by removing the unsatisfiable clause `` ` p₀ ∧ ¬ ` p₀ ``.
+The latter kind of simplification is more specific to the DNF form, and will be handled in the next section.
+
+## Simplification
+
+The !ref(DNF) structure allows us to simplify formulas to a stronger extend that what is possible with the generic procedure !remoteRef(part1)(Semantics)(simplify).
+
+```
+dual : Formula → Formula
+dual (` p) = ¬ ` p
+dual (¬ ` p) = ` p
+dual φ = φ
+
+infix 25 _°
+_° : Literal φ → Literal (dual φ)
+Pos p ° = Neg p
+Neg p ° = Pos p
+
+infix 10 _IsInClause_
+data _IsInClause_ : Literal φ → DNFClause ψ → Set where
+  stop1 : ∀ {lit : Literal φ} → lit IsInClause (lit ∙)
+  stop2 : ∀ {lit : Literal φ} {C : DNFClause ψ} → lit IsInClause (lit , C)
+  skip : ∀ {lit : Literal φ} {lit' : Literal ψ} {C : DNFClause ξ} → lit IsInClause C → lit IsInClause (lit' , C)
   
-DNF-∧-DNFClause {φ} {ψ ∨ ξ} Cφ (Cψ , DNFξ) with merge Cφ Cψ
-... | φψ , Cφψ , φψ⟺φ∧ψ with DNF-∧-DNFClause Cφ DNFξ
-... | η , DNFη , η⟺φ∧ξ = φψ ∨ η , (Cφψ , DNFη) , correctness where
+_isInClause?_ : (lit : Literal φ) → (C : DNFClause ψ) → Dec (lit IsInClause C)
 
-  correctness : φψ ∨ η ⟺ φ ∧ (ψ ∨ ξ) -- crucial use of distributivity goes here
-  correctness ρ rewrite φψ⟺φ∧ψ ρ | η⟺φ∧ξ ρ = sym (distr-left-∧∨𝔹 _ _ _)
-```
+lit isInClause? ∅ = no λ ()
 
-* We now show how to distribute.
+_isInClause?_ {φ} {ψ} lit (lit' ∙)
+  with φ ≡? ψ
+... | no φ≢ψ = no λ{stop1 → φ≢ψ refl}
+Pos p isInClause? (Pos p ∙) | yes refl = yes stop1
+Neg p isInClause? (Neg p ∙) | yes refl = yes stop1
 
-```
-DNF-∧ : ∀ {φ ψ} → DNF φ → DNF ψ → ∃[ ξ ] DNF ξ × ξ ⟺ φ ∧ ψ
-DNF-∧ {⊥} {ψ} ∅ DNFψ = ⊥ , ∅ , correctness where
+_isInClause?_ {φ} {ψ ∧ ξ} lit (lit' , C)
+  with φ ≡? ψ
+Pos p isInClause? (Pos p , C) | yes refl = yes stop2
+Neg p isInClause? (Neg p , C) | yes refl = yes stop2
+lit isInClause? (lit' , C) | no φ≢ψ
+  with lit isInClause? C
+... | yes litInC = yes (skip litInC)
+... | no ~litInC = no λ{stop2 → φ≢ψ refl; (skip litInC) → ~litInC litInC}
 
-  correctness : ⊥ ⟺ ⊥ ∧ ψ
-  correctness ρ = refl
+litAndDualInClause : (lit : Literal φ) (C : DNFClause ψ) →
+  lit IsInClause C →
+  lit ° IsInClause C →
+  --------------------
+  ψ ⟺ ⊥
+
+litAndDualInClause lit C litInC lit°InC = {!!}
+
+simplifyDNFClause : DNFClause φ → ∃[ ψ ] DNFClause ψ × φ ⟺ ψ
+simplifyDNFClause ∅ = ⊤ , ∅ , λ ϱ → refl
+simplifyDNFClause (lit ∙) = _ , lit ∙ , λ ϱ → refl
+simplifyDNFClause (lit , C)
+  with lit isInClause? C  
+... | yes litInC = {!!}
+... | no ~litInC = {!!}
   
-DNF-∧ {φ ∨ φ'} {ψ} (Cφ , DNFφ') DNFψ with DNF-∧-DNFClause Cφ DNFψ | DNF-∧ DNFφ' DNFψ
-... | ξ , DNFξ , ξ⟺φ∧ψ | η , DNFη , η⟺φ'∧ψ with DNF-∨ DNFξ DNFη
-... | μ , DNFμ , μ⟺ξ∨η = μ , DNFμ , correctness where
 
-  correctness : μ ⟺ (φ ∨ φ') ∧ ψ
-  correctness ρ rewrite μ⟺ξ∨η ρ | η⟺φ'∧ψ ρ | ξ⟺φ∧ψ ρ = sym (distr-right-∧∨𝔹 _ _ _)
+-- DNFsimplify1 : DNF φ → 
 ```
 
-We show that every formula of classical propositional logic can be transformed into an equivalent DNF formula.
-We assume an input in NNF.
 
-```
-dnf : ∀ {φ} → NNF φ → ∃[ ψ ] DNF ψ × ψ ⟺ φ
-dnf ⊤ = ⊤ ∨ ⊥ , (∅ , ∅) , correctness where
+## Complete transformation
 
-  correctness : ⊤ ∨ ⊥ ⟺ ⊤
-  correctness ρ = refl
-  
-dnf ⊥ = ⊥ , ∅ , correctness where
-
-  correctness : ⊥ ⟺ ⊥
-  correctness ρ = refl
-  
-dnf (` p) = ` p ∧ ⊤ ∨ ⊥ , ((Pos p , ∅) , ∅) , correctness where
-
-  correctness : ` p ∧ ⊤ ∨ ⊥ ⟺ ` p
-  correctness ρ with ρ p
-  ... | tt = refl
-  ... | ff = refl
-  
-dnf (¬` p) = ¬ ` p ∧ ⊤ ∨ ⊥ , ((Neg p , ∅) , ∅) , correctness where
-
-  correctness : ¬ ` p ∧ ⊤ ∨ ⊥ ⟺ ¬ ` p
-  correctness ρ with ρ p
-  ... | tt = refl
-  ... | ff = refl
-
-dnf {φ ∧ ψ} (NNFφ ∧ NNFψ) with dnf NNFφ | dnf NNFψ
-... | φ' , DNFφ' , φ'⟺φ | ψ' , DNFψ' , ψ'⟺ψ with DNF-∧ DNFφ' DNFψ'
-... | ξ , DNFξ , ξ⟺φ'∧ψ' = ξ , DNFξ , correctness where
-
-  correctness : ξ ⟺ φ ∧ ψ
-  correctness ρ rewrite ξ⟺φ'∧ψ' ρ | φ'⟺φ ρ | ψ'⟺ψ ρ = refl
-
-dnf {φ ∨ ψ} (NNFφ ∨ NNFψ) with dnf NNFφ | dnf NNFψ
-... | φ' , DNFφ' , φ'⟺φ | ψ' , DNFψ' , ψ'⟺ψ with DNF-∨ DNFφ' DNFψ'
-... | ξ , DNFξ , ξ⟺φ'∨ψ' = ξ , DNFξ , correctness where
-
-  correctness : ξ ⟺ φ ∨ ψ
-  correctness ρ rewrite ξ⟺φ'∨ψ' ρ | φ'⟺φ ρ | ψ'⟺ψ ρ = refl
-```
+The final !ref(DNF) transformation is achieved
 
 # Conjunctive normal form {#CNF}
 

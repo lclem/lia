@@ -26,7 +26,8 @@ CSL := natbib.csl
 # the bibliography file
 BIB := bibliography.bib
 
-ifeq ($(shell pandoc --version | head -n1),pandoc 2.11.1.1)
+#--filter=pandoc-crossref
+ifneq ($(shell pandoc --version | head -n1 | egrep "pandoc 2\.11\.." ),)
 	# more recent pandoc versions embed the citeproc library
 	PANDOCEXEC := pandoc --citeproc
 else

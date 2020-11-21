@@ -137,7 +137,7 @@ charLit-sound ϱ p with inspect (ϱ p)
 ```
 
 (Notice that we need to rewrite twice in each case.
-For example in the first case we need to rewrite twice accoriding to the same equality `ϱp≡tt : ϱ p ≡ tt`:
+For example in the first case we need to rewrite twice according to the same equality `ϱp≡tt : ϱ p ≡ tt`:
 The first rewrite transforms `⟦ 「 p 」 ϱ ⟧ ϱ` into ``⟦ ` p ⟧ ϱ``,
 and the second rewrite transforms the latter into !remoteRef(part0)(Booleans)(𝔹)(tt), as required.
 A single rewrite does not suffice.
@@ -556,7 +556,7 @@ and thus invariably produces formulas of exponential size $\Theta(2^n)$.
 This will be (partially) addressed also in !chapterRef(part1)(NormalForms) with a syntactic construction.
 ~~~~~~~~~~~~
 
-## Fragment `{∨, ∧, ¬}`
+## Fragment `{∨, ∧, ¬}` {#sec:fragmentOrAndNeg}
 
 Let's restrict our previous fragment !ref(Formula[⊥,⊤,¬,∨,∧]) by forbidding the constants !ref(Formula)(⊥) and !ref(Formula)(⊤).
 Formally, we have the following definition:
@@ -1303,7 +1303,7 @@ b₀ nand𝔹 b₁ = ¬𝔹 (b₀ ∧𝔹 b₁) -- g₃
 
 Sheffer showed that !ref(_nor𝔹_) can be taken as a basis and he denotes it with a *stroke* (vertical bar) `_|_` [Theorem 1, @Sheffer:AMS:1913].
 We show the analogous result for !ref(_nand𝔹_),
-and in honor of Sheffer we will call it the *Sheffer's stroke*:
+and in honour of Sheffer we will call it the *Sheffer's stroke*:
 
 ```
 _⇑_ : Formula → Formula → Formula
