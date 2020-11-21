@@ -11,3 +11,4 @@ src/_build
 tmp/
 html/
 .jekyll-cache
+*conflicted\ copy*
