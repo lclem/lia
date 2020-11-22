@@ -206,7 +206,7 @@ $(TMPDIR)/$1.$2.md: $(SRCDIR)/$1/$2.lagda.md
 		tr -d '\n'
 
 # add the markdown footer
-	@cat $(SRCDIR)/footer.md >> $(TMPDIR)/$1.$2.md
+	cat $(SRCDIR)/footer.md >> $(TMPDIR)/$1.$2.md
 
 	@echo " [DONE]"
 
