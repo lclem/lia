@@ -204,6 +204,25 @@ push¬⇔𝔹 ff ff = refl
 
 ## Basic properties
 
+### Idempotence
+
+```
+idempot-∧𝔹 : ∀ a → a ∧𝔹 a ≡ a
+idempot-∧𝔹 tt = refl
+idempot-∧𝔹 ff = refl
+
+```
+
+### Commutativity
+
+```
+comm-∧𝔹 : ∀ a b → a ∧𝔹 b ≡ b ∧𝔹 a
+comm-∧𝔹 ff ff = refl
+comm-∧𝔹 ff tt = refl
+comm-∧𝔹 tt ff = refl
+comm-∧𝔹 tt tt = refl
+```
+
 ### Associativity
 
 ```
@@ -266,6 +285,11 @@ distr-right-∧∨𝔹 ff ff ff = refl
 𝔹conjProp3 : ∀ a b → a ≡ tt → b ≡ tt → a ∧𝔹 b ≡ tt
 𝔹conjProp3 tt tt refl refl = refl
 
+𝔹conjProp-ff : ∀ a b → a ∧𝔹 b ≡ ff → a ≡ ff ⊎ b ≡ ff
+𝔹conjProp-ff ff ff refl = left refl
+𝔹conjProp-ff ff tt refl = left refl
+𝔹conjProp-ff tt ff refl = right refl
+
 ∧𝔹-inv : ∀ a b →  a ∧𝔹 b ≡ tt → a ≡ tt × b ≡ tt
 ∧𝔹-inv tt tt refl = refl , refl
 ```
@@ -315,6 +339,10 @@ distr-right-∧∨𝔹 ff ff ff = refl
 
 ¬𝔹-prop : ∀ a → ¬𝔹 a ≡ tt → a ⇒𝔹 ff ≡ tt
 ¬𝔹-prop ff refl = refl
+
+a∧𝔹¬𝔹a≡ff : ∀ a → a ∧𝔹 ¬𝔹 a ≡ ff
+a∧𝔹¬𝔹a≡ff ff = refl
+a∧𝔹¬𝔹a≡ff tt = refl
 ```
 
 ### Bi-implication

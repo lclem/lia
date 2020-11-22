@@ -49,11 +49,16 @@ open Σ' public
 thereExists' : ∀ {ℓ m} {A : Set ℓ} (B : A → Set m) → Set (ℓ ⊔ m)
 thereExists' {A = A} B = Σ' A B
 
-infix 0 forAll thereExists thereExists' forAll←
+infix 0 forAll thereExists thereExists' forAll← thereExistsP
 syntax forAll (λ x → B) = ∀[ x ] B
 syntax thereExists (λ x → B) = ∃[ x ] B
 syntax forAll← B (λ x → C) = ∀[ x ← B ] C
 syntax thereExists' (λ x → B) = ∃[[ x ]] B
+
+thereExistsP : ∀ {ℓ m n} {A : Set ℓ} (P : A → Set m) (B : {a : A} → P a → Set n) → Set (ℓ ⊔ m ⊔ n)
+thereExistsP {A = A} P B = ∃[ a ] Σ (P a) λ Pa → B {a} Pa
+
+syntax thereExistsP P (λ Pa → B) = ∃P[ Pa ← P ] B
 
 infixr 2 _×_
 -- _×_ : ∀ {ℓ m} (A : Set ℓ) (B : Set m) → Set (ℓ ⊔ m)

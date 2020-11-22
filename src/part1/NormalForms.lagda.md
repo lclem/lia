@@ -1166,7 +1166,7 @@ _+∧+_ : DNFClause φ →
           -------------------------------
           ∃[ ξ ] DNFClause ξ × φ ∧ ψ ⟺ ξ
           
-_+∨+_ : DNF φ →
+_+++∨+++_ : DNF φ →
           DNF ψ →
           -------------------------
           ∃[ ξ ] DNF ξ × φ ∨ ψ ⟺ ξ
@@ -1192,17 +1192,17 @@ _+∧+_ {φ ∧ φ'} {ψ} (Lφ , Cφ') Cψ
 ```
 
 ```
-_+∨+_ {⊥} {ψ} ∅ DNFψ = ψ , DNFψ , correctness where
+_+++∨+++_ {⊥} {ψ} ∅ DNFψ = ψ , DNFψ , correctness where
 
   correctness : ⊥ ∨ ψ ⟺ ψ
   correctness ϱ with ⟦ ψ ⟧ ϱ
   ... | tt = refl
   ... | ff = refl
 
-_+∨+_ {φ} {ψ} (Cφ ∙) DNFψ = φ ∨ ψ , (Cφ , DNFψ) , λ ϱ → refl
+_+++∨+++_ {φ} {ψ} (Cφ ∙) DNFψ = φ ∨ ψ , (Cφ , DNFψ) , λ ϱ → refl
 
-_+∨+_ {φ ∨ ψ} {ξ} (Cφ , DNFψ) DNFξ
-  with DNFψ +∨+ DNFξ
+_+++∨+++_ {φ ∨ ψ} {ξ} (Cφ , DNFψ) DNFξ
+  with DNFψ +++∨+++ DNFξ
 ... | η , DNFη , ψ∨ξ⟺η = φ ∨ η , (Cφ , DNFη) , correctness where
 
   correctness : (φ ∨ ψ) ∨ ξ ⟺ φ ∨ η
@@ -1267,7 +1267,7 @@ _+++∧+++_ {φ} {ψ} (Cφ ∙) DNFψ = Cφ ++∧++ DNFψ
 _+++∧+++_ {φ ∨ φ'} {ψ} (Cφ , DNFφ') DNFψ
   with Cφ ++∧++ DNFψ    | DNFφ' +++∧+++ DNFψ
 ... | ξ , DNFξ , φ∧ψ⟺ξ | η , DNFη , φ'∧ψ⟺η
-  with DNFξ +∨+ DNFη
+  with DNFξ +++∨+++ DNFη
 ... | μ , DNFμ , ξ∨η⟺μ = μ , DNFμ , correctness where
 
   correctness : (φ ∨ φ') ∧ ψ ⟺ μ
@@ -1277,6 +1277,8 @@ _+++∧+++_ {φ ∨ φ'} {ψ} (Cφ , DNFφ') DNFψ
     φ∧ψ⟺ξ ϱ |
     ξ∨η⟺μ ϱ = refl
 ```
+
+## Basic transformation
 
 We are now ready to present a translation from !ref(NNF) formulas to equivalent !ref(DNF) ones.
 
@@ -1295,13 +1297,13 @@ dnf1 (¬` p) = ¬ ` p , Neg p ∙ ∙ , λ ϱ → refl
 
 In the inductive cases (disjunction or conjunction)
 we first recursively compute the DNFs of the subformulas and then we combine them.
-Disjunctions are easy since DNF formulas are closed under disjunction, with no blowup (c.f. !ref(_+∨+_)):
+Disjunctions are easy since DNF formulas are closed under disjunction, with no blowup (c.f. !ref(_+++∨+++_)):
 
 ```
 dnf1 {φ ∨ ψ} (NNFφ ∨ NNFψ)
   with dnf1 NNFφ          | dnf1 NNFψ
 ... | φ' , DNFφ' , φ⟺φ' | ψ' , DNFψ' , ψ⟺ψ'
-  with DNFφ' +∨+ DNFψ'
+  with DNFφ' +++∨+++ DNFψ'
 ... | ξ , DNFξ , φ'∨ψ'⟺ξ = ξ , DNFξ , correctness where
 
   correctness : φ ∨ ψ ⟺ ξ
@@ -1324,9 +1326,9 @@ dnf1 {φ ∧ ψ} (NNFφ ∧ NNFψ)
 For example,
 
 ```
-_ : dfst (dnf1 (⊥ ∧ ` p₀)) ≡ ⊥        ×
-    dfst (dnf1 (⊤ ∨ ` p₀)) ≡ ⊤ ∨ ` p₀ ×
-    dfst (dnf1 (⊤ ∧ ` p₀)) ≡ ` p₀     ×
+_ : dfst (dnf1 (⊥ ∧ ` p₀)) ≡ ⊥                  ×
+    dfst (dnf1 (⊤ ∨ ` p₀)) ≡ ⊤ ∨ ` p₀           ×
+    dfst (dnf1 (⊤ ∧ ` p₀ ∧ ` p₀)) ≡ ` p₀ ∧ ` p₀ ×
     dfst (dnf1 (` p₀ ∧ (` p₁ ∨ ¬` p₀))) ≡ ` p₀ ∧ ` p₁ ∨ ` p₀ ∧ ¬ ` p₀
 
 _ = refl , refl , refl , refl
@@ -1334,34 +1336,53 @@ _ = refl , refl , refl , refl
 
 We can see that !ref(dnf1) performs some rudimentary form of simplification, e.g., by removing `⊥` in ``⊥ ∧ ` p₀``,
 but not all the simplifications we may desire.
-For instance ``⊤ ∨ ` p₀`` should be transformed into `⊤` (which could be achieved by !remoteRef(part1)(Semantics)(simplify))
-but more significantly `` ` p₀ ∧ ` p₁ ∨ ` p₀ ∧ ¬ ` p₀ ``
-should be transformed to `` ` p₀ ∧ ` p₁ `` by removing the unsatisfiable clause `` ` p₀ ∧ ¬ ` p₀ ``.
-The latter kind of simplification is more specific to the DNF form, and will be handled in the next section.
+For instance ``⊤ ∨ ` p₀`` should be transformed into `⊤` (which could be achieved by !remoteRef(part1)(Semantics)(simplify)).
+and 
+More significantly, ``⊤ ∧ ` p₀ ∧ ` p₀`` should be transformed to `` ` p₀`` (by removing one duplicate occurrence of `p₀`),
+and `` ` p₀ ∧ ` p₁ ∨ ` p₀ ∧ ¬ ` p₀ `` to `` ` p₀ ∧ ` p₁ `` (by removing the unsatisfiable clause `` ` p₀ ∧ ¬ ` p₀ ``).
+The latter kind of simplifications is specific to the DNF form, and it will be handled in the next section.
 
 ## Simplification
 
-The !ref(DNF) structure allows us to simplify formulas to a stronger extend that what is possible with the generic procedure !remoteRef(part1)(Semantics)(simplify).
+The !ref(DNF) structure allows us to simplify formulas to a stronger extend that what is possible with the generic procedure !remoteRef(part1)(Semantics)(simplify). In this section we explore a simplification procedure which exploits the DNF structure.
+
+We will implement two kind of simplifications,
+both based on the fact that a propositional variable should appear at most once in a clause:
+
+1) If a literal appears multiple times in a clause, then its repeated occurrences can be removed.
+2) If a literal appears positively and negatively in a clause, then the clause is unsatisfiable and can be removed.
+
+### Case 1: Repeated literals
+
+We define a predicate !ref(_IsInClause_) capturing whether a literal occurs in a clause:
 
 ```
-dual : Formula → Formula
-dual (` p) = ¬ ` p
-dual (¬ ` p) = ` p
-dual φ = φ
-
-infix 25 _°
-_° : Literal φ → Literal (dual φ)
-Pos p ° = Neg p
-Neg p ° = Pos p
-
 infix 10 _IsInClause_
 data _IsInClause_ : Literal φ → DNFClause ψ → Set where
   stop1 : ∀ {lit : Literal φ} → lit IsInClause (lit ∙)
   stop2 : ∀ {lit : Literal φ} {C : DNFClause ψ} → lit IsInClause (lit , C)
-  skip : ∀ {lit : Literal φ} {lit' : Literal ψ} {C : DNFClause ξ} → lit IsInClause C → lit IsInClause (lit' , C)
-  
-_isInClause?_ : (lit : Literal φ) → (C : DNFClause ψ) → Dec (lit IsInClause C)
+  skip : ∀ {lit : Literal φ} {lit' : Literal ψ} {C : DNFClause ξ} →
+         lit IsInClause C → lit IsInClause (lit' , C)
+```
 
+(This is analogous to the list membership predicate !remoteRef(part0)(List)(_∈_),
+except that the type of !ref(DNFClause) is more complex than a plain list,
+and moreover we have two base cases `stop1` and `stop2`, instead of just one.)
+
+!hide
+~~~~
+We need to be able to tell whether a given literal occurs somewhere inside a given clause.
+For this reason we show that !ref(_IsInClause_) is decidable:
+
+```
+_isInClause?_ : (lit : Literal φ) → (C : DNFClause ψ) → Dec (lit IsInClause C)
+```
+
+The construction proceeds by scanning the clause,
+as in !remoteRef(part0)(List)(_∈?_).
+~~~~
+~~~~
+```
 lit isInClause? ∅ = no λ ()
 
 _isInClause?_ {φ} {ψ} lit (lit' ∙)
@@ -1378,31 +1399,402 @@ lit isInClause? (lit' , C) | no φ≢ψ
   with lit isInClause? C
 ... | yes litInC = yes (skip litInC)
 ... | no ~litInC = no λ{stop2 → φ≢ψ refl; (skip litInC) → ~litInC litInC}
+```
+~~~~
 
-litAndDualInClause : (lit : Literal φ) (C : DNFClause ψ) →
+!exercise(#exercise:litTwiceInClause)
+~~~
+Show that removing duplicated occurrences of the same literal preserves the semantics:
+
+```
+litTwiceInClause : (lit : Literal φ) (C : DNFClause ψ) →
+  lit IsInClause C →
+  ------------------
+  φ ∧ ψ ⟺ ψ
+```
+
+*Hint*: Use idempotence !remoteRef(part1)(Semantics)(idempotAnd), commutativity !remoteRef(part1)(Semantics)(commAnd), and associativity !remoteRef(part1)(Semantics)(assocAnd) of conjunction.
+~~~
+~~~
+```
+litTwiceInClause {φ} lit (lit ∙) stop1 ϱ = idempotAnd φ ϱ
+
+litTwiceInClause {φ} {φ ∧ ψ} lit (lit , C) stop2 ϱ
+  rewrite sym (assocAnd φ φ ψ ϱ) |
+          idempotAnd φ ϱ = refl
+          
+litTwiceInClause {φ} {ψ ∧ ξ} lit (lit' , C) (skip litInC) ϱ
+  rewrite sym (assocAnd φ ψ ξ ϱ) |
+          commAnd φ ψ ϱ |
+          assocAnd ψ φ ξ ϱ |
+          litTwiceInClause lit C litInC ϱ = refl
+```
+~~~
+
+We are now ready to write a function which simplifies a clause by removing repeated occurrences of the same literal.
+Correctness is guaranteed by !ref(litTwiceInClause):
+
+```
+simplifyDNFClause : DNFClause φ → ∃[ ψ ] DNFClause ψ × φ ⟺ ψ
+simplifyDNFClause ∅ = ⊤ , ∅ , λ ϱ → refl
+simplifyDNFClause (lit ∙) = _ , lit ∙ , λ ϱ → refl
+simplifyDNFClause {φ ∧ ψ} (lit , C)
+  with simplifyDNFClause C
+... | ξ , D , ψ⟺ξ
+  with lit isInClause? C
+... | yes litInC = _ , D , sound where
+
+  sound : φ ∧ ψ ⟺ ξ
+  sound ϱ rewrite sym (ψ⟺ξ ϱ) = litTwiceInClause lit C litInC ϱ 
+
+... | no ~litInC = _ , (lit , D) , sound where
+
+  sound : φ ∧ ψ ⟺ φ ∧ ξ
+  sound ϱ rewrite ψ⟺ξ ϱ = refl
+```
+
+### Case 2: Positive and negative occurrences
+
+The second simplification regards the case when the same literal appears both positively and negatively.
+We would like to concisely capture the notion of the dual of a literal.
+A first attempt would be the following:
+
+    _° : Literal φ → Literal ?
+    Pos p ° = Neg p
+    Neg p ° = Pos p
+
+However it is not clear what should be the expression to fill the hole `?`.
+
+!exercise(#exercise:dual)
+~~~
+Complete the definition of `_°`.
+*Hint*: Can one express the formula in the hole as a function of `φ`?
+~~~
+~~~
+We define a function that maps a proposition to its negation, and symmetrically:
+
+```
+dual : Formula → Formula
+dual (` p) = ¬ ` p
+dual (¬ ` p) = ` p
+dual φ = φ
+```
+
+What happens to other formulas does not really matter,
+and we choose not to alter them for simplicity.
+We can then complete the definition of the dual literal as follows:
+
+```
+infix 25 _°
+_° : Literal φ → Literal (dual φ)
+Pos p ° = Neg p
+Neg p ° = Pos p
+```
+~~~
+
+The following binary predicate expresses the fact that a literal and its dual both appear in the same clause:
+
+```
+_andDualIsInClause_ : ∀ {φ} → Literal φ → DNFClause ψ → Set
+lit andDualIsInClause C = lit IsInClause C × lit ° IsInClause C
+```
+
+!hide
+~~~
+First of all, we can decide whether this is the case (by scanning all literals, one at at time):
+
+```
+someLitAndDualInClause :
+  (C : DNFClause φ) →
+  -------------------------------------------------
+  Dec (∃P[ lit ← Literal ] lit andDualIsInClause C)
+```
+
+(The `∃P`-notation is a convenient abbreviation for `∃[ ψ ] Σ (Literal ψ) λ lit → lit andDualIsInClause C`
+when we do not want to explicitly mention the underlying formula `ψ`.)
+~~~
+~~~
+```
+someLitAndDualInClause ∅ = no λ{()}
+
+-- it cannot be that lit can be both of the form Pos p and Neg p
+someLitAndDualInClause (lit ∙) = no λ{(` p , Pos p , stop1 , ())}
+
+someLitAndDualInClause (lit , C)
+  with lit ° isInClause? C
+... | yes proof = yes (_ , lit , stop2 , skip proof)
+... | no proof
+  with someLitAndDualInClause C
+... | yes (_ , lit' , lit'InC , lit'°InC) = yes (_ , lit' , skip lit'InC , skip lit'°InC)
+... | no proof' = no λ{
+  (_ , Pos p , stop2 , skip NegpInC) → proof NegpInC;
+  (_ , Neg p , stop2 , skip PospInC) → proof PospInC;
+  (_ , Pos p , skip PospInC , stop2) → proof PospInC;
+  (_ , Pos p , skip PospInC , skip NegpInC) → proof' (_ , Pos p , PospInC , NegpInC);
+  (_ , Neg p , skip NegpInC , stop2) → proof NegpInC;
+  (_ , Neg p , skip NegpInC , skip PospInC) → proof' (_ , Pos p , PospInC , NegpInC)}
+```
+~~~
+
+!hide
+~~~
+If a clause contains a literal both positively and negatively,
+then it is unsatisfiable:
+
+```
+litAndDualInClause-sound : {lit : Literal φ} {C : DNFClause ψ} →
   lit IsInClause C →
   lit ° IsInClause C →
   --------------------
   ψ ⟺ ⊥
-
-litAndDualInClause lit C litInC lit°InC = {!!}
-
-simplifyDNFClause : DNFClause φ → ∃[ ψ ] DNFClause ψ × φ ⟺ ψ
-simplifyDNFClause ∅ = ⊤ , ∅ , λ ϱ → refl
-simplifyDNFClause (lit ∙) = _ , lit ∙ , λ ϱ → refl
-simplifyDNFClause (lit , C)
-  with lit isInClause? C  
-... | yes litInC = {!!}
-... | no ~litInC = {!!}
-  
-
--- DNFsimplify1 : DNF φ → 
 ```
 
+The proof of is by a nested induction on the evidence that `lit` and its dual `lit °` are in `C`.
+~~~
+~~~
+The following little fact about duals will be used several times in the proof:
+
+```
+φ∧dualφ⟺⊥ : Literal φ → φ ∧ dual φ ⟺ ⊥
+φ∧dualφ⟺⊥ (Pos p) ϱ rewrite a∧𝔹¬𝔹a≡ff (ϱ p) = refl
+φ∧dualφ⟺⊥ (Neg p) ϱ rewrite a∧𝔹¬𝔹a≡ff (¬𝔹 ϱ p) = refl
+```
+
+We now come to the proof of !ref(litAndDualInClause-sound).
+The first base case cannot actually occur since if `C` is of the form `lit' ∙`,
+then `lit'` cannot be simultaneously of the form `lit` and `lit °`:
+
+```
+litAndDualInClause-sound {lit = Pos p} stop1 ()
+litAndDualInClause-sound {lit = Neg p} stop1 ()
+```
+
+In the second base case we have found the sought occurrence of `lit` in `C`.
+The proof continues with a nested induction on the evidence that its dual `lit °` is in `C`
+(and its occurrence is necessarily further than `lit`):
+
+```
+litAndDualInClause-sound {φ} {ψ} {lit} {C} stop2 (skip lit°InC) = go lit°InC where
+
+  go : ∀ {ψ} {C : DNFClause ψ} → lit ° IsInClause C → φ ∧ ψ ⟺ ⊥
+  go stop1 = φ∧dualφ⟺⊥ lit
+  go {ψ = _ ∧ ψ} stop2 ϱ
+    rewrite sym (assocAnd φ (dual φ) ψ ϱ) |
+                φ∧dualφ⟺⊥ lit ϱ = refl
+  go {ψ = _ ∧ ψ} (skip {ψ = φ'} lit°InC) ϱ
+    with go lit°InC
+  ... | φ∧ψ⟺⊥ rewrite sym (assocAnd φ φ' ψ ϱ) |
+                       commAnd φ φ' ϱ |
+                       assocAnd φ' φ ψ ϱ |
+                       φ∧ψ⟺⊥ ϱ = refl
+```
+
+The third base case is symmetric.
+We have found the occurrence of `lit °` in `C`
+and we proceed by nested induction on the evidence that its dual `lit` is in `C`:
+
+```
+litAndDualInClause-sound {φ} {lit = lit} (skip litInC) stop2 = go litInC where
+
+  go : ∀ {ψ} {C : DNFClause ψ} → lit IsInClause C → dual φ ∧ ψ ⟺ ⊥
+  go stop1 ϱ rewrite commAnd (dual φ) φ ϱ = φ∧dualφ⟺⊥ lit ϱ
+  go {ψ = _ ∧ ψ} stop2 ϱ
+    rewrite sym (assocAnd (dual φ) φ ψ ϱ) |
+            commAnd (dual φ) φ ϱ |
+            φ∧dualφ⟺⊥ lit ϱ = refl
+  go {ψ = _ ∧ ψ} (skip {ψ = φ'} litInC) ϱ
+    with go litInC
+  ... | dualφ∧ψ⟺⊥
+    rewrite sym (assocAnd (dual φ) φ' ψ ϱ) |
+            commAnd (dual φ) φ' ϱ |
+            assocAnd φ' (dual φ) ψ ϱ |
+            dualφ∧ψ⟺⊥ ϱ = refl
+```
+
+Finally, in the inductive step we know that neither `lit` nor its dual appear as the first literal in `C`,
+and we can thus appeal to recursion:
+
+```
+litAndDualInClause-sound (skip litInC) (skip lit°InC) ϱ
+  with litAndDualInClause-sound litInC lit°InC
+... | ξ⟺⊥ rewrite ξ⟺⊥ ϱ = refl
+```
+~~~
+
+### Putting things together
+
+We are now in a position to present the core DNF-simplification procedure:
+
+```
+simplifyDNF : DNF φ → ∃[ ψ ] DNF ψ × φ ⟺ ψ
+```
+
+The construction is by induction on the evidence that `φ` is in DNF.
+The first base case is easy enough to start with:
+
+```
+simplifyDNF ∅ = _ , ∅ , λ ϱ → refl
+```
+
+In the second base case the DNF consists of a single clause `C`.
+We appeal to !ref(someLitAndDualInClause) to test whether `C` is unsatisfiable.
+In the positive case the whole DNF reduces to `∅`,
+otherwise to the simplification of `C`:
+
+```
+simplifyDNF (C ∙)
+  with someLitAndDualInClause C
+... | yes (_ , lit , litInC , lit°InC) = _ , ∅ , litAndDualInClause-sound litInC lit°InC
+... | no _
+  with simplifyDNFClause C
+... | _ , D , equiv = _ , D ∙ , equiv
+```
+
+The inductive step is analogous:
+
+```
+simplifyDNF {φ ∨ ψ} (C , DNFψ)
+  with simplifyDNF DNFψ
+... | ψ' , DNF' , ψ⟺ψ'
+  with someLitAndDualInClause C
+... | yes (_ , lit , litInC , lit°InC) = ψ' , DNF' , φ∨ψ⟺ψ' where
+
+  φ∨ψ⟺ψ' : φ ∨ ψ ⟺ ψ'
+  φ∨ψ⟺ψ' ϱ
+    rewrite litAndDualInClause-sound litInC lit°InC ϱ |
+            ψ⟺ψ' ϱ = refl
+    
+... | no _
+  with simplifyDNFClause C
+... | φ' , D , φ⟺φ' = φ' ∨ ψ' , (D , DNF') , φ∨ψ⟺φ'∨ψ' where
+
+  φ∨ψ⟺φ'∨ψ' : φ ∨ ψ ⟺ φ' ∨ ψ'
+  φ∨ψ⟺φ'∨ψ' ϱ
+    rewrite φ⟺φ' ϱ |
+            ψ⟺ψ' ϱ = refl
+```
 
 ## Complete transformation
 
-The final !ref(DNF) transformation is achieved
+The final !ref(DNF) transformation is achieved by combining the !ref(NNF) transformation,
+the unsimplifying !ref(dnf1) transformation,
+followed by !ref(simplifyDNF) and !remoteRef(part1)(Semantics)(simplify).
+To prove its correctness we have to first show that !remoteRef(part1)(Semantics)(simplify) preserves !ref(DNF) formulas.
+
+!exercise(#exercise:simplify-preserves-DNF)
+~~~
+Show that !remoteRef(part1)(Semantics)(simplify) preserves !ref(DNF) formulas:
+
+```
+simplify-preserves-DNF : DNF φ → DNF (simplify φ)
+```
+
+*Hint*: It will be convenient to first prove some auxiliary facts:
+
+```
+simplify1-preserves-Literal : Literal φ → Literal (simplify1 φ)
+simplify1-preserves-DNFClause : DNFClause φ → DNFClause (simplify1 φ)
+simplify1-preserves-DNF : DNF φ → DNF (simplify1 φ)
+
+simplify-preserves-Literal : Literal φ → Literal (simplify φ)
+simplify-preserves-DNFClause : DNFClause φ → DNFClause (simplify φ)
+```
+~~~
+~~~
+```
+simplify1-preserves-Literal (Pos p) = Pos p
+simplify1-preserves-Literal (Neg p) = Neg p
+```
+
+```
+simplify1-preserves-DNFClause ∅ = ∅
+simplify1-preserves-DNFClause (lit ∙) = simplify1-preserves-Literal lit ∙
+simplify1-preserves-DNFClause {φ ∧ ψ} (lit , Cφ)
+  with simplify1-preserves-Literal lit
+... | lit'
+  with simplifyView (φ ∧ ψ)
+... | φ ∧⊥ = Cφ
+... | φ ∧⊤ = lit ∙
+... | stop _ = lit , Cφ
+```
+
+```
+simplify1-preserves-DNF ∅ = ∅
+simplify1-preserves-DNF (Cφ ∙) = simplify1-preserves-DNFClause Cφ ∙
+simplify1-preserves-DNF {φ ∨ ψ} (Cφ , DNFψ)
+  with simplify1-preserves-DNFClause Cφ 
+... | Cφ'
+  with simplifyView (φ ∨ ψ)
+... | ⊥∨ ψ = DNFψ
+... | φ ∨⊥ = Cφ ∙
+... | ⊤∨ ψ = Cφ' ∙
+... | φ ∨⊤ = DNFψ
+... | stop _ = Cφ , DNFψ
+```
+
+```
+simplify-preserves-Literal (Pos p) = Pos p
+simplify-preserves-Literal (Neg p) = Neg p
+```
+
+```
+simplify-preserves-DNFClause ∅ = ∅
+simplify-preserves-DNFClause (lit ∙) = simplify-preserves-Literal lit ∙
+simplify-preserves-DNFClause (lit , Cφ)
+  with simplify-preserves-Literal lit |
+       simplify-preserves-DNFClause Cφ
+... | lit' | Cφ' = simplify1-preserves-DNFClause (lit' , Cφ')
+```
+
+```
+simplify-preserves-DNF {⊥} ∅ = ∅
+simplify-preserves-DNF {⊤} (∅ ∙) = ∅ ∙
+simplify-preserves-DNF {` p} ((Pos p ∙) ∙) = (Pos p ∙) ∙
+simplify-preserves-DNF {¬ (` p)} ((Neg p ∙) ∙) = (Neg p ∙) ∙
+simplify-preserves-DNF (Cφ ∙)
+  with simplify-preserves-DNFClause Cφ
+... | res = res ∙
+simplify-preserves-DNF {φ ∨ ψ} (Cφ , DNFφ)
+  with simplify-preserves-DNFClause Cφ |
+       simplify-preserves-DNF DNFφ
+... | res0 | res1 = simplify1-preserves-DNF (res0 , res1)
+```
+~~~
+
+The announced !ref(DNF) transformation follows:
+
+```
+dnf : ∀ φ → ∃[ ψ ] DNF ψ × φ ⟺ ψ
+dnf φ
+  with nnf φ | nnf-NNF φ | nnf-sound φ
+... | φ' | NNFφ' | φ⟺φ'
+  with dnf1 NNFφ'
+... | ψ , DNFψ , φ'⟺ψ
+  with simplifyDNF DNFψ
+... | ψ' , DNFψ' , ψ⟺ψ'
+  with inspect (simplify ψ')
+... | it ψ'' eq
+  with simplify-preserves-DNF DNFψ'
+... | DNFψ'' rewrite eq = ψ'' , DNFψ'' , φ⟺ψ'' where
+
+  φ⟺ψ'' : φ ⟺ ψ''
+  φ⟺ψ'' ϱ rewrite φ⟺φ' ϱ |
+                  φ'⟺ψ ϱ |
+                  ψ⟺ψ' ϱ |
+                  sym ((simplify-sound ψ') ϱ) |
+                  eq = refl 
+```
+
+For example,
+
+```
+_ : dfst (dnf (⊥ ∧ ` p₀)) ≡ ⊥    ×
+    dfst (dnf (⊤ ∨ ` p₀)) ≡ ⊤    ×
+    dfst (dnf (⊤ ∧ ` p₀ ∧ ` p₀)) ≡ ` p₀ ×
+    dfst (dnf (` p₀ ∧ (` p₁ ∨ ¬ ` p₀))) ≡ ` p₀ ∧ ` p₁
+
+_ = refl , refl , refl , refl
+```
 
 # Conjunctive normal form {#CNF}
 
