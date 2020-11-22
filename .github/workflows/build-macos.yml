@@ -23,28 +23,28 @@ jobs:
         with:
           path: ~/.cabal/packages
           key: ${{ runner.os }}-${{ matrix.ghc }}-cabal-packages
-      - name: Cache ~/.cabal/store
-        uses: actions/cache@v1
-        with:
-          path: ~/.cabal/store
-          key: ${{ runner.os }}-${{ matrix.ghc }}-cabal-store
-      - name: Cache dist-newstyle
-        uses: actions/cache@v1
-        with:
-          path: dist-newstyle
-          key: ${{ runner.os }}-${{ matrix.ghc }}-dist-newstyle
-      - name: Cache ~/.stack
-        uses: actions/cache@v1
-        with:
-          path: ~/.stack
-          key: ${{ runner.os }}-stack-global-${{ hashFiles('stack.yaml') }}-${{ hashFiles('package.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-stack-global-
-      - name: Cache .stack-work
-        uses: actions/cache@v1
-        with:
-          path: .stack-work
-          key: ${{ runner.os }}-stack-work-${{ hashFiles('stack.yaml') }}-${{ hashFiles('package.yaml') }}-${{ '**/*.hs' }}
+#       - name: Cache ~/.cabal/store
+#         uses: actions/cache@v1
+#         with:
+#           path: ~/.cabal/store
+#           key: ${{ runner.os }}-${{ matrix.ghc }}-cabal-store
+#       - name: Cache dist-newstyle
+#         uses: actions/cache@v1
+#         with:
+#           path: dist-newstyle
+#           key: ${{ runner.os }}-${{ matrix.ghc }}-dist-newstyle
+#       - name: Cache ~/.stack
+#         uses: actions/cache@v1
+#         with:
+#           path: ~/.stack
+#           key: ${{ runner.os }}-stack-global-${{ hashFiles('stack.yaml') }}-${{ hashFiles('package.yaml') }}
+#           restore-keys: |
+#             ${{ runner.os }}-stack-global-
+#       - name: Cache .stack-work
+#         uses: actions/cache@v1
+#         with:
+#           path: .stack-work
+#           key: ${{ runner.os }}-stack-work-${{ hashFiles('stack.yaml') }}-${{ hashFiles('package.yaml') }}-${{ '**/*.hs' }}
       - name: Install deps
         run: brew install agda pandoc pandoc-citeproc pandoc-crossref gsed
       - name: Install pandoc-numbering
@@ -73,3 +73,8 @@ jobs:
         with:
           #repository: 'somewhereelse'
           commit_message: Update docs
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-artifact
+          path: ./
