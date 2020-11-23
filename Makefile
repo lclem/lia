@@ -205,9 +205,6 @@ $(TMPDIR)/$1.$2.md: $(SRCDIR)/$1/$2.lagda.md
 		sed '/^Generating.*/d; /^Warning\: HTML.*/d; /^reached from the.*/d; /.*Checking.*/d' | \
 		tr -d '\n'
 
-# add the markdown footer
-	cat $(SRCDIR)/footer.md >> $(TMPDIR)/$1.$2.md
-
 	@echo " [DONE]"
 
 # don't do dependency graph
@@ -297,6 +294,9 @@ $(OUTDIR)/$1/$2.md: $(TMPDIR)/$1.$2.md
 	@mkdir -p $(OUTDIR)/$1
 
 	@cat $(TMPDIR)/$1.$2.md > $(TMPDIR)/$1.$2.1.md
+
+# add the markdown footer
+	@cat $(SRCDIR)/footer.md >> $(TMPDIR)/$1.$2.1.md
 
 	@gsed -i "3isrc: $(SRCDIR)/$1/$2.lagda.md" $(TMPDIR)/$1.$2.1.md
 	@gsed -i "4ilayout: page" $(TMPDIR)/$1.$2.1.md
