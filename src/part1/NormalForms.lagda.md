@@ -1843,12 +1843,14 @@ literal-dual : Literal φ → Literal (φ ⁻)
 literal-dual (Pos p) = Pos p
 literal-dual (Neg p) = Neg p
 ```
+
 ```
 DNF-CNF-clause-dual : DNFClause φ → CNFClause (φ ⁻)
 DNF-CNF-clause-dual ∅ = ∅
 DNF-CNF-clause-dual (l ∙) = literal-dual l ∙
 DNF-CNF-clause-dual (l , C) = literal-dual l , DNF-CNF-clause-dual C
 ```
+
 ```
 DNF-CNF-dual ∅ = ∅
 DNF-CNF-dual (C ∙) = DNF-CNF-clause-dual C ∙
