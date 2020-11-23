@@ -832,14 +832,35 @@ _ = refl
 
 !hide
 ~~~
-The only difference between !ref(WNNF) and !ref(NNF) is that in the latter we addionally forbid implications and bi-implications.
-Moreover, if a formula does not contain implications/bi-implications in the first place,
-then !ref(wnnf) does not introduce them and thus it produces an !ref(NNF) formula:
+It is an easy observation that !ref(NNF) formulas are in the `Formula[⊥,⊤,¬,∨,∧]` form:
+
+```
+NNF-Formula[⊥,⊤,¬,∨,∧] : NNF φ → Formula[⊥,⊤,¬,∨,∧] φ
+```
+~~~
+~~~
+```
+NNF-Formula[⊥,⊤,¬,∨,∧] ⊤ = ⊤
+NNF-Formula[⊥,⊤,¬,∨,∧] ⊥ = ⊥
+NNF-Formula[⊥,⊤,¬,∨,∧] (` p) = ` p
+NNF-Formula[⊥,⊤,¬,∨,∧] (¬` p) = ¬ ` p
+NNF-Formula[⊥,⊤,¬,∨,∧] (φ ∧ ψ) = NNF-Formula[⊥,⊤,¬,∨,∧] φ ∧ NNF-Formula[⊥,⊤,¬,∨,∧] ψ
+NNF-Formula[⊥,⊤,¬,∨,∧] (φ ∨ ψ) = NNF-Formula[⊥,⊤,¬,∨,∧] φ ∨ NNF-Formula[⊥,⊤,¬,∨,∧] ψ
+```
+~~~
+
+!hide
+~~~
+Conversely, while a `Formula[⊥,⊤,¬,∨,∧]` formula in general is not in !ref(NNF),
+its !ref(WNNF) is in !ref(NNF):
 
 ```
 wnnf-impFree : Formula[⊥,⊤,¬,∨,∧] φ → NNF (wnnf φ)
 ```
 
+The only difference between !ref(WNNF) and !ref(NNF) is that in the latter we addionally forbid implications and bi-implications.
+If a formula does not contain implications/bi-implications in the first place,
+then !ref(wnnf) does not introduce them and thus it produces an !ref(NNF) formula:
 The proof proceeds by induction on the evidence that the formula is in the `Formula[⊥,⊤,¬,∨,∧]` form.
 ~~~
 ~~~
@@ -980,7 +1001,6 @@ every time a bi-implication is removed the formula size doubles.
 Avoiding such blow-up is the main advantage of !ref(WNNF) over !ref(NNF), if the weaker form suffices.
 On the other hand, if there are no bi-implications, !ref(nnf) has linear complexity, pretty much like !ref(wnnf).
 ~~~~
-
 
 ## Correctness
 
@@ -1142,6 +1162,45 @@ but the following formulas are not:
 _ : DNF? ζ₀ ×? All? (~?_ ∘ DNF?) ([ ζ₁ ζ₂ ]) ≡ yes _
 _ = refl
 ```
+
+!exercise(#exercise:DNF-fragment)
+~~~
+Show that a !ref(DNF) formula is in the `Formula[⊥,⊤,¬,∨,∧]` fragment:
+
+```
+DNF-Formula[⊥,⊤,¬,∨,∧] : DNF φ → Formula[⊥,⊤,¬,∨,∧] φ
+```
+
+*Hint*: It can be helpful to first prove that literals and clauses are in the fragment.
+~~~
+~~~
+We begin from proving that literals are in the fragment:
+
+```
+Literal-Formula[⊥,⊤,¬,∨,∧] : Literal φ → Formula[⊥,⊤,¬,∨,∧] φ
+Literal-Formula[⊥,⊤,¬,∨,∧] (Pos p) = ` p
+Literal-Formula[⊥,⊤,¬,∨,∧] (Neg p) = ¬ ` p
+```
+
+This allows us to prove that clauses are in the fragment:
+
+```
+DNFClause-Formula[⊥,⊤,¬,∨,∧] : DNFClause φ → Formula[⊥,⊤,¬,∨,∧] φ
+DNFClause-Formula[⊥,⊤,¬,∨,∧] ∅ = ⊤
+DNFClause-Formula[⊥,⊤,¬,∨,∧] (l ∙) = Literal-Formula[⊥,⊤,¬,∨,∧] l
+DNFClause-Formula[⊥,⊤,¬,∨,∧] (l , C)
+  = Literal-Formula[⊥,⊤,¬,∨,∧] l ∧ DNFClause-Formula[⊥,⊤,¬,∨,∧] C
+```
+
+In turn, this allows us to prove that !ref(DNF) formulas are in the fragment:
+
+```
+DNF-Formula[⊥,⊤,¬,∨,∧] ∅ = ⊥
+DNF-Formula[⊥,⊤,¬,∨,∧] (C ∙) = DNFClause-Formula[⊥,⊤,¬,∨,∧] C
+DNF-Formula[⊥,⊤,¬,∨,∧] (C , D)
+  =  DNFClause-Formula[⊥,⊤,¬,∨,∧] C ∨ DNF-Formula[⊥,⊤,¬,∨,∧] D
+```
+~~~
 
 In the rest of the section we show how to convert an arbitrary formula to an equivalent one in !ref(DNF).
 In fact, we have already seen a method achieving this:
@@ -1858,33 +1917,9 @@ DNF-CNF-dual (C , D) = DNF-CNF-clause-dual C , DNF-CNF-dual D
 ```
 ~~~
 
-Duality is a very useful property since it allows us to "recycle" the !ref(DNF) transformation from the previous section into a !ref!(CNF) transformation.
+Duality is a very useful property since it allows us to "recycle" the !ref(DNF) transformation from the previous section into a !ref!(CNF) transformation:
 
 ```
-Literal-Formula[⊥,⊤,¬,∨,∧] : Literal φ → Formula[⊥,⊤,¬,∨,∧] φ
-Literal-Formula[⊥,⊤,¬,∨,∧] (Pos p) = ` p
-Literal-Formula[⊥,⊤,¬,∨,∧] (Neg p) = ¬ ` p
-
-DNFClause-Formula[⊥,⊤,¬,∨,∧] : DNFClause φ → Formula[⊥,⊤,¬,∨,∧] φ
-DNFClause-Formula[⊥,⊤,¬,∨,∧] ∅ = ⊤
-DNFClause-Formula[⊥,⊤,¬,∨,∧] (l ∙) = Literal-Formula[⊥,⊤,¬,∨,∧] l
-DNFClause-Formula[⊥,⊤,¬,∨,∧] (l , C)
-  = Literal-Formula[⊥,⊤,¬,∨,∧] l ∧ DNFClause-Formula[⊥,⊤,¬,∨,∧] C
-
-DNF-Formula[⊥,⊤,¬,∨,∧] : DNF φ → Formula[⊥,⊤,¬,∨,∧] φ
-DNF-Formula[⊥,⊤,¬,∨,∧] ∅ = ⊥
-DNF-Formula[⊥,⊤,¬,∨,∧] (C ∙) = DNFClause-Formula[⊥,⊤,¬,∨,∧] C
-DNF-Formula[⊥,⊤,¬,∨,∧] (C , D)
-  =  DNFClause-Formula[⊥,⊤,¬,∨,∧] C ∨ DNF-Formula[⊥,⊤,¬,∨,∧] D
-
-NNF-Formula[⊥,⊤,¬,∨,∧] : NNF φ → Formula[⊥,⊤,¬,∨,∧] φ
-NNF-Formula[⊥,⊤,¬,∨,∧] ⊤ = ⊤
-NNF-Formula[⊥,⊤,¬,∨,∧] ⊥ = ⊥
-NNF-Formula[⊥,⊤,¬,∨,∧] (` p) = ` p
-NNF-Formula[⊥,⊤,¬,∨,∧] (¬` p) = ¬ ` p
-NNF-Formula[⊥,⊤,¬,∨,∧] (φ ∧ ψ) = NNF-Formula[⊥,⊤,¬,∨,∧] φ ∧ NNF-Formula[⊥,⊤,¬,∨,∧] ψ
-NNF-Formula[⊥,⊤,¬,∨,∧] (φ ∨ ψ) = NNF-Formula[⊥,⊤,¬,∨,∧] φ ∨ NNF-Formula[⊥,⊤,¬,∨,∧] ψ
-
 cnf : ∀ φ → ∃[ ψ ] CNF ψ × φ ⟺ ψ
 cnf φ
   with nnf φ | nnf-NNF φ | nnf-sound φ

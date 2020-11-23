@@ -2049,7 +2049,7 @@ Show that dualisation is an involutive operator,
 in the sense that applying it twice leaves the formula unchanged:
 
 ```
-dual-involutive : ∀ {φ} →
+dual-involutive :
   Formula[⊥,⊤,¬,∨,∧] φ →
   ----------
   φ ⁻ ⁻  ≡ φ
