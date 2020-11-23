@@ -40,7 +40,11 @@ data WNNF : Formula → Set where
   _⇒_ : WNNF φ → WNNF ψ → WNNF (φ ⇒ ψ)
   _⇔_ : WNNF φ → WNNF ψ → WNNF (φ ⇔ ψ)
 
+infix 100 `_
 infix 99 ¬`_
+infixr 98 _∧_
+infixr 97 _∨_ _⇒_
+infixr 96 _⇔_
 ```
 
 In this section we show that every formula can be transformed to a logically equivalent formula in WNNF.
@@ -1796,17 +1800,124 @@ _ : dfst (dnf (⊥ ∧ ` p₀)) ≡ ⊥    ×
 _ = refl , refl , refl , refl
 ```
 
+## Applications
+
+!exercise(#exercise:satisfiability)
+~~~
+What is the complexity of checking satisfiability of a formula in !ref(DNF)?
+And tautology?
+~~~
+~~~
+
+~~~
+
 # Conjunctive normal form {#CNF}
 
-CNF is dual to DNF.
-Is the exponential CNF transformation useful anywhere?
+A (CNF) *clause* `C` is a disjunction of literals `l1 ∨ ⋯ ∨ lm`
+and a formula is in *conjunctive normal form* (CNF) if it is a conjunction of clauses `C1 ∧ ⋯ ∧ Cn`:
 
 ```
 data CNFClause : Formula → Set where
   ∅ : CNFClause ⊥
-  _,_ : ∀ {φ ψ} → Literal φ → CNFClause ψ → CNFClause (φ ∨ ψ)
+  _∙ : Literal φ → CNFClause φ
+  _,_ : Literal φ → CNFClause ψ → CNFClause (φ ∨ ψ)
 
 data CNF : Formula → Set where
   ∅ : CNF ⊤
-  _,_ : ∀ {φ ψ} → CNFClause φ → CNF ψ → CNF (φ ∧ ψ)
+  _∙ : CNFClause φ → CNF φ
+  _,_ : CNFClause φ → CNF ψ → CNF (φ ∧ ψ)
+```
+
+!exercise(#exercise:DNF-CNF-duality)
+~~~
+Show that the conjunctive normal form (CNF) is [*dual*](../../part1/Semantics#duality) to the disjunctive normal form from the [previous section](#CNF),
+in the sense that swapping conjunctions with disjunctions allows one to pass from one form to the other:
+
+```
+DNF-CNF-dual : DNF φ → CNF (φ ⁻)
+```
+~~~
+~~~
+```
+literal-dual : Literal φ → Literal (φ ⁻)
+literal-dual (Pos p) = Pos p
+literal-dual (Neg p) = Neg p
+```
+```
+DNF-CNF-clause-dual : DNFClause φ → CNFClause (φ ⁻)
+DNF-CNF-clause-dual ∅ = ∅
+DNF-CNF-clause-dual (l ∙) = literal-dual l ∙
+DNF-CNF-clause-dual (l , C) = literal-dual l , DNF-CNF-clause-dual C
+```
+```
+DNF-CNF-dual ∅ = ∅
+DNF-CNF-dual (C ∙) = DNF-CNF-clause-dual C ∙
+DNF-CNF-dual (C , D) = DNF-CNF-clause-dual C , DNF-CNF-dual D
+```
+~~~
+
+Duality is a very useful property since it allows us to "recycle" the !ref(DNF) transformation from the previous section into a !ref!(CNF) transformation.
+
+```
+Literal-Formula[⊥,⊤,¬,∨,∧] : Literal φ → Formula[⊥,⊤,¬,∨,∧] φ
+Literal-Formula[⊥,⊤,¬,∨,∧] (Pos p) = ` p
+Literal-Formula[⊥,⊤,¬,∨,∧] (Neg p) = ¬ ` p
+
+DNFClause-Formula[⊥,⊤,¬,∨,∧] : DNFClause φ → Formula[⊥,⊤,¬,∨,∧] φ
+DNFClause-Formula[⊥,⊤,¬,∨,∧] ∅ = ⊤
+DNFClause-Formula[⊥,⊤,¬,∨,∧] (l ∙) = Literal-Formula[⊥,⊤,¬,∨,∧] l
+DNFClause-Formula[⊥,⊤,¬,∨,∧] (l , C)
+  = Literal-Formula[⊥,⊤,¬,∨,∧] l ∧ DNFClause-Formula[⊥,⊤,¬,∨,∧] C
+
+DNF-Formula[⊥,⊤,¬,∨,∧] : DNF φ → Formula[⊥,⊤,¬,∨,∧] φ
+DNF-Formula[⊥,⊤,¬,∨,∧] ∅ = ⊥
+DNF-Formula[⊥,⊤,¬,∨,∧] (C ∙) = DNFClause-Formula[⊥,⊤,¬,∨,∧] C
+DNF-Formula[⊥,⊤,¬,∨,∧] (C , D)
+  =  DNFClause-Formula[⊥,⊤,¬,∨,∧] C ∨ DNF-Formula[⊥,⊤,¬,∨,∧] D
+
+NNF-Formula[⊥,⊤,¬,∨,∧] : NNF φ → Formula[⊥,⊤,¬,∨,∧] φ
+NNF-Formula[⊥,⊤,¬,∨,∧] ⊤ = ⊤
+NNF-Formula[⊥,⊤,¬,∨,∧] ⊥ = ⊥
+NNF-Formula[⊥,⊤,¬,∨,∧] (` p) = ` p
+NNF-Formula[⊥,⊤,¬,∨,∧] (¬` p) = ¬ ` p
+NNF-Formula[⊥,⊤,¬,∨,∧] (φ ∧ ψ) = NNF-Formula[⊥,⊤,¬,∨,∧] φ ∧ NNF-Formula[⊥,⊤,¬,∨,∧] ψ
+NNF-Formula[⊥,⊤,¬,∨,∧] (φ ∨ ψ) = NNF-Formula[⊥,⊤,¬,∨,∧] φ ∨ NNF-Formula[⊥,⊤,¬,∨,∧] ψ
+
+cnf : ∀ φ → ∃[ ψ ] CNF ψ × φ ⟺ ψ
+cnf φ
+  with nnf φ | nnf-NNF φ | nnf-sound φ
+... | φ' | NNFφ' | φ⟺φ'
+  with dnf (φ' ⁻)
+... | ψ , DNFψ , φ'⁻⟺ψ = ψ ⁻ , DNF-CNF-dual DNFψ , φ⟺ψ⁻ where
+
+    Fψ : Formula[⊥,⊤,¬,∨,∧] ψ
+    Fψ = DNF-Formula[⊥,⊤,¬,∨,∧] DNFψ
+
+    Fφ' : Formula[⊥,⊤,¬,∨,∧] φ'
+    Fφ' = NNF-Formula[⊥,⊤,¬,∨,∧] NNFφ'
+    
+    Fφ'⁻ : Formula[⊥,⊤,¬,∨,∧] (φ' ⁻)
+    Fφ'⁻ = dual-preservation Fφ'
+
+    φ'⁻⁻⟺ψ⁻ : φ' ⁻ ⁻ ⟺ ψ ⁻
+    φ'⁻⁻⟺ψ⁻ = duality-equivalence-1 Fφ'⁻ Fψ φ'⁻⟺ψ
+
+    φ'⟺ψ⁻ : φ' ⟺ ψ ⁻
+    φ'⟺ψ⁻ rewrite sym (dual-involutive Fφ') = φ'⁻⁻⟺ψ⁻
+
+    φ⟺ψ⁻ : φ ⟺ ψ ⁻
+    φ⟺ψ⁻ ϱ rewrite φ⟺φ' ϱ |
+                   φ'⟺ψ⁻ ϱ = refl
+```
+
+For example,
+
+```
+_ : dfst (cnf (⊥ ∧ ` p₀)) ≡ ⊥    ×
+    dfst (cnf (⊤ ∨ ` p₀)) ≡ ⊤    ×
+    dfst (cnf (⊤ ∧ ` p₀ ∧ ` p₀)) ≡ ` p₀ ∧ ` p₀  ×
+    dfst (cnf (` p₀ ∧ (` p₁ ∨ ¬ ` p₀))) ≡ ` p₀ ∧ (` p₁ ∨ ¬ ` p₀) ×
+    dfst (cnf (` p₀ ∨ (` p₁ ∧ ¬ ` p₀))) ≡ ` p₀ ∨ ` p₁
+
+_ = refl , refl , refl , refl , refl
 ```

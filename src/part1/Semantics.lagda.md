@@ -2129,7 +2129,7 @@ The next exercises explore some consequences of the duality lemma.
 Prove that dualisation preserves logical equivalence:
 
 ```
-duality-equivalence-1 : ∀ φ ψ →
+duality-equivalence-1 :
   Formula[⊥,⊤,¬,∨,∧] φ →
   Formula[⊥,⊤,¬,∨,∧] ψ →
   φ ⟺ ψ →
@@ -2139,7 +2139,7 @@ duality-equivalence-1 : ∀ φ ψ →
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
-duality-equivalence-1 φ ψ view-φ view-ψ φ⟺ψ ϱ
+duality-equivalence-1 view-φ view-ψ φ⟺ψ ϱ
   rewrite duality ϱ view-φ |
           duality ϱ view-ψ |
           φ⟺ψ (- ϱ) = refl
@@ -2149,7 +2149,7 @@ duality-equivalence-1 φ ψ view-φ view-ψ φ⟺ψ ϱ
 !exercise(#exercise:duality-equivalence-2)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
-duality-equivalence-2 : ∀ φ ψ →
+duality-equivalence-2 :
   Formula[⊥,⊤,¬,∨,∧] φ →
   Formula[⊥,⊤,¬,∨,∧] ψ →
   φ ⁻ ⟺ ψ ⁻ →
@@ -2160,7 +2160,7 @@ duality-equivalence-2 : ∀ φ ψ →
 *Hint:* Use !ref(duality-equivalence-1) and the fact that dualisation preserves `{⊥,⊤,¬,∨,∧}` formulas:
 
 ```
-dual-preservation : ∀ {φ} →
+dual-preservation :
   Formula[⊥,⊤,¬,∨,∧] φ →
   ------------------------
   Formula[⊥,⊤,¬,∨,∧] (φ ⁻)
@@ -2185,11 +2185,11 @@ With !ref(dual-preservation) in hand,
 we can show !ref(duality-equivalence-2) by appealing to !ref(duality-equivalence-1):
 
 ```
-duality-equivalence-2 φ ψ view-φ view-ψ φ⁻⟺ψ⁻ ϱ = ⟦φ⟧ϱ≡⟦ψ⟧ϱ where
+duality-equivalence-2 {φ} {ψ} view-φ view-ψ φ⁻⟺ψ⁻ ϱ = ⟦φ⟧ϱ≡⟦ψ⟧ϱ where
 
   ⟦φ⁻⁻⟧ϱ≡⟦ψ⁻⁻⟧ϱ : ⟦ φ ⁻ ⁻ ⟧ ϱ ≡ ⟦ ψ ⁻ ⁻ ⟧ ϱ
   ⟦φ⁻⁻⟧ϱ≡⟦ψ⁻⁻⟧ϱ
-    rewrite duality-equivalence-1 (φ ⁻) (ψ ⁻)
+    rewrite duality-equivalence-1
       (dual-preservation view-φ)
       (dual-preservation view-ψ) φ⁻⟺ψ⁻ ϱ = refl
 
@@ -2220,7 +2220,7 @@ c.f. !remoteRef(part1)(Semantics)(tautology-equivalence).
 ```
 duality-tautology {φ} view-φ tau-φ ϱ = goal tau-φ where
   goal = Tautology φ       {-1-} by⟨ fst (tautology-equivalence φ) ⟩
-         φ ⟺ ⊤             {-2-} by⟨ duality-equivalence-1 φ ⊤ view-φ ⊤ ⟩
+         φ ⟺ ⊤             {-2-} by⟨ duality-equivalence-1 view-φ ⊤ ⟩
          φ ⁻ ⟺ ¬ ⊤         {-3-} by⟨ congF (φ ⁻) (¬ ⊤) (¬ ` p₀) p₀ ⟩
          ¬ φ ⁻ ⟺ ¬ ¬ ⊤     {-4-} by⟨ flip (trans-⟺ (¬ φ ⁻) (¬ ¬ ⊤) ⊤) ¬¬⊤⟺⊤ ⟩
          ¬ φ ⁻ ⟺ ⊤         {-5-} by⟨ flip (snd (tautology-equivalence (¬ φ ⁻))) ϱ ⟩
