@@ -1013,6 +1013,7 @@ Prove the folowing equivalences.
 idempotAnd : ∀ φ → φ ∧ φ ⟺ φ
 
 commAnd : ∀ φ ψ → φ ∧ ψ ⟺ ψ ∧ φ
+commOr : ∀ φ ψ → φ ∨ ψ ⟺ ψ ∨ φ
 
 assocOr : ∀ φ ψ ξ → (φ ∨ ψ) ∨ ξ ⟺ φ ∨ ψ ∨ ξ
 assocAnd : ∀ φ ψ ξ → (φ ∧ ψ) ∧ ξ ⟺ φ ∧ ψ ∧ ξ
@@ -1037,6 +1038,7 @@ deMorganIff-right : ∀ φ ψ → ¬ (φ ⇔ ψ) ⟺ φ ⇔ ¬ ψ
 idempotAnd φ ϱ = idempot-∧𝔹 (⟦ φ ⟧ ϱ)
 
 commAnd φ ψ ϱ = comm-∧𝔹 (⟦ φ ⟧ ϱ) (⟦ ψ ⟧ ϱ)
+commOr φ ψ ϱ = comm-∨𝔹 (⟦ φ ⟧ ϱ) (⟦ ψ ⟧ ϱ)
 
 assocOr φ ψ ξ ϱ = assoc-∨𝔹 (⟦ φ ⟧ ϱ) (⟦ ψ ⟧ ϱ) (⟦ ξ ⟧ ϱ)
 assocAnd φ ψ ξ ϱ = assoc-∧𝔹 (⟦ φ ⟧ ϱ) (⟦ ψ ⟧ ϱ) (⟦ ξ ⟧ ϱ)

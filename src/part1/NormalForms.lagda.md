@@ -1407,13 +1407,18 @@ The latter kind of simplifications is specific to the DNF form, and it will be h
 
 ## Simplification
 
-The !ref(DNF) structure allows us to simplify formulas to a stronger extend that what is possible with the generic procedure !remoteRef(part1)(Semantics)(simplify). In this section we explore a simplification procedure which exploits the DNF structure.
+The !ref(DNF) structure allows us to simplify formulas to a stronger extend that what is possible with the generic procedure !remoteRef(part1)(Semantics)(simplify).
+In this section we explore a simplification procedure which exploits the DNF structure.
 
-We will implement two kind of simplifications,
-both based on the fact that a propositional variable should appear at most once in a clause:
+We will implement three kinds of simplifications.
+The first two are based on the fact that a propositional variable should appear at most once in a clause:
 
 1) If a literal appears multiple times in a clause, then its repeated occurrences can be removed.
 2) If a literal appears positively and negatively in a clause, then the clause is unsatisfiable and can be removed.
+
+The third one is based on the fact that the same clause should appear at most once in a !ref(DNF):
+
+3) If a clause appears multiple times, then its repeated occurrences can be removed.
 
 ### Case 1: Repeated literals
 
@@ -1516,7 +1521,7 @@ simplifyDNFClause {φ ∧ ψ} (lit , C)
   sound ϱ rewrite ψ⟺ξ ϱ = refl
 ```
 
-### Case 2: Positive and negative occurrences
+### Case 2: Positive and negative literal occurrences
 
 The second simplification regards the case when the same literal appears both positively and negatively.
 We would like to concisely capture the notion of the dual of a literal.
@@ -1684,6 +1689,155 @@ litAndDualInClause-sound (skip litInC) (skip lit°InC) ϱ
 ```
 ~~~
 
+### Case 3: Clause subsumption
+
+```
+_≼_ : DNFClause φ → DNFClause ψ → Set
+C₀ ≼ C₁ = ∀ {ξ} {l : Literal ξ} → l IsInClause C₁ → l IsInClause C₀
+
+_≼?_ : (C₀ : DNFClause φ) (C₁ : DNFClause ψ) → Dec (C₀ ≼ C₁)
+C₀ ≼? C₁ = {!!}
+
+DNFClause2List : (C : DNFClause φ) →
+  ∃[ φs ] φ ≡ ⋀ φs ×
+  (∀[ ξ ∈ φs ] Σ (Literal ξ) λ l → l IsInClause C) ×
+  (∀ {ξ} (l : Literal ξ) → l IsInClause C → ξ ∈ φs)
+  
+DNFClause2List C = {!!}
+
+monotone-≼ : ∀ {C : DNFClause φ} {D : DNFClause ψ} → C ≼ D → ∀ ϱ → ⟦ φ ⟧ ϱ ≡ tt → ⟦ ψ ⟧ ϱ ≡ tt
+monotone-≼ {φ} {ψ} {C} {D} C≼D ϱ ⟦φ⟧ϱ≡tt
+  with DNFClause2List C
+... | φs , φ≡⋀φs , _ , haveC
+  with DNFClause2List D
+... | ψs , ψ≡⋀ψs , haveD , _
+  rewrite φ≡⋀φs | ψ≡⋀ψs = conjProp2 ψs ϱ goal where
+
+  goal : All (λ ξ → ⟦ ξ ⟧ ϱ ≡ tt) ψs
+  goal {ξ} ξ∈ψs
+    with haveD ξ∈ψs
+  ... | l , lInD
+    with C≼D lInD
+  ... | lInC
+    with haveC l lInC
+  ... | ξ∈φs = conjProp1 φs ϱ ⟦φ⟧ϱ≡tt ξ∈φs 
+
+subsume-≼ : ∀ {C : DNFClause φ} {C' : DNFClause ψ} → C ≼ C' → φ ∨ ψ ⟺ ψ
+subsume-≼ {φ} {ψ} C≼C' ϱ
+  with inspect (⟦ φ ⟧ ϱ)
+... | it tt ⟦φ⟧ϱ≡tt rewrite monotone-≼ C≼C' ϱ ⟦φ⟧ϱ≡tt = refl
+... | it ff ⟦φ⟧ϱ≡ff rewrite ⟦φ⟧ϱ≡ff = refl
+
+infix 10 _SubsumedByDNF_
+data _SubsumedByDNF_ : DNFClause φ → DNF ψ → Set where
+  stop1 : {C₀ : DNFClause φ} {C₁ : DNFClause ψ} → C₀ ≼ C₁ → C₁ SubsumedByDNF (C₀ ∙)
+  stop2 : {C₀ : DNFClause φ} {C₁ : DNFClause ψ} {D : DNF ξ} → C₀ ≼ C₁ → C₁ SubsumedByDNF (C₀ , D)
+  skip : {C₀ : DNFClause φ} {C₁ : DNFClause ψ} {D : DNF ξ} → C₁ SubsumedByDNF D → C₁ SubsumedByDNF (C₀ , D)
+
+
+```
+
+!hide
+~~~~
+We need to be able to tell whether a given clause occurs somewhere inside a given DNF.
+For this reason we show that !ref(_IsInDNF_) is decidable:
+
+```
+_SubsumedByDNF?_ : (C₁ : DNFClause φ) → (D : DNF ψ) → Dec (C₁ SubsumedByDNF D)
+```
+
+The construction proceeds by scanning the clause,
+as in !remoteRef(part0)(List)(_∈?_).
+~~~~
+~~~~
+
+```
+_SubsumedByDNF?_ {φ} {ψ} C₁ D = {!!}
+```
+~~~~
+
+!exercise(#exercise:clauseTwiceInDNF)
+~~~
+Show that removing subsumed clauses preserves the semantics
+
+```
+subsumedClauseInDNF : (C₁ : DNFClause φ) (D : DNF ψ) →
+  C₁ SubsumedByDNF D →
+  ------------------
+  φ ∨ ψ ⟺ ψ
+```
+
+*Hint*: Use idempotence !remoteRef(part1)(Semantics)(idempotOr), commutativity !remoteRef(part1)(Semantics)(commOr), and associativity !remoteRef(part1)(Semantics)(assocOr) of disjunction.
+~~~
+~~~
+```
+subsumedClauseInDNF C₁ D C₁subsD = {!!}
+```
+~~~
+
+
+```
+insertClauseInDNF : (C : DNFClause φ) (D : DNF ψ) → ∃[ ξ ] DNF ξ × φ ∨ ψ ⟺ ξ
+insertClauseInDNF C ∅ =  _ , C ∙ , λ ϱ → refl
+
+insertClauseInDNF {φ} {φ'} C (C' ∙)
+  with C ≼? C'
+-- C is stronger, so we do not add it
+... | yes C≼C' = _ , C' ∙ , φ∨φ'⟺φ' where
+
+  φ∨φ'⟺φ' : φ ∨ φ' ⟺ φ'
+  φ∨φ'⟺φ' ϱ rewrite subsume-≼ C≼C' ϱ = refl
+
+... | no _
+  with C' ≼? C
+-- C' is stronger, so we remove it
+... | yes C'≼C =  _ , C ∙ , φ∨φ'⟺φ where
+
+  φ∨φ'⟺φ : φ ∨ φ' ⟺ φ
+  φ∨φ'⟺φ ϱ rewrite
+    commOr φ φ' ϱ |
+    subsume-≼ C'≼C ϱ = refl
+    
+-- we keep C and C'
+... | no _ =  _ , (C , C' ∙) , λ ϱ → refl
+
+insertClauseInDNF {φ} {φ' ∨ ψ} C (C' , D)
+  with C ≼? C'
+-- C is stronger, so we do not add it
+... | yes C≼C' = _ , (C' , D) , φ∨φ'∨ψ⟺φ'∨ψ where
+
+  φ∨φ'∨ψ⟺φ'∨ψ : φ ∨ φ' ∨ ψ ⟺ φ' ∨ ψ
+  φ∨φ'∨ψ⟺φ'∨ψ ϱ rewrite
+    sym (assocOr φ φ' ψ ϱ) |
+    subsume-≼ C≼C' ϱ = refl
+
+... | no _
+-- recursively insert C somewhere in D (or not if pruned)
+  with insertClauseInDNF C D
+... | ξ , DNFξ , φ∨ψ⟺ξ
+  with C' ≼? C
+-- C' is stronger, so we remove it
+... | yes C'≼C =  _ , DNFξ , φ∨φ'∨ψ⟺ξ where
+
+  φ∨φ'∨ψ⟺ξ : φ ∨ φ' ∨ ψ ⟺ ξ
+  φ∨φ'∨ψ⟺ξ ϱ rewrite
+    sym (assocOr φ φ' ψ ϱ) |
+    commOr φ φ' ϱ |
+    subsume-≼ C'≼C ϱ |
+    φ∨ψ⟺ξ ϱ = refl
+    
+-- we keep C'
+... | no _ =  _ , (C' , DNFξ) , φ∨φ'∨ψ⟺φ'∨ξ where
+
+  φ∨φ'∨ψ⟺φ'∨ξ : φ ∨ φ' ∨ ψ ⟺ φ' ∨ ξ
+  φ∨φ'∨ψ⟺φ'∨ξ ϱ rewrite
+     sym (assocOr φ φ' ψ ϱ) |
+     commOr φ φ' ϱ |
+     assocOr φ' φ ψ ϱ |
+     φ∨ψ⟺ξ ϱ = refl
+```
+
+
 ### Putting things together
 
 We are now in a position to present the core DNF-simplification procedure:
@@ -1729,7 +1883,11 @@ simplifyDNF {φ ∨ ψ} (C , DNFψ)
     
 ... | no _
   with simplifyDNFClause C
-... | φ' , D , φ⟺φ' = φ' ∨ ψ' , (D , DNF') , φ∨ψ⟺φ'∨ψ' where
+... | φ' , D , φ⟺φ'
+--   with D IsInDNF DNF'
+-- ... | yes DinDNF' = ?
+-- ... | no _
+  = φ' ∨ ψ' , (D , DNF') , φ∨ψ⟺φ'∨ψ' where
 
   φ∨ψ⟺φ'∨ψ' : φ ∨ ψ ⟺ φ' ∨ ψ'
   φ∨ψ⟺φ'∨ψ' ϱ
@@ -1869,7 +2027,6 @@ And tautology?
 ~~~
 
 ~~~
-
 # Conjunctive normal form {#CNF}
 
 A (CNF) *clause* `C` is a disjunction of literals `l1 ∨ ⋯ ∨ lm`
@@ -1917,7 +2074,15 @@ DNF-CNF-dual (C , D) = DNF-CNF-clause-dual C , DNF-CNF-dual D
 ```
 ~~~
 
-Duality is a very useful property since it allows us to "recycle" the !ref(DNF) transformation from the previous section into a !ref!(CNF) transformation:
+Duality is a very useful property since it allows us to "recycle" the !ref(DNF) transformation from the previous section into a !ref(CNF) transformation:
+The basic idea is to dualise the formula, apply the !ref(DNF) transformation,
+and then dualise the formula again.
+Correctness relies on the fact that 1) if two formulas are equivalent,
+then so are their dualisations, and 2) if we dualise twice then we go back to the original formula.
+More precisely, we would like to apply !remoteRef(part1)(Semantics)(duality-equivalence-1) for 1) and !remoteRef(part1)(Semantics)(dual-preservation) for 2),
+which however rely on the fact that the input formulas are in the `Formula[⊥,⊤,¬,∨,∧]` fragment.
+For this reason, we start off the construction with a preliminary !ref(NNF) transformation,
+which guarantees us membership in the require fragment thanks to !ref(NNF-Formula[⊥,⊤,¬,∨,∧]):
 
 ```
 cnf : ∀ φ → ∃[ ψ ] CNF ψ × φ ⟺ ψ
@@ -1950,11 +2115,15 @@ cnf φ
 For example,
 
 ```
-_ : dfst (cnf (⊥ ∧ ` p₀)) ≡ ⊥    ×
-    dfst (cnf (⊤ ∨ ` p₀)) ≡ ⊤    ×
-    dfst (cnf (⊤ ∧ ` p₀ ∧ ` p₀)) ≡ ` p₀ ∧ ` p₀  ×
+_ : dfst (cnf (⊥ ∧ ` p₀)) ≡ ⊥                                    ×
+    dfst (cnf (⊤ ∨ ` p₀)) ≡ ⊤                                    ×
+    dfst (cnf (⊤ ∧ ` p₀ ∧ ` p₀)) ≡ ` p₀ ∧ ` p₀                   ×
     dfst (cnf (` p₀ ∧ (` p₁ ∨ ¬ ` p₀))) ≡ ` p₀ ∧ (` p₁ ∨ ¬ ` p₀) ×
     dfst (cnf (` p₀ ∨ (` p₁ ∧ ¬ ` p₀))) ≡ ` p₀ ∨ ` p₁
 
 _ = refl , refl , refl , refl , refl
 ```
+
+It seems that the third formula `` ` p₀ ∧ ` p₀`` could be simplified further.
+While this is certainly true as a !ref(DNF) formula (it consists of a single !ref(DNFClause)),
+as a !ref(CNF) formula it is more problematic to perform ...

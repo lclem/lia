@@ -59,9 +59,9 @@ instance
 
 ```
 infix 100 ¬𝔹_
-infixl 99 _∧𝔹_
-infixl 98 _∨𝔹_ _⇒𝔹_
-infixl 97 _⇔𝔹_
+infixr 99 _∧𝔹_
+infixr 98 _∨𝔹_ _⇒𝔹_
+infixr 97 _⇔𝔹_
 
 _∧𝔹_ : 𝔹 → 𝔹 → 𝔹
 ff ∧𝔹 _ = ff
@@ -216,6 +216,12 @@ idempot-∧𝔹 ff = refl
 ### Commutativity
 
 ```
+comm-∨𝔹 : ∀ a b → a ∨𝔹 b ≡ b ∨𝔹 a
+comm-∨𝔹 ff ff = refl
+comm-∨𝔹 ff tt = refl
+comm-∨𝔹 tt ff = refl
+comm-∨𝔹 tt tt = refl
+
 comm-∧𝔹 : ∀ a b → a ∧𝔹 b ≡ b ∧𝔹 a
 comm-∧𝔹 ff ff = refl
 comm-∧𝔹 ff tt = refl
@@ -226,7 +232,7 @@ comm-∧𝔹 tt tt = refl
 ### Associativity
 
 ```
-assoc-∨𝔹 : ∀ a b c → a ∨𝔹 b ∨𝔹 c ≡ a ∨𝔹 (b ∨𝔹 c)
+assoc-∨𝔹 : ∀ a b c → (a ∨𝔹 b) ∨𝔹 c ≡ a ∨𝔹 b ∨𝔹 c
 assoc-∨𝔹 tt tt tt = refl
 assoc-∨𝔹 tt tt ff = refl
 assoc-∨𝔹 tt ff tt = refl
@@ -238,7 +244,7 @@ assoc-∨𝔹 ff ff ff = refl
 ```
 
 ```
-assoc-∧𝔹 : ∀ a b c → a ∧𝔹 b ∧𝔹 c ≡ a ∧𝔹 (b ∧𝔹 c)
+assoc-∧𝔹 : ∀ a b c → (a ∧𝔹 b) ∧𝔹 c ≡ a ∧𝔹 b ∧𝔹 c
 assoc-∧𝔹 tt tt tt = refl
 assoc-∧𝔹 tt tt ff = refl
 assoc-∧𝔹 tt ff tt = refl
