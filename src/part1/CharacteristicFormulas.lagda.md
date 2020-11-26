@@ -204,7 +204,7 @@ For example, we can compute the characteristic formula of `ϱ₀`
 (automatically, this time):
 
 ```
-_ : n ≡ 3 → 〔 ϱ₀ 〕 ≡ ¬ ` p₀ ∧ ¬ ` p₁ ∧ ` p₂ ∧ ⊤
+_ : n ≡ 3 → 〔 ϱ₀ 〕 ≡ ¬ ` p₀ ∧ ¬ ` p₁ ∧ ` p₂
 _ = λ{refl → refl}
 ```
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -379,9 +379,10 @@ In fact, it more natural to show the stronger fact that the !ref(Formula[⊥,⊤
 ```
 Formula[⊥,⊤,¬,∨,∧]-⋀-closed : ∀ φs → All Formula[⊥,⊤,¬,∨,∧] φs → Formula[⊥,⊤,¬,∨,∧] (⋀ φs)
 Formula[⊥,⊤,¬,∨,∧]-⋀-closed ε all = ⊤
-Formula[⊥,⊤,¬,∨,∧]-⋀-closed (φ ∷ φs) all
+Formula[⊥,⊤,¬,∨,∧]-⋀-closed (φ ∷ ε) all = all here
+Formula[⊥,⊤,¬,∨,∧]-⋀-closed (φ ∷ φs@(_ ∷ _)) all
   with Formula[⊥,⊤,¬,∨,∧]-⋀-closed φs (λ φ∈φs → all (there φ∈φs))
-... | ind = all here ∧ ind
+... | ind = all here ∧ ind 
 
 Formula[⊥,⊤,¬,∨,∧]-⋁-closed : ∀ φs → All Formula[⊥,⊤,¬,∨,∧] φs → Formula[⊥,⊤,¬,∨,∧] (⋁ φs)
 Formula[⊥,⊤,¬,∨,∧]-⋁-closed ε all = ⊥
@@ -850,7 +851,8 @@ The two proofs are identical to !ref(Formula[⊥,⊤,¬,∨,∧]-⋀-closed), re
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
 Formula[⊥,⊤,∨,∧]-⋀-closed ε all = ⊤
-Formula[⊥,⊤,∨,∧]-⋀-closed (φ ∷ φs) all
+Formula[⊥,⊤,∨,∧]-⋀-closed (φ ∷ ε) all = all here
+Formula[⊥,⊤,∨,∧]-⋀-closed (φ ∷ φs@(_ ∷ _)) all
   with Formula[⊥,⊤,∨,∧]-⋀-closed φs (λ φ∈φs → all (there φ∈φs))
 ... | ind = all here ∧ ind
 
