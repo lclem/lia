@@ -1217,7 +1217,8 @@ Sat : Formula → Set
 Sat φ = ∃[ ϱ ] ⟦ φ ⟧ ϱ ≡ tt
 ```
 
-Satisfiability is decidable since we can enumerate satisfying assignments:
+Satisfiability is decidable (for every fixed number of propositional variables)
+since we can enumerate satisfying assignments:
 
 ```
 Sat? : ∀ φ → Dec (Sat φ)
@@ -1235,11 +1236,22 @@ _ : n ≡ 3 → ⌞ Sat? (` p₀ ∧ ¬ ` p₀) ⌟ ≡ ff
 _ = λ{refl → refl}
 ```
 
+Of course we can also prove that the latter formula is unsatisfiable for *every* number of variables:
+
+```
+p∧¬p-unsat : ~ Sat (` p ∧ ¬ ` p)
+p∧¬p-unsat {p} (ϱ , equiv) with ϱ p
+... | tt = ff≢tt equiv
+... | ff = ff≢tt equiv
+```
+
 !exercise(#exercise:tau-sat)(Tautology and satisfiability)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Elaborate and prove a natural property connecting whether `φ` is a tautology and satisfiability.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+One possible property is the following:
+
 ```
 tau-sat : ∀ φ → Tautology φ ↔ ~ Sat (¬ φ)
 tau-sat φ = tau→sat , sat→tau where
@@ -1261,6 +1273,48 @@ tau-sat φ = tau→sat , sat→tau where
 ```
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+!exercise(#exercise:equiv-unsat)(Equivalence and unsatisfiability)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Express unsatisfiability in terms of logical equivalence.
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+One possible property is that a formula is unsatisfiable if, and only if, it is logically equivalent to !ref(⊥):
+
+```
+equiv↔unsat : φ ⟺ ⊥ ↔ ~ Sat φ
+```
+
+We prove the two directions separately:
+
+```
+equiv→unsat : φ ⟺ ⊥ → ~ Sat φ
+equiv→unsat φ⟺⊥ (ϱ , ⟦φ⟧ϱ≡tt)
+  with φ⟺⊥ ϱ
+... | ⟦φ⟧ϱ≡ff = a≡ff→a≡tt-elim ⟦φ⟧ϱ≡ff ⟦φ⟧ϱ≡tt
+```
+
+```
+unsat→equiv : ~ Sat φ → φ ⟺ ⊥
+unsat→equiv {φ} ~Satφ ϱ
+  with inspect (⟦ φ ⟧ ϱ)
+... | it ff ⟦φ⟧ϱ≡ff = ⟦φ⟧ϱ≡ff
+... | it tt ⟦φ⟧ϱ≡tt = F-elim (~Satφ (ϱ , ⟦φ⟧ϱ≡tt))
+```
+
+It is now just a matter of combining the two directions:
+
+```
+equiv↔unsat {φ} = equiv→unsat {φ} , unsat→equiv {φ}
+```
+
+For instance, we can prove:
+
+```
+p∧¬p⟺⊥ : ` p ∧ ¬ ` p ⟺ ⊥
+p∧¬p⟺⊥ {p} ϱ = unsat→equiv {` p ∧ ¬ ` p} p∧¬p-unsat ϱ
+```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 ## Long conjunctions and disjunctions
 
 ### Conjunctions
@@ -1271,7 +1325,7 @@ This is achieved with the following "long conjunction" operation:
 ```
 infix 10 ⋀_
 ⋀_ : Formula * → Formula
-⋀ φs = foldr _∧_ ⊤ φs
+⋀ φs = foldr1 _∧_ ⊤ φs
 ```
 
 (Despite the typographical similarity,
@@ -1280,7 +1334,7 @@ while [`_∧_ : Formula → Formula → Formula`](#Formula._∧_) is a binary fo
 For instance, we have
 
 ```
-_ : ⋀ [ (` p₀) (` p₁) (` p₂) ] ≡ ` p₀ ∧ ` p₁ ∧ ` p₂ ∧ ⊤
+_ : ⋀ [ (` p₀) (` p₁) (` p₂) ] ≡ ` p₀ ∧ ` p₁ ∧ ` p₂
 _ = refl
 ```
 
@@ -1305,17 +1359,19 @@ Prove the two defining properties !ref(conjProp1) and !ref(conjProp2) of long co
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
-conjProp1 (ψ ∷ φs) ϱ ⟦φs⟧≡tt here = 𝔹conjProp1 (⟦ ψ ⟧ ϱ) _ ⟦φs⟧≡tt 
-conjProp1 (ψ ∷ φs) ϱ ⟦ψ∧φs⟧≡tt {φ} (there φ∈φs) = conjProp1 φs ϱ (𝔹conjProp2 (⟦ ψ ⟧ ϱ) _ ⟦ψ∧φs⟧≡tt) φ∈φs
+conjProp1 (ψ ∷ ε) ϱ ⟦φs⟧≡tt here = 𝔹conjProp1 (⟦ ψ ⟧ ϱ) tt ⟦φs⟧≡tt
+conjProp1 (ψ ∷ φs@(_ ∷ _)) ϱ ⟦φs⟧≡tt here = 𝔹conjProp1 (⟦ ψ ⟧ ϱ) (⟦ ⋀ φs ⟧ ϱ) ⟦φs⟧≡tt 
+conjProp1 (ψ ∷ φs@(_ ∷ _)) ϱ ⟦ψ∧φs⟧≡tt {φ} (there φ∈φs)
+  = conjProp1 φs ϱ (𝔹conjProp2 (⟦ ψ ⟧ ϱ) _ ⟦ψ∧φs⟧≡tt) φ∈φs 
 
 conjProp2 ε ϱ ass = refl
-conjProp2 (φ ∷ φs) ϱ ass = 𝔹conjProp3 _ _ ⟦φ⟧ϱ≡tt ⟦⋀φs⟧ϱ≡tt where
+conjProp2 (φ ∷ ε) ϱ ass = ass here
+conjProp2 (φ ∷ φs@(_ ∷ _)) ϱ ass
+  with conjProp2 φs ϱ λ ψ∈φs → ass (there ψ∈φs)
+... | ⟦⋀φs⟧ϱ≡tt = 𝔹conjProp3 _ _ ⟦φ⟧ϱ≡tt ⟦⋀φs⟧ϱ≡tt where
 
   ⟦φ⟧ϱ≡tt : ⟦ φ ⟧ ϱ ≡ tt
   ⟦φ⟧ϱ≡tt = ass here
-
-  ⟦⋀φs⟧ϱ≡tt : ⟦ ⋀ φs ⟧ ϱ ≡ tt
-  ⟦⋀φs⟧ϱ≡tt = conjProp2 φs ϱ λ ψ∈φs → ass (there ψ∈φs)
 ```
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

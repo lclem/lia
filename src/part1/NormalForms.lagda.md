@@ -3,7 +3,7 @@ title: "Normal forms 🚧"
 ---
 
 ```
-{-# OPTIONS --allow-unsolved-metas --rewriting --confluence-check #-}
+{-# OPTIONS --allow-unsolved-metas --inversion-max-depth=100 --rewriting --confluence-check #-}
 open import part0.index
 
 module part1.NormalForms (n : ℕ) where
@@ -20,7 +20,6 @@ In this chapter we study normal forms for classical propositional logic, namely
 * [negation normal form (NNF)](#NNF),
 * [disjunctive normal form (DNF)](#DNF), and its dual
 * [conjunctive normal form (CNF)](#CNF).
-
 
 # Weak negation normal form {#WNNF}
 
@@ -543,7 +542,6 @@ size-¬ : ∀ φ → size φ ≤ size (¬ φ)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
 size-¬ _ = n≤sucn
--- size-¬¬ φ = trans-≤ (size-¬ φ) (size-¬ (¬ φ)) 
 ```
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1034,19 +1032,17 @@ data Literal : Formula → Set where
   Neg : (p : PropName) → Literal (¬ (` p))
   
 data DNFClause : Formula → Set where
-  ∅ : DNFClause ⊤
   _∙ : Literal φ → DNFClause φ
   _,_ : Literal φ → DNFClause ψ → DNFClause (φ ∧ ψ)
 
 data DNF : Formula  → Set where
-  ∅ : DNF ⊥
   _∙ : DNFClause φ → DNF φ
   _,_ : DNFClause φ → DNF ψ → DNF (φ ∨ ψ)
 
 infix 11 _∙
 ```
 
-[^DNF-middle-constructors]: The middle constructors of the form `_∙` allow us to avoid always appending a `⊥` or `⊤` to !ref(DNFClause), resp., !ref(DNF) formulas.
+[^DNF-middle-constructors]: The constructors of the form `_∙` allow us to avoid always appending a `⊥` or `⊤` to !ref(DNFClause), resp., !ref(DNF) formulas.
 This introduces a slight overhead in the following code,
 but allows formulas such as `` ` p₀ `` to be already in !ref(DNF),
 instead of considering the more cumbersome `` ` p₀ ∧ ⊤ ∨ ⊥ ``.
@@ -1083,7 +1079,7 @@ Literal? (φ ⇔ ψ) = no λ ()
 
 ```
 DNFClause? ⊥ = no λ{(() ∙)}
-DNFClause? ⊤ = yes ∅
+DNFClause? ⊤ = no λ{(() ∙)}
 DNFClause? (` p) = yes (Pos p ∙)
 
 DNFClause? (¬ ⊥) = no λ{(() ∙)}
@@ -1108,8 +1104,8 @@ DNFClause? (φ ⇔ ψ) = no λ{(() ∙)}
 ```
 
 ```
-DNF? ⊥ = yes ∅
-DNF? ⊤ = yes (∅ ∙)
+DNF? ⊥ = no λ{((() ∙) ∙)}
+DNF? ⊤ = no λ{((() ∙) ∙)}
 DNF? (` p) = yes (Pos p ∙ ∙)
 DNF? (¬ ⊥) = no λ{(() ∙ ∙)}
 DNF? (¬ ⊤) = no λ{(() ∙ ∙)}
@@ -1186,7 +1182,6 @@ This allows us to prove that clauses are in the fragment:
 
 ```
 DNFClause-Formula[⊥,⊤,¬,∨,∧] : DNFClause φ → Formula[⊥,⊤,¬,∨,∧] φ
-DNFClause-Formula[⊥,⊤,¬,∨,∧] ∅ = ⊤
 DNFClause-Formula[⊥,⊤,¬,∨,∧] (l ∙) = Literal-Formula[⊥,⊤,¬,∨,∧] l
 DNFClause-Formula[⊥,⊤,¬,∨,∧] (l , C)
   = Literal-Formula[⊥,⊤,¬,∨,∧] l ∧ DNFClause-Formula[⊥,⊤,¬,∨,∧] C
@@ -1195,7 +1190,6 @@ DNFClause-Formula[⊥,⊤,¬,∨,∧] (l , C)
 In turn, this allows us to prove that !ref(DNF) formulas are in the fragment:
 
 ```
-DNF-Formula[⊥,⊤,¬,∨,∧] ∅ = ⊥
 DNF-Formula[⊥,⊤,¬,∨,∧] (C ∙) = DNFClause-Formula[⊥,⊤,¬,∨,∧] C
 DNF-Formula[⊥,⊤,¬,∨,∧] (C , D)
   =  DNFClause-Formula[⊥,⊤,¬,∨,∧] C ∨ DNF-Formula[⊥,⊤,¬,∨,∧] D
@@ -1237,13 +1231,6 @@ _+++∨+++_ : DNF φ →
 ~~~
 ~~~
 ```
-_+∧+_ {⊤} {ψ} ∅ Cψ = ψ , Cψ , correctness where
-
-  correctness : ⊤ ∧ ψ ⟺ ψ
-  correctness ϱ with ⟦ ψ ⟧ ϱ
-  ... | tt = refl
-  ... | ff = refl
-
 _+∧+_ {φ} {ψ} (Lφ ∙) Cψ = φ ∧ ψ , (Lφ , Cψ) , λ ϱ → refl
   
 _+∧+_ {φ ∧ φ'} {ψ} (Lφ , Cφ') Cψ
@@ -1352,8 +1339,8 @@ dnf1 : NNF φ → ∃[ ψ ] DNF ψ × φ ⟺ ψ
 The base cases are immediate:
 
 ```
-dnf1 ⊤ = ⊤ , ∅ ∙ , λ ϱ → refl
-dnf1 ⊥ = ⊥ , ∅ , λ ϱ → refl
+dnf1 ⊤ = ` p₀ ∨ ¬ ` p₀ , (Pos p₀ ∙ , Neg p₀ ∙ ∙) , λ ϱ → sym (LEM ϱ)
+dnf1 ⊥ = ` p₀ ∧ ¬ ` p₀ , (Pos p₀ , (Neg p₀ ∙) ) ∙ , λ ϱ → sym (p∧¬p⟺⊥ ϱ)
 dnf1 (` p) = ` p , Pos p ∙ ∙ , λ ϱ → refl
 dnf1 (¬` p) = ¬ ` p , Neg p ∙ ∙ , λ ϱ → refl
 ```
@@ -1389,14 +1376,15 @@ dnf1 {φ ∧ ψ} (NNFφ ∧ NNFψ)
 For example,
 
 ```
-_ : dfst (dnf1 (⊥ ∧ ` p₀)) ≡ ⊥                  ×
-    dfst (dnf1 (⊤ ∨ ` p₀)) ≡ ⊤ ∨ ` p₀           ×
-    dfst (dnf1 (⊤ ∧ ` p₀ ∧ ` p₀)) ≡ ` p₀ ∧ ` p₀ ×
+_ : dfst (dnf1 (⊥ ∧ ` p₀)) ≡ ` p₀ ∧ ¬ ` p₀ ∧ ` p₀              ×
+    dfst (dnf1 (⊤ ∨ ` p₀)) ≡ ` p₀ ∨ ¬ ` p₀  ∨ ` p₀           ×
+    dfst (dnf1 (` p₀ ∧ ` p₀)) ≡ ` p₀ ∧ ` p₀ ×
     dfst (dnf1 (` p₀ ∧ (` p₁ ∨ ¬` p₀))) ≡ ` p₀ ∧ ` p₁ ∨ ` p₀ ∧ ¬ ` p₀
 
 _ = refl , refl , refl , refl
 ```
 
+TODO: adjust
 We can see that !ref(dnf1) performs some rudimentary form of simplification, e.g., by removing `⊥` in ``⊥ ∧ ` p₀``,
 but not all the simplifications we may desire.
 For instance ``⊤ ∨ ` p₀`` should be transformed into `⊤` (which could be achieved by !remoteRef(part1)(Semantics)(simplify)).
@@ -1443,7 +1431,7 @@ We need to be able to tell whether a given literal occurs somewhere inside a giv
 For this reason we show that !ref(_IsInClause_) is decidable:
 
 ```
-_isInClause?_ : (lit : Literal φ) → (C : DNFClause ψ) → Dec (lit IsInClause C)
+_IsInClause?_ : (lit : Literal φ) → (C : DNFClause ψ) → Dec (lit IsInClause C)
 ```
 
 The construction proceeds by scanning the clause,
@@ -1451,20 +1439,18 @@ as in !remoteRef(part0)(List)(_∈?_).
 ~~~~
 ~~~~
 ```
-lit isInClause? ∅ = no λ ()
-
-_isInClause?_ {φ} {ψ} lit (lit' ∙)
+_IsInClause?_ {φ} {ψ} lit (lit' ∙)
   with φ ≡? ψ
 ... | no φ≢ψ = no λ{stop1 → φ≢ψ refl}
-Pos p isInClause? (Pos p ∙) | yes refl = yes stop1
-Neg p isInClause? (Neg p ∙) | yes refl = yes stop1
+Pos p IsInClause? (Pos p ∙) | yes refl = yes stop1
+Neg p IsInClause? (Neg p ∙) | yes refl = yes stop1
 
-_isInClause?_ {φ} {ψ ∧ ξ} lit (lit' , C)
+_IsInClause?_ {φ} {ψ ∧ ξ} lit (lit' , C)
   with φ ≡? ψ
-Pos p isInClause? (Pos p , C) | yes refl = yes stop2
-Neg p isInClause? (Neg p , C) | yes refl = yes stop2
-lit isInClause? (lit' , C) | no φ≢ψ
-  with lit isInClause? C
+Pos p IsInClause? (Pos p , C) | yes refl = yes stop2
+Neg p IsInClause? (Neg p , C) | yes refl = yes stop2
+lit IsInClause? (lit' , C) | no φ≢ψ
+  with lit IsInClause? C
 ... | yes litInC = yes (skip litInC)
 ... | no ~litInC = no λ{stop2 → φ≢ψ refl; (skip litInC) → ~litInC litInC}
 ```
@@ -1504,12 +1490,11 @@ Correctness is guaranteed by !ref(litTwiceInClause):
 
 ```
 simplifyDNFClause : DNFClause φ → ∃[ ψ ] DNFClause ψ × φ ⟺ ψ
-simplifyDNFClause ∅ = ⊤ , ∅ , λ ϱ → refl
 simplifyDNFClause (lit ∙) = _ , lit ∙ , λ ϱ → refl
 simplifyDNFClause {φ ∧ ψ} (lit , C)
   with simplifyDNFClause C
 ... | ξ , D , ψ⟺ξ
-  with lit isInClause? C
+  with lit IsInClause? C
 ... | yes litInC = _ , D , sound where
 
   sound : φ ∧ ψ ⟺ ξ
@@ -1583,13 +1568,11 @@ when we do not want to explicitly mention the underlying formula `ψ`.)
 ~~~
 ~~~
 ```
-someLitAndDualInClause ∅ = no λ{()}
-
 -- it cannot be that lit can be both of the form Pos p and Neg p
 someLitAndDualInClause (lit ∙) = no λ{(` p , Pos p , stop1 , ())}
 
 someLitAndDualInClause (lit , C)
-  with lit ° isInClause? C
+  with lit ° IsInClause? C
 ... | yes proof = yes (_ , lit , stop2 , skip proof)
 ... | no proof
   with someLitAndDualInClause C
@@ -1696,15 +1679,44 @@ _≼_ : DNFClause φ → DNFClause ψ → Set
 C₀ ≼ C₁ = ∀ {ξ} {l : Literal ξ} → l IsInClause C₁ → l IsInClause C₀
 
 _≼?_ : (C₀ : DNFClause φ) (C₁ : DNFClause ψ) → Dec (C₀ ≼ C₁)
-C₀ ≼? C₁ = {!!}
+C₀ ≼? (l ∙) with l IsInClause? C₀
+... | no ~lInC₀ = no λ C₀≼C₁ → ~lInC₀ (C₀≼C₁ stop1)
+... | yes lInC₀ = yes λ{stop1 → lInC₀}
+C₀ ≼? (l , C₁)  with l IsInClause? C₀
+... | no ~lInC₀ = no λ C₀≼l,C₁ → ~lInC₀ (C₀≼l,C₁ stop2)
+... | yes lInC₀ with C₀ ≼? C₁
+... | no ~C₀≼C₁ = no λ C₀≼l,C₁ → ~C₀≼C₁ λ l'InC₁ → C₀≼l,C₁ (skip l'InC₁)
+... | yes C₀≼C₁ = yes λ{stop2 → lInC₀ ; (skip x) → C₀≼C₁ x}
 
 DNFClause2List : (C : DNFClause φ) →
   ∃[ φs ] φ ≡ ⋀ φs ×
   (∀[ ξ ∈ φs ] Σ (Literal ξ) λ l → l IsInClause C) ×
   (∀ {ξ} (l : Literal ξ) → l IsInClause C → ξ ∈ φs)
   
-DNFClause2List C = {!!}
+DNFClause2List {φ} (l ∙) = [ φ ] , refl , (λ{ here → l , stop1}) , λ{l' stop1 → here}
 
+DNFClause2List {φ ∧ φ'} (l , l' ∙) = φ ∷ φ' ∷ ε , refl , (λ{ here → l , stop2 ; (there here) → l' , skip stop1}) , λ{ l₁ stop2 → here ; l₁ (skip stop1) → there here}
+
+DNFClause2List {φ ∧ ψ} (l , C@(l' , C'))
+  with DNFClause2List C
+  
+... | ε , ψ≡⋀φs , prop1 , prop2 with () ← prop2 _ stop2
+  
+... | φs@(φ' ∷ φs') , ψ≡⋀φs , prop1 , prop2
+    = φ ∷ φs , goal1 , goal2 , goal3 where
+
+    goal1 : φ ∧ ψ ≡ ⋀ (φ ∷ φs)
+    goal1 rewrite sym ψ≡⋀φs = refl
+
+    goal2 : ∀[ ξ ∈ φ ∷ φs ] Σ (Literal ξ) λ lit → lit IsInClause (l , C)
+    goal2 here = l , stop2
+    goal2 {ξ} (there x) with prop1 {ξ} x
+    ... | lit , have = lit , skip have
+
+    goal3 : ∀ {ξ} (lit : Literal ξ) → lit IsInClause (l , C) → ξ ∈ φ ∷ φs
+    goal3 lit stop2 = here
+    goal3 lit (skip x) = there (prop2 lit x)
+   
 monotone-≼ : ∀ {C : DNFClause φ} {D : DNFClause ψ} → C ≼ D → ∀ ϱ → ⟦ φ ⟧ ϱ ≡ tt → ⟦ ψ ⟧ ϱ ≡ tt
 monotone-≼ {φ} {ψ} {C} {D} C≼D ϱ ⟦φ⟧ϱ≡tt
   with DNFClause2List C
@@ -1727,58 +1739,11 @@ subsume-≼ {φ} {ψ} C≼C' ϱ
   with inspect (⟦ φ ⟧ ϱ)
 ... | it tt ⟦φ⟧ϱ≡tt rewrite monotone-≼ C≼C' ϱ ⟦φ⟧ϱ≡tt = refl
 ... | it ff ⟦φ⟧ϱ≡ff rewrite ⟦φ⟧ϱ≡ff = refl
-
-infix 10 _SubsumedByDNF_
-data _SubsumedByDNF_ : DNFClause φ → DNF ψ → Set where
-  stop1 : {C₀ : DNFClause φ} {C₁ : DNFClause ψ} → C₀ ≼ C₁ → C₁ SubsumedByDNF (C₀ ∙)
-  stop2 : {C₀ : DNFClause φ} {C₁ : DNFClause ψ} {D : DNF ξ} → C₀ ≼ C₁ → C₁ SubsumedByDNF (C₀ , D)
-  skip : {C₀ : DNFClause φ} {C₁ : DNFClause ψ} {D : DNF ξ} → C₁ SubsumedByDNF D → C₁ SubsumedByDNF (C₀ , D)
-
-
 ```
-
-!hide
-~~~~
-We need to be able to tell whether a given clause occurs somewhere inside a given DNF.
-For this reason we show that !ref(_IsInDNF_) is decidable:
-
-```
-_SubsumedByDNF?_ : (C₁ : DNFClause φ) → (D : DNF ψ) → Dec (C₁ SubsumedByDNF D)
-```
-
-The construction proceeds by scanning the clause,
-as in !remoteRef(part0)(List)(_∈?_).
-~~~~
-~~~~
-
-```
-_SubsumedByDNF?_ {φ} {ψ} C₁ D = {!!}
-```
-~~~~
-
-!exercise(#exercise:clauseTwiceInDNF)
-~~~
-Show that removing subsumed clauses preserves the semantics
-
-```
-subsumedClauseInDNF : (C₁ : DNFClause φ) (D : DNF ψ) →
-  C₁ SubsumedByDNF D →
-  ------------------
-  φ ∨ ψ ⟺ ψ
-```
-
-*Hint*: Use idempotence !remoteRef(part1)(Semantics)(idempotOr), commutativity !remoteRef(part1)(Semantics)(commOr), and associativity !remoteRef(part1)(Semantics)(assocOr) of disjunction.
-~~~
-~~~
-```
-subsumedClauseInDNF C₁ D C₁subsD = {!!}
-```
-~~~
 
 
 ```
 insertClauseInDNF : (C : DNFClause φ) (D : DNF ψ) → ∃[ ξ ] DNF ξ × φ ∨ ψ ⟺ ξ
-insertClauseInDNF C ∅ =  _ , C ∙ , λ ϱ → refl
 
 insertClauseInDNF {φ} {φ'} C (C' ∙)
   with C ≼? C'
@@ -1843,38 +1808,51 @@ insertClauseInDNF {φ} {φ' ∨ ψ} C (C' , D)
 We are now in a position to present the core DNF-simplification procedure:
 
 ```
-simplifyDNF : DNF φ → ∃[ ψ ] DNF ψ × φ ⟺ ψ
+simplifyDNF1 : DNF φ → φ ⟺ ⊥ ⊎ (∃[ ψ ] DNF ψ × φ ⟺ ψ)
 ```
 
 The construction is by induction on the evidence that `φ` is in DNF.
-The first base case is easy enough to start with:
-
-```
-simplifyDNF ∅ = _ , ∅ , λ ϱ → refl
-```
-
-In the second base case the DNF consists of a single clause `C`.
+In the base case the DNF consists of a single clause `C`.
 We appeal to !ref(someLitAndDualInClause) to test whether `C` is unsatisfiable.
 In the positive case the whole DNF reduces to `∅`,
 otherwise to the simplification of `C`:
 
 ```
-simplifyDNF (C ∙)
+simplifyDNF1 {φ} (C ∙)
   with someLitAndDualInClause C
-... | yes (_ , lit , litInC , lit°InC) = _ , ∅ , litAndDualInClause-sound litInC lit°InC
+... | yes (_ , lit , litInC , lit°InC) = left (litAndDualInClause-sound litInC lit°InC)
+
 ... | no _
   with simplifyDNFClause C
-... | _ , D , equiv = _ , D ∙ , equiv
+... | _ , D , equiv = right (_ , D ∙ , equiv)
 ```
 
 The inductive step is analogous:
 
 ```
-simplifyDNF {φ ∨ ψ} (C , DNFψ)
-  with simplifyDNF DNFψ
-... | ψ' , DNF' , ψ⟺ψ'
+simplifyDNF1 {φ ∨ ψ} (C , DNFψ)
+  with simplifyDNF1 DNFψ
+... | left ψ⟺⊥ = goal where
+
+    goal : φ ∨ ψ ⟺ ⊥ ⊎ (∃[ ξ ] DNF ξ × φ ∨ ψ ⟺ ξ)
+    goal with simplifyDNF1 (C ∙)
+    ... | left φ⟺⊥ = left φ∨ψ⟺⊥ where
+
+      φ∨ψ⟺⊥ : φ ∨ ψ ⟺ ⊥
+      φ∨ψ⟺⊥ ϱ rewrite ψ⟺⊥ ϱ |
+                       φ⟺⊥ ϱ = refl
+                       
+    ... | right (ξ , DNFξ , φ⟺ξ) = right (ξ , DNFξ , φ∨ψ⟺ξ) where
+    
+       φ∨ψ⟺ξ : φ ∨ ψ ⟺ ξ
+       φ∨ψ⟺ξ ϱ rewrite ψ⟺⊥ ϱ |
+                        φ⟺ξ ϱ = refl
+       
+... | right (ψ' , DNF' , ψ⟺ψ')
+
   with someLitAndDualInClause C
-... | yes (_ , lit , litInC , lit°InC) = ψ' , DNF' , φ∨ψ⟺ψ' where
+... | yes (_ , lit , litInC , lit°InC)
+  = right (ψ' , DNF' , φ∨ψ⟺ψ') where
 
   φ∨ψ⟺ψ' : φ ∨ ψ ⟺ ψ'
   φ∨ψ⟺ψ' ϱ
@@ -1884,17 +1862,29 @@ simplifyDNF {φ ∨ ψ} (C , DNFψ)
 ... | no _
   with simplifyDNFClause C
 ... | φ' , D , φ⟺φ'
---   with D IsInDNF DNF'
--- ... | yes DinDNF' = ?
--- ... | no _
-  = φ' ∨ ψ' , (D , DNF') , φ∨ψ⟺φ'∨ψ' where
+  with insertClauseInDNF D DNF'
+... | ξ , DNFξ , φ'∨ψ'⟺ξ = right (ξ , DNFξ , φ∨ψ⟺ξ) where
 
-  φ∨ψ⟺φ'∨ψ' : φ ∨ ψ ⟺ φ' ∨ ψ'
-  φ∨ψ⟺φ'∨ψ' ϱ
+  φ∨ψ⟺ξ : φ ∨ ψ ⟺ ξ
+  φ∨ψ⟺ξ ϱ
     rewrite φ⟺φ' ϱ |
-            ψ⟺ψ' ϱ = refl
+            ψ⟺ψ' ϱ |
+            φ'∨ψ'⟺ξ ϱ = refl
 ```
 
+
+```
+simplifyDNF : DNF φ → ∃[ ψ ] DNF ψ × φ ⟺ ψ
+simplifyDNF {φ} DNFφ with simplifyDNF1 DNFφ
+... | right x = x
+... | left φ⟺⊥ = (` p₀ ∧ ¬ ` p₀) , (Pos p₀ , Neg p₀ ∙) ∙ , φ⟺p₀∧¬p₀ where
+
+  φ⟺p₀∧¬p₀ : φ ⟺ ` p₀ ∧ ¬ ` p₀
+  φ⟺p₀∧¬p₀ ϱ
+    rewrite p∧¬p⟺⊥ {p₀} ϱ |
+            φ⟺⊥ ϱ = refl
+  
+```
 ## Complete transformation
 
 The final !ref(DNF) transformation is achieved by combining the !ref(NNF) transformation,
@@ -1928,7 +1918,6 @@ simplify1-preserves-Literal (Neg p) = Neg p
 ```
 
 ```
-simplify1-preserves-DNFClause ∅ = ∅
 simplify1-preserves-DNFClause (lit ∙) = simplify1-preserves-Literal lit ∙
 simplify1-preserves-DNFClause {φ ∧ ψ} (lit , Cφ)
   with simplify1-preserves-Literal lit
@@ -1940,7 +1929,6 @@ simplify1-preserves-DNFClause {φ ∧ ψ} (lit , Cφ)
 ```
 
 ```
-simplify1-preserves-DNF ∅ = ∅
 simplify1-preserves-DNF (Cφ ∙) = simplify1-preserves-DNFClause Cφ ∙
 simplify1-preserves-DNF {φ ∨ ψ} (Cφ , DNFψ)
   with simplify1-preserves-DNFClause Cφ 
@@ -1959,7 +1947,6 @@ simplify-preserves-Literal (Neg p) = Neg p
 ```
 
 ```
-simplify-preserves-DNFClause ∅ = ∅
 simplify-preserves-DNFClause (lit ∙) = simplify-preserves-Literal lit ∙
 simplify-preserves-DNFClause (lit , Cφ)
   with simplify-preserves-Literal lit |
@@ -1969,7 +1956,6 @@ simplify-preserves-DNFClause (lit , Cφ)
 
 ```
 simplify-preserves-DNF {⊥} ∅ = ∅
-simplify-preserves-DNF {⊤} (∅ ∙) = ∅ ∙
 simplify-preserves-DNF {` p} ((Pos p ∙) ∙) = (Pos p ∙) ∙
 simplify-preserves-DNF {¬ (` p)} ((Neg p ∙) ∙) = (Neg p ∙) ∙
 simplify-preserves-DNF (Cφ ∙)
@@ -1987,30 +1973,33 @@ The announced !ref(DNF) transformation follows:
 ```
 dnf : ∀ φ → ∃[ ψ ] DNF ψ × φ ⟺ ψ
 dnf φ
-  with nnf φ | nnf-NNF φ | nnf-sound φ
-... | φ' | NNFφ' | φ⟺φ'
-  with dnf1 NNFφ'
-... | ψ , DNFψ , φ'⟺ψ
+  with simplify φ | simplify-sound φ
+... | φ' | φ'⟺φ
+  with nnf φ' | nnf-NNF φ' | nnf-sound φ'
+... | φ'' | NNFφ'' | φ'⟺φ''
+  with dnf1 NNFφ''
+... | ψ , DNFψ , φ''⟺ψ
   with simplifyDNF DNFψ
 ... | ψ' , DNFψ' , ψ⟺ψ'
-  with inspect (simplify ψ')
-... | it ψ'' eq
+  with inspect (simplify ψ') | simplify-sound ψ'
+... | it ψ'' eq | ψ''⟺ψ'
   with simplify-preserves-DNF DNFψ'
 ... | DNFψ'' rewrite eq = ψ'' , DNFψ'' , φ⟺ψ'' where
 
   φ⟺ψ'' : φ ⟺ ψ''
-  φ⟺ψ'' ϱ rewrite φ⟺φ' ϱ |
-                  φ'⟺ψ ϱ |
+  φ⟺ψ'' ϱ rewrite sym (φ'⟺φ ϱ) |
+                  φ'⟺φ'' ϱ |
+                  φ''⟺ψ ϱ |
                   ψ⟺ψ' ϱ |
-                  sym ((simplify-sound ψ') ϱ) |
+                  sym (ψ''⟺ψ' ϱ) |
                   eq = refl 
 ```
 
 For example,
 
 ```
-_ : dfst (dnf (⊥ ∧ ` p₀)) ≡ ⊥    ×
-    dfst (dnf (⊤ ∨ ` p₀)) ≡ ⊤    ×
+_ : dfst (dnf (⊥ ∧ ` p₀)) ≡ ` p₀ ∧ ¬ ` p₀    ×
+    dfst (dnf (⊤ ∨ ` p₀)) ≡ ` p₀ ∨ ¬ ` p₀    ×
     dfst (dnf (⊤ ∧ ` p₀ ∧ ` p₀)) ≡ ` p₀ ×
     dfst (dnf (` p₀ ∧ (` p₁ ∨ ¬ ` p₀))) ≡ ` p₀ ∧ ` p₁
 
@@ -2062,13 +2051,11 @@ literal-dual (Neg p) = Neg p
 
 ```
 DNF-CNF-clause-dual : DNFClause φ → CNFClause (φ ⁻)
-DNF-CNF-clause-dual ∅ = ∅
 DNF-CNF-clause-dual (l ∙) = literal-dual l ∙
 DNF-CNF-clause-dual (l , C) = literal-dual l , DNF-CNF-clause-dual C
 ```
 
 ```
-DNF-CNF-dual ∅ = ∅
 DNF-CNF-dual (C ∙) = DNF-CNF-clause-dual C ∙
 DNF-CNF-dual (C , D) = DNF-CNF-clause-dual C , DNF-CNF-dual D
 ```
@@ -2115,15 +2102,12 @@ cnf φ
 For example,
 
 ```
-_ : dfst (cnf (⊥ ∧ ` p₀)) ≡ ⊥                                    ×
-    dfst (cnf (⊤ ∨ ` p₀)) ≡ ⊤                                    ×
-    dfst (cnf (⊤ ∧ ` p₀ ∧ ` p₀)) ≡ ` p₀ ∧ ` p₀                   ×
+_ : dfst (cnf (⊥ ∧ ` p₀)) ≡ ` p₀ ∧ ¬ ` p₀                                    ×
+    dfst (cnf (⊤ ∨ ` p₀)) ≡ ` p₀ ∨ ¬ ` p₀                                    ×
+    dfst (cnf (⊤ ∧ ` p₀ ∧ ` p₀)) ≡ ` p₀                          ×
     dfst (cnf (` p₀ ∧ (` p₁ ∨ ¬ ` p₀))) ≡ ` p₀ ∧ (` p₁ ∨ ¬ ` p₀) ×
     dfst (cnf (` p₀ ∨ (` p₁ ∧ ¬ ` p₀))) ≡ ` p₀ ∨ ` p₁
 
 _ = refl , refl , refl , refl , refl
 ```
 
-It seems that the third formula `` ` p₀ ∧ ` p₀`` could be simplified further.
-While this is certainly true as a !ref(DNF) formula (it consists of a single !ref(DNFClause)),
-as a !ref(CNF) formula it is more problematic to perform ...

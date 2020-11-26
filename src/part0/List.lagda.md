@@ -26,9 +26,10 @@ tail (_ ∷ as) = as
 
 --TODO: use the variable mechanism to reduce clutter
 
---variable
-
---  ℓ : Level
+private
+  variable
+    ℓ : Level
+    
 --  A : Set ℓ
   
 --  a a' : A
@@ -172,10 +173,16 @@ foldr : ∀ {ℓ m} {A : Set ℓ} {B : Set m} → (A → B → B) → B → A * 
 foldr f b ε = b
 foldr f b (a ∷ as) = f a (foldr f b as)
 
-foldr1 : ∀ {ℓ m} {A : Set ℓ} {B : Set m} → (A → A → A) → A → A * → A
+foldr1 : {A : Set ℓ} → (A → A → A) → A → A * → A
 foldr1 _ a ε = a
 foldr1 _ _ (a ∷ ε) = a
-foldr1 {A = A} {B = B} f a (a' ∷ as) = f a' (foldr1 {A = A} {B = B} f a as)
+foldr1 f a (a' ∷ as) = f a' (foldr1 f a as)
+
+foldr1-exp : ∀ {A : Set ℓ} (f : A → A → A) (a a' a'' : A) (as : A *) →
+  foldr1 f a (a' ∷ a'' ∷ as) ≡ f a' (foldr1 f a (a'' ∷ as))
+  
+foldr1-exp f a a' a'' ε = refl
+foldr1-exp f a a' a'' (b ∷ as) = refl
 ```
 
 ## Concatenation
