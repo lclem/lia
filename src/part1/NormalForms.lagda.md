@@ -1022,19 +1022,26 @@ In the following sections we will study stronger normal forms.
 
 # Disjunctive normal form {#DNF}
 
-A *clause* `C` is a conjunction of literals `l1 ∧ ⋯ ∧ lm`.
-A formula is in *disjunctive normal form* (DNF) if it is a disjunction of clauses `C1 ∨ ⋯ ∨ Cn`.
-When discussing formulas in DNF it is customary to use a list-like notation[^DNF-middle-constructors]:
+Recall that a literal is either a variable or the negation of a variable:
 
 ```
 data Literal : Formula → Set where
   Pos : (p : PropName) → Literal (` p)
   Neg : (p : PropName) → Literal (¬ (` p))
-  
+```
+
+A *clause* `C` is a non-empty conjunction of literals `l1 ∧ ⋯ ∧ lm`.
+It is customary (and more convenient) to represent a clause as a non-empty sequence of literals:
+
+```
 data DNFClause : Formula → Set where
   _∙ : Literal φ → DNFClause φ
   _,_ : Literal φ → DNFClause ψ → DNFClause (φ ∧ ψ)
+```
 
+A formula is in *disjunctive normal form* (DNF) if it is a disjunction of clauses `C1 ∨ ⋯ ∨ Cn`:
+
+```
 data DNF : Formula  → Set where
   _∙ : DNFClause φ → DNF φ
   _,_ : DNFClause φ → DNF ψ → DNF (φ ∨ ψ)
@@ -1042,14 +1049,8 @@ data DNF : Formula  → Set where
 infix 11 _∙
 ```
 
-[^DNF-middle-constructors]: The constructors of the form `_∙` allow us to avoid always appending a `⊥` or `⊤` to !ref(DNFClause), resp., !ref(DNF) formulas.
-This introduces a slight overhead in the following code,
-but allows formulas such as `` ` p₀ `` to be already in !ref(DNF),
-instead of considering the more cumbersome `` ` p₀ ∧ ⊤ ∨ ⊥ ``.
-
 !hide
 ~~~
-We conventionally allow `⊤` to be a !ref(DNFClause) and similarly `⊥` to be a !ref(DNF), in line with !ref(NNF).
 All the notions of !ref(Literal), !ref(DNFClause), and !ref(DNF) are decidable (proved by a standard inductive argument):
 
 ```
@@ -1674,11 +1675,37 @@ litAndDualInClause-sound (skip litInC) (skip lit°InC) ϱ
 
 ### Case 3: Clause subsumption
 
+In the previous section we have seen that we can remove a clause when it is unsatisfiable.
+In this section we explore a way to remove a clause whenever there is another clause which is "weaker" than this one.
+
+For instance, consider the !ref(DNF) formula
+
+    ` p₀ ∨ ` p₀ ∧ ` p₁.
+
+Since the second clause logically implies the first one, it can be removed,
+and thus the formula above is logically equivalent to
+
+    ` p₀.
+
+We formally capture that a clause `C₁` is weaker than a clause `C₀` with the following *subsumption relation*:
+
 ```
 _≼_ : DNFClause φ → DNFClause ψ → Set
 C₀ ≼ C₁ = ∀ {ξ} {l : Literal ξ} → l IsInClause C₁ → l IsInClause C₀
+```
 
+!hide
+~~~
+In other words, every literal in the weaker (subsuming) clause `C₁` must appear in the stronger (subsumed) clause `C₀`
+(which thus may contain additional literals).
+We can of course decide whether a given clause is subsumed by another:
+
+```
 _≼?_ : (C₀ : DNFClause φ) (C₁ : DNFClause ψ) → Dec (C₀ ≼ C₁)
+```
+~~~
+~~~
+```
 C₀ ≼? (l ∙) with l IsInClause? C₀
 ... | no ~lInC₀ = no λ C₀≼C₁ → ~lInC₀ (C₀≼C₁ stop1)
 ... | yes lInC₀ = yes λ{stop1 → lInC₀}
@@ -1688,14 +1715,48 @@ C₀ ≼? (l , C₁)  with l IsInClause? C₀
 ... | no ~C₀≼C₁ = no λ C₀≼l,C₁ → ~C₀≼C₁ λ l'InC₁ → C₀≼l,C₁ (skip l'InC₁)
 ... | yes C₀≼C₁ = yes λ{stop2 → lInC₀ ; (skip x) → C₀≼C₁ x}
 
+infix 9 _≼_ _≼?_
+```
+~~~
+
+In the previous example, we can check that the first clause is subsumed by the second one:
+
+```
+_ : Pos p₀ , Pos p₁ ∙ ≼? Pos p₀ ∙ ≡ yes _
+_ = refl
+```
+
+The fundamental property of the subsumption relation !ref(_≼_) is that whenever the subsumed clause/formula is true,
+then so is the subsuming one:
+
+```
+monotone-≼ : ∀ {C : DNFClause φ} {D : DNFClause ψ} →
+  C ≼ D →
+  ------------------------------------
+  ∀[ ϱ ] (⟦ φ ⟧ ϱ ≡ tt → ⟦ ψ ⟧ ϱ ≡ tt)
+```
+
+!hide
+~~~
+In order to prove this property, we first need to explain that a clause is the same as a conjunction of a sequence of literals:
+
+```
 DNFClause2List : (C : DNFClause φ) →
   ∃[ φs ] φ ≡ ⋀ φs ×
   (∀[ ξ ∈ φs ] Σ (Literal ξ) λ l → l IsInClause C) ×
   (∀ {ξ} (l : Literal ξ) → l IsInClause C → ξ ∈ φs)
-  
+```
+~~~
+~~~
+The proof is almost a standard structural induction,
+which the difference that we need to split the inductive step in two separate case since conjunctions !remoteRef(part1)(Semantics)(⋀_) are defined in terms of !remoteRef(part0)(List)(foldr1),
+and thus we need to know whether the clause  `C` is just a literal `l' ∙` or compound `l' , C'`:
+
+```
 DNFClause2List {φ} (l ∙) = [ φ ] , refl , (λ{ here → l , stop1}) , λ{l' stop1 → here}
 
-DNFClause2List {φ ∧ φ'} (l , l' ∙) = φ ∷ φ' ∷ ε , refl , (λ{ here → l , stop2 ; (there here) → l' , skip stop1}) , λ{ l₁ stop2 → here ; l₁ (skip stop1) → there here}
+DNFClause2List {φ ∧ φ'} (l , C@(l' ∙)) = φ ∷ φ' ∷ ε , refl ,
+  (λ{ here → l , stop2 ; (there here) → l' , skip stop1}) , λ{ l₁ stop2 → here ; l₁ (skip stop1) → there here}
 
 DNFClause2List {φ ∧ ψ} (l , C@(l' , C'))
   with DNFClause2List C
@@ -1716,8 +1777,12 @@ DNFClause2List {φ ∧ ψ} (l , C@(l' , C'))
     goal3 : ∀ {ξ} (lit : Literal ξ) → lit IsInClause (l , C) → ξ ∈ φ ∷ φs
     goal3 lit stop2 = here
     goal3 lit (skip x) = there (prop2 lit x)
-   
-monotone-≼ : ∀ {C : DNFClause φ} {D : DNFClause ψ} → C ≼ D → ∀ ϱ → ⟦ φ ⟧ ϱ ≡ tt → ⟦ ψ ⟧ ϱ ≡ tt
+```
+~~~
+
+The proof of !ref(monotone-≼) follows immediately from the connection between clauses and conjunctions from !ref(DNFClause2List):
+
+```
 monotone-≼ {φ} {ψ} {C} {D} C≼D ϱ ⟦φ⟧ϱ≡tt
   with DNFClause2List C
 ... | φs , φ≡⋀φs , _ , haveC
@@ -1733,7 +1798,11 @@ monotone-≼ {φ} {ψ} {C} {D} C≼D ϱ ⟦φ⟧ϱ≡tt
   ... | lInC
     with haveC l lInC
   ... | ξ∈φs = conjProp1 φs ϱ ⟦φ⟧ϱ≡tt ξ∈φs 
+```
 
+The immediate by-product of !ref(monotone-≼) is that removing a subsumed clause preserves the semantics:
+
+```
 subsume-≼ : ∀ {C : DNFClause φ} {C' : DNFClause ψ} → C ≼ C' → φ ∨ ψ ⟺ ψ
 subsume-≼ {φ} {ψ} C≼C' ϱ
   with inspect (⟦ φ ⟧ ϱ)
@@ -1741,67 +1810,99 @@ subsume-≼ {φ} {ψ} C≼C' ϱ
 ... | it ff ⟦φ⟧ϱ≡ff rewrite ⟦φ⟧ϱ≡ff = refl
 ```
 
+We are ready to put subsumption at work.
+The following function takes a clause `C` and a DNF `D` and produces a DNF equivalent to their disjunction:
 
 ```
 insertClauseInDNF : (C : DNFClause φ) (D : DNF ψ) → ∃[ ξ ] DNF ξ × φ ∨ ψ ⟺ ξ
+```
 
+The catch is that `C` is actually added only if it is not subsumed by any other clause in `D`
+and moreover if `C` it is actually added, then all clauses in `D` that are subsumed by `C` are removed.
+The definition is by structural induction on `D`.
+In the base case, `D` is a single clause `C'` and we thus compare for subsumption with `C` in both directions.
+If `C` is subsumed by `C'` then it is discarded:
+
+```
 insertClauseInDNF {φ} {φ'} C (C' ∙)
   with C ≼? C'
--- C is stronger, so we do not add it
 ... | yes C≼C' = _ , C' ∙ , φ∨φ'⟺φ' where
 
   φ∨φ'⟺φ' : φ ∨ φ' ⟺ φ'
   φ∨φ'⟺φ' ϱ rewrite subsume-≼ C≼C' ϱ = refl
+```
 
+If `C'` is subsumed by `C` then it is discarded:
+
+```
 ... | no _
   with C' ≼? C
--- C' is stronger, so we remove it
 ... | yes C'≼C =  _ , C ∙ , φ∨φ'⟺φ where
 
   φ∨φ'⟺φ : φ ∨ φ' ⟺ φ
   φ∨φ'⟺φ ϱ rewrite
     commOr φ φ' ϱ |
     subsume-≼ C'≼C ϱ = refl
-    
--- we keep C and C'
-... | no _ =  _ , (C , C' ∙) , λ ϱ → refl
-
-insertClauseInDNF {φ} {φ' ∨ ψ} C (C' , D)
-  with C ≼? C'
--- C is stronger, so we do not add it
-... | yes C≼C' = _ , (C' , D) , φ∨φ'∨ψ⟺φ'∨ψ where
-
-  φ∨φ'∨ψ⟺φ'∨ψ : φ ∨ φ' ∨ ψ ⟺ φ' ∨ ψ
-  φ∨φ'∨ψ⟺φ'∨ψ ϱ rewrite
-    sym (assocOr φ φ' ψ ϱ) |
-    subsume-≼ C≼C' ϱ = refl
-
-... | no _
--- recursively insert C somewhere in D (or not if pruned)
-  with insertClauseInDNF C D
-... | ξ , DNFξ , φ∨ψ⟺ξ
-  with C' ≼? C
--- C' is stronger, so we remove it
-... | yes C'≼C =  _ , DNFξ , φ∨φ'∨ψ⟺ξ where
-
-  φ∨φ'∨ψ⟺ξ : φ ∨ φ' ∨ ψ ⟺ ξ
-  φ∨φ'∨ψ⟺ξ ϱ rewrite
-    sym (assocOr φ φ' ψ ϱ) |
-    commOr φ φ' ϱ |
-    subsume-≼ C'≼C ϱ |
-    φ∨ψ⟺ξ ϱ = refl
-    
--- we keep C'
-... | no _ =  _ , (C' , DNFξ) , φ∨φ'∨ψ⟺φ'∨ξ where
-
-  φ∨φ'∨ψ⟺φ'∨ξ : φ ∨ φ' ∨ ψ ⟺ φ' ∨ ξ
-  φ∨φ'∨ψ⟺φ'∨ξ ϱ rewrite
-     sym (assocOr φ φ' ψ ϱ) |
-     commOr φ φ' ϱ |
-     assocOr φ' φ ψ ϱ |
-     φ∨ψ⟺ξ ϱ = refl
 ```
 
+Finally, if neither `C` nor `C'` subsumes the other one,
+then we keep both of them:
+
+```
+... | no _ =  _ , (C , C' ∙) , λ ϱ → refl
+```
+
+In the inductive case, we have a DNF of the form `(C' , D')` and  we start by checking whether `C` is subsumed by `C'`.
+If this is the case, then `C` is discarded:
+
+```
+insertClauseInDNF {φ} {ψ@(φ' ∨ ψ')} C D@(C' , D')
+  with C ≼? C'
+... | yes C≼C' = _ , D , φ∨ψ⟺ψ where
+
+  φ∨ψ⟺ψ : φ ∨ ψ ⟺ ψ
+  φ∨ψ⟺ψ ϱ rewrite
+    sym (assocOr φ φ' ψ' ϱ) |
+    subsume-≼ C≼C' ϱ = refl
+```
+
+Otherwise, we recursively try to insert `C` somewhere in `D'`:
+
+```
+... | no _
+  with insertClauseInDNF C D'
+... | ξ , DNFξ , φ∨ψ'⟺ξ
+```
+
+We now check whether `C'` is subsumed by `C`.
+If this is the case, then `C'` is removed:
+
+```
+  with C' ≼? C
+... | yes C'≼C =  _ , DNFξ , φ∨ψ⟺ξ where
+
+  φ∨ψ⟺ξ : φ ∨ ψ ⟺ ξ
+  φ∨ψ⟺ξ ϱ rewrite
+    sym (assocOr φ φ' ψ' ϱ) |
+    commOr φ φ' ϱ |
+    subsume-≼ C'≼C ϱ |
+    φ∨ψ'⟺ξ ϱ = refl
+```
+
+Otherwise, we keep both `C` and `C'`:
+
+```
+... | no _ =  _ , (C' , DNFξ) , φ∨ψ⟺φ'∨ξ where
+
+  φ∨ψ⟺φ'∨ξ : φ ∨ ψ ⟺ φ' ∨ ξ
+  φ∨ψ⟺φ'∨ξ ϱ rewrite
+     sym (assocOr φ φ' ψ' ϱ) |
+     commOr φ φ' ϱ |
+     assocOr φ' φ ψ' ϱ |
+     φ∨ψ'⟺ξ ϱ = refl
+```
+
+The function !ref(insertClauseInDNF) will be the instrumental in the next section in order to build simpler DNF's from given formulas.
 
 ### Putting things together
 
