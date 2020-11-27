@@ -959,7 +959,7 @@ removeImp-impFree (φ ⇔ ψ) = (¬ removeImp-impFree φ ∨ removeImp-impFree �
 ```
 ~~~~
 
-## Transformation to !ref(NNF)
+## Transformation
 
 We are now ready to put the pieces together.
 The transformation to !ref(NNF) proceeds by simplifying the formula (this removes the zero-ary connectives `⊤` and `⊥`, even though we won't formally prove this is the case), by removing implications/bi-implications, and by transforming to !ref(WNNF):
@@ -1400,14 +1400,12 @@ The !ref(DNF) structure allows us to simplify formulas to a stronger extend that
 In this section we explore a simplification procedure which exploits the DNF structure.
 
 We will implement three kinds of simplifications.
-The first two are based on the fact that a propositional variable should appear at most once in a clause:
+The first two are based on the fact that a propositional variable should appear at most once in a clause,
+and the third one is based on comparing different clauses for subsumption:
 
 1) If a literal appears multiple times in a clause, then its repeated occurrences can be removed.
 2) If a literal appears positively and negatively in a clause, then the clause is unsatisfiable and can be removed.
-
-The third one is based on the fact that the same clause should appear at most once in a !ref(DNF):
-
-3) If a clause appears multiple times, then its repeated occurrences can be removed.
+3) A clause can be removed if a logically "weaker" clause is already in the DNF.
 
 ### Case 1: Repeated literals
 
@@ -1915,7 +1913,7 @@ simplifyDNF1 : DNF φ → φ ⟺ ⊥ ⊎ (∃[ ψ ] DNF ψ × φ ⟺ ψ)
 The construction is by induction on the evidence that `φ` is in DNF.
 In the base case the DNF consists of a single clause `C`.
 We appeal to !ref(someLitAndDualInClause) to test whether `C` is unsatisfiable.
-In the positive case the whole DNF reduces to `∅`,
+In the positive case the whole DNF reduces to `⊥`,
 otherwise to the simplification of `C`:
 
 ```
@@ -1928,7 +1926,9 @@ simplifyDNF1 {φ} (C ∙)
 ... | _ , D , equiv = right (_ , D ∙ , equiv)
 ```
 
-The inductive step is analogous:
+The inductive step is analogous.
+We start by recursively simplifying the remainder of the DNF.
+If it reduces to `⊥`, we do the same for `C`:
 
 ```
 simplifyDNF1 {φ ∨ ψ} (C , DNFψ)
@@ -1948,7 +1948,12 @@ simplifyDNF1 {φ ∨ ψ} (C , DNFψ)
        φ∨ψ⟺ξ : φ ∨ ψ ⟺ ξ
        φ∨ψ⟺ξ ϱ rewrite ψ⟺⊥ ϱ |
                         φ⟺ξ ϱ = refl
-       
+```
+
+If not, then we check whether `C` is unsatisfiable.
+If so, then we discard it:
+
+```
 ... | right (ψ' , DNF' , ψ⟺ψ')
 
   with someLitAndDualInClause C
@@ -1959,7 +1964,12 @@ simplifyDNF1 {φ ∨ ψ} (C , DNFψ)
   φ∨ψ⟺ψ' ϱ
     rewrite litAndDualInClause-sound litInC lit°InC ϱ |
             ψ⟺ψ' ϱ = refl
-    
+```
+
+In the other case, `C` is satisfiable and we proceed to simplify it
+and insert it in the rest of the (simplified) DNF:
+
+```
 ... | no _
   with simplifyDNFClause C
 ... | φ' , D , φ⟺φ'
@@ -1973,6 +1983,8 @@ simplifyDNF1 {φ ∨ ψ} (C , DNFψ)
             φ'∨ψ'⟺ξ ϱ = refl
 ```
 
+The actual simplification procedure !ref(simplifyDNF) is the same as !ref(simplifyDNF1)
+but it expands the unsatisfiable DNF case as an actual DNF:
 
 ```
 simplifyDNF : DNF φ → ∃[ ψ ] DNF ψ × φ ⟺ ψ
@@ -1984,8 +1996,8 @@ simplifyDNF {φ} DNFφ with simplifyDNF1 DNFφ
   φ⟺p₀∧¬p₀ ϱ
     rewrite p∧¬p⟺⊥ {p₀} ϱ |
             φ⟺⊥ ϱ = refl
-  
 ```
+
 ## Complete transformation
 
 The final !ref(DNF) transformation is achieved by combining the !ref(NNF) transformation,
@@ -2107,16 +2119,17 @@ _ : dfst (dnf (⊥ ∧ ` p₀)) ≡ ` p₀ ∧ ¬ ` p₀    ×
 _ = refl , refl , refl , refl
 ```
 
-## Applications
-
 !exercise(#exercise:satisfiability)
 ~~~
 What is the complexity of checking satisfiability of a formula in !ref(DNF)?
 And tautology?
 ~~~
 ~~~
-
+Satisfiability of a DNF formula can be checked in LOGSPACE, since it is enough to find a satisfiable clause,
+i.e., one which does not contain the same variable both positively and negatively.
+Tautology on the other hand is coNP-complete.
 ~~~
+
 # Conjunctive normal form {#CNF}
 
 A (CNF) *clause* `C` is a disjunction of literals `l1 ∨ ⋯ ∨ lm`
@@ -2124,12 +2137,10 @@ and a formula is in *conjunctive normal form* (CNF) if it is a conjunction of cl
 
 ```
 data CNFClause : Formula → Set where
-  ∅ : CNFClause ⊥
   _∙ : Literal φ → CNFClause φ
   _,_ : Literal φ → CNFClause ψ → CNFClause (φ ∨ ψ)
 
 data CNF : Formula → Set where
-  ∅ : CNF ⊤
   _∙ : CNFClause φ → CNF φ
   _,_ : CNFClause φ → CNF ψ → CNF (φ ∧ ψ)
 ```
@@ -2137,7 +2148,9 @@ data CNF : Formula → Set where
 !exercise(#exercise:DNF-CNF-duality)
 ~~~
 Show that the conjunctive normal form (CNF) is [*dual*](../../part1/Semantics#duality) to the disjunctive normal form from the [previous section](#CNF),
-in the sense that swapping conjunctions with disjunctions allows one to pass from one form to the other:
+in the sense that swapping conjunctions with disjunctions allows one to pass from one form to the other[^CNF-DNF-duality]:
+
+[^CNF-DNF-duality]: Of course we can also dualise a CNF formula to obtain a DNF one, but we will not need this fact in the following.
 
 ```
 DNF-CNF-dual : DNF φ → CNF (φ ⁻)
@@ -2162,13 +2175,15 @@ DNF-CNF-dual (C , D) = DNF-CNF-clause-dual C , DNF-CNF-dual D
 ```
 ~~~
 
+## Transformation
+
 Duality is a very useful property since it allows us to "recycle" the !ref(DNF) transformation from the previous section into a !ref(CNF) transformation:
 The basic idea is to dualise the formula, apply the !ref(DNF) transformation,
 and then dualise the formula again.
 Correctness relies on the fact that 1) if two formulas are equivalent,
 then so are their dualisations, and 2) if we dualise twice then we go back to the original formula.
 More precisely, we would like to apply !remoteRef(part1)(Semantics)(duality-equivalence-1) for 1) and !remoteRef(part1)(Semantics)(dual-preservation) for 2),
-which however rely on the fact that the input formulas are in the `Formula[⊥,⊤,¬,∨,∧]` fragment.
+which however relies on the fact that the input formulas are in the `Formula[⊥,⊤,¬,∨,∧]` fragment.
 For this reason, we start off the construction with a preliminary !ref(NNF) transformation,
 which guarantees us membership in the require fragment thanks to !ref(NNF-Formula[⊥,⊤,¬,∨,∧]):
 
