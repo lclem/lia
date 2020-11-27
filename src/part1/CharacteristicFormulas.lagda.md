@@ -9,7 +9,7 @@ In this chapter we study characteristic formulas and their application to functi
 open import part0.index
 
 module part1.CharacteristicFormulas (n′ : ℕ) where
-open import part1.Semantics n′
+open import part1.Semantics n′ public
 ```
 
 # Characteristic formulas {#characteristic-formulas}

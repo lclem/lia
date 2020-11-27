@@ -8,6 +8,11 @@ title: Boolean values🚧
 
 module part0.Booleans where
 open import part0.Equality public
+
+private
+  variable
+    ℓ : Level
+    A : Set ℓ
 ```
 
 In this section we introduce *Boolean values*.
@@ -421,7 +426,7 @@ monotone-∨𝔹 tt≤tt tt≤tt = tt≤tt
 ## Conditionals
 
 ```
-Cond𝔹 : ∀ {ℓ} {A : Set ℓ} → A → A → 𝔹 → A
+Cond𝔹 : A → A → 𝔹 → A
 Cond𝔹 x y tt = x
 Cond𝔹 x y ff = y
 ```
