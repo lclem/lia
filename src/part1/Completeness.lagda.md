@@ -24,21 +24,31 @@ References:
 ## Proof system
 
 ```
-
-infix 99 ¬_
-¬_ : Formula → Formula
-¬ φ = φ ⇒ ⊥
-
 infixr 5 _⊢_
 data _⊢_ : Context → Formula → Set where
 
   -- assumption
   Ass : φ ∈ Γ → Γ ⊢ φ
 
-  -- axioms
+  -- axioms for implication
   A1 : Γ ⊢ φ ⇒ ψ ⇒ φ -- projection
   A2 : Γ ⊢ (φ ⇒ ψ ⇒ θ) ⇒ (φ ⇒ ψ) ⇒ φ ⇒ θ -- transitivity
-  A3 : Γ ⊢ ¬ ¬ φ ⇒ φ -- double negation
+  A3 : Γ ⊢ ((φ ⇒ ⊥) ⇒ ⊥) ⇒ φ -- double negation
+
+  -- axioms for disjunction
+  D1 : Γ ⊢ φ ⇒ φ ∨ ψ
+  D2 : Γ ⊢ ψ ⇒ φ ∨ ψ
+  D3 : Γ ⊢ (φ ⇒ θ) ⇒ (ψ ⇒ θ) ⇒ (φ ∨ ψ) ⇒ θ
+
+  -- axioms for conjunction
+  C1 : Γ ⊢ φ ∧ ψ ⇒ φ
+  C2 : Γ ⊢ φ ∧ ψ ⇒ ψ
+  C3 : Γ ⊢ (φ ⇒ ψ) ⇒ (φ ⇒ θ) ⇒ φ ⇒ ψ ∧ θ
+
+  -- axioms for bi-implication
+  E1 : Γ ⊢ (φ ⇔ ψ) ⇒ φ ⇒ ψ
+  E2 : Γ ⊢ (φ ⇔ ψ) ⇒ ψ ⇒ φ
+  E3 : Γ ⊢ (φ ⇒ ψ) ⇒ (ψ ⇒ φ) ⇒ (φ ⇔ ψ)
 
   -- modus ponens
   MP : Δ ⊢ φ ⇒ ψ → Δ ⊢ φ → Δ ⊢ ψ
@@ -71,16 +81,30 @@ B0 {Δ} {φ} = S5 where
 ```
 monotonicityOfProofs1 : Δ ⊢ φ → Δ · ψ ⊢ φ
 monotonicityOfProofs1 (Ass φ∈Δ) = Ass (there φ∈Δ)
+
 monotonicityOfProofs1 A1 = A1
 monotonicityOfProofs1 A2 = A2
 monotonicityOfProofs1 A3 = A3
+
+monotonicityOfProofs1 D1 = D1
+monotonicityOfProofs1 D2 = D2
+monotonicityOfProofs1 D3 = D3
+
+monotonicityOfProofs1 C1 = C1
+monotonicityOfProofs1 C2 = C2
+monotonicityOfProofs1 C3 = C3
+
+monotonicityOfProofs1 E1 = E1
+monotonicityOfProofs1 E2 = E2
+monotonicityOfProofs1 E3 = E3
+
 monotonicityOfProofs1 (MP Δ⊢φ Δ⊢ψ) = MP (monotonicityOfProofs1 Δ⊢φ) (monotonicityOfProofs1 Δ⊢ψ)
 ```
 
 ## Deduction theorem
 
 ```
-dt1 : Δ ⊢ φ ⇒ ψ → φ ∷ Δ ⊢ ψ
+dt1 : Δ ⊢ φ ⇒ ψ → Δ · φ ⊢ ψ
 dt1 {Δ} {φ} {ψ} Δ⊢φ⇒ψ = MP Δ,φ⊢φ⇒ψ Δ,φ⊢φ where
 
   Δ,φ⊢φ⇒ψ : φ ∷ Δ ⊢ φ ⇒ ψ
@@ -98,6 +122,19 @@ dt2 (Ass (there ψ∈Δ)) = MP A1 (Ass ψ∈Δ)
 dt2 A1 = MP A1 A1
 dt2 A2 = MP A1 A2
 dt2 A3 = MP A1 A3
+
+dt2 D1 = MP A1 D1
+dt2 D2 = MP A1 D2
+dt2 D3 = MP A1 D3
+
+dt2 C1 = MP A1 C1
+dt2 C2 = MP A1 C2
+dt2 C3 = MP A1 C3
+
+dt2 E1 = MP A1 E1
+dt2 E2 = MP A1 E2
+dt2 E3 = MP A1 E3
+
 dt2 {Δ} {φ} {ψ} (MP {φ = ξ} φ,Δ⊢ξ⇒ψ φ,Δ⊢ξ) = SS where
 
   S1 : Δ ⊢ φ ⇒ ξ
@@ -130,13 +167,13 @@ B1 : ∀ Δ φ → Δ ⊢ ⊥ ⇒ φ
 B1 Δ φ = Δ⊢⊥⇒φ where
 
   Δ1 : Context
-  Δ1 = ¬ φ ∷ ⊥ ∷ Δ
-  Δ2 = ⊥ ∷ Δ
+  Δ1 = Δ · ⊥ · φ ⇒ ⊥
+  Δ2 = Δ · ⊥
   
   Δ1⊢⊥ : Δ1 ⊢ ⊥
   Δ1⊢⊥ = Ass (there here)
 
-  Δ2⊢¬¬φ : Δ2 ⊢ ¬ ¬ φ
+  Δ2⊢¬¬φ : Δ2 ⊢ (φ ⇒ ⊥) ⇒ ⊥
   Δ2⊢¬¬φ = dt2 Δ1⊢⊥
 
   Δ2⊢φ : Δ2 ⊢ φ
@@ -146,16 +183,16 @@ B1 Δ φ = Δ⊢⊥⇒φ where
   Δ⊢⊥⇒φ = dt2 Δ2⊢φ
   
 -- double negation
-B2 : ∀ Δ φ  → Δ ⊢ ¬ φ ⇒ φ ⇒ ⊥
+B2 : ∀ Δ φ  → Δ ⊢ (φ ⇒ ⊥) ⇒ φ ⇒ ⊥
 B2 Δ φ = dt2 (dt2 Γ₀⊢⊥)  where
 
    Γ₀ : Context
-   Γ₀ = φ ∷ ¬ φ ∷ Δ
+   Γ₀ = Δ · φ ⇒ ⊥ · φ
 
    Γ₀⊢φ : Γ₀ ⊢ φ
    Γ₀⊢φ = Ass here
 
-   Γ₀⊢¬φ : Γ₀ ⊢ ¬ φ
+   Γ₀⊢¬φ : Γ₀ ⊢ φ ⇒ ⊥
    Γ₀⊢¬φ = Ass (there here)
 
    Γ₀⊢⊥ : Γ₀ ⊢ ⊥
@@ -163,11 +200,11 @@ B2 Δ φ = dt2 (dt2 Γ₀⊢⊥)  where
    
 -- contradiction
 -- used in the core lemma
-B3 : ∀ Δ φ ψ → Δ ⊢ ¬ φ ⇒ φ ⇒ ψ
+B3 : ∀ Δ φ ψ → Δ ⊢ (φ ⇒ ⊥) ⇒ φ ⇒ ψ
 B3 Δ φ ψ = Δ⊢¬φ⇒φ⇒ψ where
 
   Γ₀ : Context
-  Γ₀ = φ ∷ ¬ φ ∷ Δ
+  Γ₀ = Δ · φ ⇒ ⊥ · φ
 
   Γ₀⊢⊥ : Γ₀ ⊢ ⊥
   Γ₀⊢⊥ = dt1 (dt1 (B2 Δ φ))
@@ -175,17 +212,17 @@ B3 Δ φ ψ = Δ⊢¬φ⇒φ⇒ψ where
   Γ₀⊢ψ : Γ₀ ⊢ ψ
   Γ₀⊢ψ = MP (B1 Γ₀ ψ) Γ₀⊢⊥
 
-  Δ⊢¬φ⇒φ⇒ψ : Δ ⊢ ¬ φ ⇒ φ ⇒ ψ
+  Δ⊢¬φ⇒φ⇒ψ : Δ ⊢ (φ ⇒ ⊥) ⇒ φ ⇒ ψ
   Δ⊢¬φ⇒φ⇒ψ = dt2 (dt2 Γ₀⊢ψ)
 
 -- proof by cases
 -- useed in the second core lemma
-B4 : ∀ Δ φ ψ → Δ ⊢ (φ ⇒ ψ) ⇒ (¬ φ ⇒ ψ) ⇒ ψ
+B4 : ∀ Δ φ ψ → Δ ⊢ (φ ⇒ ψ) ⇒ ((φ ⇒ ⊥) ⇒ ψ) ⇒ ψ
 B4 Δ φ ψ = dt2 (dt2 Δ1⊢ψ) where
 
   Δ1 Δ2 Δ3 : Context
-  Δ1 = ¬ φ ⇒ ψ ∷ φ ⇒ ψ ∷ Δ
-  Δ2 = ¬ ψ ∷ Δ1
+  Δ1 = (φ ⇒ ⊥) ⇒ ψ ∷ φ ⇒ ψ ∷ Δ
+  Δ2 = Δ1 · ψ ⇒ ⊥
   Δ3 = φ ∷ Δ2
 
   Δ3⊢φ : Δ3 ⊢ φ
@@ -197,39 +234,39 @@ B4 Δ φ ψ = dt2 (dt2 Δ1⊢ψ) where
   Δ3⊢ψ : Δ3 ⊢ ψ
   Δ3⊢ψ = MP Δ3⊢φ⇒ψ Δ3⊢φ
   
-  Δ3⊢¬ψ : Δ3 ⊢ ¬ ψ
+  Δ3⊢¬ψ : Δ3 ⊢ ψ ⇒ ⊥
   Δ3⊢¬ψ = Ass (there here)
   
   Δ3⊢⊥ : Δ3 ⊢ ⊥
   Δ3⊢⊥ = MP Δ3⊢¬ψ Δ3⊢ψ
 
-  Δ2⊢¬φ : Δ2 ⊢ ¬ φ
+  Δ2⊢¬φ : Δ2 ⊢ φ ⇒ ⊥
   Δ2⊢¬φ = dt2 Δ3⊢⊥
 
-  Δ2⊢¬φ⇒ψ : Δ2 ⊢ ¬ φ ⇒ ψ
+  Δ2⊢¬φ⇒ψ : Δ2 ⊢ (φ ⇒ ⊥) ⇒ ψ
   Δ2⊢¬φ⇒ψ = Ass (there here)
 
   Δ2⊢ψ : Δ2 ⊢ ψ
   Δ2⊢ψ = MP Δ2⊢¬φ⇒ψ Δ2⊢¬φ
 
-  Δ2⊢¬ψ : Δ2 ⊢ ¬ ψ
+  Δ2⊢¬ψ : Δ2 ⊢ ψ ⇒ ⊥
   Δ2⊢¬ψ = Ass here
   
   Δ2⊢⊥ : Δ2 ⊢ ⊥
   Δ2⊢⊥ = MP Δ2⊢¬ψ Δ2⊢ψ
 
-  Δ1⊢¬¬ψ : Δ1 ⊢ ¬ ¬ ψ
+  Δ1⊢¬¬ψ : Δ1 ⊢ (ψ ⇒ ⊥) ⇒ ⊥
   Δ1⊢¬¬ψ = dt2 Δ2⊢⊥
 
   Δ1⊢ψ : Δ1 ⊢ ψ
   Δ1⊢ψ = MP A3 Δ1⊢¬¬ψ
 
 -- used in the core lemma
-B5 : ∀ Δ φ ψ → Δ ⊢ φ ⇒ ¬ ψ ⇒ ¬ (φ ⇒ ψ)
+B5 : ∀ Δ φ ψ → Δ ⊢ φ ⇒ (ψ ⇒ ⊥) ⇒ (φ ⇒ ψ) ⇒ ⊥
 B5 Δ φ ψ = dt2 (dt2 (dt2 Δ1⊢⊥)) where
 
   Δ1 : Context
-  Δ1 = φ ⇒ ψ ∷ ¬ ψ ∷ φ ∷ Δ
+  Δ1 = Δ · φ · ψ ⇒ ⊥ · φ ⇒ ψ
 
   Δ1⊢φ : Δ1 ⊢ φ
   Δ1⊢φ = Ass (there (there here))
@@ -240,7 +277,7 @@ B5 Δ φ ψ = dt2 (dt2 (dt2 Δ1⊢⊥)) where
   Δ1⊢ψ : Δ1 ⊢ ψ
   Δ1⊢ψ = MP Δ1⊢φ⇒ψ Δ1⊢φ
 
-  Δ1⊢¬ψ : Δ1 ⊢ ¬ ψ
+  Δ1⊢¬ψ : Δ1 ⊢ ψ ⇒ ⊥
   Δ1⊢¬ψ = Ass (there here)
   
   Δ1⊢⊥ : Δ1 ⊢ ⊥
@@ -254,13 +291,15 @@ soundness : ∀ Δ φ → Δ ⊢ φ → Δ ⊨ φ
 
 soundness Δ φ (Ass ψ∈Δ) ϱ ⟦Δ⟧ = ⟦Δ⟧ ψ∈Δ
 
-soundness Δ (φ ⇒ ψ ⇒ φ) A1 ϱ _ with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ
+soundness Δ (φ ⇒ ψ ⇒ φ) A1 ϱ _
+  with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ
 ... | tt | tt = refl
 ... | tt | ff = refl
 ... | ff | tt = refl
 ... | ff | ff = refl
 
-soundness Δ ((φ ⇒ ψ ⇒ ξ) ⇒ (φ ⇒ ψ) ⇒ φ ⇒ ξ) A2 ϱ _ with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ | ⟦ ξ ⟧ ϱ
+soundness Δ ((φ ⇒ ψ ⇒ ξ) ⇒ (φ ⇒ ψ) ⇒ φ ⇒ ξ) A2 ϱ _
+  with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ | ⟦ ξ ⟧ ϱ
 ... | tt | tt | tt = refl
 ... | tt | tt | ff = refl
 ... | tt | ff | tt = refl
@@ -270,13 +309,95 @@ soundness Δ ((φ ⇒ ψ ⇒ ξ) ⇒ (φ ⇒ ψ) ⇒ φ ⇒ ξ) A2 ϱ _ with ⟦
 ... | ff | ff | tt = refl
 ... | ff | ff | ff = refl
 
-soundness Δ (((φ ⇒ ⊥) ⇒ ⊥) ⇒ φ) A3 ϱ _ with ⟦ φ ⟧ ϱ
--- soundness Δ (¬ ¬ φ ⇒ φ) A3 ϱ _ with ⟦ φ ⟧ ϱ
+soundness Δ (((φ ⇒ ⊥) ⇒ ⊥) ⇒ φ) A3 ϱ _
+  with ⟦ φ ⟧ ϱ
 ... | tt = refl
 ... | ff = refl
 
+soundness Δ (φ ⇒ ψ ∨ ξ) D1 ϱ _
+  with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ | ⟦ ξ ⟧ ϱ
+... | tt | tt | tt = refl
+... | tt | tt | ff = refl
+... | tt | ff | tt = refl
+... | tt | ff | ff = refl
+... | ff | tt | tt = refl
+... | ff | tt | ff = refl
+... | ff | ff | tt = refl
+... | ff | ff | ff = refl
+
+soundness Δ (φ ⇒ ψ ∨ ξ) D2 ϱ _ 
+  with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ | ⟦ ξ ⟧ ϱ
+... | tt | tt | tt = refl
+... | tt | tt | ff = refl
+... | tt | ff | tt = refl
+... | tt | ff | ff = refl
+... | ff | tt | tt = refl
+... | ff | tt | ff = refl
+... | ff | ff | tt = refl
+... | ff | ff | ff = refl
+
+soundness Δ ((φ ⇒ θ) ⇒ (ψ ⇒ θ) ⇒ (φ ∨ ψ) ⇒ θ) D3 ϱ _ 
+  with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ | ⟦ θ ⟧ ϱ
+... | tt | tt | tt = refl
+... | tt | tt | ff = refl
+... | tt | ff | tt = refl
+... | tt | ff | ff = refl
+... | ff | tt | tt = refl
+... | ff | tt | ff = refl
+... | ff | ff | tt = refl
+... | ff | ff | ff = refl
+
+soundness Δ (φ ∧ ψ ⇒ φ) C1 ϱ _
+  with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ
+... | tt | tt = refl
+... | tt | ff = refl
+... | ff | tt = refl
+... | ff | ff = refl
+
+soundness Δ (φ ∧ ψ ⇒ ψ) C2 ϱ _
+  with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ
+... | tt | tt = refl
+... | tt | ff = refl
+... | ff | tt = refl
+... | ff | ff = refl
+
+
+soundness Δ ((φ ⇒ ψ) ⇒ (φ ⇒ θ) ⇒ φ ⇒ ψ ∧ θ) C3 ϱ _
+  with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ | ⟦ θ ⟧ ϱ
+... | tt | tt | tt = refl
+... | tt | tt | ff = refl
+... | tt | ff | tt = refl
+... | tt | ff | ff = refl
+... | ff | tt | tt = refl
+... | ff | tt | ff = refl
+... | ff | ff | tt = refl
+... | ff | ff | ff = refl
+
+soundness Δ ((φ ⇔ ψ) ⇒ φ ⇒ ψ) E1 ϱ _ 
+  with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ
+... | tt | tt = refl
+... | tt | ff = refl
+... | ff | tt = refl
+... | ff | ff = refl
+
+soundness Δ ((φ ⇔ ψ) ⇒ ψ ⇒ φ) E2 ϱ _
+  with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ
+... | tt | tt = refl
+... | tt | ff = refl
+... | ff | tt = refl
+... | ff | ff = refl
+
+soundness Δ ((φ ⇒ ψ) ⇒ (ψ ⇒ φ) ⇒ (φ ⇔ ψ)) E3 ϱ _ 
+  with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ
+... | tt | tt = refl
+... | tt | ff = refl
+... | ff | tt = refl
+... | ff | ff = refl
+
 -- strong soundness of modus ponens
-soundness Δ ψ (MP {φ = φ} Δ⊢φ⇒ψ Δ⊢φ) ϱ ⟦Δ⟧ with soundness _ _ Δ⊢φ⇒ψ ϱ ⟦Δ⟧ | soundness _ _ Δ⊢φ ϱ ⟦Δ⟧
+soundness Δ ψ (MP {φ = φ} Δ⊢φ⇒ψ Δ⊢φ) ϱ ⟦Δ⟧
+  with soundness _ _ Δ⊢φ⇒ψ ϱ ⟦Δ⟧ |
+       soundness _ _ Δ⊢φ ϱ ⟦Δ⟧
 ... | ⟦φ⇒ψ⟧ϱ≡tt | ⟦φ⟧ϱ≡tt with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ
 ... | tt | tt = refl
 ```
@@ -389,7 +510,7 @@ core-lemma2 {φ} viewφ ⊨φ (suc m) ϱ sucm≤sucn
   ϱffv≡ff : ϱff v ≡ ff
   ϱffv≡ff = update-≡ v
 
-  v^ϱff≡¬v : ` v ^ ϱff ≡ ¬ (` v)
+  v^ϱff≡¬v : ` v ^ ϱff ≡ ` v ⇒ ⊥
   v^ϱff≡¬v rewrite ϱffv≡ff = refl
 
   drops : drop m propNames ≡ v ∷ drop (suc m) propNames
@@ -399,7 +520,7 @@ core-lemma2 {φ} viewφ ⊨φ (suc m) ϱ sucm≤sucn
   agree b = map-Agree _ _ _ agree2 where
 
     agree2 : Agree (λ p → ` p ^ (ϱ [ v ↦ b ])) (λ p → ` p ^ ϱ) (drop (suc m) propNames)
-    agree2 = Agree2-∘ (λ p → Cond𝔹 (` p) (¬ (` p))) (ϱ [ v ↦ b ]) ϱ (drop (suc m) propNames) agree1 where
+    agree2 = Agree2-∘ (λ p → Cond𝔹 (` p) (` p ⇒ ⊥)) (ϱ [ v ↦ b ]) ϱ (drop (suc m) propNames) agree1 where
 
      agree1 : Agree (ϱ [ v ↦ b ]) ϱ (drop (suc m) propNames)
      agree1 {p} p∈dropps = update-≢ v≢p where
@@ -444,7 +565,7 @@ core-lemma2 {φ} viewφ ⊨φ (suc m) ϱ sucm≤sucn
   agreeff : map (λ p → ` p ^ ϱff) (drop (suc m) propNames) ≡ map (λ p → ` p ^ ϱ) (drop (suc m) propNames)
   agreeff = agree ff
 
-  equality : ∀ b → drop m vars ^^ (ϱ [ v ↦ b ]) ≡ Cond𝔹 (` v) (¬ (` v)) b ∷ drop (suc m) vars ^^ ϱ
+  equality : ∀ b → drop m vars ^^ (ϱ [ v ↦ b ]) ≡ Cond𝔹 (` v) (` v ⇒ ⊥) b ∷ drop (suc m) vars ^^ ϱ
   equality b = begin
     drop m vars ^^ (ϱ [ v ↦ b ])
       ≡⟨ cong (λ C → C ^^ (ϱ [ v ↦ b ])) (drop-map _ m propNames) ⟩
@@ -456,10 +577,10 @@ core-lemma2 {φ} viewφ ⊨φ (suc m) ϱ sucm≤sucn
       ≡⟨⟩
     (` v ^ (ϱ [ v ↦ b ])) ∷ map (λ p → ` p ^ (ϱ [ v ↦ b ])) (drop (suc m) propNames)
       ≡⟨⟩
-    Cond𝔹 (` v) (¬ (` v)) (⟦ ` v ⟧ (ϱ [ v ↦ b ])) ∷ map (λ p → ` p ^ (ϱ [ v ↦ b ])) (drop (suc m) propNames)
+    Cond𝔹 (` v) (` v ⇒ ⊥) (⟦ ` v ⟧ (ϱ [ v ↦ b ])) ∷ map (λ p → ` p ^ (ϱ [ v ↦ b ])) (drop (suc m) propNames)
       ≡⟨⟩
-    Cond𝔹 (` v) (¬ (` v)) ((ϱ [ v ↦ b ]) v) ∷ map (λ p → ` p ^ (ϱ [ v ↦ b ])) (drop (suc m) propNames)
-      ≡⟨ cong (λ C → Cond𝔹 (` v) (¬ (` v)) C ∷ map (λ p → ` p ^ (ϱ [ v ↦ b ])) (drop (suc m) propNames)) (update-≡ v)  ⟩
+    Cond𝔹 (` v) (` v ⇒ ⊥) ((ϱ [ v ↦ b ]) v) ∷ map (λ p → ` p ^ (ϱ [ v ↦ b ])) (drop (suc m) propNames)
+      ≡⟨ cong (λ C → Cond𝔹 (` v) (` v ⇒ ⊥) C ∷ map (λ p → ` p ^ (ϱ [ v ↦ b ])) (drop (suc m) propNames)) (update-≡ v)  ⟩
     ψ₀ ∷ map (λ p → ` p ^ (ϱ [ v ↦ b ])) (drop (suc m) propNames)
       ≡⟨ cong (λ C → ψ₀ ∷ C) (agree b) ⟩
     ψ₀ ∷ map (λ p → ` p ^ ϱ) (drop (suc m) propNames)
@@ -469,24 +590,24 @@ core-lemma2 {φ} viewφ ⊨φ (suc m) ϱ sucm≤sucn
     ψ₀ ∷ drop (suc m) vars ^^ ϱ ∎ where
 
       ψ₀ : Formula
-      ψ₀ = Cond𝔹 (` v) (¬ (` v)) b
+      ψ₀ = Cond𝔹 (` v) (` v ⇒ ⊥) b
 
   eql-tt : drop m vars ^^ ϱtt ≡ ` v ∷ drop (suc m) vars ^^ ϱ
   eql-tt = equality tt
 
-  eql-ff : drop m vars ^^ ϱff ≡ (¬ (` v)) ∷ drop (suc m) vars ^^ ϱ
+  eql-ff : drop m vars ^^ ϱff ≡ (` v ⇒ ⊥) ∷ drop (suc m) vars ^^ ϱ
   eql-ff = equality ff
 
   indtt' : drop (suc m) vars ^^ ϱ · ` v ⊢ φ
   indtt' = repl indtt (cong (λ C → C ⊢ φ) eql-tt)
 
-  indff' : ¬ ` v ∷ drop (suc m) vars ^^ ϱ ⊢ φ
+  indff' : drop (suc m) vars ^^ ϱ · ` v ⇒ ⊥ ⊢ φ
   indff' = repl indff (cong (λ C → C ⊢ φ) eql-ff)
 
   indtt'' : drop (suc m) vars ^^ ϱ ⊢ ` v ⇒ φ
   indtt'' = dt2 indtt'
 
-  indff'' : drop (suc m) vars ^^ ϱ ⊢ ¬ (` v) ⇒ φ
+  indff'' : drop (suc m) vars ^^ ϱ ⊢ (` v ⇒ ⊥) ⇒ φ
   indff'' = dt2 indff' 
 
   goal : drop (suc m) vars ^^ ϱ ⊢ φ
