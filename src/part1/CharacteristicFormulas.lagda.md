@@ -1097,7 +1097,6 @@ monCharFormula-completeness ϱ ϱ′ ⟦φ⟧ϱ′≡tt p
 ```
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-
 With all these ingredients in hand,
 we are now ready to prove that the `{⊥, ⊤, ∨, ∧}` fragment is functionally complete for monotone functions:
 

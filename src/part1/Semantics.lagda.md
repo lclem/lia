@@ -929,6 +929,20 @@ tautology-equivalence φ = (λ tau ϱ → tau ϱ) , λ φ⟺⊤ ϱ → φ⟺⊤ 
 
 While quite evident by itself, the equivalence above does find its applications,
 such as in !remoteRef(part1)(CharacteristicFormulas)(duality-tautology).
+
+TODO: put this in context:
+
+```
+tautology-impl : 
+  Tautology φ →
+  φ ⇛ ψ →
+  ------------
+  Tautology ψ
+
+tautology-impl = {!   !}
+```
+
+
 The following exercise explores a converse relationship between entailment/equivalnce and tautology.
 
 !exercise(#exercise:entailment-implication)(Entailment and implication)
@@ -994,7 +1008,7 @@ entailment-equivalence φ ψ = {!!}
 ```
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Some equivalences require to computation at all:
+Some equivalences require no computation at all:
 
 ```
 ¬¬⊤⟺⊤ : ¬ ¬ ⊤ ⟺ ⊤
@@ -1428,6 +1442,10 @@ Context = Formula *
 
 ∅ : Context
 ∅ = ε
+
+private
+  variable
+    Γ Δ : Context
 ```
 
 If `Γ` is a context and `φ` is a formula,
@@ -1603,15 +1621,30 @@ _ : ∅ · φ₀ · φ₁ Imply ` p₀ ≡ φ₀ ⇒ φ₁ ⇒ ` p₀
 _ = refl
 ```
 
+TODO: put it in context as an application of DT
+
+```
+modus-ponens : ∀ {Γ} φ ψ →
+  Γ ⊨ φ ⇒ ψ →
+  Γ ⊨ φ →
+  ------
+  Γ ⊨ ψ
+
+modus-ponens φ ψ Γ⊨φ⇒ψ Γ⊨φ ϱ x
+ with semDT2 _ φ ψ Γ⊨φ⇒ψ
+... | Γ·φ⊨ψ = Γ·φ⊨ψ ϱ λ{ here → Γ⊨φ ϱ x
+                        ; (there y) → x y}
+```
+
 We can now state the following "long" versions of the semantic deduction theorem.
 
 ```
-longSemDT1 : ∀ Δ φ →
+longSemDT1 :
   Δ ⊨ φ →
   -------------
   ∅ ⊨ Δ Imply φ
 
-longSemDT2 : ∀ Δ φ →
+longSemDT2 :
   ∅ ⊨ Δ Imply φ →
   -----
   Δ ⊨ φ
@@ -1623,11 +1656,11 @@ The proofs are a straightforward applications of !ref(semDT1) and !ref(semDT2).
 ~~~~~~~~~
 ~~~~~~~~~
 ```
-longSemDT1 ε φ ε⊨φ = ε⊨φ
-longSemDT1 (ψ ∷ Δ) φ ψ∷Δ⊨φ = longSemDT1 Δ (ψ ⇒ φ) (semDT1 Δ ψ φ ψ∷Δ⊨φ)
+longSemDT1 {ε} {φ} ε⊨φ = ε⊨φ
+longSemDT1 {ψ ∷ Δ} {φ} ψ∷Δ⊨φ = longSemDT1 {Δ} {ψ ⇒ φ} (semDT1 Δ ψ φ ψ∷Δ⊨φ)
 
-longSemDT2 ε φ ∅⊨φ ϱ All∅ = ∅⊨φ ϱ All∅
-longSemDT2 (ψ ∷ Δ) φ ∅⊨ΔImplyφ = semDT2 Δ ψ φ (longSemDT2 Δ (ψ ⇒ φ) ∅⊨ΔImplyφ)
+longSemDT2 {ε} {φ} ∅⊨φ ϱ All∅ = ∅⊨φ ϱ All∅
+longSemDT2 {ψ ∷ Δ} {φ} ∅⊨ΔImplyφ = semDT2 Δ ψ φ (longSemDT2 {Δ} {ψ ⇒ φ} ∅⊨ΔImplyφ)
 ```
 ~~~~~~~~~
 

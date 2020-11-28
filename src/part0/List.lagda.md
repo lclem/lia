@@ -70,7 +70,6 @@ Fun : ∀ {ℓ} (A : Set ℓ) (B : Set ℓ) (n : ℕ) → Set ℓ
 Fun A B zero = B
 Fun A B (suc n) = A → Fun A B n
 
-
 [ : ∀ {ℓ} {A : Set ℓ} {n : ℕ} → Fun A (A *) n
 [ {A = A} {n = n} = go n ε where
 
@@ -607,10 +606,67 @@ drop-∈! a zero as k memb rewrite drop-zero as = memb
 drop-∈! a (suc m) (_ ∷ as) k memb with drop-∈! a m as k memb
 ... | ind = there ind
 
-
-data TList {ℓ} : (Set ℓ) * → Set ℓ where
+data TList {ℓ} : Set ℓ * → Set ℓ where
+--    just_ : ∀ {A : Set ℓ} → A → TList (A ∷ ε)
     ε : TList ε
     _∷_ : ∀ {A : Set ℓ} {As : (Set ℓ) *} → A → TList As → TList (A ∷ As)
+
+fetchElem : ∀ {A : Set ℓ} {Ts : (Set ℓ) *} → TList Ts → A ∈ Ts → A
+-- fetchElem (just a) here = a
+fetchElem (a ∷ _) here = a
+fetchElem (_ ∷ as) (there x) = fetchElem as x
+
+Funs : (As : Set ℓ *) (B : Set ℓ) → Set ℓ
+Funs ε B = B
+-- Funs (A ∷ ε) B = A → B
+-- Funs (A ∷ As@(_ ∷ _)) B = A → Funs As B
+Funs (A ∷ As) B = A → Funs As B
+
+X_ : Set ℓ * → Set ℓ
+X ε = T
+-- X (A ∷ ε) = A
+-- X (A ∷ As@(_ ∷ _)) = A × X As
+X (A ∷ As) = A × X As
+
+applyFuns : {As : Set ℓ *} {B : Set ℓ} → Funs As B → X As → B
+applyFuns {As = ε} b tt = b
+-- applyFuns {As = A ∷ ε} f a = f a
+-- applyFuns {As = A ∷ As@(_ ∷ _)} f (a , as) = applyFuns (f a) as
+applyFuns {As = A ∷ As} f (a , as) = applyFuns (f a) as
+
+infixl 7.2 _have_by_ _have_apply_at_
+
+_have_by_ : ∀ {As : (Set ℓ) *} → TList As → (A : Set ℓ) → A → TList (A ∷ As)
+as have A by a = a ∷ as
+
+--_have_apply_at_ : ∀ {A B : Set ℓ} {Ts : (Set ℓ) *} → TList Ts → (C : Set ℓ) → (A → B → C) → A ∈ Ts × B ∈ Ts → TList (C ∷ Ts)
+_have_apply_at_ : ∀ {As : Set ℓ *} {Ts : (Set ℓ) *} → TList Ts → (B : Set ℓ) → Funs As B → X map (λ A → A ∈ Ts) As → TList (B ∷ Ts)
+_have_apply_at_ {ℓ} {As} {Ts} as B f x = applyFuns f (g As x) ∷ as where
+
+  g : (As : Set ℓ *) → X map (λ A → A ∈ Ts) As → X As
+  g ε _ = tt
+  -- g (A ∷ ε) A∈Ts = fetchElem as A∈Ts
+  -- g (A ∷ As@(_ ∷ _)) (A∈Ts , x) = fetchElem as A∈Ts , g As x
+  g (A ∷ As) (A∈Ts , x) = fetchElem as A∈Ts , g As x
+
+infixl 7.1 _haveit
+_haveit : {A : Set ℓ} {As : (Set ℓ) *} → TList (A ∷ As) → A
+-- (just a) haveit = a
+(a ∷ _) haveit = a
+
+infixl 10 _,_# _,,_
+_,_# _,,_ : {A B : Set ℓ} → A → B → X (A ∷ B ∷ ε)
+a , b # = a , b , tt
+a ,, b = a , b , tt
+
+_ : ε
+    have ℕ by 2
+    have ℕ by 3
+    have ℕ apply _+_ at here , there here , tt
+    have ℕ apply _+_ at here , there here , tt
+    have ℕ apply _+_ at here , there here , tt
+    haveit ≡ 13
+_ = refl
 
 -- tmap : ∀ {ℓ} {As Bs : Vector (Set ℓ) n} → TVector {ℓ} {n} (zipWith Fun As Bs) → TList As → TList Bs
 -- tmap {ε} {ε} ε ε = ε

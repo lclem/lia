@@ -1,5 +1,5 @@
 ---
-title: "Completeness of Hilbert-style proof systems for propositional logic 🚧"
+title: "Completeness of Hilbert's proof system for propositional logic 🚧"
 ---
 
 ```
@@ -7,11 +7,11 @@ title: "Completeness of Hilbert-style proof systems for propositional logic 🚧
 open import part0.index
 
 module part1.Completeness (n′ : ℕ) where
-open import part1.CharacteristicFormulas n′ hiding (¬_; ϱtt; ϱff)
+open import part1.CharacteristicFormulas n′ hiding (ϱtt; ϱff)
 
 private
   variable
-    φ ψ θ : Formula
+    φ ψ θ ξ : Formula
     Γ Δ : Context
 ```
 
@@ -20,8 +20,7 @@ References:
 * Proof pearl @CaiKaposiAltenkirch:2015 for propositional logic.
 * modal logic S5 @Bentzen:arXiv:2019.
 
-
-## Proof system
+# Proof system
 
 ```
 infixr 5 _⊢_
@@ -51,13 +50,36 @@ data _⊢_ : Context → Formula → Set where
   E3 : Γ ⊢ (φ ⇒ ψ) ⇒ (ψ ⇒ φ) ⇒ (φ ⇔ ψ)
 
   -- modus ponens
-  MP : Δ ⊢ φ ⇒ ψ → Δ ⊢ φ → Δ ⊢ ψ
+  MP : Δ ⊢ φ ⇒ ψ →
+       Δ ⊢ φ →
+       -----
+       Δ ⊢ ψ
+```
+
+
+```
+MP2 : Γ ⊢ φ ⇒ ψ ⇒ ξ →
+      Γ ⊢ φ →
+      Γ ⊢ ψ →
+      ------
+      Γ ⊢ ξ
+
+MP2 = {!   !}
+
+MP3 : Γ ⊢ φ ⇒ ψ ⇒ ξ ⇒ θ →
+      Γ ⊢ φ →
+      Γ ⊢ ψ →
+      Γ ⊢ ξ →
+      ------
+      Γ ⊢ θ
+
+MP3 = {!   !}
 ```
 
 A proof example.
 
 ```
-B0 : ∀ {Δ φ} → Δ ⊢ φ ⇒ φ
+B0 : Δ ⊢ φ ⇒ φ
 B0 {Δ} {φ} = S5 where
 
   S1 : Δ ⊢ φ ⇒ φ ⇒ φ
@@ -79,36 +101,42 @@ B0 {Δ} {φ} = S5 where
 ## Monotonicity
 
 ```
-monotonicityOfProofs1 : Δ ⊢ φ → Δ · ψ ⊢ φ
-monotonicityOfProofs1 (Ass φ∈Δ) = Ass (there φ∈Δ)
+mon-⊢ : Δ ⊢ φ → Δ · ψ ⊢ φ
+mon-⊢ (Ass φ∈Δ) = Ass (there φ∈Δ)
 
-monotonicityOfProofs1 A1 = A1
-monotonicityOfProofs1 A2 = A2
-monotonicityOfProofs1 A3 = A3
+mon-⊢ A1 = A1
+mon-⊢ A2 = A2
+mon-⊢ A3 = A3
 
-monotonicityOfProofs1 D1 = D1
-monotonicityOfProofs1 D2 = D2
-monotonicityOfProofs1 D3 = D3
+mon-⊢ D1 = D1
+mon-⊢ D2 = D2
+mon-⊢ D3 = D3
 
-monotonicityOfProofs1 C1 = C1
-monotonicityOfProofs1 C2 = C2
-monotonicityOfProofs1 C3 = C3
+mon-⊢ C1 = C1
+mon-⊢ C2 = C2
+mon-⊢ C3 = C3
 
-monotonicityOfProofs1 E1 = E1
-monotonicityOfProofs1 E2 = E2
-monotonicityOfProofs1 E3 = E3
+mon-⊢ E1 = E1
+mon-⊢ E2 = E2
+mon-⊢ E3 = E3
 
-monotonicityOfProofs1 (MP Δ⊢φ Δ⊢ψ) = MP (monotonicityOfProofs1 Δ⊢φ) (monotonicityOfProofs1 Δ⊢ψ)
+mon-⊢ (MP Δ⊢φ Δ⊢ψ) = MP (mon-⊢ Δ⊢φ) (mon-⊢ Δ⊢ψ)
+
+mon2-⊢ : Δ ⊢ φ → Δ · ψ · ξ ⊢ φ
+mon2-⊢ = {!   !}
 ```
 
 ## Deduction theorem
 
 ```
-dt1 : Δ ⊢ φ ⇒ ψ → Δ · φ ⊢ ψ
+dt1 : Δ ⊢ φ ⇒ ψ →
+      ---------
+      Δ · φ ⊢ ψ
+
 dt1 {Δ} {φ} {ψ} Δ⊢φ⇒ψ = MP Δ,φ⊢φ⇒ψ Δ,φ⊢φ where
 
   Δ,φ⊢φ⇒ψ : φ ∷ Δ ⊢ φ ⇒ ψ
-  Δ,φ⊢φ⇒ψ = monotonicityOfProofs1 {ψ = φ} Δ⊢φ⇒ψ
+  Δ,φ⊢φ⇒ψ = mon-⊢ {ψ = φ} Δ⊢φ⇒ψ
 
   Δ,φ⊢φ : φ ∷ Δ ⊢ φ
   Δ,φ⊢φ = Ass here
@@ -153,9 +181,10 @@ dt2 {Δ} {φ} {ψ} (MP {φ = ξ} φ,Δ⊢ξ⇒ψ φ,Δ⊢ξ) = SS where
 We inductively extend the deduction theorem to finite sequences of assumptions.
 
 ```
-deductionTheorem : ∀ Δ φ → ε ⊢ Δ Imply φ → Δ ⊢ φ
-deductionTheorem ε φ ε⊢ΔImplyφ = ε⊢ΔImplyφ
-deductionTheorem (ψ ∷ Δ) φ ε⊢ΔImply[ψ⇒φ] with deductionTheorem Δ (ψ ⇒ φ) ε⊢ΔImply[ψ⇒φ]
+deductionTheorem : ε ⊢ Δ Imply φ → Δ ⊢ φ
+deductionTheorem {ε} ε⊢ΔImplyφ = ε⊢ΔImplyφ
+deductionTheorem {ψ ∷ Δ} {φ} ε⊢ΔImply[ψ⇒φ]
+  with deductionTheorem {Δ} {ψ ⇒ φ} ε⊢ΔImply[ψ⇒φ]
 ... | ind = dt1 ind
 ```
 
@@ -181,10 +210,10 @@ B1 Δ φ = Δ⊢⊥⇒φ where
 
   Δ⊢⊥⇒φ : Δ ⊢ ⊥ ⇒ φ
   Δ⊢⊥⇒φ = dt2 Δ2⊢φ
-  
--- double negation
-B2 : ∀ Δ φ  → Δ ⊢ (φ ⇒ ⊥) ⇒ φ ⇒ ⊥
-B2 Δ φ = dt2 (dt2 Γ₀⊢⊥)  where
+
+-- a much simpler proof ;p
+B2 : ∀ Δ φ → Δ ⊢ (φ ⇒ ⊥) ⇒ φ ⇒ ⊥
+B2 Δ φ = B0 {- dt2 (dt2 Γ₀⊢⊥)  where
 
    Γ₀ : Context
    Γ₀ = Δ · φ ⇒ ⊥ · φ
@@ -196,7 +225,7 @@ B2 Δ φ = dt2 (dt2 Γ₀⊢⊥)  where
    Γ₀⊢¬φ = Ass (there here)
 
    Γ₀⊢⊥ : Γ₀ ⊢ ⊥
-   Γ₀⊢⊥ = MP Γ₀⊢¬φ Γ₀⊢φ
+   Γ₀⊢⊥ = MP Γ₀⊢¬φ Γ₀⊢φ -}
    
 -- contradiction
 -- used in the core lemma
@@ -216,7 +245,7 @@ B3 Δ φ ψ = Δ⊢¬φ⇒φ⇒ψ where
   Δ⊢¬φ⇒φ⇒ψ = dt2 (dt2 Γ₀⊢ψ)
 
 -- proof by cases
--- useed in the second core lemma
+-- used in the second core lemma
 B4 : ∀ Δ φ ψ → Δ ⊢ (φ ⇒ ψ) ⇒ ((φ ⇒ ⊥) ⇒ ψ) ⇒ ψ
 B4 Δ φ ψ = dt2 (dt2 Δ1⊢ψ) where
 
@@ -282,23 +311,34 @@ B5 Δ φ ψ = dt2 (dt2 (dt2 Δ1⊢⊥)) where
   
   Δ1⊢⊥ : Δ1 ⊢ ⊥
   Δ1⊢⊥ = MP Δ1⊢¬ψ Δ1⊢ψ
+
+B6 : Γ ⊢ (ψ ⇒ φ) ⇒ ¬ φ ⇒ ¬ ψ
+B6 = {!   !}
+
+-- contraposition
+B7 : Γ ⊢ (¬ φ ⇒ ¬ ψ) ⇒ ψ ⇒ φ
+B7 = {!   !}
+
 ```
 
-## Soundness
+# Soundness
 
 ```
-soundness : ∀ Δ φ → Δ ⊢ φ → Δ ⊨ φ
+soundness :
+  Δ ⊢ φ →
+  -----
+  Δ ⊨ φ
 
-soundness Δ φ (Ass ψ∈Δ) ϱ ⟦Δ⟧ = ⟦Δ⟧ ψ∈Δ
+soundness (Ass ψ∈Δ) ϱ ⟦Δ⟧ = ⟦Δ⟧ ψ∈Δ
 
-soundness Δ (φ ⇒ ψ ⇒ φ) A1 ϱ _
+soundness {φ = φ ⇒ ψ ⇒ φ} A1 ϱ _
   with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ
 ... | tt | tt = refl
 ... | tt | ff = refl
 ... | ff | tt = refl
 ... | ff | ff = refl
 
-soundness Δ ((φ ⇒ ψ ⇒ ξ) ⇒ (φ ⇒ ψ) ⇒ φ ⇒ ξ) A2 ϱ _
+soundness {φ = (φ ⇒ ψ ⇒ ξ) ⇒ (φ ⇒ ψ) ⇒ φ ⇒ ξ} A2 ϱ _
   with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ | ⟦ ξ ⟧ ϱ
 ... | tt | tt | tt = refl
 ... | tt | tt | ff = refl
@@ -309,12 +349,12 @@ soundness Δ ((φ ⇒ ψ ⇒ ξ) ⇒ (φ ⇒ ψ) ⇒ φ ⇒ ξ) A2 ϱ _
 ... | ff | ff | tt = refl
 ... | ff | ff | ff = refl
 
-soundness Δ (((φ ⇒ ⊥) ⇒ ⊥) ⇒ φ) A3 ϱ _
+soundness {φ = ((φ ⇒ ⊥) ⇒ ⊥) ⇒ φ} A3 ϱ _
   with ⟦ φ ⟧ ϱ
 ... | tt = refl
 ... | ff = refl
 
-soundness Δ (φ ⇒ ψ ∨ ξ) D1 ϱ _
+soundness {φ = φ ⇒ ψ ∨ ξ} D1 ϱ _
   with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ | ⟦ ξ ⟧ ϱ
 ... | tt | tt | tt = refl
 ... | tt | tt | ff = refl
@@ -325,7 +365,7 @@ soundness Δ (φ ⇒ ψ ∨ ξ) D1 ϱ _
 ... | ff | ff | tt = refl
 ... | ff | ff | ff = refl
 
-soundness Δ (φ ⇒ ψ ∨ ξ) D2 ϱ _ 
+soundness {φ = φ ⇒ ψ ∨ ξ} D2 ϱ _ 
   with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ | ⟦ ξ ⟧ ϱ
 ... | tt | tt | tt = refl
 ... | tt | tt | ff = refl
@@ -336,7 +376,7 @@ soundness Δ (φ ⇒ ψ ∨ ξ) D2 ϱ _
 ... | ff | ff | tt = refl
 ... | ff | ff | ff = refl
 
-soundness Δ ((φ ⇒ θ) ⇒ (ψ ⇒ θ) ⇒ (φ ∨ ψ) ⇒ θ) D3 ϱ _ 
+soundness {φ = (φ ⇒ θ) ⇒ (ψ ⇒ θ) ⇒ (φ ∨ ψ) ⇒ θ} D3 ϱ _ 
   with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ | ⟦ θ ⟧ ϱ
 ... | tt | tt | tt = refl
 ... | tt | tt | ff = refl
@@ -347,22 +387,21 @@ soundness Δ ((φ ⇒ θ) ⇒ (ψ ⇒ θ) ⇒ (φ ∨ ψ) ⇒ θ) D3 ϱ _
 ... | ff | ff | tt = refl
 ... | ff | ff | ff = refl
 
-soundness Δ (φ ∧ ψ ⇒ φ) C1 ϱ _
+soundness {φ = φ ∧ ψ ⇒ φ} C1 ϱ _
   with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ
 ... | tt | tt = refl
 ... | tt | ff = refl
 ... | ff | tt = refl
 ... | ff | ff = refl
 
-soundness Δ (φ ∧ ψ ⇒ ψ) C2 ϱ _
+soundness {φ = φ ∧ ψ ⇒ ψ} C2 ϱ _
   with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ
 ... | tt | tt = refl
 ... | tt | ff = refl
 ... | ff | tt = refl
 ... | ff | ff = refl
 
-
-soundness Δ ((φ ⇒ ψ) ⇒ (φ ⇒ θ) ⇒ φ ⇒ ψ ∧ θ) C3 ϱ _
+soundness {φ = (φ ⇒ ψ) ⇒ (φ ⇒ θ) ⇒ φ ⇒ ψ ∧ θ} C3 ϱ _
   with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ | ⟦ θ ⟧ ϱ
 ... | tt | tt | tt = refl
 ... | tt | tt | ff = refl
@@ -373,21 +412,21 @@ soundness Δ ((φ ⇒ ψ) ⇒ (φ ⇒ θ) ⇒ φ ⇒ ψ ∧ θ) C3 ϱ _
 ... | ff | ff | tt = refl
 ... | ff | ff | ff = refl
 
-soundness Δ ((φ ⇔ ψ) ⇒ φ ⇒ ψ) E1 ϱ _ 
+soundness {φ = (φ ⇔ ψ) ⇒ φ ⇒ ψ} E1 ϱ _ 
   with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ
 ... | tt | tt = refl
 ... | tt | ff = refl
 ... | ff | tt = refl
 ... | ff | ff = refl
 
-soundness Δ ((φ ⇔ ψ) ⇒ ψ ⇒ φ) E2 ϱ _
+soundness {φ = (φ ⇔ ψ) ⇒ ψ ⇒ φ} E2 ϱ _
   with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ
 ... | tt | tt = refl
 ... | tt | ff = refl
 ... | ff | tt = refl
 ... | ff | ff = refl
 
-soundness Δ ((φ ⇒ ψ) ⇒ (ψ ⇒ φ) ⇒ (φ ⇔ ψ)) E3 ϱ _ 
+soundness {φ = (φ ⇒ ψ) ⇒ (ψ ⇒ φ) ⇒ (φ ⇔ ψ)} E3 ϱ _ 
   with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ
 ... | tt | tt = refl
 ... | tt | ff = refl
@@ -395,14 +434,13 @@ soundness Δ ((φ ⇒ ψ) ⇒ (ψ ⇒ φ) ⇒ (φ ⇔ ψ)) E3 ϱ _
 ... | ff | ff = refl
 
 -- strong soundness of modus ponens
-soundness Δ ψ (MP {φ = φ} Δ⊢φ⇒ψ Δ⊢φ) ϱ ⟦Δ⟧
-  with soundness _ _ Δ⊢φ⇒ψ ϱ ⟦Δ⟧ |
-       soundness _ _ Δ⊢φ ϱ ⟦Δ⟧
+soundness {φ = ψ} (MP {φ = φ} Δ⊢φ⇒ψ Δ⊢φ) ϱ ⟦Δ⟧
+  with soundness Δ⊢φ⇒ψ ϱ ⟦Δ⟧ |
+       soundness Δ⊢φ ϱ ⟦Δ⟧
 ... | ⟦φ⇒ψ⟧ϱ≡tt | ⟦φ⟧ϱ≡tt with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ
 ... | tt | tt = refl
 ```
-
-## Completeness {#Completeness}
+# Completeness for the `⇒, ⊥` fragment {#Completeness}
 
 ```
 infix 51 _^_ _^^_
@@ -418,7 +456,7 @@ vars : Context
 vars = map `_ propNames
 ```
 
-### Core lemma
+## Core lemma
 
 ```
 core-lemma : ∀ φ (_ : Formula[⇒,⊥] φ) (ϱ : Val) →
@@ -450,7 +488,7 @@ core-lemma (φ ⇒ ψ) (viewφ ⇒ viewψ) ϱ
 
 -- B5 : ∀ {n} Δ (φ ψ : Formula n) → Δ ⊢ φ ⇒ ¬ ψ ⇒ ¬ (φ ⇒ ψ)
 
-### Core lemma 2
+## Core lemma 2
 
 ```
 core-lemma2 :
@@ -614,11 +652,287 @@ core-lemma2 {φ} viewφ ⊨φ (suc m) ϱ sucm≤sucn
   goal = MP (MP (B4 _ _ _) indtt'') indff''
 ```
 
-### Weak completeness
+# Completeness for the full fragment
+
+We need to convert an arbitrary formula `φ` to a formula `ψ` in the implication fragment
+s.t. the two are provably equivalent:
 
 ```
-weak-completeness : ∀ φ → Formula[⇒,⊥] φ → ε ⊨ φ → ε ⊢ φ
-weak-completeness φ viewφ ⊨φ = ε⊢φ where
+help0 : Γ ⊢ φ ⇔ ψ → Γ ⊢ φ ⇒ ψ
+help0 Γ⊢φ⇔ψ = {!   !}
+
+help1 : Γ ⊢ φ ⇔ ψ → Γ ⊢ ψ ⇒ φ
+help1 Γ⊢φ⇔ψ = {!   !}
+
+help2 : Γ ⊢ φ ⇒ ψ → Γ ⊢ ψ ⇒ φ → Γ ⊢ φ ⇔ ψ
+help2 Γ⊢φ⇒ψ Γ⊢ψ⇒φ = MP (MP E3 Γ⊢φ⇒ψ) Γ⊢ψ⇒φ
+
+refl-⇔ : Γ ⊢ φ ⇔ φ
+refl-⇔ = help2 (MP (MP A2 A1) A1) (MP (MP A2 A1) A1)
+
+sym-⇔ : Γ ⊢ φ ⇔ ψ → Γ ⊢ ψ ⇔ φ
+sym-⇔ = {!   !}
+
+trans-⇔ : Γ ⊢ φ ⇔ ψ → Γ ⊢ ψ ⇔ ξ → Γ ⊢ φ ⇔ ξ
+trans-⇔ = {!   !}
+
+helper-⇒ : ∀ {Γ p φ ψ} ξ₀ ξ₁ →
+  Γ ⊢ ξ₀ F[ p ↦ ψ ] ⇒ ξ₀ F[ p ↦ φ ] →
+  Γ ⊢ ξ₁ F[ p ↦ φ ] ⇒ ξ₁ F[ p ↦ ψ ] →
+  --------------------------------------------------------
+  Γ ⊢ (ξ₀ ⇒ ξ₁) F[ p ↦ φ ] ⇒ (ξ₀ ⇒ ξ₁) F[ p ↦ ψ ]
+
+helper-⇒ {Γ} {p} {φ} {ψ} ξ₀ ξ₁ ass₀ ass₁ = dt2 (dt2 goal) where
+
+    Ξ₀ = Γ · (ξ₀ ⇒ ξ₁) F[ p ↦ φ ] · ξ₀ F[ p ↦ ψ ]
+
+    goal = ε
+        have Ξ₀ ⊢ ξ₀ F[ p ↦ ψ ]                 by Ass here
+        have Ξ₀ ⊢ ξ₀ F[ p ↦ ψ ] ⇒ ξ₀ F[ p ↦ φ ] by mon2-⊢ ass₀
+        have Ξ₀ ⊢ ξ₀ F[ p ↦ φ ]                 apply MP at here ,, there here
+        have Ξ₀ ⊢ (ξ₀ ⇒ ξ₁) F[ p ↦ φ ]          by Ass (there here)
+        have Ξ₀ ⊢ ξ₁ F[ p ↦ φ ]                 apply MP at here ,, there here
+        have Ξ₀ ⊢ ξ₁ F[ p ↦ φ ] ⇒ ξ₁ F[ p ↦ ψ ] by mon2-⊢ ass₁
+        have Ξ₀ ⊢ ξ₁ F[ p ↦ ψ ]                 apply MP at here ,, there here
+        haveit
+
+helper-⇔ : ∀ {Γ p φ ψ} ξ₀ ξ₁ →
+  Γ ⊢ ξ₀ F[ p ↦ φ ] ⇔ ξ₀ F[ p ↦ ψ ] →
+  Γ ⊢ ξ₁ F[ p ↦ φ ] ⇔ ξ₁ F[ p ↦ ψ ] →
+  ------------------------------------------------
+  Γ ⊢ (ξ₀ ⇔ ξ₁) F[ p ↦ φ ] ⇒ (ξ₀ ⇔ ξ₁) F[ p ↦ ψ ]
+
+helper-⇔ {Γ} {p} {φ} {ψ} ξ₀ ξ₁ ass₀ ass₁
+  = dt2 (help2 goal₀ goal₁) where
+
+  Γ₀ = Γ · (ξ₀ ⇔ ξ₁) F[ p ↦ φ ]
+
+  goal₀ = ε
+    have Γ ⊢ ξ₀ F[ p ↦ ψ ] ⇒ ξ₀ F[ p ↦ φ ]                by help1 ass₀
+    have Γ ⊢ ξ₁ F[ p ↦ φ ] ⇒ ξ₁ F[ p ↦ ψ ]                by help0 ass₁
+    have Γ ⊢ (ξ₀ ⇒ ξ₁) F[ p ↦ φ ] ⇒ (ξ₀ ⇒ ξ₁) F[ p ↦ ψ ]  apply helper-⇒ ξ₀ ξ₁ at there here ,, here
+
+    have Γ₀ ⊢ (ξ₀ ⇔ ξ₁) F[ p ↦ φ ]                        by Ass here
+    have Γ₀ ⊢ (ξ₀ ⇒ ξ₁) F[ p ↦ φ ]                        apply help0 at here , tt
+    have Γ₀ ⊢ (ξ₀ ⇒ ξ₁) F[ p ↦ φ ] ⇒ (ξ₀ ⇒ ξ₁) F[ p ↦ ψ ] apply mon-⊢ at (there (there here)) , tt
+    have Γ₀ ⊢ (ξ₀ ⇒ ξ₁) F[ p ↦ ψ ]                        apply MP at here ,, there here
+    haveit
+
+  goal₁ = ε
+    have Γ ⊢ ξ₁ F[ p ↦ ψ ] ⇒ ξ₁ F[ p ↦ φ ]                by help1 ass₁
+    have Γ ⊢ ξ₀ F[ p ↦ φ ] ⇒ ξ₀ F[ p ↦ ψ ]                by help0 ass₀
+    have Γ ⊢ (ξ₁ ⇒ ξ₀) F[ p ↦ φ ] ⇒ (ξ₁ ⇒ ξ₀) F[ p ↦ ψ ]  apply helper-⇒ ξ₁ ξ₀ at there here ,, here
+
+    have Γ₀ ⊢ (ξ₀ ⇔ ξ₁) F[ p ↦ φ ]                        by Ass here
+    have Γ₀ ⊢ (ξ₁ ⇒ ξ₀) F[ p ↦ φ ]                        apply help1 at here , tt
+    have Γ₀ ⊢ (ξ₁ ⇒ ξ₀) F[ p ↦ φ ] ⇒ (ξ₁ ⇒ ξ₀) F[ p ↦ ψ ] apply mon-⊢ at (there (there here)) , tt
+    have Γ₀ ⊢ (ξ₁ ⇒ ξ₀) F[ p ↦ ψ ]                        apply MP at here ,, there here
+    haveit
+
+cong-∨ : ∀ {Γ p φ ψ} ξ₀ ξ₁ →
+  Γ ⊢ ξ₀ F[ p ↦ φ ] ⇒ ξ₀ F[ p ↦ ψ ] →
+  Γ ⊢ ξ₁ F[ p ↦ φ ] ⇒ ξ₁ F[ p ↦ ψ ] →
+  ------------------------------------------------
+  Γ ⊢ (ξ₀ ∨ ξ₁) F[ p ↦ φ ] ⇒ (ξ₀ ∨ ξ₁) F[ p ↦ ψ ]
+
+cong-∨ {Γ} {p} {φ} {ψ} ξ₀ ξ₁ ass₀ ass₁ = ε
+    have Γ · ξ₀ F[ p ↦ φ ] ⊢ ξ₀ F[ p ↦ ψ ]          by dt1 ass₀
+    have Γ · ξ₀ F[ p ↦ φ ] ⊢ (ξ₀ ∨ ξ₁) F[ p ↦ ψ ]   apply (MP D1) at here , tt
+    have Γ ⊢ ξ₀ F[ p ↦ φ ] ⇒ (ξ₀ ∨ ξ₁) F[ p ↦ ψ ]   apply dt2 at here , tt
+
+    have Γ · ξ₁ F[ p ↦ φ ] ⊢ ξ₁ F[ p ↦ ψ ]          by dt1 ass₁
+    have Γ · ξ₁ F[ p ↦ φ ] ⊢ (ξ₀ ∨ ξ₁) F[ p ↦ ψ ]   apply (MP D2) at here , tt
+    have Γ ⊢ ξ₁ F[ p ↦ φ ] ⇒ (ξ₀ ∨ ξ₁) F[ p ↦ ψ ]   apply dt2 at here , tt
+
+    have Γ ⊢ (ξ₀ ∨ ξ₁) F[ p ↦ φ ] ⇒ (ξ₀ ∨ ξ₁) F[ p ↦ ψ ]
+      apply (MP2 D3) at there (there (there here)) ,, here
+    haveit
+
+cong-∧ : ∀ {Γ p φ ψ} ξ₀ ξ₁ →
+  Γ ⊢ ξ₀ F[ p ↦ φ ] ⇒ ξ₀ F[ p ↦ ψ ] →
+  Γ ⊢ ξ₁ F[ p ↦ φ ] ⇒ ξ₁ F[ p ↦ ψ ] →
+  ------------------------------------------------
+  Γ ⊢ (ξ₀ ∧ ξ₁) F[ p ↦ φ ] ⇒ (ξ₀ ∧ ξ₁) F[ p ↦ ψ ]
+
+cong-∧ {Γ} {p} {φ} {ψ} ξ₀ ξ₁ ass₀ ass₁ = ε
+      have Γ · (ξ₀ ∧ ξ₁) F[ p ↦ φ ] ⊢ ξ₀ F[ p ↦ φ ] ⇒ ξ₀ F[ p ↦ ψ ]   by mon-⊢ ass₀
+      have Γ · (ξ₀ ∧ ξ₁) F[ p ↦ φ ] ⊢ ξ₀ F[ p ↦ φ ]                   by MP C1 (Ass here) 
+      have Γ · (ξ₀ ∧ ξ₁) F[ p ↦ φ ] ⊢ ξ₀ F[ p ↦ ψ ]                   apply MP at there here ,, here
+      have Γ ⊢ (ξ₀ ∧ ξ₁) F[ p ↦ φ ] ⇒ ξ₀ F[ p ↦ ψ ]                   apply dt2 at here , tt
+
+      have Γ · (ξ₀ ∧ ξ₁) F[ p ↦ φ ] ⊢ ξ₁ F[ p ↦ φ ] ⇒ ξ₁ F[ p ↦ ψ ]   by mon-⊢ ass₁
+      have Γ · (ξ₀ ∧ ξ₁) F[ p ↦ φ ] ⊢ ξ₁ F[ p ↦ φ ]                   by MP C2 (Ass here)
+      have Γ · (ξ₀ ∧ ξ₁) F[ p ↦ φ ] ⊢ ξ₁ F[ p ↦ ψ ]                   apply MP at there here ,, here
+      have Γ ⊢ (ξ₀ ∧ ξ₁) F[ p ↦ φ ] ⇒ ξ₁ F[ p ↦ ψ ]                   apply dt2 at here , tt
+
+      have Γ ⊢ (ξ₀ ∧ ξ₁) F[ p ↦ φ ] ⇒ (ξ₀ ∧ ξ₁) F[ p ↦ ψ ]
+        apply (MP2 C3) at there (there (there (there here))) ,, here
+      haveit
+
+cong-↔ : ∀ ξ p →
+  Γ ⊢ φ ⇔ ψ →
+  -----------------------------
+  Γ ⊢ ξ F[ p ↦ φ ] ⇔ ξ F[ p ↦ ψ ]
+
+cong-↔ ⊥ p Γ⊢φ⇔ψ = refl-⇔
+
+cong-↔ ⊤ p Γ⊢φ⇔ψ = refl-⇔
+
+cong-↔ (` q) p Γ⊢φ⇔ψ
+  with p ≡? q
+... | yes _ = Γ⊢φ⇔ψ
+... | no _ = refl-⇔
+
+cong-↔ {Γ} {φ} {ψ} (¬ ξ) p Γ⊢φ⇔ψ
+  with cong-↔ ξ p Γ⊢φ⇔ψ
+... | Γ⊢ξ[p↦φ]⇔ξ[p↦ψ]
+  with help0 Γ⊢ξ[p↦φ]⇔ξ[p↦ψ] |
+       help1 Γ⊢ξ[p↦φ]⇔ξ[p↦ψ]
+... | Γ⊢ξ[p↦φ]⇒ξ[p↦ψ] | Γ⊢ξ[p↦ψ]⇒ξ[p↦φ]
+  = help2 Γ⊢¬ξ[p↦φ]⇒¬ξ[p↦ψ] Γ⊢¬ξ[p↦ψ]⇒¬ξ[p↦φ] where
+
+    Γ⊢¬ξ[p↦φ]⇒¬ξ[p↦ψ] : Γ ⊢ ¬ ξ F[ p ↦ φ ] ⇒ ¬ ξ F[ p ↦ ψ ]
+    Γ⊢¬ξ[p↦φ]⇒¬ξ[p↦ψ] = MP B6 Γ⊢ξ[p↦ψ]⇒ξ[p↦φ]
+    
+    Γ⊢¬ξ[p↦ψ]⇒¬ξ[p↦φ] : Γ ⊢ ¬ ξ F[ p ↦ ψ ] ⇒ ¬ ξ F[ p ↦ φ ]
+    Γ⊢¬ξ[p↦ψ]⇒¬ξ[p↦φ] = MP B6 Γ⊢ξ[p↦φ]⇒ξ[p↦ψ]
+
+cong-↔ (ξ₀ ∨ ξ₁) p Γ⊢φ⇔ψ
+  with cong-↔ ξ₀ p Γ⊢φ⇔ψ | cong-↔ ξ₁ p Γ⊢φ⇔ψ
+... | Γ⊢ξ₀[p↦φ]⇔ξ₀[p↦ψ] | Γ⊢ξ₁[p↦φ]⇔ξ₁[p↦ψ]
+  with help0 Γ⊢ξ₀[p↦φ]⇔ξ₀[p↦ψ] | help1 Γ⊢ξ₀[p↦φ]⇔ξ₀[p↦ψ] |
+       help0 Γ⊢ξ₁[p↦φ]⇔ξ₁[p↦ψ] | help1 Γ⊢ξ₁[p↦φ]⇔ξ₁[p↦ψ]
+... | Γ⊢ξ₀[p↦φ]⇒ξ₀[p↦ψ] | Γ⊢ξ₀[p↦ψ]⇒ξ₀[p↦φ]
+    | Γ⊢ξ₁[p↦φ]⇒ξ₁[p↦ψ] | Γ⊢ξ₁[p↦ψ]⇒ξ₁[p↦φ]
+  = help2 (cong-∨ ξ₀ ξ₁ Γ⊢ξ₀[p↦φ]⇒ξ₀[p↦ψ] Γ⊢ξ₁[p↦φ]⇒ξ₁[p↦ψ])
+          (cong-∨ ξ₀ ξ₁ Γ⊢ξ₀[p↦ψ]⇒ξ₀[p↦φ] Γ⊢ξ₁[p↦ψ]⇒ξ₁[p↦φ])
+
+cong-↔ (ξ₀ ∧ ξ₁) p Γ⊢φ⇔ψ
+  with cong-↔ ξ₀ p Γ⊢φ⇔ψ | cong-↔ ξ₁ p Γ⊢φ⇔ψ
+... | Γ⊢ξ₀[p↦φ]⇔ξ₀[p↦ψ] | Γ⊢ξ₁[p↦φ]⇔ξ₁[p↦ψ]
+  with help0 Γ⊢ξ₀[p↦φ]⇔ξ₀[p↦ψ] | help1 Γ⊢ξ₀[p↦φ]⇔ξ₀[p↦ψ] |
+       help0 Γ⊢ξ₁[p↦φ]⇔ξ₁[p↦ψ] | help1 Γ⊢ξ₁[p↦φ]⇔ξ₁[p↦ψ]
+... | Γ⊢ξ₀[p↦φ]⇒ξ₀[p↦ψ] | Γ⊢ξ₀[p↦ψ]⇒ξ₀[p↦φ]
+    | Γ⊢ξ₁[p↦φ]⇒ξ₁[p↦ψ] | Γ⊢ξ₁[p↦ψ]⇒ξ₁[p↦φ]
+  = help2 (cong-∧ ξ₀ ξ₁ Γ⊢ξ₀[p↦φ]⇒ξ₀[p↦ψ] Γ⊢ξ₁[p↦φ]⇒ξ₁[p↦ψ])
+          (cong-∧ ξ₀ ξ₁ Γ⊢ξ₀[p↦ψ]⇒ξ₀[p↦φ] Γ⊢ξ₁[p↦ψ]⇒ξ₁[p↦φ])
+
+cong-↔ (ξ₀ ⇒ ξ₁) p Γ⊢φ⇔ψ 
+  with cong-↔ ξ₀ p Γ⊢φ⇔ψ | cong-↔ ξ₁ p Γ⊢φ⇔ψ
+... | Γ⊢ξ₀[p↦φ]⇔ξ₀[p↦ψ] | Γ⊢ξ₁[p↦φ]⇔ξ₁[p↦ψ]
+  with help0 Γ⊢ξ₀[p↦φ]⇔ξ₀[p↦ψ] | help1 Γ⊢ξ₀[p↦φ]⇔ξ₀[p↦ψ] |
+       help0 Γ⊢ξ₁[p↦φ]⇔ξ₁[p↦ψ] | help1 Γ⊢ξ₁[p↦φ]⇔ξ₁[p↦ψ]
+... | Γ⊢ξ₀[p↦φ]⇒ξ₀[p↦ψ] | Γ⊢ξ₀[p↦ψ]⇒ξ₀[p↦φ]
+    | Γ⊢ξ₁[p↦φ]⇒ξ₁[p↦ψ] | Γ⊢ξ₁[p↦ψ]⇒ξ₁[p↦φ]
+  = help2 (helper-⇒ ξ₀ ξ₁ Γ⊢ξ₀[p↦ψ]⇒ξ₀[p↦φ] Γ⊢ξ₁[p↦φ]⇒ξ₁[p↦ψ])
+          (helper-⇒ ξ₀ ξ₁ Γ⊢ξ₀[p↦φ]⇒ξ₀[p↦ψ] Γ⊢ξ₁[p↦ψ]⇒ξ₁[p↦φ])
+
+cong-↔ (ξ₀ ⇔ ξ₁) p Γ⊢φ⇔ψ
+  with cong-↔ ξ₀ p Γ⊢φ⇔ψ | cong-↔ ξ₁ p Γ⊢φ⇔ψ
+... | Γ⊢ξ₀[p↦φ]⇔ξ₀[p↦ψ] | Γ⊢ξ₁[p↦φ]⇔ξ₁[p↦ψ]
+  = help2 (helper-⇔ ξ₀ ξ₁ Γ⊢ξ₀[p↦φ]⇔ξ₀[p↦ψ] Γ⊢ξ₁[p↦φ]⇔ξ₁[p↦ψ])
+          (helper-⇔ ξ₀ ξ₁ (sym-⇔ Γ⊢ξ₀[p↦φ]⇔ξ₀[p↦ψ]) (sym-⇔ Γ⊢ξ₁[p↦φ]⇔ξ₁[p↦ψ]))
+
+-- this is actually false;
+-- turn it into an exercise
+cong-alt : ∀ ξ p →
+  Γ ⊢ φ ⇔ ψ →
+  -------------------------------
+  Γ ⊢ φ F[ p ↦ ξ ] ⇔ ψ F[ p ↦ ξ ]
+
+cong-alt ξ p Γ⊢φ⇔ψ = {!   !}
+
+cong2-↔ : ∀ {φ ψ φ′ ψ′} ξ p q →
+  Γ ⊢ φ ⇔ ψ →
+  Γ ⊢ φ′ ⇔ ψ′ →
+  -------------------------------------------------------
+  --Γ ⊢ ξ F[ p ↦ φ ] F[ q ↦ φ′ ] ⇔ ξ F[ p ↦ ψ ] F[ q ↦ ψ′ ]
+  Γ ⊢ ξ F2[ p , q ↦ φ , φ′ ] ⇔ ξ F2[ p , q ↦ ψ , ψ′ ]
+
+cong2-↔ {Γ} {φ} {ψ} {φ′} {ψ′} ξ p q Γ⊢φ⇔ψ Γ⊢φ′⇔ψ′ = ε
+    have Γ ⊢ ξ F[ p ↦ φ ] ⇔ ξ F[ p ↦ ψ ]                          by cong-↔ ξ p Γ⊢φ⇔ψ
+
+
+    have Γ ⊢ ξ F2[ p , q ↦ φ , φ′ ] ⇔ ξ F2[ p , q ↦ ψ , ψ′ ] by {!   !}
+    haveit
+
+equiv-¬ : Γ ⊢ ¬ φ ⇔ φ ⇒ ⊥
+equiv-¬ = {!   !}
+
+equiv-∨ : Γ ⊢ (φ ∨ ψ) ⇔ ((φ ⇒ ⊥) ⇒ ψ)
+equiv-∨ = {!   !}
+
+equiv-∧ : Γ ⊢ (φ ∧ ψ) ⇔ ((φ ⇒ ψ ⇒ ⊥) ⇒ ⊥)
+equiv-∧ = {!   !}
+
+equiv-⇔ : Γ ⊢ (φ ⇔ ψ) ⇔ (((φ ⇒ ψ) ⇒ (ψ ⇒ φ) ⇒ ⊥) ⇒ ⊥)
+equiv-⇔ = {!   !}
+
+-- notice that we need only the ψ ⇒ φ direction
+convert : ∀ φ → ∃[ ψ ] Formula[⇒,⊥] ψ × ∅ ⊢ φ ⇔ ψ
+
+convert ⊥ = _ , ⊥ , refl-⇔
+
+convert ⊤ = _ , ` p₀ ⇒ ` p₀ , {!   !}
+
+convert (` p) = _ , ` p , refl-⇔
+
+convert (¬ φ)
+  with convert φ
+... | ψ , view-ψ , ⊢φ⇔ψ = ψ ⇒ ⊥ , view-ψ ⇒ ⊥ , (ε
+  have ε ⊢ ¬ φ ⇔ (φ ⇒ ⊥)      by equiv-¬
+  have ε ⊢ (φ ⇒ ⊥) ⇔ (ψ ⇒ ⊥)  by cong-↔ (` p₀ ⇒ ⊥) p₀ ⊢φ⇔ψ
+  have ε ⊢ ¬ φ ⇔ (ψ ⇒ ⊥)      apply trans-⇔ at there here ,, here
+  haveit)
+
+convert (φ ∨ ψ)
+  with convert φ | convert ψ
+... | φ′ , view-φ′ , ⊢φ⇔φ′
+    | ψ′ , view-ψ′ , ⊢ψ⇔ψ′
+    = (φ′ ⇒ ⊥) ⇒ ψ′ , (view-φ′ ⇒ ⊥) ⇒ view-ψ′ , (ε
+    have ε ⊢ φ ∨ ψ ⇔ ((φ ⇒ ⊥) ⇒ ψ)            by equiv-∨
+    have ε ⊢ ((φ ⇒ ⊥) ⇒ ψ) ⇔ ((φ′ ⇒ ⊥) ⇒ ψ′)  by cong2-↔ ((` p₀ ⇒ ⊥) ⇒ ` p₁) p₀ p₁ ⊢φ⇔φ′ ⊢ψ⇔ψ′
+    have ε ⊢ φ ∨ ψ ⇔ (φ′ ⇒ ⊥) ⇒ ψ′            apply trans-⇔ at there here ,, here
+    haveit)
+
+convert (φ ∧ ψ)
+  with convert φ | convert ψ
+... | φ′ , view-φ′ , ⊢φ⇔φ′
+    | ψ′ , view-ψ′ , ⊢ψ⇔ψ′
+    = (φ′ ⇒ ψ′ ⇒ ⊥) ⇒ ⊥ , ((view-φ′ ⇒ (view-ψ′ ⇒ ⊥)) ⇒ ⊥) , (ε
+    have ε ⊢ φ ∧ ψ ⇔ (φ ⇒ ψ ⇒ ⊥) ⇒ ⊥              by equiv-∧
+    have ε ⊢ (φ ⇒ ψ ⇒ ⊥) ⇒ ⊥ ⇔ (φ′ ⇒ ψ′ ⇒ ⊥) ⇒ ⊥  by cong2-↔ ((` p₀ ⇒ ` p₁ ⇒ ⊥) ⇒ ⊥) p₀ p₁ ⊢φ⇔φ′ ⊢ψ⇔ψ′
+    have ε ⊢ φ ∧ ψ ⇔ (φ′ ⇒ ψ′ ⇒ ⊥) ⇒ ⊥            apply trans-⇔ at there here ,, here
+    haveit)
+
+convert (φ ⇒ ψ)
+  with convert φ | convert ψ
+... | φ′ , view-φ′ , ⊢φ⇔φ′
+    | ψ′ , view-ψ′ , ⊢ψ⇔ψ′
+    = φ′ ⇒ ψ′ , view-φ′ ⇒ view-ψ′ , cong2-↔ (` p₀ ⇒ ` p₁) p₀ p₁ ⊢φ⇔φ′ ⊢ψ⇔ψ′
+
+
+convert (φ ⇔ ψ)
+  with convert φ | convert ψ
+... | φ′ , view-φ′ , ⊢φ⇔φ′
+    | ψ′ , view-ψ′ , ⊢ψ⇔ψ′
+    = (((φ′ ⇒ ψ′) ⇒ (ψ′ ⇒ φ′) ⇒ ⊥) ⇒ ⊥) ,
+      (((view-φ′ ⇒ view-ψ′) ⇒ ((view-ψ′ ⇒ view-φ′) ⇒ ⊥)) ⇒ ⊥) , (ε
+    have ε ⊢ (φ ⇔ ψ) ⇔ (((φ ⇒ ψ) ⇒ (ψ ⇒ φ) ⇒ ⊥) ⇒ ⊥)
+      by equiv-⇔
+    have ε ⊢ (((φ ⇒ ψ) ⇒ (ψ ⇒ φ) ⇒ ⊥) ⇒ ⊥) ⇔ (((φ′ ⇒ ψ′) ⇒ (ψ′ ⇒ φ′) ⇒ ⊥) ⇒ ⊥)
+      by cong2-↔ ((((` p₀ ⇒ ` p₁) ⇒ (` p₁ ⇒ ` p₀) ⇒ ⊥) ⇒ ⊥)) p₀ p₁ ⊢φ⇔φ′ ⊢ψ⇔ψ′
+    have ε ⊢ (φ ⇔ ψ) ⇔ (((φ′ ⇒ ψ′) ⇒ (ψ′ ⇒ φ′) ⇒ ⊥) ⇒ ⊥)
+      apply trans-⇔ at there here ,, here
+    haveit)
+```
+
+
+## Weak completeness
+
+```
+weak-completeness : Formula[⇒,⊥] φ → ε ⊨ φ → ε ⊢ φ
+weak-completeness {φ} viewφ ⊨φ = ε⊢φ where
 
   anyVal : Val
   anyVal = λ _ → tt
@@ -652,17 +966,36 @@ weak-completeness φ viewφ ⊨φ = ε⊢φ where
   
 ```
 
-### Strong completeness
+```
+weak-completeness' : ε ⊨ φ → ε ⊢ φ
+weak-completeness' {φ} ⊨φ
+  with convert φ
+... | ψ , view-ψ , ⊢φ⇔ψ
+  with help0 ⊢φ⇔ψ | help1 ⊢φ⇔ψ
+... | ⊢φ⇒ψ | ⊢ψ⇒φ
+  with soundness ⊢φ⇒ψ
+... | ⊨φ⇒ψ 
+  with modus-ponens φ ψ ⊨φ⇒ψ ⊨φ
+... | ⊨ψ = ⊢φ where
+
+  ⊢ψ : ε ⊢ ψ
+  ⊢ψ = weak-completeness view-ψ ⊨ψ
+
+  ⊢φ : ε ⊢ φ
+  ⊢φ = MP ⊢ψ⇒φ ⊢ψ
+```
+
+## Strong completeness
 
 ```
 completeness : ∀ φ Δ → Formula[⇒,⊥] φ → All Formula[⇒,⊥] Δ → Δ ⊨ φ → Δ ⊢ φ
 completeness φ Δ viewφ viewΔ = begin→
   Δ ⊨ φ
-    →⟨ longSemDT1 Δ φ ⟩
+    →⟨ longSemDT1 ⟩
   ε ⊨ Δ Imply φ
-    →⟨ weak-completeness (Δ Imply φ) (view Δ φ viewφ viewΔ) ⟩
+    →⟨ weak-completeness (view Δ φ viewφ viewΔ) ⟩
   ε ⊢ Δ Imply φ
-    →⟨ deductionTheorem Δ φ ⟩
+    →⟨ deductionTheorem ⟩
   Δ ⊢ φ
   ∎→  where
 
@@ -673,3 +1006,23 @@ completeness φ Δ viewφ viewΔ = begin→
     viewψ : Formula[⇒,⊥] ψ
     viewψ = viewΔ here
 ```
+
+The following is the milestone of this chapter:
+
+```
+completeness' :
+  Δ ⊨ φ →
+  -----
+  Δ ⊢ φ
+
+completeness' {Δ} {φ} = begin→
+  Δ ⊨ φ
+    →⟨ longSemDT1 ⟩
+  ε ⊨ Δ Imply φ
+    →⟨ weak-completeness' ⟩
+  ε ⊢ Δ Imply φ
+    →⟨ deductionTheorem ⟩
+  Δ ⊢ φ
+  ∎→
+```
+
