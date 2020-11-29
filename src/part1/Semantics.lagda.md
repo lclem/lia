@@ -5,7 +5,7 @@ title: "Syntax and semantics of propositional logic 🚧"
 In this chapter we introduce the syntax of propositional logic.
 
 ```
-{-# OPTIONS --allow-unsolved-metas --confluence-check --rewriting #-}
+{-# OPTIONS --allow-unsolved-metas --rewriting --confluence-check #-} -- 
 open import part0.index
 
 module part1.Semantics (n' : ℕ) where
@@ -1549,31 +1549,31 @@ The semantic deduction theorem establishes a close connection between the implic
 which is a syntactic object,
 and entailment !ref(_⊨_), which is a semantic one.
 It consists of two halves.
-The first half shows how to move a formula from the context to the right of !ref(_⊨_):
+The first half shows how to move a formula from the formula to the context:
 
 ```
-semDT1 : ∀ Γ φ ψ →
-  Γ · φ ⊨ ψ →
-  ----------
-  Γ ⊨ φ ⇒ ψ
-```
-
-The second half shows the converse operation:
-
-```
-semDT2 : ∀ Γ φ ψ →
+semDT1 : ∀ φ ψ →
   Γ ⊨ φ ⇒ ψ →
   ---------
   Γ · φ ⊨ ψ
 ```
 
+The second half shows the converse operation:
+
+```
+semDT2 : ∀ φ ψ →
+  Γ · φ ⊨ ψ →
+  ----------
+  Γ ⊨ φ ⇒ ψ
+```
+
 !exercise(#exercise:sem-DT)(Semantic deduction theorem)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Prove the two parts !ref(semDT1) and !ref(semDT2) of the semantic deduction theorem.
+Prove the two parts !ref(semDT2) and !ref(semDT1) of the semantic deduction theorem.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
-semDT1 Γ ψ φ Γ·ψ⊨φ = Δ⊨ψ⇒φ where
+semDT2 {Γ} ψ φ Γ·ψ⊨φ = Δ⊨ψ⇒φ where
 
   Δ⊨ψ⇒φ : Γ ⊨ ψ ⇒ φ
   Δ⊨ψ⇒φ ϱ ⟦Γ⟧ with inspect (⟦ ψ ⟧ ϱ)
@@ -1590,7 +1590,7 @@ semDT1 Γ ψ φ Γ·ψ⊨φ = Δ⊨ψ⇒φ where
       ⟦ψ∷Γ⟧ here = ⟦ψ⟧ϱ≡tt
       ⟦ψ∷Γ⟧ (there ξ∈Γ) = ⟦Γ⟧ ξ∈Γ
 
-semDT2 Γ φ ψ Γ⊨φ⇒ψ ϱ AllΓ·φ = ⟦ψ⟧ϱ≡tt where
+semDT1 {Γ} φ ψ Γ⊨φ⇒ψ ϱ AllΓ·φ = ⟦ψ⟧ϱ≡tt where
 
   AllΓ : All (λ φ → ⟦ φ ⟧ ϱ ≡ tt) Γ
   AllΓ {φ} φ∈Γ = AllΓ·φ (there φ∈Γ)
@@ -1631,7 +1631,7 @@ modus-ponens : ∀ {Γ} φ ψ →
   Γ ⊨ ψ
 
 modus-ponens φ ψ Γ⊨φ⇒ψ Γ⊨φ ϱ x
- with semDT2 _ φ ψ Γ⊨φ⇒ψ
+ with semDT1 φ ψ Γ⊨φ⇒ψ
 ... | Γ·φ⊨ψ = Γ·φ⊨ψ ϱ λ{ here → Γ⊨φ ϱ x
                         ; (there y) → x y}
 ```
@@ -1652,15 +1652,15 @@ longSemDT2 :
 
 !hide
 ~~~~~~~~~
-The proofs are a straightforward applications of !ref(semDT1) and !ref(semDT2).
+The proofs are a straightforward applications of !ref(semDT2) and !ref(semDT1).
 ~~~~~~~~~
 ~~~~~~~~~
 ```
 longSemDT1 {ε} {φ} ε⊨φ = ε⊨φ
-longSemDT1 {ψ ∷ Δ} {φ} ψ∷Δ⊨φ = longSemDT1 {Δ} {ψ ⇒ φ} (semDT1 Δ ψ φ ψ∷Δ⊨φ)
+longSemDT1 {ψ ∷ Δ} {φ} ψ∷Δ⊨φ = longSemDT1 {Δ} {ψ ⇒ φ} (semDT2 ψ φ ψ∷Δ⊨φ)
 
 longSemDT2 {ε} {φ} ∅⊨φ ϱ All∅ = ∅⊨φ ϱ All∅
-longSemDT2 {ψ ∷ Δ} {φ} ∅⊨ΔImplyφ = semDT2 Δ ψ φ (longSemDT2 {Δ} {ψ ⇒ φ} ∅⊨ΔImplyφ)
+longSemDT2 {ψ ∷ Δ} {φ} ∅⊨ΔImplyφ = semDT1 ψ φ (longSemDT2 {Δ} {ψ ⇒ φ} ∅⊨ΔImplyφ)
 ```
 ~~~~~~~~~
 
