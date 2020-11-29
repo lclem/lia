@@ -49,7 +49,7 @@ data _⊢_ : Context → Formula → Set where
   -- axioms for conjunction
   C1 : Γ ⊢ φ ∧ ψ ⇒ φ
   C2 : Γ ⊢ φ ∧ ψ ⇒ ψ
-  C3 : Γ ⊢ (φ ⇒ ψ) ⇒ (φ ⇒ θ) ⇒ φ ⇒ ψ ∧ θ
+  C3 : Γ ⊢ φ ⇒ ψ ⇒ φ ∧ ψ
 
   -- axioms for bi-implication
   E1 : Γ ⊢ (φ ⇔ ψ) ⇒ φ ⇒ ψ
@@ -79,7 +79,7 @@ MP3 : Γ ⊢ φ ⇒ ψ ⇒ ξ ⇒ θ →
       ------
       Γ ⊢ θ
 
-MP3 = {!   !}
+MP3 Γ⊢φ⇒ψ⇒ξ⇒θ Γ⊢φ Γ⊢ψ Γ⊢ξ = MP (MP2 Γ⊢φ⇒ψ⇒ξ⇒θ Γ⊢φ Γ⊢ψ) Γ⊢ξ
 ```
 
 A proof example.
@@ -215,10 +215,19 @@ deductionTheorem {ψ ∷ Δ} {φ} ε⊢ΔImply[ψ⇒φ]
 
 ```
 DN1 : Γ ⊢ ¬ ¬ φ ⇒ φ
-DN1 = {!  !}
+DN1 {Γ} {φ} = ε
+  have Γ · ¬ ¬ φ · φ ⇒ ⊥ ⊢ φ ⇒ ⊥      by Ass here
+  have Γ · ¬ ¬ φ · φ ⇒ ⊥ ⊢ ¬ φ        apply MP N2 at here , tt
+  have Γ · ¬ ¬ φ · φ ⇒ ⊥ ⊢ ¬ ¬ φ      by Ass (there here)
+  have Γ · ¬ ¬ φ · φ ⇒ ⊥ ⊢ ¬ φ ⇒ ⊥    apply MP N1 at here , tt
+  have Γ · ¬ ¬ φ · φ ⇒ ⊥ ⊢ ⊥          apply MP at here ,, there (there here)
+  have Γ · ¬ ¬ φ ⊢ (φ ⇒ ⊥) ⇒ ⊥        apply dt2 at here , tt
+  have Γ · ¬ ¬ φ ⊢ φ                  apply MP A3 at here , tt
+  have Γ ⊢ ¬ ¬ φ ⇒ φ                  apply dt2 at here , tt
+  haveit
 
-DN2 : Γ ⊢ φ ⇒ ¬ ¬ φ
-DN2 = {!   !}
+-- DN2 : Γ ⊢ φ ⇒ ¬ ¬ φ
+-- DN2 = {!   !}
 
 irref-LEM : Γ ⊢ ¬ ¬ (φ ∨ ¬ φ)
 irref-LEM {Γ} {φ} = ε
@@ -243,13 +252,11 @@ irref-LEM {Γ} {φ} = ε
 LEM : Γ ⊢ φ ∨ ¬ φ
 LEM = MP DN1 irref-LEM
 ```
-irrefutability : {A : Set} → ~ ~ (A ⊎ ~ A)
-irrefutability f = {! f (right (λ a → f (left a))) !}
 
 ```
 -- ex falso
-B1 : ∀ Δ φ → Δ ⊢ ⊥ ⇒ φ
-B1 Δ φ = Δ⊢⊥⇒φ where
+B1 : Δ ⊢ ⊥ ⇒ φ
+B1 {Δ} {φ} = Δ⊢⊥⇒φ where
 
   Δ1 : Context
   Δ1 = Δ · ⊥ · φ ⇒ ⊥
@@ -279,15 +286,15 @@ B2 {Δ} {φ} {ψ} = Δ⊢¬φ⇒φ⇒ψ where
   Γ₀⊢⊥ = dt1 (dt1 (B0))
 
   Γ₀⊢ψ : Γ₀ ⊢ ψ
-  Γ₀⊢ψ = MP (B1 Γ₀ ψ) Γ₀⊢⊥
+  Γ₀⊢ψ = MP B1 Γ₀⊢⊥
 
   Δ⊢¬φ⇒φ⇒ψ : Δ ⊢ (φ ⇒ ⊥) ⇒ φ ⇒ ψ
   Δ⊢¬φ⇒φ⇒ψ = dt2 (dt2 Γ₀⊢ψ)
 
 -- proof by cases
 -- used in the second core lemma
-B3 : ∀ Δ φ ψ → Δ ⊢ (φ ⇒ ψ) ⇒ ((φ ⇒ ⊥) ⇒ ψ) ⇒ ψ
-B3 Δ φ ψ = dt2 (dt2 Δ1⊢ψ) where
+B3 : Δ ⊢ (φ ⇒ ψ) ⇒ ((φ ⇒ ⊥) ⇒ ψ) ⇒ ψ
+B3 {Δ} {φ} {ψ} = dt2 (dt2 Δ1⊢ψ) where
 
   Δ1 Δ2 Δ3 : Context
   Δ1 = (φ ⇒ ⊥) ⇒ ψ ∷ φ ⇒ ψ ∷ Δ
@@ -461,16 +468,12 @@ soundness {φ = φ ∧ ψ ⇒ ψ} C2 ϱ _
 ... | ff | tt = refl
 ... | ff | ff = refl
 
-soundness {φ = (φ ⇒ ψ) ⇒ (φ ⇒ θ) ⇒ φ ⇒ ψ ∧ θ} C3 ϱ _
-  with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ | ⟦ θ ⟧ ϱ
-... | tt | tt | tt = refl
-... | tt | tt | ff = refl
-... | tt | ff | tt = refl
-... | tt | ff | ff = refl
-... | ff | tt | tt = refl
-... | ff | tt | ff = refl
-... | ff | ff | tt = refl
-... | ff | ff | ff = refl
+soundness {φ = φ ⇒ ψ ⇒ φ ∧ ψ} C3 ϱ _
+  with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ
+... | tt | tt = refl
+... | tt | ff = refl
+... | ff | tt = refl
+... | ff | ff = refl
 
 soundness {φ = (φ ⇔ ψ) ⇒ φ ⇒ ψ} E1 ϱ _ 
   with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ
@@ -708,7 +711,7 @@ core-lemma2 {φ} viewφ ⊨φ (suc m) ϱ sucm≤sucn
   indff'' = dt2 indff' 
 
   goal : drop (suc m) vars ^^ ϱ ⊢ φ
-  goal = MP (MP (B3 _ _ _) indtt'') indff''
+  goal = MP (MP B3 indtt'') indff''
 ```
 
 # Completeness for the full fragment
@@ -842,15 +845,13 @@ cong-∧ {Γ} {p} {φ} {ψ} ξ₀ ξ₁ ass₀ ass₁ = ε
       have Γ · (ξ₀ ∧ ξ₁) F[ p ↦ φ ] ⊢ ξ₀ F[ p ↦ φ ] ⇒ ξ₀ F[ p ↦ ψ ]   by mon-⊢ ass₀
       have Γ · (ξ₀ ∧ ξ₁) F[ p ↦ φ ] ⊢ ξ₀ F[ p ↦ φ ]                   by MP C1 (Ass here) 
       have Γ · (ξ₀ ∧ ξ₁) F[ p ↦ φ ] ⊢ ξ₀ F[ p ↦ ψ ]                   apply MP at there here ,, here
-      have Γ ⊢ (ξ₀ ∧ ξ₁) F[ p ↦ φ ] ⇒ ξ₀ F[ p ↦ ψ ]                   apply dt2 at here , tt
 
       have Γ · (ξ₀ ∧ ξ₁) F[ p ↦ φ ] ⊢ ξ₁ F[ p ↦ φ ] ⇒ ξ₁ F[ p ↦ ψ ]   by mon-⊢ ass₁
       have Γ · (ξ₀ ∧ ξ₁) F[ p ↦ φ ] ⊢ ξ₁ F[ p ↦ φ ]                   by MP C2 (Ass here)
       have Γ · (ξ₀ ∧ ξ₁) F[ p ↦ φ ] ⊢ ξ₁ F[ p ↦ ψ ]                   apply MP at there here ,, here
-      have Γ ⊢ (ξ₀ ∧ ξ₁) F[ p ↦ φ ] ⇒ ξ₁ F[ p ↦ ψ ]                   apply dt2 at here , tt
 
-      have Γ ⊢ (ξ₀ ∧ ξ₁) F[ p ↦ φ ] ⇒ (ξ₀ ∧ ξ₁) F[ p ↦ ψ ]
-        apply (MP2 C3) at there (there (there (there here))) ,, here
+      have Γ · (ξ₀ ∧ ξ₁) F[ p ↦ φ ] ⊢ (ξ₀ ∧ ξ₁) F[ p ↦ ψ ]            apply MP2 C3 at there (there (there here)) ,, here
+      have Γ ⊢ (ξ₀ ∧ ξ₁) F[ p ↦ φ ] ⇒ (ξ₀ ∧ ξ₁) F[ p ↦ ψ ]            apply dt2 at here , tt
       haveit
 
 cong-↔ : ∀ ξ p →
@@ -928,8 +929,6 @@ cong-↔ (ξ₀ ⇔ ξ₁) p Γ⊢φ⇔ψ
 
 ```
 
-
-
 ```
 cong2-∨ : ∀ {Γ p q φ φ′ ψ ψ′} ξ₀ ξ₁ →
   Γ ⊢ ξ₀ F2[ p , q ↦ φ , ψ ] ⇒ ξ₀ F2[ p , q ↦ φ′ , ψ′ ] →
@@ -958,18 +957,16 @@ cong2-∧ : ∀ {Γ p q φ φ′ ψ ψ′} ξ₀ ξ₁ →
 
 cong2-∧ {Γ} {p} {q} {φ} {φ′} {ψ} {ψ′} ξ₀ ξ₁ ass₀ ass₁ = ε
 
-  have Γ₀ ⊢ ξ₀ F2[ p , q ↦ φ , ψ ] ⇒ ξ₀ F2[ p , q ↦ φ′ , ψ′ ]       by mon-⊢ ass₀
-  have Γ₀ ⊢ ξ₀ F2[ p , q ↦ φ , ψ ]                                  by MP C1 (Ass here) 
-  have Γ₀ ⊢ ξ₀ F2[ p , q ↦ φ′ , ψ′ ]                                apply MP at there here ,, here
-  have Γ ⊢ (ξ₀ ∧ ξ₁) F2[ p , q ↦ φ , ψ ] ⇒ ξ₀ F2[ p , q ↦ φ′ , ψ′ ] apply dt2 at here , tt
+  have Γ₀ ⊢ ξ₀ F2[ p , q ↦ φ , ψ ] ⇒ ξ₀ F2[ p , q ↦ φ′ , ψ′ ]               by mon-⊢ ass₀
+  have Γ₀ ⊢ ξ₀ F2[ p , q ↦ φ , ψ ]                                          by MP C1 (Ass here) 
+  have Γ₀ ⊢ ξ₀ F2[ p , q ↦ φ′ , ψ′ ]                                        apply MP at there here ,, here
 
-  have Γ₀ ⊢ ξ₁ F2[ p , q ↦ φ , ψ ] ⇒ ξ₁ F2[ p , q ↦ φ′ , ψ′ ]       by mon-⊢ ass₁
-  have Γ₀ ⊢ ξ₁ F2[ p , q ↦ φ , ψ ]                                  by MP C2 (Ass here)
-  have Γ₀ ⊢ ξ₁ F2[ p , q ↦ φ′ , ψ′ ]                                apply MP at there here ,, here
-  have Γ ⊢ (ξ₀ ∧ ξ₁) F2[ p , q ↦ φ , ψ ] ⇒ ξ₁ F2[ p , q ↦ φ′ , ψ′ ] apply dt2 at here , tt
+  have Γ₀ ⊢ ξ₁ F2[ p , q ↦ φ , ψ ] ⇒ ξ₁ F2[ p , q ↦ φ′ , ψ′ ]               by mon-⊢ ass₁
+  have Γ₀ ⊢ ξ₁ F2[ p , q ↦ φ , ψ ]                                          by MP C2 (Ass here)
+  have Γ₀ ⊢ ξ₁ F2[ p , q ↦ φ′ , ψ′ ]                                        apply MP at there here ,, here
 
-  have Γ ⊢ (ξ₀ ∧ ξ₁) F2[ p , q ↦ φ , ψ ] ⇒ (ξ₀ ∧ ξ₁) F2[ p , q ↦ φ′ , ψ′ ]
-    apply (MP2 C3) at there (there (there (there here))) ,, here
+  have Γ₀ ⊢ (ξ₀ ∧ ξ₁) F2[ p , q ↦ φ′ , ψ′ ]                                 apply MP2 C3 at there (there (there here)) ,, here
+  have Γ ⊢ (ξ₀ ∧ ξ₁) F2[ p , q ↦ φ , ψ ] ⇒ (ξ₀ ∧ ξ₁) F2[ p , q ↦ φ′ , ψ′ ]  apply dt2 at here , tt
   haveit where Γ₀ = Γ · (ξ₀ ∧ ξ₁) F2[ p , q ↦ φ , ψ ]
 
 cong2-⇒ : ∀ {Γ p q φ φ′ ψ ψ′} ξ₀ ξ₁ →
@@ -1131,25 +1128,97 @@ equiv-∨-left {Γ} {φ} {ψ} = ε
 equiv-∨-right : Γ ⊢ ((φ ⇒ ⊥) ⇒ ψ) ⇒ φ ∨ ψ
 equiv-∨-right {Γ} {φ} {ψ} = ε
 
-  have Γ · (φ ⇒ ⊥) ⇒ ψ ⊢ φ ∨ ψ      by {!   !}
-  have Γ ⊢ ((φ ⇒ ⊥) ⇒ ψ) ⇒ φ ∨ ψ    apply dt2 at here , tt
+  have Γ · (φ ⇒ ⊥) ⇒ ψ · φ ⇒ ⊥ ⊢ φ ⇒ ⊥        by Ass here
+  have Γ · (φ ⇒ ⊥) ⇒ ψ · φ ⇒ ⊥ ⊢ (φ ⇒ ⊥) ⇒ ψ  by Ass (there here)
+  have Γ · (φ ⇒ ⊥) ⇒ ψ · φ ⇒ ⊥ ⊢ ψ            apply MP at here ,, there here
+  have Γ · (φ ⇒ ⊥) ⇒ ψ · φ ⇒ ⊥ ⊢ φ ∨ ψ        apply MP D2 at here , tt
+  have Γ · (φ ⇒ ⊥) ⇒ ψ ⊢ (φ ⇒ ⊥) ⇒ φ ∨ ψ      apply dt2 at here , tt
+
+  have Γ · (φ ⇒ ⊥) ⇒ ψ ⊢ φ ⇒ φ ∨ ψ            by D1
+
+  have Γ · (φ ⇒ ⊥) ⇒ ψ ⊢ φ ∨ ψ                apply MP2 B3 at here ,, there here
+  have Γ ⊢ ((φ ⇒ ⊥) ⇒ ψ) ⇒ φ ∨ ψ              apply dt2 at here , tt
   haveit
 
 equiv-∨ : Γ ⊢ (φ ∨ ψ) ⇔ ((φ ⇒ ⊥) ⇒ ψ)
 equiv-∨ = help2 equiv-∨-left equiv-∨-right
 
-equiv-∧ : Γ ⊢ (φ ∧ ψ) ⇔ ((φ ⇒ ψ ⇒ ⊥) ⇒ ⊥)
-equiv-∧ = {!   !}
+equiv-∧-left : Γ ⊢ φ ∧ ψ ⇒ ((φ ⇒ ψ ⇒ ⊥) ⇒ ⊥)
+equiv-∧-left {Γ} {φ} {ψ} = ε
 
+  have Γ · φ ∧ ψ · φ ⇒ ψ ⇒ ⊥ ⊢ φ ∧ ψ      by Ass (there here)
+  have Γ · φ ∧ ψ · φ ⇒ ψ ⇒ ⊥ ⊢ φ          apply MP C1 at here , tt
+  have Γ · φ ∧ ψ · φ ⇒ ψ ⇒ ⊥ ⊢ ψ          apply MP C2 at there here , tt
+  have Γ · φ ∧ ψ · φ ⇒ ψ ⇒ ⊥ ⊢ φ ⇒ ψ ⇒ ⊥  by Ass here
+  have Γ · φ ∧ ψ · φ ⇒ ψ ⇒ ⊥ ⊢ ⊥          apply MP2 at here , there (there here) , there here , tt
+  have Γ · φ ∧ ψ ⊢ (φ ⇒ ψ ⇒ ⊥) ⇒ ⊥        apply dt2 at here , tt
+  have Γ ⊢ φ ∧ ψ ⇒ ((φ ⇒ ψ ⇒ ⊥) ⇒ ⊥)      apply dt2 at here , tt
+  haveit
+
+equiv-∧-right : Γ ⊢ ((φ ⇒ ψ ⇒ ⊥) ⇒ ⊥) ⇒ φ ∧ ψ
+equiv-∧-right {Γ} {φ} {ψ} = ε
+
+  have Γ · (φ ⇒ ψ ⇒ ⊥) ⇒ ⊥ · φ ∧ ψ ⇒ ⊥ · φ · ψ ⊢ φ          by Ass (there here)
+  have Γ · (φ ⇒ ψ ⇒ ⊥) ⇒ ⊥ · φ ∧ ψ ⇒ ⊥ · φ · ψ ⊢ ψ          by Ass here
+  have Γ · (φ ⇒ ψ ⇒ ⊥) ⇒ ⊥ · φ ∧ ψ ⇒ ⊥ · φ · ψ ⊢ φ ∧ ψ      apply MP2 C3 at there here ,, here
+  have Γ · (φ ⇒ ψ ⇒ ⊥) ⇒ ⊥ · φ ∧ ψ ⇒ ⊥ · φ · ψ ⊢ φ ∧ ψ ⇒ ⊥  by Ass (there (there here))
+  have Γ · (φ ⇒ ψ ⇒ ⊥) ⇒ ⊥ · φ ∧ ψ ⇒ ⊥ · φ · ψ ⊢ ⊥          apply MP at here ,, there here
+  have Γ · (φ ⇒ ψ ⇒ ⊥) ⇒ ⊥ · φ ∧ ψ ⇒ ⊥ · φ ⊢ ψ ⇒ ⊥          apply dt2 at here , tt
+  have Γ · (φ ⇒ ψ ⇒ ⊥) ⇒ ⊥ · φ ∧ ψ ⇒ ⊥ ⊢ φ ⇒ ψ ⇒ ⊥          apply dt2 at here , tt
+  have Γ · (φ ⇒ ψ ⇒ ⊥) ⇒ ⊥ · φ ∧ ψ ⇒ ⊥ ⊢ (φ ⇒ ψ ⇒ ⊥) ⇒ ⊥    by Ass (there here)
+  have Γ · (φ ⇒ ψ ⇒ ⊥) ⇒ ⊥ · φ ∧ ψ ⇒ ⊥ ⊢ ⊥                  apply MP at here ,, there here
+  have Γ · (φ ⇒ ψ ⇒ ⊥) ⇒ ⊥ · φ ∧ ψ ⇒ ⊥ ⊢ φ ∧ ψ              apply MP B1 at here , tt
+  have Γ · (φ ⇒ ψ ⇒ ⊥) ⇒ ⊥ ⊢ (φ ∧ ψ ⇒ ⊥) ⇒ φ ∧ ψ            apply dt2 at here , tt
+
+  have Γ · (φ ⇒ ψ ⇒ ⊥) ⇒ ⊥ ⊢ φ ∧ ψ ⇒ φ ∧ ψ                  by refl-⇒
+
+  have Γ · (φ ⇒ ψ ⇒ ⊥) ⇒ ⊥ ⊢ φ ∧ ψ                          apply MP2 B3 at here ,, there here
+  have Γ ⊢ ((φ ⇒ ψ ⇒ ⊥) ⇒ ⊥) ⇒ φ ∧ ψ                        apply dt2 at here , tt
+  haveit
+
+equiv-∧ : Γ ⊢ φ ∧ ψ ⇔ ((φ ⇒ ψ ⇒ ⊥) ⇒ ⊥)
+equiv-∧ = help2 equiv-∧-left equiv-∧-right
+  
 equiv-⇔ : Γ ⊢ (φ ⇔ ψ) ⇔ (((φ ⇒ ψ) ⇒ (ψ ⇒ φ) ⇒ ⊥) ⇒ ⊥)
-equiv-⇔ = {!   !}
+equiv-⇔ {Γ} {φ} {ψ} = ε
+
+  have Γ · φ ⇔ ψ ⊢ φ ⇔ ψ                          by Ass here
+  have Γ · φ ⇔ ψ ⊢ φ ⇒ ψ                          apply help0 at here , tt
+  have Γ · φ ⇔ ψ ⊢ ψ ⇒ φ                          apply help1 at (there here) , tt
+  have Γ · φ ⇔ ψ ⊢ (φ ⇒ ψ) ∧ (ψ ⇒ φ)              apply MP2 C3 at there here ,, here
+  have Γ ⊢ (φ ⇔ ψ) ⇒ (φ ⇒ ψ) ∧ (ψ ⇒ φ)            apply dt2 at here , tt
+
+  have Γ · (φ ⇒ ψ) ∧ (ψ ⇒ φ) ⊢ (φ ⇒ ψ) ∧ (ψ ⇒ φ)  by Ass here
+  have Γ · (φ ⇒ ψ) ∧ (ψ ⇒ φ) ⊢ φ ⇒ ψ              apply MP C1 at here , tt
+  have Γ · (φ ⇒ ψ) ∧ (ψ ⇒ φ) ⊢ ψ ⇒ φ              apply MP C2 at there here , tt
+  have Γ · (φ ⇒ ψ) ∧ (ψ ⇒ φ) ⊢ φ ⇔ ψ              apply help2 at there here ,, here
+  have Γ ⊢ (φ ⇒ ψ) ∧ (ψ ⇒ φ) ⇒ (φ ⇔ ψ)            apply dt2 at here , tt
+
+  have Γ ⊢ (φ ⇔ ψ) ⇔ (φ ⇒ ψ) ∧ (ψ ⇒ φ)            apply help2 at there (there (there (there (there here)))) ,, here
+
+  have Γ ⊢ (φ ⇒ ψ) ∧ (ψ ⇒ φ) ⇔ (((φ ⇒ ψ) ⇒ (ψ ⇒ φ) ⇒ ⊥) ⇒ ⊥)  by equiv-∧
+
+  have Γ ⊢ (φ ⇔ ψ) ⇔ (((φ ⇒ ψ) ⇒ (ψ ⇒ φ) ⇒ ⊥) ⇒ ⊥)            apply trans-⇔ at there here ,, here
+  haveit
+
+equiv-⊤ : Γ ⊢ ⊤ ⇔ φ ⇒ φ
+equiv-⊤ {Γ} {φ} = ε
+
+  have Γ · ⊤ ⊢ φ ⇒ φ    by refl-⇒
+  have Γ ⊢ ⊤ ⇒ φ ⇒ φ    apply dt2 at here , tt 
+
+  have Γ · φ ⇒ φ ⊢ ⊤    by T1
+  have Γ ⊢ (φ ⇒ φ) ⇒ ⊤  apply dt2 at here , tt 
+
+  have Γ ⊢ ⊤ ⇔ φ ⇒ φ    apply help2 at there (there here) ,, here
+  haveit
 
 -- notice that we need only the ψ ⇒ φ direction
 convert : ∀ φ → ∃[ ψ ] Formula[⇒,⊥] ψ × ∅ ⊢ φ ⇔ ψ
 
 convert ⊥ = _ , ⊥ , refl-⇔
 
-convert ⊤ = _ , ` p₀ ⇒ ` p₀ , {!   !}
+convert ⊤ = _ , ` p₀ ⇒ ` p₀ , equiv-⊤
 
 convert (` p) = _ , ` p , refl-⇔
 
