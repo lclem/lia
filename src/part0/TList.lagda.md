@@ -50,6 +50,27 @@ _ : BEGIN
     ≡ 8 , 5 , 3 , 2 , BEGIN
 _ = refl
 
+backType : ∀ {ℓ} {A : Set ℓ} → A * → ℕ → Set ℓ
+backType {A = A} as 0 = ∀ {x} {xs : A *} → x ∈ (as ++ x ∷ xs)
+backType as (suc n) = ∀ {a} → backType (a ∷ as) n
+
+back : ∀ {ℓ} {A : Set ℓ} (n : ℕ) → backType ε n
+back {A = A} n = go ε n where
+
+  go : (as : A *) → (n : ℕ) → backType as n
+  go ε zero = here
+  go (_ ∷ as) zero
+    with go as zero
+  ... | ind = there ind
+  go as (suc n) {a} = go (a ∷ as) n
+
+_ : BEGIN
+    have ℕ apply 2 at tt
+    have ℕ apply suc at back 0
+    have ℕ apply _+_ at back 0 , back 1
+    have ℕ apply _+_ at back 0 , back 1
+    ≡ 8 , 5 , 3 , 2 , BEGIN
+_ = refl
 ```
 
 ```
