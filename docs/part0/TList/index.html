@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TLists 🚧 | Logic in Agda</title><!-- Begin Jekyll SEO tag v2.6.1 -->
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="TLists 🚧" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Propositional and fist-order logic developed with the proof assistant Agda." />
+<meta property="og:description" content="Propositional and fist-order logic developed with the proof assistant Agda." />
+<link rel="canonical" href="/lia/part0/TList/" />
+<meta property="og:url" content="/lia/part0/TList/" />
+<meta property="og:site_name" content="Logic in Agda" />
+<script type="application/ld+json">
+{"url":"/lia/part0/TList/","headline":"TLists 🚧","description":"Propositional and fist-order logic developed with the proof assistant Agda.","@type":"WebPage","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/lia/assets/main.css">
+  <!-- <link rel="stylesheet" href="/lia/assets/custom.css"> --><!-- Mathjax Support -->
+  <script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+  <!-- Load KaTeX -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1.1/katex.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1.1/katex.min.js"></script>
+</head>
+<body><header class="site-header" role="banner">
+
+    <div class="wrapper">
+
+        <a class="site-title" href="/lia/">Logic in Agda</a>
+
+        <nav class="site-nav">
+            <span class="menu-icon">
+                <svg viewBox="0 0 18 15" width="18px" height="15px">
+                    <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+                    <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+                    <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+                </svg>
+            </span>
+
+            <div class="trigger">
+                <a class="page-link" href="/lia/part0/index/">Part 0</a>
+                <a class="page-link" href="/lia/part1/index/">Part 1</a>
+                <a class="page-link" href="/lia/part2/index/">Part 2</a>
+                <a class="page-link" href="/lia/part3/index/">Part 3</a>
+                <a class="page-link" href="/lia/part4/index/">Part 4</a>
+            </div>
+        </nav>
+
+    </div>
+
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post">
+
+    <header class="post-header">
+        <h1 class="post-title">TLists 🚧</h1>
+    </header>
+  
+    <p style="text-align:center;">
+    
+    
+    
+    <a alt="Part" href="/lia/part0/index/">Part</a>
+    &bullet;
+    
+    
+    <a alt="Source code" href="https://github.com/lclem/lia/blob/main/src/part0/TList.lagda.md">Source</a>
+    
+    
+    
+</p>
+
+  
+    <div class="post-content">
+        <h2>Contents</h2>    
+        <ul class="section-nav">
+<li class="toc-entry toc-h1"><a href="#references">References</a></li>
+<li class="toc-entry toc-h1"><a href="#solutions">Solutions</a></li>
+</ul><pre class="Agda"><a id="32" class="Symbol">{-#</a> <a id="36" class="Keyword">OPTIONS</a> <a id="44" class="Pragma">--allow-unsolved-metas</a> <a id="67" class="Symbol">#-}</a>
+
+<a id="72" class="Keyword">module</a> <a id="79" href="/lia/part0/TList/" class="Module">part0.TList</a> <a id="91" class="Keyword">where</a>
+<a id="97" class="Keyword">open</a> <a id="102" class="Keyword">import</a> <a id="109" href="/lia/part0/List/" class="Module">part0.List</a> <a id="120" class="Keyword">public</a>
+
+<a id="X_"></a><a id="128" href="/lia/part0/TList/#128" class="Function Operator">X_</a> <a id="131" class="Symbol">:</a> <a id="133" class="Symbol">∀</a> <a id="135" class="Symbol">{</a><a id="136" href="/lia/part0/TList/#136" class="Bound">ℓ</a><a id="137" class="Symbol">}</a> <a id="139" class="Symbol">→</a> <a id="141" class="PrimitiveType">Set</a> <a id="145" href="/lia/part0/TList/#136" class="Bound">ℓ</a> <a id="147" href="/lia/part0/List/#450" class="Datatype Operator">*</a> <a id="149" class="Symbol">→</a> <a id="151" class="PrimitiveType">Set</a> <a id="155" href="/lia/part0/TList/#136" class="Bound">ℓ</a>
+<a id="157" href="/lia/part0/TList/#128" class="Function Operator">X</a> <a id="159" href="/lia/part0/List/#487" class="InductiveConstructor">ε</a> <a id="161" class="Symbol">=</a> <a id="163" href="/lia/part0/Logic/#2225" class="Datatype">T</a>
+<a id="165" href="/lia/part0/TList/#128" class="Function Operator">X</a> <a id="167" class="Symbol">(</a><a id="168" href="/lia/part0/TList/#168" class="Bound">A</a> <a id="170" href="/lia/part0/List/#499" class="InductiveConstructor Operator">∷</a> <a id="172" href="/lia/part0/List/#487" class="InductiveConstructor">ε</a><a id="173" class="Symbol">)</a> <a id="175" class="Symbol">=</a> <a id="177" href="/lia/part0/TList/#168" class="Bound">A</a>
+<a id="179" href="/lia/part0/TList/#128" class="Function Operator">X</a> <a id="181" class="Symbol">(</a><a id="182" href="/lia/part0/TList/#182" class="Bound">A</a> <a id="184" href="/lia/part0/List/#499" class="InductiveConstructor Operator">∷</a> <a id="186" href="/lia/part0/TList/#186" class="Bound">As</a><a id="188" class="Symbol">@(_</a> <a id="192" href="/lia/part0/List/#499" class="InductiveConstructor Operator">∷</a> <a id="194" class="Symbol">_))</a> <a id="198" class="Symbol">=</a> <a id="200" href="/lia/part0/TList/#182" class="Bound">A</a> <a id="202" href="/lia/part0/Logic/#1770" class="Record Operator">×</a> <a id="204" href="/lia/part0/TList/#128" class="Function Operator">X</a> <a id="206" href="/lia/part0/TList/#186" class="Bound">As</a>
+
+<a id="210" class="Keyword">data</a> <a id="TList"></a><a id="215" href="/lia/part0/TList/#215" class="Datatype">TList</a> <a id="221" class="Symbol">{</a><a id="222" href="/lia/part0/TList/#222" class="Bound">ℓ</a><a id="223" class="Symbol">}</a> <a id="225" class="Symbol">:</a> <a id="227" class="PrimitiveType">Set</a> <a id="231" href="/lia/part0/TList/#222" class="Bound">ℓ</a> <a id="233" href="/lia/part0/List/#450" class="Datatype Operator">*</a> <a id="235" class="Symbol">→</a> <a id="237" class="PrimitiveType">Set</a> <a id="241" href="/lia/part0/TList/#222" class="Bound">ℓ</a> <a id="243" class="Keyword">where</a>
+    <a id="TList.BEGIN"></a><a id="253" href="/lia/part0/TList/#253" class="InductiveConstructor">BEGIN</a> <a id="259" class="Symbol">:</a> <a id="261" href="/lia/part0/TList/#215" class="Datatype">TList</a> <a id="267" href="/lia/part0/List/#487" class="InductiveConstructor">ε</a>
+    <a id="TList._,_"></a><a id="273" href="/lia/part0/TList/#273" class="InductiveConstructor Operator">_,_</a> <a id="277" class="Symbol">:</a> <a id="279" class="Symbol">∀</a> <a id="281" class="Symbol">{</a><a id="282" href="/lia/part0/TList/#282" class="Bound">A</a> <a id="284" class="Symbol">:</a> <a id="286" class="PrimitiveType">Set</a> <a id="290" href="/lia/part0/TList/#222" class="Bound">ℓ</a><a id="291" class="Symbol">}</a> <a id="293" class="Symbol">{</a><a id="294" href="/lia/part0/TList/#294" class="Bound">As</a> <a id="297" class="Symbol">:</a> <a id="299" class="PrimitiveType">Set</a> <a id="303" href="/lia/part0/TList/#222" class="Bound">ℓ</a> <a id="305" href="/lia/part0/List/#450" class="Datatype Operator">*</a><a id="306" class="Symbol">}</a> <a id="308" class="Symbol">→</a> <a id="310" href="/lia/part0/TList/#282" class="Bound">A</a> <a id="312" class="Symbol">→</a> <a id="314" href="/lia/part0/TList/#215" class="Datatype">TList</a> <a id="320" href="/lia/part0/TList/#294" class="Bound">As</a> <a id="323" class="Symbol">→</a> <a id="325" href="/lia/part0/TList/#215" class="Datatype">TList</a> <a id="331" class="Symbol">(</a><a id="332" href="/lia/part0/TList/#282" class="Bound">A</a> <a id="334" href="/lia/part0/List/#499" class="InductiveConstructor Operator">∷</a> <a id="336" href="/lia/part0/TList/#294" class="Bound">As</a><a id="338" class="Symbol">)</a>
+
+<a id="fetchElem"></a><a id="341" href="/lia/part0/TList/#341" class="Function">fetchElem</a> <a id="351" class="Symbol">:</a> <a id="353" class="Symbol">∀</a> <a id="355" class="Symbol">{</a><a id="356" href="/lia/part0/TList/#356" class="Bound">A</a> <a id="358" class="Symbol">:</a> <a id="360" class="PrimitiveType">Set</a><a id="363" class="Symbol">}</a> <a id="365" class="Symbol">{</a><a id="366" href="/lia/part0/TList/#366" class="Bound">As</a> <a id="369" class="Symbol">:</a> <a id="371" class="PrimitiveType">Set</a> <a id="375" href="/lia/part0/List/#450" class="Datatype Operator">*</a><a id="376" class="Symbol">}</a> <a id="378" class="Symbol">→</a> <a id="380" href="/lia/part0/TList/#215" class="Datatype">TList</a> <a id="386" href="/lia/part0/TList/#366" class="Bound">As</a> <a id="389" class="Symbol">→</a> <a id="391" href="/lia/part0/TList/#356" class="Bound">A</a> <a id="393" href="/lia/part0/List/#7303" class="Datatype Operator">∈</a> <a id="395" href="/lia/part0/TList/#366" class="Bound">As</a> <a id="398" class="Symbol">→</a> <a id="400" href="/lia/part0/TList/#356" class="Bound">A</a>
+<a id="402" href="/lia/part0/TList/#341" class="Function">fetchElem</a> <a id="412" class="Symbol">(</a><a id="413" href="/lia/part0/TList/#413" class="Bound">a</a> <a id="415" href="/lia/part0/TList/#273" class="InductiveConstructor Operator">,</a> <a id="417" class="Symbol">_)</a> <a id="420" href="/lia/part0/List/#7349" class="InductiveConstructor">here</a> <a id="425" class="Symbol">=</a> <a id="427" href="/lia/part0/TList/#413" class="Bound">a</a>
+<a id="429" href="/lia/part0/TList/#341" class="Function">fetchElem</a> <a id="439" class="Symbol">(_</a> <a id="442" href="/lia/part0/TList/#273" class="InductiveConstructor Operator">,</a> <a id="444" href="/lia/part0/TList/#444" class="Bound">as</a><a id="446" class="Symbol">)</a> <a id="448" class="Symbol">(</a><a id="449" href="/lia/part0/List/#7392" class="InductiveConstructor">there</a> <a id="455" href="/lia/part0/TList/#455" class="Bound">A∈As</a><a id="459" class="Symbol">)</a> <a id="461" class="Symbol">=</a> <a id="463" href="/lia/part0/TList/#341" class="Function">fetchElem</a> <a id="473" href="/lia/part0/TList/#444" class="Bound">as</a> <a id="476" href="/lia/part0/TList/#455" class="Bound">A∈As</a>
+
+<a id="Funs"></a><a id="482" href="/lia/part0/TList/#482" class="Function">Funs</a> <a id="487" class="Symbol">:</a> <a id="489" class="Symbol">(</a><a id="490" href="/lia/part0/TList/#490" class="Bound">As</a> <a id="493" class="Symbol">:</a> <a id="495" class="PrimitiveType">Set</a> <a id="499" href="/lia/part0/List/#450" class="Datatype Operator">*</a><a id="500" class="Symbol">)</a> <a id="502" class="Symbol">(</a><a id="503" href="/lia/part0/TList/#503" class="Bound">B</a> <a id="505" class="Symbol">:</a> <a id="507" class="PrimitiveType">Set</a><a id="510" class="Symbol">)</a> <a id="512" class="Symbol">→</a> <a id="514" class="PrimitiveType">Set</a>
+<a id="518" href="/lia/part0/TList/#482" class="Function">Funs</a> <a id="523" href="/lia/part0/List/#487" class="InductiveConstructor">ε</a> <a id="525" href="/lia/part0/TList/#525" class="Bound">B</a> <a id="527" class="Symbol">=</a> <a id="529" href="/lia/part0/TList/#525" class="Bound">B</a>
+<a id="531" href="/lia/part0/TList/#482" class="Function">Funs</a> <a id="536" class="Symbol">(</a><a id="537" href="/lia/part0/TList/#537" class="Bound">A</a> <a id="539" href="/lia/part0/List/#499" class="InductiveConstructor Operator">∷</a> <a id="541" href="/lia/part0/TList/#541" class="Bound">As</a><a id="543" class="Symbol">)</a> <a id="545" href="/lia/part0/TList/#545" class="Bound">B</a> <a id="547" class="Symbol">=</a> <a id="549" href="/lia/part0/TList/#537" class="Bound">A</a> <a id="551" class="Symbol">→</a> <a id="553" href="/lia/part0/TList/#482" class="Function">Funs</a> <a id="558" href="/lia/part0/TList/#541" class="Bound">As</a> <a id="561" href="/lia/part0/TList/#545" class="Bound">B</a>
+
+<a id="564" class="Keyword">infixl</a> <a id="571" class="Number">7.2</a> <a id="575" href="/lia/part0/TList/#617" class="Function Operator">_have_by_</a> <a id="585" href="/lia/part0/TList/#713" class="Function Operator">_have_apply_at_</a> <a id="601" class="Comment">-- haveApplyAt</a>
+
+<a id="_have_by_"></a><a id="617" href="/lia/part0/TList/#617" class="Function Operator">_have_by_</a> <a id="627" class="Symbol">:</a> <a id="629" class="Symbol">∀</a> <a id="631" class="Symbol">{</a><a id="632" href="/lia/part0/TList/#632" class="Bound">As</a> <a id="635" class="Symbol">:</a> <a id="637" class="PrimitiveType">Set</a> <a id="641" href="/lia/part0/List/#450" class="Datatype Operator">*</a><a id="642" class="Symbol">}</a> <a id="644" class="Symbol">→</a> <a id="646" href="/lia/part0/TList/#215" class="Datatype">TList</a> <a id="652" href="/lia/part0/TList/#632" class="Bound">As</a> <a id="655" class="Symbol">→</a> <a id="657" class="Symbol">(</a><a id="658" href="/lia/part0/TList/#658" class="Bound">A</a> <a id="660" class="Symbol">:</a> <a id="662" class="PrimitiveType">Set</a><a id="665" class="Symbol">)</a> <a id="667" class="Symbol">→</a> <a id="669" href="/lia/part0/TList/#658" class="Bound">A</a> <a id="671" class="Symbol">→</a> <a id="673" href="/lia/part0/TList/#215" class="Datatype">TList</a> <a id="679" class="Symbol">(</a><a id="680" href="/lia/part0/TList/#658" class="Bound">A</a> <a id="682" href="/lia/part0/List/#499" class="InductiveConstructor Operator">∷</a> <a id="684" href="/lia/part0/TList/#632" class="Bound">As</a><a id="686" class="Symbol">)</a>
+<a id="688" href="/lia/part0/TList/#688" class="Bound">as</a> <a id="691" href="/lia/part0/TList/#617" class="Function Operator">have</a> <a id="696" href="/lia/part0/TList/#696" class="Bound">A</a> <a id="698" href="/lia/part0/TList/#617" class="Function Operator">by</a> <a id="701" href="/lia/part0/TList/#701" class="Bound">a</a> <a id="703" class="Symbol">=</a> <a id="705" href="/lia/part0/TList/#701" class="Bound">a</a> <a id="707" href="/lia/part0/TList/#273" class="InductiveConstructor Operator">,</a> <a id="709" href="/lia/part0/TList/#688" class="Bound">as</a>
+
+<a id="_have_apply_at_"></a><a id="713" href="/lia/part0/TList/#713" class="Function Operator">_have_apply_at_</a> <a id="729" class="Symbol">:</a> <a id="731" class="Symbol">∀</a> <a id="733" class="Symbol">{</a><a id="734" href="/lia/part0/TList/#734" class="Bound">As</a> <a id="737" href="/lia/part0/TList/#737" class="Bound">Bs</a> <a id="740" class="Symbol">:</a> <a id="742" class="PrimitiveType">Set</a> <a id="746" href="/lia/part0/List/#450" class="Datatype Operator">*</a><a id="747" class="Symbol">}</a> <a id="749" class="Symbol">→</a> <a id="751" href="/lia/part0/TList/#215" class="Datatype">TList</a> <a id="757" href="/lia/part0/TList/#737" class="Bound">Bs</a> <a id="760" class="Symbol">→</a> <a id="762" class="Symbol">(</a><a id="763" href="/lia/part0/TList/#763" class="Bound">B</a> <a id="765" class="Symbol">:</a> <a id="767" class="PrimitiveType">Set</a><a id="770" class="Symbol">)</a> <a id="772" class="Symbol">→</a> <a id="774" href="/lia/part0/TList/#482" class="Function">Funs</a> <a id="779" href="/lia/part0/TList/#734" class="Bound">As</a> <a id="782" href="/lia/part0/TList/#763" class="Bound">B</a> <a id="784" class="Symbol">→</a> <a id="786" href="/lia/part0/TList/#128" class="Function Operator">X</a> <a id="788" class="Symbol">(</a><a id="789" href="/lia/part0/List/#2373" class="Function">map</a> <a id="793" class="Symbol">(λ</a> <a id="796" href="/lia/part0/TList/#796" class="Bound">A</a> <a id="798" class="Symbol">→</a> <a id="800" href="/lia/part0/TList/#796" class="Bound">A</a> <a id="802" href="/lia/part0/List/#7303" class="Datatype Operator">∈</a> <a id="804" href="/lia/part0/TList/#737" class="Bound">Bs</a><a id="806" class="Symbol">)</a> <a id="808" href="/lia/part0/TList/#734" class="Bound">As</a><a id="810" class="Symbol">)</a> <a id="812" class="Symbol">→</a> <a id="814" href="/lia/part0/TList/#215" class="Datatype">TList</a> <a id="820" class="Symbol">(</a><a id="821" href="/lia/part0/TList/#763" class="Bound">B</a> <a id="823" href="/lia/part0/List/#499" class="InductiveConstructor Operator">∷</a> <a id="825" href="/lia/part0/TList/#737" class="Bound">Bs</a><a id="827" class="Symbol">)</a>
+<a id="829" href="/lia/part0/TList/#713" class="Function Operator">_have_apply_at_</a> <a id="845" class="Symbol">{</a><a id="846" href="/lia/part0/List/#487" class="InductiveConstructor">ε</a><a id="847" class="Symbol">}</a> <a id="849" class="Symbol">{</a><a id="850" href="/lia/part0/TList/#850" class="Bound">Bs</a><a id="852" class="Symbol">}</a> <a id="854" href="/lia/part0/TList/#854" class="Bound">bs</a> <a id="857" href="/lia/part0/TList/#857" class="Bound">B</a> <a id="859" href="/lia/part0/TList/#859" class="Bound">b</a> <a id="861" href="/lia/part0/Logic/#2249" class="InductiveConstructor">tt</a> <a id="864" class="Symbol">=</a> <a id="866" href="/lia/part0/TList/#859" class="Bound">b</a> <a id="868" href="/lia/part0/TList/#273" class="InductiveConstructor Operator">,</a> <a id="870" href="/lia/part0/TList/#854" class="Bound">bs</a>
+<a id="873" href="/lia/part0/TList/#713" class="Function Operator">_have_apply_at_</a> <a id="889" class="Symbol">{</a><a id="890" href="/lia/part0/TList/#890" class="Bound">A</a> <a id="892" href="/lia/part0/List/#499" class="InductiveConstructor Operator">∷</a> <a id="894" href="/lia/part0/List/#487" class="InductiveConstructor">ε</a><a id="895" class="Symbol">}</a> <a id="897" class="Symbol">{</a><a id="898" href="/lia/part0/TList/#898" class="Bound">Bs</a><a id="900" class="Symbol">}</a> <a id="902" href="/lia/part0/TList/#902" class="Bound">bs</a> <a id="905" href="/lia/part0/TList/#905" class="Bound">B</a> <a id="907" href="/lia/part0/TList/#907" class="Bound">f</a> <a id="909" href="/lia/part0/TList/#909" class="Bound">A∈Bs</a> <a id="914" class="Symbol">=</a> <a id="916" href="/lia/part0/TList/#907" class="Bound">f</a> <a id="918" class="Symbol">(</a><a id="919" href="/lia/part0/TList/#341" class="Function">fetchElem</a> <a id="929" href="/lia/part0/TList/#902" class="Bound">bs</a> <a id="932" href="/lia/part0/TList/#909" class="Bound">A∈Bs</a><a id="936" class="Symbol">)</a> <a id="938" href="/lia/part0/TList/#273" class="InductiveConstructor Operator">,</a> <a id="940" href="/lia/part0/TList/#902" class="Bound">bs</a>
+<a id="943" href="/lia/part0/TList/#713" class="Function Operator">_have_apply_at_</a> <a id="959" class="Symbol">{</a><a id="960" href="/lia/part0/TList/#960" class="Bound">A</a> <a id="962" href="/lia/part0/List/#499" class="InductiveConstructor Operator">∷</a> <a id="964" href="/lia/part0/TList/#964" class="Bound">As</a><a id="966" class="Symbol">@(</a><a id="968" href="/lia/part0/TList/#968" class="Bound">A'</a> <a id="971" href="/lia/part0/List/#499" class="InductiveConstructor Operator">∷</a> <a id="973" href="/lia/part0/TList/#973" class="Bound">As'</a><a id="976" class="Symbol">)}</a> <a id="979" class="Symbol">{</a><a id="980" href="/lia/part0/TList/#980" class="Bound">Bs</a><a id="982" class="Symbol">}</a> <a id="984" href="/lia/part0/TList/#984" class="Bound">bs</a> <a id="987" href="/lia/part0/TList/#987" class="Bound">B</a> <a id="989" href="/lia/part0/TList/#989" class="Bound">f</a> <a id="991" class="Symbol">(</a><a id="992" href="/lia/part0/TList/#992" class="Bound">A∈Bs</a> <a id="997" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="999" href="/lia/part0/TList/#999" class="Bound">pr</a><a id="1001" class="Symbol">)</a> <a id="1003" class="Symbol">=</a> <a id="1005" href="/lia/part0/TList/#713" class="Function Operator">_have_apply_at_</a> <a id="1021" class="Symbol">{</a><a id="1022" href="/lia/part0/TList/#964" class="Bound">As</a><a id="1024" class="Symbol">}</a> <a id="1026" class="Symbol">{</a><a id="1027" href="/lia/part0/TList/#980" class="Bound">Bs</a><a id="1029" class="Symbol">}</a> <a id="1031" href="/lia/part0/TList/#984" class="Bound">bs</a> <a id="1034" href="/lia/part0/TList/#987" class="Bound">B</a> <a id="1036" class="Symbol">(</a><a id="1037" href="/lia/part0/TList/#989" class="Bound">f</a> <a id="1039" class="Symbol">(</a><a id="1040" href="/lia/part0/TList/#341" class="Function">fetchElem</a> <a id="1050" href="/lia/part0/TList/#984" class="Bound">bs</a> <a id="1053" href="/lia/part0/TList/#992" class="Bound">A∈Bs</a><a id="1057" class="Symbol">))</a> <a id="1060" href="/lia/part0/TList/#999" class="Bound">pr</a>
+
+<a id="1064" class="Keyword">infixl</a> <a id="1071" class="Number">7.1</a> <a id="1075" href="/lia/part0/TList/#1097" class="Function Operator">_haveit</a> <a id="1083" href="/lia/part0/TList/#1171" class="Function">haveit-syntax</a>
+<a id="_haveit"></a><a id="1097" href="/lia/part0/TList/#1097" class="Function Operator">_haveit</a> <a id="1105" class="Symbol">:</a> <a id="1107" class="Symbol">{</a><a id="1108" href="/lia/part0/TList/#1108" class="Bound">A</a> <a id="1110" class="Symbol">:</a> <a id="1112" class="PrimitiveType">Set</a><a id="1115" class="Symbol">}</a> <a id="1117" class="Symbol">{</a><a id="1118" href="/lia/part0/TList/#1118" class="Bound">As</a> <a id="1121" class="Symbol">:</a> <a id="1123" class="PrimitiveType">Set</a> <a id="1127" href="/lia/part0/List/#450" class="Datatype Operator">*</a><a id="1128" class="Symbol">}</a> <a id="1130" class="Symbol">→</a> <a id="1132" href="/lia/part0/TList/#215" class="Datatype">TList</a> <a id="1138" class="Symbol">(</a><a id="1139" href="/lia/part0/TList/#1108" class="Bound">A</a> <a id="1141" href="/lia/part0/List/#499" class="InductiveConstructor Operator">∷</a> <a id="1143" href="/lia/part0/TList/#1118" class="Bound">As</a><a id="1145" class="Symbol">)</a> <a id="1147" class="Symbol">→</a> <a id="1149" href="/lia/part0/TList/#1108" class="Bound">A</a>
+<a id="1151" class="Symbol">(</a><a id="1152" href="/lia/part0/TList/#1152" class="Bound">a</a> <a id="1154" href="/lia/part0/TList/#273" class="InductiveConstructor Operator">,</a> <a id="1156" class="Symbol">_)</a> <a id="1159" href="/lia/part0/TList/#1097" class="Function Operator">haveit</a> <a id="1166" class="Symbol">=</a> <a id="1168" href="/lia/part0/TList/#1152" class="Bound">a</a>
+
+<a id="haveit-syntax"></a><a id="1171" href="/lia/part0/TList/#1171" class="Function">haveit-syntax</a> <a id="1185" class="Symbol">=</a> <a id="1187" href="/lia/part0/TList/#1097" class="Function Operator">_haveit</a>
+<a id="1195" class="Keyword">syntax</a> <a id="1202" href="/lia/part0/TList/#1171" class="Function">haveit-syntax</a> <a id="1216" class="Bound">x</a> <a id="1218" class="Symbol">=</a> <a id="1220" class="Bound">x</a> <a id="1222" class="Function">END</a>
+
+<a id="1227" href="/lia/part0/TList/#1227" class="Function">_</a> <a id="1229" class="Symbol">:</a> <a id="1231" href="/lia/part0/TList/#253" class="InductiveConstructor">BEGIN</a>
+    <a id="1241" href="/lia/part0/TList/#713" class="Function Operator">have</a> <a id="1246" href="/lia/part0/Naturals/#177" class="Datatype">ℕ</a> <a id="1248" href="/lia/part0/TList/#713" class="Function Operator">apply</a> <a id="1254" class="Number">2</a> <a id="1256" href="/lia/part0/TList/#713" class="Function Operator">at</a> <a id="1259" href="/lia/part0/Logic/#2249" class="InductiveConstructor">tt</a>
+    <a id="1266" href="/lia/part0/TList/#713" class="Function Operator">have</a> <a id="1271" href="/lia/part0/Naturals/#177" class="Datatype">ℕ</a> <a id="1273" href="/lia/part0/TList/#713" class="Function Operator">apply</a> <a id="1279" href="/lia/part0/Naturals/#204" class="InductiveConstructor">suc</a> <a id="1283" href="/lia/part0/TList/#713" class="Function Operator">at</a> <a id="1286" href="/lia/part0/List/#7349" class="InductiveConstructor">here</a>
+    <a id="1295" href="/lia/part0/TList/#713" class="Function Operator">have</a> <a id="1300" href="/lia/part0/Naturals/#177" class="Datatype">ℕ</a> <a id="1302" href="/lia/part0/TList/#713" class="Function Operator">apply</a> <a id="1308" href="/lia/part0/Naturals/#3664" class="Function Operator">_+_</a> <a id="1312" href="/lia/part0/TList/#713" class="Function Operator">at</a> <a id="1315" href="/lia/part0/List/#7349" class="InductiveConstructor">here</a> <a id="1320" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="1322" href="/lia/part0/List/#7392" class="InductiveConstructor">there</a> <a id="1328" href="/lia/part0/List/#7349" class="InductiveConstructor">here</a>
+    <a id="1337" href="/lia/part0/TList/#713" class="Function Operator">have</a> <a id="1342" href="/lia/part0/Naturals/#177" class="Datatype">ℕ</a> <a id="1344" href="/lia/part0/TList/#713" class="Function Operator">apply</a> <a id="1350" href="/lia/part0/Naturals/#3664" class="Function Operator">_+_</a> <a id="1354" href="/lia/part0/TList/#713" class="Function Operator">at</a> <a id="1357" href="/lia/part0/List/#7349" class="InductiveConstructor">here</a> <a id="1362" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="1364" href="/lia/part0/List/#7392" class="InductiveConstructor">there</a> <a id="1370" href="/lia/part0/List/#7349" class="InductiveConstructor">here</a>
+    <a id="1379" href="/lia/part0/Equality/#214" class="Datatype Operator">≡</a> <a id="1381" class="Number">8</a> <a id="1383" href="/lia/part0/TList/#273" class="InductiveConstructor Operator">,</a> <a id="1385" class="Number">5</a> <a id="1387" href="/lia/part0/TList/#273" class="InductiveConstructor Operator">,</a> <a id="1389" class="Number">3</a> <a id="1391" href="/lia/part0/TList/#273" class="InductiveConstructor Operator">,</a> <a id="1393" class="Number">2</a> <a id="1395" href="/lia/part0/TList/#273" class="InductiveConstructor Operator">,</a> <a id="1397" href="/lia/part0/TList/#253" class="InductiveConstructor">BEGIN</a>
+<a id="1403" class="Symbol">_</a> <a id="1405" class="Symbol">=</a> <a id="1407" href="/lia/part0/Equality/#262" class="InductiveConstructor">refl</a></pre>
+<pre class="Agda"><a id="1422" class="Comment">-- tmap : ∀ {ℓ} {As Bs : Vector (Set ℓ) n} → TVector {ℓ} {n} (zipWith Fun As Bs) → TList As → TList Bs</a>
+<a id="1525" class="Comment">-- tmap {ε} {ε} ε ε = ε</a>
+<a id="1549" class="Comment">-- tmap {A ∷ As} {B ∷ Bs} (f ∷ fs) (a ∷ as) = f a ∷ tmap fs as</a>
+
+<a id="1613" class="Comment">-- tfilter :</a>
+
+<a id="1627" class="Comment">-- dependent map over a list</a>
+<a id="1656" class="Comment">-- dmap : ∀ {ℓ m} {A : Set ℓ} {B : A → Set m} → Π A B → (as : A *) → TList (map B as)</a>
+<a id="1742" class="Comment">-- dmap _ ε = BEGIN</a>
+<a id="1762" class="Comment">-- dmap f (a ∷ as) = f a ∷ dmap f as</a>
+
+<a id="1800" class="Comment">-- filter-proof : ∀ {A : Set} {P : A → Set} → (P? : Decidable P) → (as : A *) → TList {! map (Dec ∘ P) as  !}</a>
+<a id="1910" class="Comment">-- filter-proof {A} {P} P? as = {!   !} where</a>
+<a id="1956" class="Comment">--</a>
+<a id="1959" class="Comment">--   as? : TList (map (Dec ∘ P) as)</a>
+<a id="1995" class="Comment">--   as? = dmap P? as</a></pre>
+
+<div id="refs">
+
+  <h1 id="references">
+<a class="anchor" href="#references" aria-hidden="true"><span class="octicon octicon-link"></span></a>References</h1>
+
+</div>
+
+<h1 id="solutions">
+<a class="anchor" href="#solutions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Solutions</h1>
+
+<p>!solutions</p>
+
+<hr>
+
+    </div>
+  
+    <p style="text-align:center;">
+    
+    
+    
+    <a alt="Part" href="/lia/part0/index/">Part</a>
+    &bullet;
+    
+    
+    <a alt="Source code" href="https://github.com/lclem/lia/blob/main/src/part0/TList.lagda.md">Source</a>
+    
+    
+    
+</p>
+
+    <p class="p-name"> Last-modified: Nov 29 22:37:49 2020 </p>
+  </article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/lia/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Logic in Agda</h2><div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Lorenzo Clemente</li>
+          <li><a class="u-email" href="mailto:clementelorenzo@gmail.com">clementelorenzo@gmail.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/lclem"><svg class="svg-icon"><use xlink:href="/lia/assets/minima-social-icons.svg#github"></use></svg> <span class="username">lclem</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3"></div>
+    </div>This work is licensed under a <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>
+  </div>
+</footer>
+
+<!-- Parse the Latex divs with Katex
+<script type="text/javascript">
+  $("script[type='math/tex']").replaceWith(
+    function(){
+      var tex = $(this).text();
+      return katex.renderToString(tex, {displayMode: false});
+  });
+  
+  $("script[type='math/tex; mode=display']").replaceWith(
+    function(){
+      var tex = $(this).text();
+      return katex.renderToString(tex.replace(/%.*/g, ''), {displayMode: true});
+  });
+</script>
+-->
+
+<script type="text/javascript" src="/lia/assets/hidebox.js"></script>
+</body>
+
+</html>
