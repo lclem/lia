@@ -261,15 +261,18 @@ DT2 {Γ} {φ} {ψ} (MP {φ = ξ} φ,Γ⊢ξ⇒ψ φ,Γ⊢ξ) = SS where
   SS = MP S3 S1
 ```
 
-As a example of the usefulness of !ref(DT2), we can reprove !ref(refl-⇒) with a one-liner:
+!example(#example:refl)
+~~~
+Testifying to usefulness of !ref(DT2), we can reprove !ref(refl-⇒) with a one-liner:
 
 ```
 refl-⇒' : Γ ⊢ φ ⇒ φ
-refl-⇒' = DT2 {!   !} 
+refl-⇒' = DT2 (Ass here) 
 ```
+~~~
 
-
-Putting together the two halves above, we obtain the following theorem.
+Putting together the two halves of the deduction theorem,
+we obtain the following theorem.
 
 !theorem(#theorem:DT)(Deduction theorem)
 ~~~
