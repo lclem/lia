@@ -10,7 +10,8 @@ module part1.index where
 open import part1.Semantics
 open import part1.CharacteristicFormulas
 open import part1.NormalForms
-open import part1.Completeness
+open import part1.Hilbert
+open import part1.NaturalDeduction
 --open import part1.Resolution
 --open import part1.Resolution-Completeness
 --open import part1.Interpolation

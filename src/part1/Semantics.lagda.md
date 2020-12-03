@@ -55,8 +55,9 @@ We use !ref(p), !ref(q), and !ref(r) as generic variable names,
 which will be abstracted automatically as implicit arguments:
 
 ```
-variable
-  p q r : PropName
+private
+  variable
+    p q r : PropName
 ```
 
 Since propositions are modelled with !remoteRef(part0)(Finite)(Fin),
