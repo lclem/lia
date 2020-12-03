@@ -1,13 +1,13 @@
 ---
-title: "Completeness of Hilbert's proof system for propositional logic 🚧"
+title: "Hilbert-style proof system for propositional logic 🚧"
 ---
 
 ```
 {-# OPTIONS --allow-unsolved-metas #-} -- --rewriting --confluence-check
 open import part0.index
 
-module part1.Completeness (n′ : ℕ) where
-open import part1.CharacteristicFormulas n′ hiding (ϱtt; ϱff; LEM)
+module part1.Hilbert (n′ : ℕ) where
+open import part1.CharacteristicFormulas n′ public hiding (ϱtt; ϱff; LEM)
 
 private
   variable
@@ -20,9 +20,9 @@ References:
 * Proof pearl @CaiKaposiAltenkirch:2015 for propositional logic.
 * modal logic S5 @Bentzen:arXiv:2019.
 
-# Hilbert's style proof system
+# Hilbert-style proof system
 
-We present a Hilbert's style proof system to establish tautologies of propositional logic.
+We present a Hilbert-style proof system to establish tautologies of propositional logic.
 The proof system consists of several *axioms* and a single *inference rule*.
 
 ```
@@ -263,7 +263,7 @@ DT2 {Γ} {φ} {ψ} (MP {φ = ξ} φ,Γ⊢ξ⇒ψ φ,Γ⊢ξ) = SS where
 
 !example(#example:refl)
 ~~~
-Testifying to usefulness of !ref(DT2), we can reprove !ref(refl-⇒) with a one-liner:
+Testifying to the usefulness of !ref(DT2), we can reprove !ref(refl-⇒) with a one-liner:
 
 ```
 refl-⇒' : Γ ⊢ φ ⇒ φ
@@ -305,16 +305,23 @@ longDT {ψ ∷ Γ} {φ} ε⊢ΓImply[ψ⇒φ]
 ```
 ~~~
 
-## Writing theorems
+TODO: Introduce the !ref(part0)(TList)(TList) syntax.
 
-We introduce a flexible syntax for writing theorems which will allow us to avoiding naming each intermediate step.
-
-# Examples
-
-We have the following *principle of explosion* ("ex falso [sequitur] quodlibet"):
+!exercise(#exercise:B1-B4)
+~~~
+Prove the following theorems:
 
 ```
 B1 : Γ ⊢ ⊥ ⇒ φ
+B2 : Γ ⊢ (φ ⇒ ⊥) ⇒ φ ⇒ ψ
+B3 : Γ ⊢ (φ ⇒ ψ) ⇒ ((φ ⇒ ⊥) ⇒ ψ) ⇒ ψ
+B4 : Γ ⊢ φ ⇒ (ψ ⇒ ⊥) ⇒ (φ ⇒ ψ) ⇒ ⊥
+```
+
+Theorem !ref(B1) is known as the *principle of explosion* ("ex falso [sequitur] quodlibet").
+~~~
+~~~
+```
 B1 {Γ} {φ} =
   BEGIN
   have Γ · ⊥ · φ ⇒ ⊥ ⊢ ⊥    by Ass back 1
@@ -325,179 +332,64 @@ B1 {Γ} {φ} =
 ```
 
 ```
-DN1 : Γ ⊢ ¬ ¬ φ ⇒ φ
-DN1 {Γ} {φ} =
+B2 {Γ} {φ} {ψ} =
   BEGIN
-  have Γ · ¬ ¬ φ · φ ⇒ ⊥ ⊢ φ ⇒ ⊥      by Ass here
-  have Γ · ¬ ¬ φ · φ ⇒ ⊥ ⊢ ¬ φ        apply MP N2 at here
-  have Γ · ¬ ¬ φ · φ ⇒ ⊥ ⊢ ¬ ¬ φ      by Ass back 1
-  have Γ · ¬ ¬ φ · φ ⇒ ⊥ ⊢ ¬ φ ⇒ ⊥    apply MP N1 at here
-  have Γ · ¬ ¬ φ · φ ⇒ ⊥ ⊢ ⊥          apply MP at here , back 2
-  have Γ · ¬ ¬ φ ⊢ (φ ⇒ ⊥) ⇒ ⊥        apply DT2 at here
-  have Γ · ¬ ¬ φ ⊢ φ                  apply MP A3 at here
-  have Γ ⊢ ¬ ¬ φ ⇒ φ                  apply DT2 at here
-  END
-
--- DN2 : Γ ⊢ φ ⇒ ¬ ¬ φ
--- DN2 = {!   !}
-
-irref-LEM : Γ ⊢ ¬ ¬ (φ ∨ ¬ φ)
-irref-LEM {Γ} {φ} =
-  BEGIN
-  have Γ · ¬ (φ ∨ ¬ φ) · φ ⊢ φ              by Ass here
-  have Γ · ¬ (φ ∨ ¬ φ) · φ ⊢ φ ∨ ¬ φ        apply MP D1 at here
-
-  have Γ · ¬ (φ ∨ ¬ φ) · φ ⊢ ¬ (φ ∨ ¬ φ)    by Ass back 1
-  have Γ · ¬ (φ ∨ ¬ φ) · φ ⊢ (φ ∨ ¬ φ) ⇒ ⊥  apply MP N1 at here
-  have Γ · ¬ (φ ∨ ¬ φ) · φ ⊢ ⊥              apply MP at here , back 2
-  have Γ · ¬ (φ ∨ ¬ φ) ⊢ φ ⇒ ⊥              apply DT2 at here
-  have Γ · ¬ (φ ∨ ¬ φ) ⊢ ¬ φ                apply MP N2 at here
-  have Γ · ¬ (φ ∨ ¬ φ) ⊢ φ ∨ ¬ φ            apply MP D2 at here
-  have Γ · ¬ (φ ∨ ¬ φ) ⊢ ¬ (φ ∨ ¬ φ)        by Ass here
-  have Γ · ¬ (φ ∨ ¬ φ) ⊢ (φ ∨ ¬ φ) ⇒ ⊥      apply MP N1 at here
-  
-  have Γ · ¬ (φ ∨ ¬ φ) ⊢ ⊥                  apply MP at here , back 2
-  have Γ ⊢ (¬ (φ ∨ ¬ φ)) ⇒ ⊥                apply DT2 at here
-  have Γ ⊢ ¬ ¬ (φ ∨ ¬ φ)                    apply MP N2 at here
-  END
-
-LEM : Γ ⊢ φ ∨ ¬ φ
-LEM = MP DN1 irref-LEM
-```
-
-```
-
-   
--- contradiction
--- used in the core lemma
-B2 : Γ ⊢ (φ ⇒ ⊥) ⇒ φ ⇒ ψ
-B2 {Γ} {φ} {ψ} = Γ⊢¬φ⇒φ⇒ψ where
-
-  Γ₀ : Context
-  Γ₀ = Γ · φ ⇒ ⊥ · φ
-
-  Γ₀⊢⊥ : Γ₀ ⊢ ⊥
-  Γ₀⊢⊥ = DT1 (DT1 (refl-⇒))
-
-  Γ₀⊢ψ : Γ₀ ⊢ ψ
-  Γ₀⊢ψ = MP B1 Γ₀⊢⊥
-
-  Γ⊢¬φ⇒φ⇒ψ : Γ ⊢ (φ ⇒ ⊥) ⇒ φ ⇒ ψ
-  Γ⊢¬φ⇒φ⇒ψ = DT2 (DT2 Γ₀⊢ψ)
-
--- proof by cases
--- used in the second core lemma
-B3 : Γ ⊢ (φ ⇒ ψ) ⇒ ((φ ⇒ ⊥) ⇒ ψ) ⇒ ψ
-B3 {Γ} {φ} {ψ} = DT2 (DT2 Γ1⊢ψ) where
-
-  Γ1 Γ2 Γ3 : Context
-  Γ1 = (φ ⇒ ⊥) ⇒ ψ ∷ φ ⇒ ψ ∷ Γ
-  Γ2 = Γ1 · ψ ⇒ ⊥
-  Γ3 = φ ∷ Γ2
-
-  Γ3⊢φ : Γ3 ⊢ φ
-  Γ3⊢φ = Ass here
-  
-  Γ3⊢φ⇒ψ : Γ3 ⊢ φ ⇒ ψ
-  Γ3⊢φ⇒ψ = Ass back 3
-
-  Γ3⊢ψ : Γ3 ⊢ ψ
-  Γ3⊢ψ = MP Γ3⊢φ⇒ψ Γ3⊢φ
-  
-  Γ3⊢¬ψ : Γ3 ⊢ ψ ⇒ ⊥
-  Γ3⊢¬ψ = Ass back 1
-  
-  Γ3⊢⊥ : Γ3 ⊢ ⊥
-  Γ3⊢⊥ = MP Γ3⊢¬ψ Γ3⊢ψ
-
-  Γ2⊢¬φ : Γ2 ⊢ φ ⇒ ⊥
-  Γ2⊢¬φ = DT2 Γ3⊢⊥
-
-  Γ2⊢¬φ⇒ψ : Γ2 ⊢ (φ ⇒ ⊥) ⇒ ψ
-  Γ2⊢¬φ⇒ψ = Ass back 1
-
-  Γ2⊢ψ : Γ2 ⊢ ψ
-  Γ2⊢ψ = MP Γ2⊢¬φ⇒ψ Γ2⊢¬φ
-
-  Γ2⊢¬ψ : Γ2 ⊢ ψ ⇒ ⊥
-  Γ2⊢¬ψ = Ass here
-  
-  Γ2⊢⊥ : Γ2 ⊢ ⊥
-  Γ2⊢⊥ = MP Γ2⊢¬ψ Γ2⊢ψ
-
-  Γ1⊢¬¬ψ : Γ1 ⊢ (ψ ⇒ ⊥) ⇒ ⊥
-  Γ1⊢¬¬ψ = DT2 Γ2⊢⊥
-
-  Γ1⊢ψ : Γ1 ⊢ ψ
-  Γ1⊢ψ = MP A3 Γ1⊢¬¬ψ
-
--- used in the core lemma
-B4 : ∀ Γ φ ψ → Γ ⊢ φ ⇒ (ψ ⇒ ⊥) ⇒ (φ ⇒ ψ) ⇒ ⊥
-B4 Γ φ ψ = DT2 (DT2 (DT2 Γ1⊢⊥)) where
-
-  Γ1 : Context
-  Γ1 = Γ · φ · ψ ⇒ ⊥ · φ ⇒ ψ
-
-  Γ1⊢φ : Γ1 ⊢ φ
-  Γ1⊢φ = Ass back 2
-
-  Γ1⊢φ⇒ψ : Γ1 ⊢ φ ⇒ ψ
-  Γ1⊢φ⇒ψ = Ass here
-
-  Γ1⊢ψ : Γ1 ⊢ ψ
-  Γ1⊢ψ = MP Γ1⊢φ⇒ψ Γ1⊢φ
-
-  Γ1⊢¬ψ : Γ1 ⊢ ψ ⇒ ⊥
-  Γ1⊢¬ψ = Ass back 1
-  
-  Γ1⊢⊥ : Γ1 ⊢ ⊥
-  Γ1⊢⊥ = MP Γ1⊢¬ψ Γ1⊢ψ
-
-B5 : Γ ⊢ (ψ ⇒ φ) ⇒ ¬ φ ⇒ ¬ ψ
-B5 {Γ} {ψ} {φ} =
-  BEGIN
-  have Γ · ψ ⇒ φ · ¬ φ · ψ ⊢ ψ ⇒ φ  by Ass back 2
-  have Γ · ψ ⇒ φ · ¬ φ · ψ ⊢ ψ      by Ass here
-  have Γ · ψ ⇒ φ · ¬ φ · ψ ⊢ φ      apply MP at back 1 , here
-
-  have Γ · ψ ⇒ φ · ¬ φ · ψ ⊢ ¬ φ    by Ass back 1
-  have Γ · ψ ⇒ φ · ¬ φ · ψ ⊢ φ ⇒ ⊥  apply MP N1 at here
-  
-  have Γ · ψ ⇒ φ · ¬ φ · ψ ⊢ ⊥      apply MP at here , back 2
-  have Γ · ψ ⇒ φ · ¬ φ ⊢ ψ ⇒ ⊥      apply DT2 at here
-  have Γ · ψ ⇒ φ · ¬ φ ⊢ ¬ ψ        apply MP N2 at here
-  have Γ · ψ ⇒ φ ⊢ ¬ φ ⇒ ¬ ψ        apply DT2 at here
-  have Γ ⊢ (ψ ⇒ φ) ⇒ ¬ φ ⇒ ¬ ψ      apply DT2 at here
+  have Γ · φ ⇒ ⊥ · φ ⊢ ⊥      by DT1 (DT1 (refl-⇒))
+  have Γ · φ ⇒ ⊥ · φ ⊢ ψ      apply MP B1 at here
+  have Γ ⊢ (φ ⇒ ⊥) ⇒ φ ⇒ ψ    apply DT2 ∘ DT2 at here
   END
 ```
 
 ```
-MP2 : Γ ⊢ φ ⇒ ψ ⇒ ξ →
-      Γ ⊢ φ →
-      Γ ⊢ ψ →
-      ------
-      Γ ⊢ ξ
-
-MP2 Γ⊢φ⇒ψ⇒ξ Γ⊢φ Γ⊢ψ = MP (MP Γ⊢φ⇒ψ⇒ξ Γ⊢φ) Γ⊢ψ
-
-MP3 : Γ ⊢ φ ⇒ ψ ⇒ ξ ⇒ θ →
-      Γ ⊢ φ →
-      Γ ⊢ ψ →
-      Γ ⊢ ξ →
-      ------
-      Γ ⊢ θ
-
-MP3 Γ⊢φ⇒ψ⇒ξ⇒θ Γ⊢φ Γ⊢ψ Γ⊢ξ = MP (MP2 Γ⊢φ⇒ψ⇒ξ⇒θ Γ⊢φ Γ⊢ψ) Γ⊢ξ
+B3 {Γ} {φ} {ψ} =
+  BEGIN
+  have Γ · φ ⇒ ψ · (φ ⇒ ⊥) ⇒ ψ · ψ ⇒ ⊥ · φ ⊢ φ        by Ass here
+  have Γ · φ ⇒ ψ · (φ ⇒ ⊥) ⇒ ψ · ψ ⇒ ⊥ · φ ⊢ φ ⇒ ψ    by Ass back 3
+  have Γ · φ ⇒ ψ · (φ ⇒ ⊥) ⇒ ψ · ψ ⇒ ⊥ · φ ⊢ ψ        apply MP at here , back 1
+  have Γ · φ ⇒ ψ · (φ ⇒ ⊥) ⇒ ψ · ψ ⇒ ⊥ · φ ⊢ ψ ⇒ ⊥    by Ass back 1
+  have Γ · φ ⇒ ψ · (φ ⇒ ⊥) ⇒ ψ · ψ ⇒ ⊥ · φ ⊢ ⊥        apply MP at here , back 1
+  have Γ · φ ⇒ ψ · (φ ⇒ ⊥) ⇒ ψ · ψ ⇒ ⊥ ⊢ φ ⇒ ⊥        apply DT2 at here
+  have Γ · φ ⇒ ψ · (φ ⇒ ⊥) ⇒ ψ · ψ ⇒ ⊥ ⊢ (φ ⇒ ⊥) ⇒ ψ  by Ass back 1
+  have Γ · φ ⇒ ψ · (φ ⇒ ⊥) ⇒ ψ · ψ ⇒ ⊥ ⊢ ψ            apply MP at here , back 1
+  have Γ · φ ⇒ ψ · (φ ⇒ ⊥) ⇒ ψ · ψ ⇒ ⊥ ⊢ ψ ⇒ ⊥        by Ass here
+  have Γ · φ ⇒ ψ · (φ ⇒ ⊥) ⇒ ψ · ψ ⇒ ⊥ ⊢ ⊥            apply MP at here , back 1
+  have Γ · φ ⇒ ψ · (φ ⇒ ⊥) ⇒ ψ ⊢ (ψ ⇒ ⊥) ⇒ ⊥          apply DT2 at here
+  have Γ · φ ⇒ ψ · (φ ⇒ ⊥) ⇒ ψ ⊢ ψ                    apply MP A3 at here
+  have Γ ⊢ (φ ⇒ ψ) ⇒ ((φ ⇒ ⊥) ⇒ ψ) ⇒ ψ                apply DT2 ∘ DT2 at here
+  END
 ```
 
-# Soundness
+```
+B4 {Γ} {φ} {ψ} =
+  BEGIN
+  have Γ · φ · ψ ⇒ ⊥ · φ ⇒ ψ ⊢ φ        by Ass back 2
+  have Γ · φ · ψ ⇒ ⊥ · φ ⇒ ψ ⊢ φ ⇒ ψ    by Ass here
+  have Γ · φ · ψ ⇒ ⊥ · φ ⇒ ψ ⊢ ψ        apply MP at here , back 1
+  have Γ · φ · ψ ⇒ ⊥ · φ ⇒ ψ ⊢ ψ ⇒ ⊥    by Ass back 1
+  have Γ · φ · ψ ⇒ ⊥ · φ ⇒ ψ ⊢ ⊥        apply MP at here , back 1
+  have Γ ⊢ φ ⇒ (ψ ⇒ ⊥) ⇒ (φ ⇒ ψ) ⇒ ⊥    apply DT2 ∘ DT2 ∘ DT2 at here
+  END
+```
+~~~
+
+## Soundness
+
+!hide
+~~~
+A proof system is *sound* if it can only prove logical consequences of the context.
+It is an easy, but important sanity check to verify that our proof rules are sound:
 
 ```
 soundness :
   Δ ⊢ φ →
   -----
   Δ ⊨ φ
+```
 
+The proof goes by structural induction on proofs using the method of truth tables.
+~~~
+~~~
+```
 soundness (Ass ψ∈Δ) ϱ ⟦Δ⟧ = ⟦Δ⟧ ψ∈Δ
 
 soundness {φ = ⊤} T1 ϱ _ = refl
@@ -618,8 +510,37 @@ soundness {φ = ψ} (MP {φ = φ} Δ⊢φ⇒ψ Δ⊢φ) ϱ ⟦Δ⟧
   with ⟦ φ ⟧ ϱ | ⟦ ψ ⟧ ϱ
 ... | tt | tt = refl
 ```
+~~~
 
-# Completeness for the `{⇒, ⊥}` fragment {#Completeness}
+# Completeness for the `{⇒, ⊥}` fragment {#completeness-fragment}
+
+Soundness is only half of the story regarding a proof system, and the easier half for that matter.
+The second half of the story is that of completeness:
+A proof system is *complete* if it can prove any logical consequence of the context.
+In this section we will prove that Hilbert-style proof system is complete in the restricted case of formulas in the `{⇒, ⊥}` fragment:
+
+```
+completeness1 :
+    Formula[⇒,⊥] φ →
+    All Formula[⇒,⊥] Γ →
+    Γ ⊨ φ →
+    -----
+    Γ ⊢ φ
+```
+
+This will be used as a stepping stone for the proof of completeness for the [full fragment](#completeness).
+In fact, it suffices (and its easier) to prove the completeness theorem in the special case of an empty context.
+This is called the *weak completeness* theorem:
+
+```
+weak-completeness1 :
+  Formula[⇒,⊥] φ →
+  ε ⊨ φ →
+  -----
+  ε ⊢ φ
+```
+
+The central idea behind the proof of the (weak) completeness theorem is to have the proof system simulate the method of truth tables.
 
 ```
 infix 51 _^_ _^^_
@@ -635,7 +556,7 @@ vars : Context
 vars = map `_ propNames
 ```
 
-## Core lemma
+## Core lemma 1
 
 ```
 core-lemma : ∀ φ (_ : Formula[⇒,⊥] φ) (ϱ : Val) →
@@ -661,7 +582,7 @@ core-lemma (φ ⇒ ψ) (viewφ ⇒ viewψ) ϱ
           ⇒𝔹-rewrite-tt-right (⟦ φ ⟧ ϱ) = MP A1 indψ 
 ... | indψ | it ff ⟦ψ⟧ϱ≡ff rewrite ⟦ψ⟧ϱ≡ff
   with core-lemma φ viewφ ϱ | inspect (⟦ φ ⟧ ϱ)
-... | indφ | it tt ⟦φ⟧ϱ≡tt rewrite ⟦φ⟧ϱ≡tt = MP (MP (B4 _ _ _) indφ) indψ
+... | indφ | it tt ⟦φ⟧ϱ≡tt rewrite ⟦φ⟧ϱ≡tt = MP (MP B4 indφ) indψ
 ... | indφ | it ff ⟦φ⟧ϱ≡ff rewrite ⟦φ⟧ϱ≡ff = MP B2 indφ
 ```
 
@@ -829,7 +750,149 @@ core-lemma2 {φ} viewφ ⊨φ (suc m) ϱ sucm≤sucn
   goal = MP (MP B3 indtt'') indff''
 ```
 
-# Completeness for the full fragment
+## Back to completeness
+
+```
+weak-completeness1 {φ} viewφ ⊨φ = ε⊢φ where
+
+  anyVal : Val
+  anyVal = λ _ → tt
+
+  have : drop n vars ^^ anyVal ⊢ φ
+  have = core-lemma2 viewφ ⊨φ n anyVal refl-≤
+
+  vars-len : length vars ≡ n
+  vars-len = begin
+     length vars ≡⟨⟩
+     length {A = Formula} (map `_ (enumFin _)) ≡⟨ map-length `_ (enumFin _) ⟩
+     length (enumFin _) ≡⟨ enumFinLen n ⟩
+     n ∎
+
+  eql : drop n vars ≡ ε
+  eql = begin
+    drop n vars ≡⟨ cong (λ C → drop C vars) (sym vars-len) ⟩
+    drop (length vars) vars ≡⟨ drop-all vars ⟩
+    ε ∎
+
+  eql1 : drop n vars ^^ anyVal ≡ ε
+  eql1 = begin
+     drop n vars ^^ anyVal
+       ≡⟨ cong (λ C → C ^^ anyVal) eql  ⟩
+     ε ^^ anyVal
+       ≡⟨⟩
+     ε ∎
+  
+  ε⊢φ : ε ⊢ φ
+  ε⊢φ = repl have (cong (λ C → C ⊢ φ) eql1)
+
+
+completeness1 {φ} {Γ} viewφ viewΓ = begin→
+  Γ ⊨ φ
+    →⟨ longSemDT1 ⟩
+  ε ⊨ Γ Imply φ
+    →⟨ weak-completeness1 (view Γ φ viewφ viewΓ) ⟩
+  ε ⊢ Γ Imply φ
+    →⟨ longDT ⟩
+  Γ ⊢ φ
+  ∎→  where
+
+  view : ∀ Δ φ → Formula[⇒,⊥] φ → All Formula[⇒,⊥] Δ → Formula[⇒,⊥] (Δ Imply φ)
+  view ε φ viewφ viewΔ = viewφ
+  view (ψ ∷ Δ) φ viewφ viewΔ = view Δ (ψ ⇒ φ) (viewψ ⇒ viewφ) (viewΔ ∘ there) where
+
+    viewψ : Formula[⇒,⊥] ψ
+    viewψ = viewΔ here
+```
+
+# Translation to the `{⇒ , ⊥}` fragment
+
+## Equivalences
+
+## Congruence properties
+
+## Translation
+
+
+```
+contraposition : Γ ⊢ (ψ ⇒ φ) ⇒ ¬ φ ⇒ ¬ ψ
+contraposition {Γ} {ψ} {φ} =
+  BEGIN
+  have Γ · ψ ⇒ φ · ¬ φ · ψ ⊢ ψ ⇒ φ  by Ass back 2
+  have Γ · ψ ⇒ φ · ¬ φ · ψ ⊢ ψ      by Ass here
+  have Γ · ψ ⇒ φ · ¬ φ · ψ ⊢ φ      apply MP at back 1 , here
+
+  have Γ · ψ ⇒ φ · ¬ φ · ψ ⊢ ¬ φ    by Ass back 1
+  have Γ · ψ ⇒ φ · ¬ φ · ψ ⊢ φ ⇒ ⊥  apply MP N1 at here
+  
+  have Γ · ψ ⇒ φ · ¬ φ · ψ ⊢ ⊥      apply MP at here , back 2
+  have Γ · ψ ⇒ φ · ¬ φ ⊢ ψ ⇒ ⊥      apply DT2 at here
+  have Γ · ψ ⇒ φ · ¬ φ ⊢ ¬ ψ        apply MP N2 at here
+  have Γ · ψ ⇒ φ ⊢ ¬ φ ⇒ ¬ ψ        apply DT2 at here
+  have Γ ⊢ (ψ ⇒ φ) ⇒ ¬ φ ⇒ ¬ ψ      apply DT2 at here
+  END
+```
+
+
+```
+DN1 : Γ ⊢ ¬ ¬ φ ⇒ φ
+DN1 {Γ} {φ} =
+  BEGIN
+  have Γ · ¬ ¬ φ · φ ⇒ ⊥ ⊢ φ ⇒ ⊥      by Ass here
+  have Γ · ¬ ¬ φ · φ ⇒ ⊥ ⊢ ¬ φ        apply MP N2 at here
+  have Γ · ¬ ¬ φ · φ ⇒ ⊥ ⊢ ¬ ¬ φ      by Ass back 1
+  have Γ · ¬ ¬ φ · φ ⇒ ⊥ ⊢ ¬ φ ⇒ ⊥    apply MP N1 at here
+  have Γ · ¬ ¬ φ · φ ⇒ ⊥ ⊢ ⊥          apply MP at here , back 2
+  have Γ · ¬ ¬ φ ⊢ (φ ⇒ ⊥) ⇒ ⊥        apply DT2 at here
+  have Γ · ¬ ¬ φ ⊢ φ                  apply MP A3 at here
+  have Γ ⊢ ¬ ¬ φ ⇒ φ                  apply DT2 at here
+  END
+
+-- DN2 : Γ ⊢ φ ⇒ ¬ ¬ φ
+-- DN2 = {!   !}
+
+irref-LEM : Γ ⊢ ¬ ¬ (φ ∨ ¬ φ)
+irref-LEM {Γ} {φ} =
+  BEGIN
+  have Γ · ¬ (φ ∨ ¬ φ) · φ ⊢ φ              by Ass here
+  have Γ · ¬ (φ ∨ ¬ φ) · φ ⊢ φ ∨ ¬ φ        apply MP D1 at here
+
+  have Γ · ¬ (φ ∨ ¬ φ) · φ ⊢ ¬ (φ ∨ ¬ φ)    by Ass back 1
+  have Γ · ¬ (φ ∨ ¬ φ) · φ ⊢ (φ ∨ ¬ φ) ⇒ ⊥  apply MP N1 at here
+  have Γ · ¬ (φ ∨ ¬ φ) · φ ⊢ ⊥              apply MP at here , back 2
+  have Γ · ¬ (φ ∨ ¬ φ) ⊢ φ ⇒ ⊥              apply DT2 at here
+  have Γ · ¬ (φ ∨ ¬ φ) ⊢ ¬ φ                apply MP N2 at here
+  have Γ · ¬ (φ ∨ ¬ φ) ⊢ φ ∨ ¬ φ            apply MP D2 at here
+  have Γ · ¬ (φ ∨ ¬ φ) ⊢ ¬ (φ ∨ ¬ φ)        by Ass here
+  have Γ · ¬ (φ ∨ ¬ φ) ⊢ (φ ∨ ¬ φ) ⇒ ⊥      apply MP N1 at here
+  
+  have Γ · ¬ (φ ∨ ¬ φ) ⊢ ⊥                  apply MP at here , back 2
+  have Γ ⊢ (¬ (φ ∨ ¬ φ)) ⇒ ⊥                apply DT2 at here
+  have Γ ⊢ ¬ ¬ (φ ∨ ¬ φ)                    apply MP N2 at here
+  END
+
+LEM : Γ ⊢ φ ∨ ¬ φ
+LEM = MP DN1 irref-LEM
+```
+
+
+```
+MP2 : Γ ⊢ φ ⇒ ψ ⇒ ξ →
+      Γ ⊢ φ →
+      Γ ⊢ ψ →
+      ------
+      Γ ⊢ ξ
+
+MP2 Γ⊢φ⇒ψ⇒ξ Γ⊢φ Γ⊢ψ = MP (MP Γ⊢φ⇒ψ⇒ξ Γ⊢φ) Γ⊢ψ
+
+MP3 : Γ ⊢ φ ⇒ ψ ⇒ ξ ⇒ θ →
+      Γ ⊢ φ →
+      Γ ⊢ ψ →
+      Γ ⊢ ξ →
+      ------
+      Γ ⊢ θ
+
+MP3 Γ⊢φ⇒ψ⇒ξ⇒θ Γ⊢φ Γ⊢ψ Γ⊢ξ = MP (MP2 Γ⊢φ⇒ψ⇒ξ⇒θ Γ⊢φ Γ⊢ψ) Γ⊢ξ
+```
 
 We need to convert an arbitrary formula `φ` to a formula `ψ` in the implication fragment
 s.t. the two are provably equivalent:
@@ -995,10 +1058,10 @@ cong-↔ {Γ} {φ} {ψ} (¬ ξ) p Γ⊢φ⇔ψ
   = help2 Γ⊢¬ξ[p↦φ]⇒¬ξ[p↦ψ] Γ⊢¬ξ[p↦ψ]⇒¬ξ[p↦φ] where
 
     Γ⊢¬ξ[p↦φ]⇒¬ξ[p↦ψ] : Γ ⊢ ¬ ξ F[ p ↦ φ ] ⇒ ¬ ξ F[ p ↦ ψ ]
-    Γ⊢¬ξ[p↦φ]⇒¬ξ[p↦ψ] = MP B5 Γ⊢ξ[p↦ψ]⇒ξ[p↦φ]
+    Γ⊢¬ξ[p↦φ]⇒¬ξ[p↦ψ] = MP contraposition Γ⊢ξ[p↦ψ]⇒ξ[p↦φ]
     
     Γ⊢¬ξ[p↦ψ]⇒¬ξ[p↦φ] : Γ ⊢ ¬ ξ F[ p ↦ ψ ] ⇒ ¬ ξ F[ p ↦ φ ]
-    Γ⊢¬ξ[p↦ψ]⇒¬ξ[p↦φ] = MP B5 Γ⊢ξ[p↦φ]⇒ξ[p↦ψ]
+    Γ⊢¬ξ[p↦ψ]⇒¬ξ[p↦φ] = MP contraposition Γ⊢ξ[p↦φ]⇒ξ[p↦ψ]
 
 cong-↔ (ξ₀ ∨ ξ₁) p Γ⊢φ⇔ψ
   with cong-↔ ξ₀ p Γ⊢φ⇔ψ | cong-↔ ξ₁ p Γ⊢φ⇔ψ
@@ -1164,7 +1227,7 @@ cong2-↔-left (` r) p q Γ⊢φ⇔φ′ Γ⊢ψ⇔ψ′
 
 cong2-↔-left (¬ ξ) p q Γ⊢φ⇔φ′ Γ⊢ψ⇔ψ′
   with cong2-↔-right ξ p q Γ⊢φ⇔φ′ Γ⊢ψ⇔ψ′ -- !
-... | ass = MP B5 ass
+... | ass = MP contraposition ass
 
 cong2-↔-left (ξ₀ ∨ ξ₁) p q Γ⊢φ⇔φ′ Γ⊢ψ⇔ψ′
   with cong2-↔-left ξ₀ p q Γ⊢φ⇔φ′ Γ⊢ψ⇔ψ′ |
@@ -1200,7 +1263,7 @@ cong2-↔-right (` r) p q Γ⊢φ⇔φ′ Γ⊢ψ⇔ψ′
 
 cong2-↔-right (¬ ξ) p q Γ⊢φ⇔φ′ Γ⊢ψ⇔ψ′
   with cong2-↔-left ξ p q Γ⊢φ⇔φ′ Γ⊢ψ⇔ψ′ -- !
-... | ass = MP B5 ass
+... | ass = MP contraposition ass
 
 cong2-↔-right (ξ₀ ∨ ξ₁) p q Γ⊢φ⇔φ′ Γ⊢ψ⇔ψ′
   with cong2-↔-right ξ₀ p q Γ⊢φ⇔φ′ Γ⊢ψ⇔ψ′ |
@@ -1394,47 +1457,13 @@ convert (φ ⇔ ψ)
     END)
 ```
 
-## Weak completeness
+# Completeness for the full fragment {#completeness}
+
+
 
 ```
-weak-completeness : Formula[⇒,⊥] φ → ε ⊨ φ → ε ⊢ φ
-weak-completeness {φ} viewφ ⊨φ = ε⊢φ where
-
-  anyVal : Val
-  anyVal = λ _ → tt
-
-  have : drop n vars ^^ anyVal ⊢ φ
-  have = core-lemma2 viewφ ⊨φ n anyVal refl-≤
-
-  vars-len : length vars ≡ n
-  vars-len = begin
-     length vars ≡⟨⟩
-     length {A = Formula} (map `_ (enumFin _)) ≡⟨ map-length `_ (enumFin _) ⟩
-     length (enumFin _) ≡⟨ enumFinLen n ⟩
-     n ∎
-
-  eql : drop n vars ≡ ε
-  eql = begin
-    drop n vars ≡⟨ cong (λ C → drop C vars) (sym vars-len) ⟩
-    drop (length vars) vars ≡⟨ drop-all vars ⟩
-    ε ∎
-
-  eql1 : drop n vars ^^ anyVal ≡ ε
-  eql1 = begin
-     drop n vars ^^ anyVal
-       ≡⟨ cong (λ C → C ^^ anyVal) eql  ⟩
-     ε ^^ anyVal
-       ≡⟨⟩
-     ε ∎
-  
-  ε⊢φ : ε ⊢ φ
-  ε⊢φ = repl have (cong (λ C → C ⊢ φ) eql1)
-  
-```
-
-```
-weak-completeness' : ε ⊨ φ → ε ⊢ φ
-weak-completeness' {φ} ⊨φ
+weak-completeness : ε ⊨ φ → ε ⊢ φ
+weak-completeness {φ} ⊨φ
   with convert φ
 ... | ψ , view-ψ , ⊢φ⇔ψ
   with help0 ⊢φ⇔ψ | help1 ⊢φ⇔ψ
@@ -1445,47 +1474,26 @@ weak-completeness' {φ} ⊨φ
 ... | ⊨ψ = ⊢φ where
 
   ⊢ψ : ε ⊢ ψ
-  ⊢ψ = weak-completeness view-ψ ⊨ψ
+  ⊢ψ = weak-completeness1 view-ψ ⊨ψ
 
   ⊢φ : ε ⊢ φ
   ⊢φ = MP ⊢ψ⇒φ ⊢ψ
 ```
 
-## Strong completeness
-
-```
-completeness : ∀ φ Δ → Formula[⇒,⊥] φ → All Formula[⇒,⊥] Δ → Δ ⊨ φ → Δ ⊢ φ
-completeness φ Δ viewφ viewΔ = begin→
-  Δ ⊨ φ
-    →⟨ longSemDT1 ⟩
-  ε ⊨ Δ Imply φ
-    →⟨ weak-completeness (view Δ φ viewφ viewΔ) ⟩
-  ε ⊢ Δ Imply φ
-    →⟨ longDT ⟩
-  Δ ⊢ φ
-  ∎→  where
-
-  view : ∀ Δ φ → Formula[⇒,⊥] φ → All Formula[⇒,⊥] Δ → Formula[⇒,⊥] (Δ Imply φ)
-  view ε φ viewφ viewΔ = viewφ
-  view (ψ ∷ Δ) φ viewφ viewΔ = view Δ (ψ ⇒ φ) (viewψ ⇒ viewφ) (viewΔ ∘ there) where
-
-    viewψ : Formula[⇒,⊥] ψ
-    viewψ = viewΔ here
-```
 
 The following is the milestone of this chapter:
 
 ```
-completeness' :
+strong-completeness :
   Δ ⊨ φ →
   -----
   Δ ⊢ φ
 
-completeness' {Δ} {φ} = begin→
+strong-completeness {Δ} {φ} = begin→
   Δ ⊨ φ
     →⟨ longSemDT1 ⟩
   ε ⊨ Δ Imply φ
-    →⟨ weak-completeness' ⟩
+    →⟨ weak-completeness ⟩
   ε ⊢ Δ Imply φ
     →⟨ longDT ⟩
   Δ ⊢ φ
