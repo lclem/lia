@@ -147,22 +147,25 @@
     <a id="1925" href="/lia/part0/TList/#713" class="Function Operator">have</a> <a id="1930" href="/lia/part0/Naturals/#177" class="Datatype">ℕ</a> <a id="1932" href="/lia/part0/TList/#713" class="Function Operator">apply</a> <a id="1938" href="/lia/part0/Naturals/#3664" class="Function Operator">_+_</a> <a id="1942" href="/lia/part0/TList/#713" class="Function Operator">at</a> <a id="1945" href="/lia/part0/TList/#1573" class="Function">back</a> <a id="1950" class="Number">0</a> <a id="1952" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="1954" href="/lia/part0/TList/#1573" class="Function">back</a> <a id="1959" class="Number">1</a>
     <a id="1965" href="/lia/part0/Equality/#214" class="Datatype Operator">≡</a> <a id="1967" class="Number">8</a> <a id="1969" href="/lia/part0/TList/#273" class="InductiveConstructor Operator">,</a> <a id="1971" class="Number">5</a> <a id="1973" href="/lia/part0/TList/#273" class="InductiveConstructor Operator">,</a> <a id="1975" class="Number">3</a> <a id="1977" href="/lia/part0/TList/#273" class="InductiveConstructor Operator">,</a> <a id="1979" class="Number">2</a> <a id="1981" href="/lia/part0/TList/#273" class="InductiveConstructor Operator">,</a> <a id="1983" href="/lia/part0/TList/#253" class="InductiveConstructor">BEGIN</a>
 <a id="1989" class="Symbol">_</a> <a id="1991" class="Symbol">=</a> <a id="1993" href="/lia/part0/Equality/#262" class="InductiveConstructor">refl</a></pre>
-<pre class="Agda"><a id="2007" class="Comment">-- tmap : ∀ {ℓ} {As Bs : Vector (Set ℓ) n} → TVector {ℓ} {n} (zipWith Fun As Bs) → TList As → TList Bs</a>
-<a id="2110" class="Comment">-- tmap {ε} {ε} ε ε = ε</a>
-<a id="2134" class="Comment">-- tmap {A ∷ As} {B ∷ Bs} (f ∷ fs) (a ∷ as) = f a ∷ tmap fs as</a>
+<pre class="Agda"><a id="2007" class="Comment">-- Funs As B → X (map (λ A → A ∈ Bs) As) </a>
+<a id="_have_by-magic"></a><a id="2049" href="/lia/part0/TList/#2049" class="Function Operator">_have_by-magic</a> <a id="2064" class="Symbol">:</a> <a id="2066" class="Symbol">∀</a> <a id="2068" class="Symbol">{</a><a id="2069" href="/lia/part0/TList/#2069" class="Bound">As</a> <a id="2072" href="/lia/part0/TList/#2072" class="Bound">Bs</a> <a id="2075" class="Symbol">:</a> <a id="2077" class="PrimitiveType">Set</a> <a id="2081" href="/lia/part0/List/#450" class="Datatype Operator">*</a><a id="2082" class="Symbol">}</a> <a id="2084" class="Symbol">→</a> <a id="2086" href="/lia/part0/TList/#215" class="Datatype">TList</a> <a id="2092" href="/lia/part0/TList/#2072" class="Bound">Bs</a> <a id="2095" class="Symbol">→</a> <a id="2097" class="Symbol">(</a><a id="2098" href="/lia/part0/TList/#2098" class="Bound">B</a> <a id="2100" class="Symbol">:</a> <a id="2102" class="PrimitiveType">Set</a><a id="2105" class="Symbol">)</a> <a id="2107" class="Symbol">→</a> <a id="2109" href="/lia/part0/TList/#215" class="Datatype">TList</a> <a id="2115" class="Symbol">(</a><a id="2116" href="/lia/part0/TList/#2098" class="Bound">B</a> <a id="2118" href="/lia/part0/List/#499" class="InductiveConstructor Operator">∷</a> <a id="2120" href="/lia/part0/TList/#2072" class="Bound">Bs</a><a id="2122" class="Symbol">)</a>
+<a id="2124" href="/lia/part0/TList/#2124" class="Bound">bs</a> <a id="2127" href="/lia/part0/TList/#2049" class="Function Operator">have</a> <a id="2132" href="/lia/part0/TList/#2132" class="Bound">B</a> <a id="2134" href="/lia/part0/TList/#2049" class="Function Operator">by-magic</a> <a id="2143" class="Symbol">=</a> <a id="2145" href="/lia/part0/TList/#2124" class="Bound">bs</a> <a id="2148" href="/lia/part0/TList/#713" class="UnsolvedMeta Function Operator">have</a><a id="2152" class="UnsolvedMeta"> </a><a id="2153" href="/lia/part0/TList/#2132" class="UnsolvedMeta Bound">B</a><a id="2154" class="UnsolvedMeta"> </a><a id="2155" href="/lia/part0/TList/#713" class="UnsolvedMeta Function Operator">apply</a><a id="2160" class="UnsolvedMeta"> </a><a id="2161" class="UnsolvedMeta Symbol">_</a><a id="2162" class="UnsolvedMeta"> </a><a id="2163" href="/lia/part0/TList/#713" class="UnsolvedMeta Function Operator">at</a> <a id="2166" class="UnsolvedMeta Symbol">_</a></pre>
+<pre class="Agda"><a id="2177" class="Comment">-- tmap : ∀ {ℓ} {As Bs : Vector (Set ℓ) n} → TVector {ℓ} {n} (zipWith Fun As Bs) → TList As → TList Bs</a>
+<a id="2280" class="Comment">-- tmap {ε} {ε} ε ε = ε</a>
+<a id="2304" class="Comment">-- tmap {A ∷ As} {B ∷ Bs} (f ∷ fs) (a ∷ as) = f a ∷ tmap fs as</a>
 
-<a id="2198" class="Comment">-- tfilter :</a>
+<a id="2368" class="Comment">-- tfilter :</a>
 
-<a id="2212" class="Comment">-- dependent map over a list</a>
-<a id="2241" class="Comment">-- dmap : ∀ {ℓ m} {A : Set ℓ} {B : A → Set m} → Π A B → (as : A *) → TList (map B as)</a>
-<a id="2327" class="Comment">-- dmap _ ε = BEGIN</a>
-<a id="2347" class="Comment">-- dmap f (a ∷ as) = f a ∷ dmap f as</a>
+<a id="2382" class="Comment">-- dependent map over a list</a>
+<a id="2411" class="Comment">-- dmap : ∀ {ℓ m} {A : Set ℓ} {B : A → Set m} → Π A B → (as : A *) → TList (map B as)</a>
+<a id="2497" class="Comment">-- dmap _ ε = BEGIN</a>
+<a id="2517" class="Comment">-- dmap f (a ∷ as) = f a ∷ dmap f as</a>
 
-<a id="2385" class="Comment">-- filter-proof : ∀ {A : Set} {P : A → Set} → (P? : Decidable P) → (as : A *) → TList {! map (Dec ∘ P) as  !}</a>
-<a id="2495" class="Comment">-- filter-proof {A} {P} P? as = {!   !} where</a>
-<a id="2541" class="Comment">--</a>
-<a id="2544" class="Comment">--   as? : TList (map (Dec ∘ P) as)</a>
-<a id="2580" class="Comment">--   as? = dmap P? as</a></pre>
+<a id="2555" class="Comment">-- filter-proof : ∀ {A : Set} {P : A → Set} → (P? : Decidable P) → (as : A *) → TList {! map (Dec ∘ P) as  !}</a>
+<a id="2665" class="Comment">-- filter-proof {A} {P} P? as = {!   !} where</a>
+<a id="2711" class="Comment">--</a>
+<a id="2714" class="Comment">--   as? : TList (map (Dec ∘ P) as)</a>
+<a id="2750" class="Comment">--   as? = dmap P? as</a></pre>
 
 <div id="refs">
 
@@ -194,7 +197,7 @@
     
 </p>
 
-    <p class="p-name"> Last-modified: Dec  3 09:32:57 2020 </p>
+    <p class="p-name"> Last-modified: Dec  3 10:37:38 2020 </p>
   </article>
       </div>
     </main><footer class="site-footer h-card">
