@@ -13,7 +13,7 @@ open import part1.Hilbert n' renaming (_⊢_ to _⊢H_) hiding (mon-⊢; soundne
 private
   variable
     p q r : PropName
-    φ ψ θ : Formula
+    φ ψ θ ξ : Formula
     Γ Δ : Context
 ```
 
@@ -205,6 +205,60 @@ More examples...
 --   step6 = ⇒I step5
 ```
 
+Useful examples:
+
+```
+A1-ND : Γ ⊢ φ ⇒ ψ ⇒ φ
+A1-ND {Γ} {φ} {ψ} =
+  BEGIN
+  have Γ · φ · ψ ⊢ φ  by Ass back 1
+  have Γ ⊢ φ ⇒ ψ ⇒ φ  apply ⇒I ∘ ⇒I at here 
+  END
+```
+
+```
+A2-ND : Γ ⊢ (φ ⇒ ψ ⇒ ξ) ⇒ (φ ⇒ ψ) ⇒ φ ⇒ ξ
+A2-ND {Γ} {φ} {ψ} {ξ} =
+  BEGIN
+  have Γ · φ ⇒ ψ ⇒ ξ · φ ⇒ ψ · φ ⊢ φ ⇒ ψ      by Ass back 1
+  have Γ · φ ⇒ ψ ⇒ ξ · φ ⇒ ψ · φ ⊢ φ          by Ass here
+  have Γ · φ ⇒ ψ ⇒ ξ · φ ⇒ ψ · φ ⊢ ψ          apply ⇒E at back 1 , here
+  
+  have Γ · φ ⇒ ψ ⇒ ξ · φ ⇒ ψ · φ ⊢ φ ⇒ ψ ⇒ ξ  by Ass back 2
+  have Γ · φ ⇒ ψ ⇒ ξ · φ ⇒ ψ · φ ⊢ ψ ⇒ ξ      apply ⇒E at here , back 2
+  have Γ · φ ⇒ ψ ⇒ ξ · φ ⇒ ψ · φ ⊢ ξ          apply ⇒E at here , back 2
+
+  have Γ ⊢ (φ ⇒ ψ ⇒ ξ) ⇒ (φ ⇒ ψ) ⇒ φ ⇒ ξ      apply ⇒I ∘ ⇒I ∘ ⇒I at here
+  END
+```
+
+```
+A3-ND : Γ ⊢ ((φ ⇒ ⊥) ⇒ ⊥) ⇒ φ
+A3-ND {Γ} {φ} =
+  BEGIN
+  have Γ · (φ ⇒ ⊥) ⇒ ⊥ ⊢ (φ ⇒ ⊥) ⇒ ⊥  by Ass here
+  have Γ · (φ ⇒ ⊥) ⇒ ⊥ ⊢ φ            apply ⊥⊥E at here
+  have Γ ⊢ ((φ ⇒ ⊥) ⇒ ⊥) ⇒ φ          apply ⇒I at here
+  END
+```
+
+```
+N1-ND : Γ ⊢ ¬ φ ⇒ φ ⇒ ⊥
+N1-ND {Γ} {φ} =
+  BEGIN
+  -- have Γ · ¬ φ · φ ⊢ ¬ φ    by Ass _
+  -- have Γ · ¬ φ · φ ⊢ φ ⇒ ⊥  apply ¬E at _
+  -- have Γ · ¬ φ · φ ⊢ φ      by _
+  -- have Γ · ¬ φ · φ ⊢ ⊥      apply ⇒E at _
+  -- have Γ ⊢ ¬ φ ⇒ φ ⇒ ⊥      apply ⇒I ∘ ⇒I at _
+  have Γ · ¬ φ · φ ⊢ ¬ φ    by-magic
+  have Γ · ¬ φ · φ ⊢ φ ⇒ ⊥  by-magic
+  have Γ · ¬ φ · φ ⊢ φ      by-magic
+  have Γ · ¬ φ · φ ⊢ ⊥      by-magic
+  have Γ ⊢ ¬ φ ⇒ φ ⇒ ⊥      by-magic
+  END
+```
+
 ## Monotonicity
 
 ```
@@ -253,22 +307,7 @@ soundness :
   -----
   Γ ⊨ φ
 
-soundness {Γ} {φ} (Ass φ∈Γ) = {! λ ϱ z → z φ∈Γ !}
-soundness {Γ} {.⊤} ⊤I = {!   !}
-soundness {Γ} {.(_ ⇒ _)} (⇒I Γ⊢φ) = {!   !}
-soundness {Γ} {φ} (⇒E Γ⊢φ Γ⊢φ₁) = {!   !}
-soundness {Γ} {.(_ ∧ _)} (∧I Γ⊢φ Γ⊢φ₁) = {!   !}
-soundness {Γ} {φ} (∧E-left Γ⊢φ) = {!   !}
-soundness {Γ} {φ} (∧E-right Γ⊢φ) = {!   !}
-soundness {Γ} {.(_ ∨ _)} (∨I-left Γ⊢φ) = {!   !}
-soundness {Γ} {.(_ ∨ _)} (∨I-right Γ⊢φ) = {!   !}
-soundness {Γ} {φ} (∨E Γ⊢φ Γ⊢φ₁ Γ⊢φ₂) = {!   !}
-soundness {Γ} {φ} (⊥E Γ⊢φ) = {!   !}
-soundness {Γ} {φ} (⊥⊥E Γ⊢φ) = {!   !}
-soundness {Γ} {.(¬ _)} (¬I Γ⊢φ) = {!   !}
-soundness {Γ} {.(_ ⇒ ⊥)} (¬E Γ⊢φ) = {!   !}
-soundness {Γ} {.(_ ⇔ _)} (⇔I Γ⊢φ) = {!   !}
-soundness {Γ} {.((_ ⇒ _) ∧ (_ ⇒ _))} (⇔E Γ⊢φ) = {!   !}
+soundness {Γ} {φ} Γ⊢NDφ = {!   !}
 ```
 
 # Soundness and completeness
@@ -362,12 +401,12 @@ hilbert→ND :
   -------
   Γ ⊢ND φ
 
-hilbert→ND {Γ} {φ} (Ass x) = {!   !}
-hilbert→ND {Γ} {.(_ ⇒ (_ ⇒ _))} A1 = {!   !}
-hilbert→ND {Γ} {.((_ ⇒ (_ ⇒ _)) ⇒ ((_ ⇒ _) ⇒ (_ ⇒ _)))} A2 = {!   !}
-hilbert→ND {Γ} {.(((_ ⇒ ⊥) ⇒ ⊥) ⇒ _)} A3 = {!   !}
-hilbert→ND {Γ} {.⊤} T1 = {!   !}
-hilbert→ND {Γ} {.((¬ _) ⇒ (_ ⇒ ⊥))} N1 = {!   !}
+hilbert→ND {Γ} {φ} (Ass φ∈Γ) = Ass φ∈Γ
+hilbert→ND {Γ} {φ ⇒ ψ ⇒ φ} A1 = A1-ND
+hilbert→ND {Γ} {(φ ⇒ ψ ⇒ ξ) ⇒ (φ ⇒ ψ) ⇒ φ ⇒ ξ} A2 = A2-ND
+hilbert→ND {Γ} {.(((_ ⇒ ⊥) ⇒ ⊥) ⇒ _)} A3 = A3-ND
+hilbert→ND {Γ} {⊤} T1 = ⊤I
+hilbert→ND {Γ} {.((¬ _) ⇒ (_ ⇒ ⊥))} N1 = N1-ND
 hilbert→ND {Γ} {.((_ ⇒ ⊥) ⇒ (¬ _))} N2 = {!   !}
 hilbert→ND {Γ} {.(_ ⇒ (_ ∨ _))} D1 = {!   !}
 hilbert→ND {Γ} {.(_ ⇒ (_ ∨ _))} D2 = {!   !}

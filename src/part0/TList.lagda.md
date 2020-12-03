@@ -74,6 +74,12 @@ _ = refl
 ```
 
 ```
+-- Funs As B → X (map (λ A → A ∈ Bs) As) 
+_have_by-magic : ∀ {As Bs : Set *} → TList Bs → (B : Set) → TList (B ∷ Bs)
+bs have B by-magic = bs have B apply _ at _
+```
+
+```
 -- tmap : ∀ {ℓ} {As Bs : Vector (Set ℓ) n} → TVector {ℓ} {n} (zipWith Fun As Bs) → TList As → TList Bs
 -- tmap {ε} {ε} ε ε = ε
 -- tmap {A ∷ As} {B ∷ Bs} (f ∷ fs) (a ∷ as) = f a ∷ tmap fs as
