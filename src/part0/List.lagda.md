@@ -732,6 +732,10 @@ xs ⊆ ys = ∀ {x} → x ∈ xs → x ∈ ys
 ... | left a∈as = as⊆cs a∈as
 ... | right a∈bs = bs⊆cs a∈bs
 
+⊆-cons-1 : ∀ {ℓ} {A : Set ℓ} {as bs : A *} {a : A} → as ⊆ bs → a ∷ as ⊆ a ∷ bs
+⊆-cons-1 as⊆bs here = here
+⊆-cons-1 as⊆bs (there x) = there (as⊆bs x)
+
 ⊆-cons-2 : ∀ {ℓ} {A : Set ℓ} {as bs : A *} {a : A} → a ∷ as ⊆ bs → as ⊆ bs
 ⊆-cons-2 = {!!}
 

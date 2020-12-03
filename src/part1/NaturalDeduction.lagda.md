@@ -8,7 +8,7 @@ title: "Gentzen's natural deduction 🚧"
 open import part0.index
 
 module part1.NaturalDeduction (n' : ℕ) where
-open import part1.Hilbert n' renaming (_⊢_ to _⊢H_) hiding (mon-⊢; soundness)
+open import part1.Hilbert n' renaming (_⊢_ to _⊢H_; soundness to soundness-H; completeness to completeness-H)
 
 private
   variable
@@ -106,6 +106,82 @@ data _⊢_ : Context → Formula → Set where
 
 Theorem : Formula → Set
 Theorem φ = ∅ ⊢ φ
+```
+
+## weakening-ND
+
+```
+weakening-ND :
+  Δ ⊢ φ →
+  Δ ⊆ Γ →
+  -----
+  Γ ⊢ φ
+
+weakening-ND (Ass φ∈Δ) Δ⊆Γ = Ass Δ⊆Γ φ∈Δ
+
+weakening-ND ⊤I Δ⊆Γ = ⊤I
+
+weakening-ND {Δ} {φ ⇒ ψ} {Γ} (⇒I Δ·φ⊢ψ) Δ⊆Γ = ⇒I (weakening-ND Δ·φ⊢ψ (⊆-cons-1 Δ⊆Γ))
+
+weakening-ND (⇒E Δ⊢φ⇒ψ Δ⊢φ) Δ⊆Γ = ⇒E (weakening-ND Δ⊢φ⇒ψ Δ⊆Γ) (weakening-ND Δ⊢φ Δ⊆Γ)
+
+weakening-ND (∧I Δ⊢φ Δ⊢ψ) Δ⊆Γ = ∧I (weakening-ND Δ⊢φ Δ⊆Γ) (weakening-ND Δ⊢ψ Δ⊆Γ)
+
+weakening-ND (∧E-left Δ⊢φ) Δ⊆Γ = ∧E-left (weakening-ND Δ⊢φ Δ⊆Γ)
+
+weakening-ND (∧E-right Δ⊢φ) Δ⊆Γ = ∧E-right (weakening-ND Δ⊢φ Δ⊆Γ)
+
+weakening-ND (∨I-left Δ⊢φ) Δ⊆Γ = ∨I-left (weakening-ND Δ⊢φ Δ⊆Γ)
+
+weakening-ND (∨I-right Δ⊢φ) Δ⊆Γ = ∨I-right (weakening-ND Δ⊢φ Δ⊆Γ)
+
+weakening-ND {Δ} {θ} {Γ} (∨E {Δ} {φ} {ψ} {θ} Δ⊢φ∨ψ Δ·φ⊢θ Δ·ψ⊢θ) Δ⊆Γ
+  with weakening-ND Δ⊢φ∨ψ Δ⊆Γ |
+       weakening-ND Δ·φ⊢θ (⊆-cons-1 Δ⊆Γ) |
+       weakening-ND Δ·ψ⊢θ (⊆-cons-1 Δ⊆Γ)
+... | Γ⊢φ∨ψ | Γ·φ⊢θ | Γ·ψ⊢θ = ∨E Γ⊢φ∨ψ Γ·φ⊢θ Γ·ψ⊢θ
+
+weakening-ND (⊥E Δ⊢φ) Δ⊆Γ = ⊥E (weakening-ND Δ⊢φ Δ⊆Γ)
+
+weakening-ND (⊥⊥E Δ⊢φ) Δ⊆Γ = ⊥⊥E (weakening-ND Δ⊢φ Δ⊆Γ)
+
+weakening-ND (¬I Δ⊢φ⇒⊥) Δ⊆Γ
+  with weakening-ND Δ⊢φ⇒⊥ Δ⊆Γ
+... | Γ⊢φ⇒⊥ = ¬I Γ⊢φ⇒⊥
+
+weakening-ND (¬E Δ⊢¬φ) Δ⊆Γ
+  with weakening-ND Δ⊢¬φ Δ⊆Γ
+... | Γ⊢¬φ = ¬E Γ⊢¬φ
+
+weakening-ND (⇔I Δ⊢φ) Δ⊆Γ = ⇔I (weakening-ND Δ⊢φ Δ⊆Γ)
+
+weakening-ND (⇔E Δ⊢φ) Δ⊆Γ = ⇔E (weakening-ND Δ⊢φ Δ⊆Γ)
+```
+
+## Deduction theorem
+
+Now one direction is totally obvious, since it is built into the system:
+
+```
+DT2-ND :
+  Γ · φ ⊢ ψ →
+  ----------
+  Γ ⊢ φ ⇒ ψ
+DT2-ND = ⇒I
+```
+
+```
+DT1-ND :
+  Γ ⊢ φ ⇒ ψ →
+  -----------
+  Γ · φ ⊢ ψ
+
+DT1-ND {Γ} {φ} {ψ} Γ⊢φ⇒ψ =
+  BEGIN
+  have Γ · φ ⊢ φ      by Ass here
+  have Γ · φ ⊢ φ ⇒ ψ  by (weakening-ND Γ⊢φ⇒ψ there)
+  have Γ · φ ⊢ ψ      apply ⇒E at here , back 1
+  END
 ```
 
 ## Examples
@@ -207,6 +283,8 @@ More examples...
 
 Useful examples:
 
+
+
 ```
 A1-ND : Γ ⊢ φ ⇒ ψ ⇒ φ
 A1-ND {Γ} {φ} {ψ} =
@@ -246,68 +324,128 @@ A3-ND {Γ} {φ} =
 N1-ND : Γ ⊢ ¬ φ ⇒ φ ⇒ ⊥
 N1-ND {Γ} {φ} =
   BEGIN
-  -- have Γ · ¬ φ · φ ⊢ ¬ φ    by Ass _
-  -- have Γ · ¬ φ · φ ⊢ φ ⇒ ⊥  apply ¬E at _
-  -- have Γ · ¬ φ · φ ⊢ φ      by _
-  -- have Γ · ¬ φ · φ ⊢ ⊥      apply ⇒E at _
-  -- have Γ ⊢ ¬ φ ⇒ φ ⇒ ⊥      apply ⇒I ∘ ⇒I at _
-  have Γ · ¬ φ · φ ⊢ ¬ φ    by-magic
-  have Γ · ¬ φ · φ ⊢ φ ⇒ ⊥  by-magic
-  have Γ · ¬ φ · φ ⊢ φ      by-magic
-  have Γ · ¬ φ · φ ⊢ ⊥      by-magic
-  have Γ ⊢ ¬ φ ⇒ φ ⇒ ⊥      by-magic
+  have Γ · ¬ φ · φ ⊢ ¬ φ    by Ass back 1
+  have Γ · ¬ φ · φ ⊢ φ ⇒ ⊥  apply ¬E at here
+  have Γ · ¬ φ · φ ⊢ φ      by Ass here
+  have Γ · ¬ φ · φ ⊢ ⊥      apply ⇒E at back 1 , here
+  have Γ ⊢ ¬ φ ⇒ φ ⇒ ⊥      apply ⇒I ∘ ⇒I at here
   END
 ```
 
-## Monotonicity
-
 ```
-mon-⊢ weakening : Δ ⊢ φ → Δ ⊆ Γ → Γ ⊢ φ
-mon-⊢ {Δ} {φ} {Γ} (Ass φ∈Δ) Δ⊆Γ = Ass(Δ⊆Γ φ∈Δ)
-mon-⊢ {Δ} {.⊤} {Γ} ⊤I Δ⊆Γ = {!   !}
-mon-⊢ {Δ} {.(_ ⇒ _)} {Γ} (⇒I Δ⊢φ) Δ⊆Γ = {!   !}
-mon-⊢ {Δ} {φ} {Γ} (⇒E Δ⊢φ Δ⊢φ₁) Δ⊆Γ = {!   !}
-mon-⊢ {Δ} {.(_ ∧ _)} {Γ} (∧I Δ⊢φ Δ⊢φ₁) Δ⊆Γ = {!   !}
-mon-⊢ {Δ} {φ} {Γ} (∧E-left Δ⊢φ) Δ⊆Γ = {!   !}
-mon-⊢ {Δ} {φ} {Γ} (∧E-right Δ⊢φ) Δ⊆Γ = {!   !}
-mon-⊢ {Δ} {.(_ ∨ _)} {Γ} (∨I-left Δ⊢φ) Δ⊆Γ = {!   !}
-mon-⊢ {Δ} {.(_ ∨ _)} {Γ} (∨I-right Δ⊢φ) Δ⊆Γ = {!   !}
-mon-⊢ {Δ} {φ} {Γ} (∨E Δ⊢φ Δ⊢φ₁ Δ⊢φ₂) Δ⊆Γ = {!   !}
-mon-⊢ {Δ} {φ} {Γ} (⊥E Δ⊢φ) Δ⊆Γ = {!   !}
-mon-⊢ {Δ} {φ} {Γ} (⊥⊥E Δ⊢φ) Δ⊆Γ = {!   !}
-mon-⊢ {Δ} {.(¬ _)} {Γ} (¬I Δ⊢φ) Δ⊆Γ = {!   !}
-mon-⊢ {Δ} {.(_ ⇒ ⊥)} {Γ} (¬E Δ⊢φ) Δ⊆Γ = {!   !}
-mon-⊢ {Δ} {.(_ ⇔ _)} {Γ} (⇔I Δ⊢φ) Δ⊆Γ = {!   !}
-mon-⊢ {Δ} {.((_ ⇒ _) ∧ (_ ⇒ _))} {Γ} (⇔E Δ⊢φ) Δ⊆Γ = {!   !}
-
-weakening = mon-⊢
+N2-ND : Γ ⊢ (φ ⇒ ⊥) ⇒ ¬ φ
+N2-ND {Γ} {φ} =
+  BEGIN
+  have Γ · φ ⇒ ⊥ ⊢ φ ⇒ ⊥      by Ass here
+  have Γ · φ ⇒ ⊥ ⊢ ¬ φ        apply ¬I at here
+  have Γ ⊢ (φ ⇒ ⊥) ⇒ ¬ φ      apply ⇒I at here
+  END
 ```
 
-## Consistency
 
 ```
-consistent : ~ (∅ ⊢ ⊥)
-consistent = {!!}
+D1-ND : Γ ⊢ φ ⇒ φ ∨ ψ
+D1-ND {Γ} {φ} {ψ} =
+  BEGIN
+  have Γ · φ ⊢ φ        by Ass here
+  have Γ · φ ⊢ φ ∨ ψ    apply ∨I-left at here
+  have Γ ⊢ φ ⇒ φ ∨ ψ    apply ⇒I at here
+  END
 ```
 
-## Deduction theorem
-
-Now this is totally obvious, since it is built into the system:
+```
+D2-ND : Γ ⊢ ψ ⇒ φ ∨ ψ
+D2-ND {Γ} {ψ} {φ} =
+  BEGIN
+  have Γ · ψ ⊢ ψ        by Ass here
+  have Γ · ψ ⊢ φ ∨ ψ    apply ∨I-right at here
+  have Γ ⊢ ψ ⇒ φ ∨ ψ    apply ⇒I at here
+  END
+```
 
 ```
-deductionTheorem : Γ · φ ⊢ ψ → Γ ⊢ φ ⇒ ψ
-deductionTheorem = ⇒I
+D3-ND : Γ ⊢ (φ ⇒ θ) ⇒ (ψ ⇒ θ) ⇒ (φ ∨ ψ) ⇒ θ
+D3-ND {Γ} {φ} {θ} {ψ} =
+  BEGIN
+  have Γ · φ ⇒ θ · ψ ⇒ θ · φ ∨ ψ ⊢ φ ⇒ θ      by Ass back 2
+  have Γ · φ ⇒ θ · ψ ⇒ θ · φ ∨ ψ · φ ⊢ θ      apply DT1-ND at here
+
+  have Γ · φ ⇒ θ · ψ ⇒ θ · φ ∨ ψ ⊢ ψ ⇒ θ      by Ass back 1
+  have Γ · φ ⇒ θ · ψ ⇒ θ · φ ∨ ψ · ψ ⊢ θ      apply DT1-ND at here
+
+  have Γ · φ ⇒ θ · ψ ⇒ θ · φ ∨ ψ ⊢ φ ∨ ψ      by Ass here
+  have Γ · φ ⇒ θ · ψ ⇒ θ · φ ∨ ψ ⊢ θ          apply ∨E at here , back 3 , back 1
+  have Γ ⊢ (φ ⇒ θ) ⇒ (ψ ⇒ θ) ⇒ (φ ∨ ψ) ⇒ θ    apply ⇒I ∘ ⇒I ∘ ⇒I at here
+  END
 ```
 
-## Soundness
+```
+C1-ND : Γ ⊢ φ ∧ ψ ⇒ φ
+C1-ND {Γ} {φ} {ψ} =
+  BEGIN
+  have Γ · φ ∧ ψ ⊢ φ ∧ ψ      by Ass here
+  have Γ · φ ∧ ψ ⊢ φ          apply ∧E-left at here
+  have Γ ⊢ φ ∧ ψ ⇒ φ          apply ⇒I at here
+  END
+```
 
 ```
-soundness : 
-  Γ ⊢ φ →
-  -----
-  Γ ⊨ φ
+C2-ND : Γ ⊢ φ ∧ ψ ⇒ ψ
+C2-ND {Γ} {φ} {ψ} =
+  BEGIN
+  have Γ · φ ∧ ψ ⊢ φ ∧ ψ      by Ass here
+  have Γ · φ ∧ ψ ⊢ ψ          apply ∧E-right at here
+  have Γ ⊢ φ ∧ ψ ⇒ ψ          apply ⇒I at here
+  END
+```
 
-soundness {Γ} {φ} Γ⊢NDφ = {!   !}
+```
+C3-ND : Γ ⊢ φ ⇒ ψ ⇒ φ ∧ ψ
+C3-ND {Γ} {φ} {ψ} =
+  BEGIN
+  have Γ · φ · ψ ⊢ φ        by Ass back 1
+  have Γ · φ · ψ ⊢ ψ        by Ass here
+  have Γ · φ · ψ ⊢ φ ∧ ψ    apply ∧I at back 1 , here
+  have Γ ⊢ φ ⇒ ψ ⇒ φ ∧ ψ    apply ⇒I ∘ ⇒I at here
+  END
+```
+
+```
+E1-ND : Γ ⊢ (φ ⇔ ψ) ⇒ φ ⇒ ψ
+E1-ND {Γ} {φ} {ψ} =
+  BEGIN
+  have Γ · φ ⇔ ψ · φ ⊢ φ ⇔ ψ              by Ass back 1
+  have Γ · φ ⇔ ψ · φ ⊢ (φ ⇒ ψ) ∧ (ψ ⇒ φ)  apply ⇔E at here
+  have Γ · φ ⇔ ψ · φ ⊢ φ ⇒ ψ              apply ∧E-left at here
+  have Γ · φ ⇔ ψ · φ ⊢ φ                  by Ass here
+  have Γ · φ ⇔ ψ · φ ⊢ ψ                  apply ⇒E at back 1 , here
+  have Γ ⊢ (φ ⇔ ψ) ⇒ φ ⇒ ψ                apply ⇒I ∘ ⇒I at here
+  END
+```
+
+```
+E2-ND : Γ ⊢ (φ ⇔ ψ) ⇒ ψ ⇒ φ
+E2-ND {Γ} {φ} {ψ} =
+  BEGIN
+  have Γ · φ ⇔ ψ · ψ ⊢ φ ⇔ ψ              by Ass back 1
+  have Γ · φ ⇔ ψ · ψ ⊢ (φ ⇒ ψ) ∧ (ψ ⇒ φ)  apply ⇔E at here
+  have Γ · φ ⇔ ψ · ψ ⊢ ψ ⇒ φ              apply ∧E-right at here
+  have Γ · φ ⇔ ψ · ψ ⊢ ψ                  by Ass here
+  have Γ · φ ⇔ ψ · ψ ⊢ φ                  apply ⇒E at back 1 , here
+  have Γ ⊢ (φ ⇔ ψ) ⇒ ψ ⇒ φ                apply ⇒I ∘ ⇒I at here
+  END
+```
+
+```
+E3-ND : Γ ⊢ (φ ⇒ ψ) ⇒ (ψ ⇒ φ) ⇒ (φ ⇔ ψ)
+E3-ND {Γ} {φ} {ψ} =
+  BEGIN
+  have Γ · φ ⇒ ψ · ψ ⇒ φ ⊢ φ ⇒ ψ              by Ass back 1
+  have Γ · φ ⇒ ψ · ψ ⇒ φ ⊢ ψ ⇒ φ              by Ass here
+  have Γ · φ ⇒ ψ · ψ ⇒ φ ⊢ (φ ⇒ ψ) ∧ (ψ ⇒ φ)  apply ∧I at back 1 , here
+  have Γ · φ ⇒ ψ · ψ ⇒ φ ⊢ φ ⇔ ψ              apply ⇔I at here
+  have Γ ⊢ (φ ⇒ ψ) ⇒ (ψ ⇒ φ) ⇒ (φ ⇔ ψ)        apply ⇒I ∘ ⇒I at here
+  END
 ```
 
 # Soundness and completeness
@@ -321,7 +459,7 @@ For clarity:
 _⊢ND_ = _⊢_
 ```
 
-For soundness, it suffices to show that natural deduction can be simulated by Hilbert-style proofs:
+For the soundness property , it suffices to show that natural deduction can be simulated by Hilbert-style proofs:
 
 ```
 ND→hilbert :
@@ -388,12 +526,22 @@ ND→hilbert {Γ} {(φ ⇒ ψ) ∧ (ψ ⇒ φ)} (⇔E Γ⊢NDφ⇔ψ)
 ... | Γ⊢Hφ⇔ψ = MP2 C3 (help0 Γ⊢Hφ⇔ψ) (help1 Γ⊢Hφ⇔ψ)
 ```
 
+```
+soundness : 
+  Γ ⊢ND φ →
+  -----
+  Γ ⊨ φ
+
+soundness Γ⊢NDφ = soundness-H (ND→hilbert Γ⊢NDφ)
+```
+
 Notice how:
 
 * Rule !ref(_⊢_)(⇒I) in natural deduction corresponds to the deduction theorem in Hilbert-style proofs.
 * Rule !ref(_⊢_)(⇒E) in natural deduction corresponds to modus ponens in Hilbert-style proofs.
 
-For completeness, it suffices to show that Hilbert-style proofs can be simulated by natural deduction:
+For the completeness property,
+it suffices to show that Hilbert-style proofs can be simulated by natural deduction:
 
 ```
 hilbert→ND :
@@ -401,22 +549,37 @@ hilbert→ND :
   -------
   Γ ⊢ND φ
 
-hilbert→ND {Γ} {φ} (Ass φ∈Γ) = Ass φ∈Γ
-hilbert→ND {Γ} {φ ⇒ ψ ⇒ φ} A1 = A1-ND
-hilbert→ND {Γ} {(φ ⇒ ψ ⇒ ξ) ⇒ (φ ⇒ ψ) ⇒ φ ⇒ ξ} A2 = A2-ND
-hilbert→ND {Γ} {.(((_ ⇒ ⊥) ⇒ ⊥) ⇒ _)} A3 = A3-ND
-hilbert→ND {Γ} {⊤} T1 = ⊤I
-hilbert→ND {Γ} {.((¬ _) ⇒ (_ ⇒ ⊥))} N1 = N1-ND
-hilbert→ND {Γ} {.((_ ⇒ ⊥) ⇒ (¬ _))} N2 = {!   !}
-hilbert→ND {Γ} {.(_ ⇒ (_ ∨ _))} D1 = {!   !}
-hilbert→ND {Γ} {.(_ ⇒ (_ ∨ _))} D2 = {!   !}
-hilbert→ND {Γ} {.((_ ⇒ _) ⇒ ((_ ⇒ _) ⇒ ((_ ∨ _) ⇒ _)))} D3 = {!   !}
-hilbert→ND {Γ} {.((_ ∧ _) ⇒ _)} C1 = {!   !}
-hilbert→ND {Γ} {.((_ ∧ _) ⇒ _)} C2 = {!   !}
-hilbert→ND {Γ} {.(_ ⇒ (_ ⇒ (_ ∧ _)))} C3 = {!   !}
-hilbert→ND {Γ} {.((_ ⇔ _) ⇒ (_ ⇒ _))} E1 = {!   !}
-hilbert→ND {Γ} {.((_ ⇔ _) ⇒ (_ ⇒ _))} E2 = {!   !}
-hilbert→ND {Γ} {.((_ ⇒ _) ⇒ ((_ ⇒ _) ⇒ (_ ⇔ _)))} E3 = {!   !}
-hilbert→ND {Γ} {φ} (MP Γ⊢Hφ Γ⊢Hφ₁) = {!   !}
+hilbert→ND (Ass φ∈Γ) = Ass φ∈Γ
+hilbert→ND A1 = A1-ND
+hilbert→ND A2 = A2-ND
+hilbert→ND A3 = A3-ND
+hilbert→ND T1 = ⊤I
+hilbert→ND N1 = N1-ND
+hilbert→ND N2 = N2-ND
+hilbert→ND D1 = D1-ND
+hilbert→ND D2 = D2-ND
+hilbert→ND D3 = D3-ND
+hilbert→ND C1 = C1-ND
+hilbert→ND C2 = C2-ND
+hilbert→ND C3 = C3-ND
+hilbert→ND E1 = E1-ND
+hilbert→ND E2 = E2-ND
+hilbert→ND E3 = E3-ND
+hilbert→ND {Γ} {ψ} (MP {Γ} {φ} Γ⊢Hφ⇒ψ Γ⊢Hφ)
+  with hilbert→ND Γ⊢Hφ⇒ψ | hilbert→ND Γ⊢Hφ
+... | Γ⊢NDφ⇒ψ | Γ⊢NDφ = ⇒E Γ⊢NDφ⇒ψ Γ⊢NDφ
+```
+
+The application of modus ponens is simulated by the `⇒`-elimination rule !ref(_⊢_)(⇒E).
+
+We obtain completeness for natural deduction thanks to completness of the Hilbert-style proof system and the fact that natural deduction simulates it:
+
+```
+completeness : 
+  Γ ⊨ φ →
+  -----
+  Γ ⊢ND φ
+
+completeness Γ⊨φ = hilbert→ND (completeness-H Γ⊨φ)
 ```
 

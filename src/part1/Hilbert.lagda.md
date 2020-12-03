@@ -118,7 +118,7 @@ In order to make our life easier, we will prove some metatheorems (i.e., theorem
 such as the monotonicity and deduction theorems,
 which will allow us to write proofs more concisely.
 
-## Monotonicity
+## Weakening
 
 The proof system !ref(_⊢_) is *monotonic* in the sense that adding additional assumptions can only enlarge the set of formulas it can prove.
 This is a fundamental property of so-called "monotone logics", whereby adding new knowledge can only increase our knowledge of the world.
@@ -129,7 +129,7 @@ This is a fundamental property of so-called "monotone logics", whereby adding ne
 For every context `Γ` and formulas `φ`, `ψ`:
 
 ```
-mon-⊢ : Γ ⊢ φ →
+weakening : Γ ⊢ φ →
         ---------
         Γ · ψ ⊢ φ
 ```
@@ -141,45 +141,45 @@ The proof goes by a monotone (pun intended) structural induction.
 ~~~
 ~~~
 ```
-mon-⊢ (Ass φ∈Δ) = Ass there φ∈Δ
+weakening (Ass φ∈Δ) = Ass there φ∈Δ
 
-mon-⊢ T1 = T1
+weakening T1 = T1
 
-mon-⊢ N1 = N1
-mon-⊢ N2 = N2
+weakening N1 = N1
+weakening N2 = N2
 
-mon-⊢ A1 = A1
-mon-⊢ A2 = A2
-mon-⊢ A3 = A3
+weakening A1 = A1
+weakening A2 = A2
+weakening A3 = A3
 
-mon-⊢ D1 = D1
-mon-⊢ D2 = D2
-mon-⊢ D3 = D3
+weakening D1 = D1
+weakening D2 = D2
+weakening D3 = D3
 
-mon-⊢ C1 = C1
-mon-⊢ C2 = C2
-mon-⊢ C3 = C3
+weakening C1 = C1
+weakening C2 = C2
+weakening C3 = C3
 
-mon-⊢ E1 = E1
-mon-⊢ E2 = E2
-mon-⊢ E3 = E3
+weakening E1 = E1
+weakening E2 = E2
+weakening E3 = E3
 
-mon-⊢ (MP Δ⊢φ Δ⊢ψ) = MP (mon-⊢ Δ⊢φ) (mon-⊢ Δ⊢ψ)
+weakening (MP Δ⊢φ Δ⊢ψ) = MP (weakening Δ⊢φ) (weakening Δ⊢ψ)
 ```
 ~~~
 
 !exercise(#exercise:mon2)
 ~~~
 The [monotonicity theorem](#theorem:monotonicity) allows us to add a single formula to the context.
-Sometimes it is convenient to add *two* formulas to the context. State and prove this fact (as `mon2-⊢`).
+Sometimes it is convenient to add *two* formulas to the context. State and prove this fact (as `weakening2`).
 ~~~
 ~~~
 ```
-mon2-⊢ : Δ ⊢ φ →
+weakening2 : Δ ⊢ φ →
          -------------
          Δ · ψ · ξ ⊢ φ
 
-mon2-⊢ = mon-⊢ ∘ mon-⊢
+weakening2 = weakening ∘ weakening
 ```
 ~~~
 
@@ -200,13 +200,13 @@ DT1 : Γ ⊢ φ ⇒ ψ →
 DT1 {Γ} {φ} {ψ} Γ⊢φ⇒ψ = MP Γ,φ⊢φ⇒ψ Γ,φ⊢φ where
 
   Γ,φ⊢φ⇒ψ : φ ∷ Γ ⊢ φ ⇒ ψ
-  Γ,φ⊢φ⇒ψ = mon-⊢ {ψ = φ} Γ⊢φ⇒ψ
+  Γ,φ⊢φ⇒ψ = weakening {ψ = φ} Γ⊢φ⇒ψ
 
   Γ,φ⊢φ : φ ∷ Γ ⊢ φ
   Γ,φ⊢φ = Ass here
 ```
 
-The proof is a straightforward application of modus ponens !ref(_⊢_)(MP) and monotonicity !ref(mon-⊢).
+The proof is a straightforward application of modus ponens !ref(_⊢_)(MP) and monotonicity !ref(weakening).
 The second direction of the deduction theorem allows us to move a formula from the context to the goal:
 
 ```
@@ -915,9 +915,9 @@ trans-⇒ : Γ ⊢ φ ⇒ ψ →
 trans-⇒ {Γ} {φ} {ψ} {ξ} Γ⊢φ⇒ψ Γ⊢ψ⇒ξ =
   BEGIN
   have Γ · φ ⊢ φ      by Ass here
-  have Γ · φ ⊢ φ ⇒ ψ  by mon-⊢ Γ⊢φ⇒ψ
+  have Γ · φ ⊢ φ ⇒ ψ  by weakening Γ⊢φ⇒ψ
   have Γ · φ ⊢ ψ      apply MP at here , back 1
-  have Γ · φ ⊢ ψ ⇒ ξ  by mon-⊢ Γ⊢ψ⇒ξ
+  have Γ · φ ⊢ ψ ⇒ ξ  by weakening Γ⊢ψ⇒ξ
   have Γ · φ ⊢ ξ      apply MP at here , back 1
   have Γ ⊢ φ ⇒ ξ      apply DT2 at here
   END
@@ -952,11 +952,11 @@ helper-⇒ {Γ} {p} {φ} {ψ} ξ₀ ξ₁ ass₀ ass₁ = DT2 (DT2 goal) where
     goal =
         BEGIN
         have Ξ₀ ⊢ ξ₀ F[ p ↦ ψ ]                 by Ass here
-        have Ξ₀ ⊢ ξ₀ F[ p ↦ ψ ] ⇒ ξ₀ F[ p ↦ φ ] by mon2-⊢ ass₀
+        have Ξ₀ ⊢ ξ₀ F[ p ↦ ψ ] ⇒ ξ₀ F[ p ↦ φ ] by weakening2 ass₀
         have Ξ₀ ⊢ ξ₀ F[ p ↦ φ ]                 apply MP at here , back 1
         have Ξ₀ ⊢ (ξ₀ ⇒ ξ₁) F[ p ↦ φ ]          by Ass back 1
         have Ξ₀ ⊢ ξ₁ F[ p ↦ φ ]                 apply MP at here , back 1
-        have Ξ₀ ⊢ ξ₁ F[ p ↦ φ ] ⇒ ξ₁ F[ p ↦ ψ ] by mon2-⊢ ass₁
+        have Ξ₀ ⊢ ξ₁ F[ p ↦ φ ] ⇒ ξ₁ F[ p ↦ ψ ] by weakening2 ass₁
         have Ξ₀ ⊢ ξ₁ F[ p ↦ ψ ]                 apply MP at here , back 1
         END
 
@@ -979,7 +979,7 @@ helper-⇔ {Γ} {p} {φ} {ψ} ξ₀ ξ₁ ass₀ ass₁
 
     have Γ₀ ⊢ (ξ₀ ⇔ ξ₁) F[ p ↦ φ ]                        by Ass here
     have Γ₀ ⊢ (ξ₀ ⇒ ξ₁) F[ p ↦ φ ]                        apply help0 at here
-    have Γ₀ ⊢ (ξ₀ ⇒ ξ₁) F[ p ↦ φ ] ⇒ (ξ₀ ⇒ ξ₁) F[ p ↦ ψ ] apply mon-⊢ at back 2
+    have Γ₀ ⊢ (ξ₀ ⇒ ξ₁) F[ p ↦ φ ] ⇒ (ξ₀ ⇒ ξ₁) F[ p ↦ ψ ] apply weakening at back 2
     have Γ₀ ⊢ (ξ₀ ⇒ ξ₁) F[ p ↦ ψ ]                        apply MP at here , back 1
     END
 
@@ -991,7 +991,7 @@ helper-⇔ {Γ} {p} {φ} {ψ} ξ₀ ξ₁ ass₀ ass₁
 
     have Γ₀ ⊢ (ξ₀ ⇔ ξ₁) F[ p ↦ φ ]                        by Ass here
     have Γ₀ ⊢ (ξ₁ ⇒ ξ₀) F[ p ↦ φ ]                        apply help1 at here
-    have Γ₀ ⊢ (ξ₁ ⇒ ξ₀) F[ p ↦ φ ] ⇒ (ξ₁ ⇒ ξ₀) F[ p ↦ ψ ] apply mon-⊢ at back 2
+    have Γ₀ ⊢ (ξ₁ ⇒ ξ₀) F[ p ↦ φ ] ⇒ (ξ₁ ⇒ ξ₀) F[ p ↦ ψ ] apply weakening at back 2
     have Γ₀ ⊢ (ξ₁ ⇒ ξ₀) F[ p ↦ ψ ]                        apply MP at here , back 1
     END
 
@@ -1023,11 +1023,11 @@ cong-∧ : ∀ {Γ p φ ψ} ξ₀ ξ₁ →
 
 cong-∧ {Γ} {p} {φ} {ψ} ξ₀ ξ₁ ass₀ ass₁ =
   BEGIN
-  have Γ · (ξ₀ ∧ ξ₁) F[ p ↦ φ ] ⊢ ξ₀ F[ p ↦ φ ] ⇒ ξ₀ F[ p ↦ ψ ]   by mon-⊢ ass₀
+  have Γ · (ξ₀ ∧ ξ₁) F[ p ↦ φ ] ⊢ ξ₀ F[ p ↦ φ ] ⇒ ξ₀ F[ p ↦ ψ ]   by weakening ass₀
   have Γ · (ξ₀ ∧ ξ₁) F[ p ↦ φ ] ⊢ ξ₀ F[ p ↦ φ ]                   by MP C1 (Ass here) 
   have Γ · (ξ₀ ∧ ξ₁) F[ p ↦ φ ] ⊢ ξ₀ F[ p ↦ ψ ]                   apply MP at back 1 , here
 
-  have Γ · (ξ₀ ∧ ξ₁) F[ p ↦ φ ] ⊢ ξ₁ F[ p ↦ φ ] ⇒ ξ₁ F[ p ↦ ψ ]   by mon-⊢ ass₁
+  have Γ · (ξ₀ ∧ ξ₁) F[ p ↦ φ ] ⊢ ξ₁ F[ p ↦ φ ] ⇒ ξ₁ F[ p ↦ ψ ]   by weakening ass₁
   have Γ · (ξ₀ ∧ ξ₁) F[ p ↦ φ ] ⊢ ξ₁ F[ p ↦ φ ]                   by MP C2 (Ass here)
   have Γ · (ξ₀ ∧ ξ₁) F[ p ↦ φ ] ⊢ ξ₁ F[ p ↦ ψ ]                   apply MP at back 1 , here
 
@@ -1139,11 +1139,11 @@ cong2-∧ : ∀ {Γ p q φ φ′ ψ ψ′} ξ₀ ξ₁ →
 
 cong2-∧ {Γ} {p} {q} {φ} {φ′} {ψ} {ψ′} ξ₀ ξ₁ ass₀ ass₁ =
   BEGIN
-  have Γ₀ ⊢ ξ₀ F2[ p , q ↦ φ , ψ ] ⇒ ξ₀ F2[ p , q ↦ φ′ , ψ′ ]               by mon-⊢ ass₀
+  have Γ₀ ⊢ ξ₀ F2[ p , q ↦ φ , ψ ] ⇒ ξ₀ F2[ p , q ↦ φ′ , ψ′ ]               by weakening ass₀
   have Γ₀ ⊢ ξ₀ F2[ p , q ↦ φ , ψ ]                                          by MP C1 (Ass here) 
   have Γ₀ ⊢ ξ₀ F2[ p , q ↦ φ′ , ψ′ ]                                        apply MP at back 1 , here
 
-  have Γ₀ ⊢ ξ₁ F2[ p , q ↦ φ , ψ ] ⇒ ξ₁ F2[ p , q ↦ φ′ , ψ′ ]               by mon-⊢ ass₁
+  have Γ₀ ⊢ ξ₁ F2[ p , q ↦ φ , ψ ] ⇒ ξ₁ F2[ p , q ↦ φ′ , ψ′ ]               by weakening ass₁
   have Γ₀ ⊢ ξ₁ F2[ p , q ↦ φ , ψ ]                                          by MP C2 (Ass here)
   have Γ₀ ⊢ ξ₁ F2[ p , q ↦ φ′ , ψ′ ]                                        apply MP at back 1 , here
 
@@ -1164,11 +1164,11 @@ cong2-⇒ {Γ} {p} {q} {φ} {φ′} {ψ} {ψ′} ξ₀ ξ₁ ass₀ ass₁ = DT2
     goal =
       BEGIN
       have Ξ₀ ⊢ ξ₀ F2[ p , q ↦ φ′ , ψ′ ]                          by Ass here
-      have Ξ₀ ⊢ ξ₀ F2[ p , q ↦ φ′ , ψ′ ] ⇒ ξ₀ F2[ p , q ↦ φ , ψ ] by mon2-⊢ ass₀
+      have Ξ₀ ⊢ ξ₀ F2[ p , q ↦ φ′ , ψ′ ] ⇒ ξ₀ F2[ p , q ↦ φ , ψ ] by weakening2 ass₀
       have Ξ₀ ⊢ ξ₀ F2[ p , q ↦ φ , ψ ]                            apply MP at here , back 1
       have Ξ₀ ⊢ (ξ₀ ⇒ ξ₁) F2[ p , q ↦ φ , ψ ]                     by Ass back 1
       have Ξ₀ ⊢ ξ₁ F2[ p , q ↦ φ , ψ ]                            apply MP at here , back 1
-      have Ξ₀ ⊢ ξ₁ F2[ p , q ↦ φ , ψ ] ⇒ ξ₁ F2[ p , q ↦ φ′ , ψ′ ] by mon2-⊢ ass₁
+      have Ξ₀ ⊢ ξ₁ F2[ p , q ↦ φ , ψ ] ⇒ ξ₁ F2[ p , q ↦ φ′ , ψ′ ] by weakening2 ass₁
       have Ξ₀ ⊢ ξ₁ F2[ p , q ↦ φ′ , ψ′ ]                          apply MP at here , back 1
       END
 
@@ -1188,7 +1188,7 @@ cong2-⇔ {Γ} {p} {q} {φ} {φ′} {ψ} {ψ′} ξ₀ ξ₁ ass₀ ass₁ ass�
     BEGIN
     have Ξ ⊢ (ξ₀ ⇔ ξ₁) F2[ p , q ↦ φ , ψ ]                                    by Ass here
     have Ξ ⊢ (ξ₀ ⇒ ξ₁) F2[ p , q ↦ φ , ψ ]                                    apply help0 at here
-    have Ξ ⊢ (ξ₀ ⇒ ξ₁) F2[ p , q ↦ φ , ψ ] ⇒ (ξ₀ ⇒ ξ₁) F2[ p , q ↦ φ′ , ψ′ ]  by mon-⊢ (cong2-⇒ ξ₀ ξ₁ ass₂ ass₁)
+    have Ξ ⊢ (ξ₀ ⇒ ξ₁) F2[ p , q ↦ φ , ψ ] ⇒ (ξ₀ ⇒ ξ₁) F2[ p , q ↦ φ′ , ψ′ ]  by weakening (cong2-⇒ ξ₀ ξ₁ ass₂ ass₁)
     have Ξ ⊢ (ξ₀ ⇒ ξ₁) F2[ p , q ↦ φ′ , ψ′ ]                                  apply MP at here , back 1
     END
 
@@ -1196,7 +1196,7 @@ cong2-⇔ {Γ} {p} {q} {φ} {φ′} {ψ} {ψ′} ξ₀ ξ₁ ass₀ ass₁ ass�
     BEGIN
     have Ξ ⊢ (ξ₀ ⇔ ξ₁) F2[ p , q ↦ φ , ψ ]                                    by Ass here
     have Ξ ⊢ (ξ₁ ⇒ ξ₀) F2[ p , q ↦ φ , ψ ]                                    apply help1 at here
-    have Ξ ⊢ (ξ₁ ⇒ ξ₀) F2[ p , q ↦ φ , ψ ] ⇒ (ξ₁ ⇒ ξ₀) F2[ p , q ↦ φ′ , ψ′ ]  by mon-⊢ (cong2-⇒ ξ₁ ξ₀ ass₃ ass₀)
+    have Ξ ⊢ (ξ₁ ⇒ ξ₀) F2[ p , q ↦ φ , ψ ] ⇒ (ξ₁ ⇒ ξ₀) F2[ p , q ↦ φ′ , ψ′ ]  by weakening (cong2-⇒ ξ₁ ξ₀ ass₃ ass₀)
     have Ξ ⊢ (ξ₁ ⇒ ξ₀) F2[ p , q ↦ φ′ , ψ′ ]                                  apply MP at here , back 1
     END
 
@@ -1484,12 +1484,12 @@ weak-completeness {φ} ⊨φ
 The following is the milestone of this chapter:
 
 ```
-strong-completeness :
+completeness :
   Δ ⊨ φ →
   -----
   Δ ⊢ φ
 
-strong-completeness {Δ} {φ} = begin→
+completeness {Δ} {φ} = begin→
   Δ ⊨ φ
     →⟨ longSemDT1 ⟩
   ε ⊨ Δ Imply φ
