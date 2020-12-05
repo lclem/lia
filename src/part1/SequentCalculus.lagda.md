@@ -553,7 +553,21 @@ SC→ND (∧-right {Γ} {Δ} {φ} {ψ} Γ⊢Δ·φ Γ⊢Δ·ψ)
     have Γ ⊢ND φ ∧ ψ ∨ (⋁ Ξ)                    apply case-split at here , back 2
     END
 
-SC→ND (∨-left Γ⊢Δ Γ⊢Δ₁) = {!   !}
+SC→ND (∨-left {Γ} {φ} {Δ} {ψ} Γ·φ⊢Δ Γ·ψ⊢Δ)
+    with SC→ND Γ·φ⊢Δ | SC→ND Γ·ψ⊢Δ
+... | Γ·φ⊢ND⋁Δ | Γ·ψ⊢ND⋁Δ =
+    BEGIN
+    have Γ · φ ⊢ND ⋁ Δ                  by Γ·φ⊢ND⋁Δ
+    have Γ · φ ⊆ Γ · φ ∨ ψ · φ          by (λ{ here → here; (there x) → there (there x)}) -- can this be automated?
+    have Γ · φ ∨ ψ · φ ⊢ND ⋁ Δ          apply weakening-ND at back 1 , here
+
+    have Γ · ψ ⊢ND ⋁ Δ                  by Γ·ψ⊢ND⋁Δ
+    have Γ · ψ ⊆ Γ · φ ∨ ψ · ψ          by (λ{ here → here; (there x) → there (there x)}) -- can this be automated?
+    have Γ · φ ∨ ψ · ψ ⊢ND ⋁ Δ          apply weakening-ND at back 1 , here
+
+    have Γ · φ ∨ ψ ⊢ND φ ∨ ψ            by Ass here
+    have Γ · φ ∨ ψ ⊢ND ⋁ Δ              apply ∨E at here , back 4 , back 1
+    END
 
 SC→ND (∨-right Γ⊢Δ) = {!   !}
 
