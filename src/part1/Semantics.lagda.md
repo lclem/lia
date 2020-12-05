@@ -1457,6 +1457,7 @@ then we can add `φ` to `Γ` and form the new context `Γ · φ`
 infixl 50 _·_  
 _·_ : Context → Formula → Context
 Γ · φ = φ ∷ Γ
+-- pattern _·_ Γ φ = φ ∷ Γ
 ```
 
 We say that a context `Γ` *entails* (or *logically implies*) a formula `ψ`

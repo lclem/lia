@@ -8,7 +8,7 @@ title: "Gentzen's natural deduction 🚧"
 open import part0.index
 
 module part1.NaturalDeduction (n' : ℕ) where
-open import part1.Hilbert n' renaming (_⊢_ to _⊢H_; soundness to soundness-H; completeness to completeness-H)
+open import part1.Hilbert n' public renaming (_⊢_ to _⊢H_; soundness to soundness-H; completeness to completeness-H)
 
 private
   variable
@@ -17,10 +17,11 @@ private
     Γ Δ : Context
 ```
 
-# Natural deduction proofs
+# Natural deduction
 
 ```
 infixr 5 _⊢_
+infix 12 Ass_
 data _⊢_ : Context → Formula → Set where
 
   Ass_ : φ ∈ Γ →
@@ -108,7 +109,7 @@ Theorem : Formula → Set
 Theorem φ = ∅ ⊢ φ
 ```
 
-## weakening-ND
+## Weakening
 
 ```
 weakening-ND :

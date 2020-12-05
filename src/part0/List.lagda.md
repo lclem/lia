@@ -1355,8 +1355,9 @@ a ∈1? b ∷ as with a ≡? b
 ... | no a≢b = there a≢b (∈→∈1 a∈as)
 ```
 
+# Permutations
+
 ```
--- move this to List
 data Perm {ℓ} {A : Set ℓ} : A * → A * → Set ℓ where
   stop : ∀ {as} → Perm as as
   skip : ∀ {a as bs} → Perm as bs → Perm (a ∷ as) (a ∷ bs)
