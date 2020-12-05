@@ -1582,6 +1582,18 @@ permOr {Γ} {Δ} (tran π ρ) ϱ
           permOr ρ ϱ = refl
 ```
 
+TODO: put it somewhere and turn it into an exercise:
+
+```
+semantics-⟺ :
+  Γ ⊨ φ →
+  φ ⟺ ψ →
+  --------
+  Γ ⊨ ψ
+
+semantics-⟺ Γ⊨φ φ⟺ψ ϱ all rewrite sym (φ⟺ψ ϱ) = Γ⊨φ ϱ all
+```
+
 ### Deduction theorem
 
 The semantic deduction theorem establishes a close connection between the implication connective !ref(Formula)(_⇒_),

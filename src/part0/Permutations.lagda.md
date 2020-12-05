@@ -44,4 +44,9 @@ perm-singleton (tran π ρ)
 ... | eq-π rewrite eq-π
   with perm-singleton ρ
 ... | eq-ρ = eq-ρ
+
+swap-deep : ∀ (as : A *) → Perm (as ++ a ∷ b ∷ bs) (as ++ b ∷ a ∷ bs)
+swap-deep ε = swap stop
+swap-deep (a ∷ as) = skip (swap-deep as)
+
 ```

@@ -216,7 +216,7 @@ _⊢SC_ = _⊢_
 -- elim-SC : 
 
 ND→SC : Γ ⊢ND φ →
-        ------------
+        -----------
         Γ ⊢SC [ φ ]
         
 ND→SC (Ass φ∈Γ) = Ax-left-SC φ∈Γ
@@ -400,6 +400,172 @@ ND→SC {Γ} {(φ ⇒ ψ) ∧ (ψ ⇒ φ)} (⇔E Γ⊢NDφ⇔ψ)
 
     have Γ ⊢ [ ((φ ⇒ ψ) ∧ (ψ ⇒ φ)) ]        apply ∧-right at back 6 , here
     END
+```
+
+We simulate sequent calculus with natural deduction.
+Since natural deduction takes a single formula on the right,
+we take the disjunction of all formulas of the right haalf of a sequent.
+
+```
+SC→ND : Γ ⊢SC Δ →
+        -----------
+        Γ ⊢ND ⋁ Δ
+
+SC→ND Ax = Ass here
+
+SC→ND (weakening-left Γ⊢Δ)
+    with SC→ND Γ⊢Δ
+... | Γ⊢NDΔ = weakening-ND Γ⊢NDΔ there
+
+SC→ND {Γ} {φ ∷ Δ} (weakening-right Γ⊢Δ)
+    with SC→ND Γ⊢Δ
+... | Γ⊢NDΔ
+    with Δ 
+... | ε = ⊥E Γ⊢NDΔ
+... | _ ∷ _ = ∨I-right Γ⊢NDΔ
+
+SC→ND (exchange-left {φ} {ψ} {Δ} {Ξ} Γ ΓφψΔ⊢Ξ)
+    with SC→ND ΓφψΔ⊢Ξ 
+... | ΓφψΔ⊢NDΞ = perm-ND-left (swap-deep Γ) ΓφψΔ⊢NDΞ
+
+SC→ND (exchange-right {Δ} {φ} {ψ} {Ξ} Γ Γ⊢ΔφψΞ)
+    with SC→ND Γ⊢ΔφψΞ
+... | Γ⊢NDΔφψΞ = perm-ND-right (swap-deep Δ) Γ⊢NDΔφψΞ
+
+SC→ND (contraction-left Γφφ⊢Δ)
+    with SC→ND Γφφ⊢Δ
+... | Γφφ⊢NDΔ = contraction-ND-left Γφφ⊢NDΔ
+
+SC→ND {Δ = φ ∷ Δ} (contraction-right Γ⊢Δφφ)
+    with SC→ND Γ⊢Δφφ
+... | Γ⊢NDΔφφ = contraction-ND-right Δ Γ⊢NDΔφφ
+
+SC→ND ⊥-left = Ass here
+
+SC→ND ⊤-right = ⊤I
+
+SC→ND (¬-left {Γ} {Δ} {φ} Γ⊢Δ·φ)
+    with SC→ND Γ⊢Δ·φ
+... | Γ⊢NDΔ∨φ
+    with Δ
+... | ε =
+    BEGIN
+    have Γ ⊢ND φ            by Γ⊢NDΔ∨φ
+    have Γ ⊆ Γ · ¬ φ        by there
+    have Γ · ¬ φ ⊢ND φ      apply weakening-ND at back 1 , here
+    have Γ · ¬ φ ⊢ND ¬ φ    by Ass here
+    have Γ · ¬ φ ⊢ND φ ⇒ ⊥  apply ¬E at here
+    have Γ · ¬ φ ⊢ND ⊥      apply ⇒E at here , back 2
+    END
+
+... | Ξ@(_ ∷ _) =
+    BEGIN
+    have Γ ⊢ND φ ∨ (⋁ Ξ)            by Γ⊢NDΔ∨φ
+    have Γ ⊆ Γ · ¬ φ                by there
+    have Γ · ¬ φ ⊢ND φ ∨ (⋁ Ξ)      apply weakening-ND at back 1 , here
+
+    have Γ · ¬ φ · φ ⊢ND φ          by Ass here
+    have Γ · ¬ φ · φ ⊢ND ¬ φ        by Ass back 1
+    have Γ · ¬ φ · φ ⊢ND φ ⇒ ⊥      apply ¬E at here
+    have Γ · ¬ φ · φ ⊢ND ⊥          apply ⇒E at here , back 2
+
+    have Γ · ¬ φ · φ ⊢ND ⋁ Ξ        apply ⊥E at here
+
+    have Γ · ¬ φ · (⋁ Ξ) ⊢ND ⋁ Ξ    by Ass here
+
+    have Γ · ¬ φ ⊢ND ⋁ Ξ            apply ∨E at back 6 , back 1 , here
+    END
+
+SC→ND (¬-right {Γ} {φ} {Δ} Γ·φ⊢Δ)
+    with SC→ND Γ·φ⊢Δ
+... | Γ·φ⊢ND⋁Δ
+    with Δ
+... | ε =
+    BEGIN
+    have Γ · φ ⊢ND ⊥    by Γ·φ⊢ND⋁Δ
+    have Γ ⊢ND φ ⇒ ⊥    apply ⇒I at here
+    have Γ ⊢ND ¬ φ      apply ¬I at here
+    END
+
+... | Ξ@(_ ∷ _) =
+    BEGIN
+    have Γ · φ ⊢ND ⋁ Ξ                      by Γ·φ⊢ND⋁Δ
+    have Γ · φ ⊢ND ¬ φ ∨ (⋁ Ξ)              apply ∨I-right at here
+    
+    have Γ · φ ⇒ ⊥ ⊢ND φ ⇒ ⊥                by Ass here 
+    have Γ · φ ⇒ ⊥ ⊢ND ¬ φ                  apply ¬I at here
+    have Γ · φ ⇒ ⊥ ⊢ND ¬ φ ∨ (⋁ Ξ)          apply ∨I-left at here
+    
+    have Γ ⊢ND ¬ φ ∨ (⋁ Ξ)                  apply case-split at back 3 , here 
+    END
+
+SC→ND (∧-left {Γ} {φ} {ψ} {Δ} Γφψ⊢Δ)
+    with SC→ND Γφψ⊢Δ
+... | Γφψ⊢ND⋁Δ =
+    BEGIN
+    have Γ · φ ∧ ψ ⊢ND φ ∧ ψ            by Ass here
+    have Γ · φ ∧ ψ ⊢ND φ                apply ∧E-left at here
+    have Γ · φ ∧ ψ ⊢ND ψ                apply ∧E-right at back 1
+
+    have Γ · φ · ψ ⊢ND ⋁ Δ              by Γφψ⊢ND⋁Δ
+    have Γ ⊢ND φ ⇒ ψ ⇒ (⋁ Δ)            apply DT2-ND ∘ DT2-ND at here
+    have Γ ⊆ Γ · φ ∧ ψ                  by there
+    have Γ · φ ∧ ψ ⊢ND φ ⇒ ψ ⇒ (⋁ Δ)    apply weakening-ND at back 1 , here
+    have Γ · φ ∧ ψ ⊢ND ψ ⇒ (⋁ Δ)        apply ⇒E at here , back 5
+    have Γ · φ ∧ ψ ⊢ND ⋁ Δ              apply ⇒E at here , back 5
+    END
+
+SC→ND (∧-right {Γ} {Δ} {φ} {ψ} Γ⊢Δ·φ Γ⊢Δ·ψ)
+    with SC→ND Γ⊢Δ·φ | SC→ND Γ⊢Δ·ψ
+... | Γ⊢ND⋁Δφ | Γ⊢ND⋁Δψ
+    with Δ
+... | ε =
+    BEGIN
+    have Γ ⊢ND φ            by Γ⊢ND⋁Δφ
+    have Γ ⊢ND ψ            by Γ⊢ND⋁Δψ
+    have Γ ⊢ND φ ∧ ψ        apply ∧I at back 1 , here
+    END
+
+... | Ξ@(_ ∷ _ ) =
+    BEGIN
+    have Γ ⊢ND φ ∨ (⋁ Ξ)                        by Γ⊢ND⋁Δφ
+    have Γ ⊆ Γ · (⋁ Ξ) ⇒ ⊥                      by there
+    have Γ · (⋁ Ξ) ⇒ ⊥ ⊢ND φ ∨ (⋁ Ξ)            apply weakening-ND at back 1 , here
+    have Γ · (⋁ Ξ) ⇒ ⊥ · φ ⊢ND φ                by Ass here
+    have Γ · (⋁ Ξ) ⇒ ⊥ · (⋁ Ξ) ⊢ND (⋁ Ξ) ⇒ ⊥    by Ass back 1
+    have Γ · (⋁ Ξ) ⇒ ⊥ · (⋁ Ξ) ⊢ND ⋁ Ξ          by Ass here
+    have Γ · (⋁ Ξ) ⇒ ⊥ · (⋁ Ξ) ⊢ND ⊥            apply ⇒E at back 1 , here
+    have Γ · (⋁ Ξ) ⇒ ⊥ · (⋁ Ξ) ⊢ND φ            apply ⊥E at here
+    have Γ · (⋁ Ξ) ⇒ ⊥ ⊢ND φ                    apply ∨E at back 5 , back 4 , here
+
+    have Γ ⊢ND ψ ∨ (⋁ Ξ)                        by Γ⊢ND⋁Δψ
+    have Γ · (⋁ Ξ) ⇒ ⊥ ⊢ND ψ ∨ (⋁ Ξ)            apply weakening-ND at here , back 8
+    have Γ · (⋁ Ξ) ⇒ ⊥ · ψ ⊢ND ψ                by Ass here
+    have Γ · (⋁ Ξ) ⇒ ⊥ · (⋁ Ξ) ⊢ND ψ            apply ⊥E at back 5
+    have Γ · (⋁ Ξ) ⇒ ⊥ ⊢ND ψ                    apply ∨E at back 2 , back 1 , here
+
+    have Γ · (⋁ Ξ) ⇒ ⊥ ⊢ND φ ∧ ψ                apply ∧I at back 5 , here
+    have Γ · (⋁ Ξ) ⇒ ⊥ ⊢ND φ ∧ ψ ∨ (⋁ Ξ)        apply ∨I-left at here
+
+    have Γ · (⋁ Ξ) ⊢ND ⋁ Ξ                      by Ass here
+    have Γ · (⋁ Ξ) ⊢ND φ ∧ ψ ∨ (⋁ Ξ)            apply ∨I-right at here
+
+    have Γ ⊢ND φ ∧ ψ ∨ (⋁ Ξ)                    apply case-split at here , back 2
+    END
+
+SC→ND (∨-left Γ⊢Δ Γ⊢Δ₁) = {!   !}
+
+SC→ND (∨-right Γ⊢Δ) = {!   !}
+
+SC→ND (⇒-left Γ⊢Δ Γ⊢Δ₁) = {!   !}
+
+SC→ND (⇒-right Γ⊢Δ) = {!   !}
+
+SC→ND (⇔-left Γ⊢Δ Γ⊢Δ₁) = {!   !}
+
+SC→ND (⇔-right Γ⊢Δ Γ⊢Δ₁) = {!   !}
+
+SC→ND (cut Γ⊢Δ Γ⊢Δ₁) = {!   !}
 ```
 
 ```

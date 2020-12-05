@@ -14,7 +14,7 @@ private
   variable
     p q r : PropName
     φ ψ θ ξ : Formula
-    Γ Δ : Context
+    Γ Δ Ξ : Context
 ```
 
 # Natural deduction
@@ -584,3 +584,79 @@ completeness :
 completeness Γ⊨φ = hilbert→ND (completeness-H Γ⊨φ)
 ```
 
+Invariance under context permutation.
+
+```
+perm-ND-left : Perm Γ Δ →
+          Γ ⊢ φ →
+          ----------------
+          Δ ⊢ φ
+
+perm-ND-left = {!   !}
+```
+
+Commutativity of disjunctions in the goal.
+We use a semantic proof via completeness.
+
+```
+perm-ND-right : Perm Δ Ξ →
+                Γ ⊢ ⋁ Δ →
+                ----------
+                Γ ⊢ ⋁ Ξ
+
+-- does not seem to go through by induction on permutations
+-- (classical logic does not satisfy the disjunction property)
+-- perm-ND-right {ε} {Ξ} π Γ⊢⋁Δ = ⊥E Γ⊢⋁Δ
+-- perm-ND-right {φ ∷ ε} {Ξ} π Γ⊢⋁Δ rewrite perm-singleton π = Γ⊢⋁Δ
+-- perm-ND-right {φ ∷ Δ@(_ ∷ _)} {φ ∷ _ ∷ _} stop Γ⊢⋁Δ = Γ⊢⋁Δ
+-- perm-ND-right {φ ∷ Δ@(ψ ∷ Δ′)} {φ ∷ Ξ} (skip π) Γ⊢⋁φ∷Δ
+--   with perm-ND-right π {!   !} -- Γ⊢⋁Δ
+-- ... | Γ⊢⋁Ξ = {!   !}
+-- perm-ND-right {φ ∷ Δ@(_ ∷ _)} {.(_ ∷ φ ∷ _)} (swap π) Γ⊢⋁Δ = {!   !}
+-- perm-ND-right {φ ∷ Δ@(_ ∷ _)} {Ξ} (tran π π₁) Γ⊢⋁Δ = {!   !}
+perm-ND-right {Δ} {Ξ} {Γ} π Γ⊢⋁Δ =
+  BEGIN
+  have Γ ⊨ ⋁ Δ        by soundness Γ⊢⋁Δ
+  have ⋁ Δ ⟺ ⋁ Ξ    by permOr π
+  have Γ ⊨ ⋁ Ξ        apply semantics-⟺ {Γ} {⋁ Δ} {⋁ Ξ} at back 1 , here
+  have Γ ⊢ ⋁ Ξ        apply completeness at here
+  END
+```
+
+```
+contraction-ND-left : Γ · φ · φ ⊢ ψ →
+                      ----------------
+                      Γ · φ ⊢ ψ
+
+contraction-ND-left = {!   !}
+
+contraction-ND-right : ∀ Δ →
+                      Γ ⊢ ⋁ (Δ · φ · φ) →
+                      --------------------
+                      Γ ⊢ ⋁ (Δ · φ)
+
+contraction-ND-right = {!   !}
+```
+
+Reasoning by case split:
+
+```
+case-split :
+  Γ · φ ⊢ ψ →
+  Γ · φ ⇒ ⊥ ⊢ ψ →
+  ----------------
+  Γ ⊢ ψ
+
+case-split {Γ} {φ} {ψ} Γ·φ⊢ψ Γ·φ⇒⊥⊢ψ = 
+  BEGIN
+  have Γ · φ ⊢ ψ                          by Γ·φ⊢ψ
+  have Γ ⊢ φ ⇒ ψ                          apply ⇒I at here
+
+  have Γ · φ ⇒ ⊥ ⊢ ψ                      by Γ·φ⇒⊥⊢ψ
+  have Γ ⊢ (φ ⇒ ⊥) ⇒ ψ                    apply ⇒I at here
+
+  have Γ ⊢ (φ ⇒ ψ) ⇒ ((φ ⇒ ⊥) ⇒ ψ) ⇒ ψ    by hilbert→ND B3
+  have Γ ⊢ ((φ ⇒ ⊥) ⇒ ψ) ⇒ ψ              apply ⇒E at here , back 3
+  have Γ ⊢ ψ                              apply ⇒E at here , back 2
+  END
+```
