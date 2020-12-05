@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Permutationss 🚧 | Logic in Agda</title><!-- Begin Jekyll SEO tag v2.6.1 -->
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Permutationss 🚧" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Propositional and fist-order logic developed with the proof assistant Agda." />
+<meta property="og:description" content="Propositional and fist-order logic developed with the proof assistant Agda." />
+<link rel="canonical" href="/lia/part0/Permutations/" />
+<meta property="og:url" content="/lia/part0/Permutations/" />
+<meta property="og:site_name" content="Logic in Agda" />
+<script type="application/ld+json">
+{"url":"/lia/part0/Permutations/","headline":"Permutationss 🚧","description":"Propositional and fist-order logic developed with the proof assistant Agda.","@type":"WebPage","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/lia/assets/main.css">
+  <!-- <link rel="stylesheet" href="/lia/assets/custom.css"> --><!-- Mathjax Support -->
+  <script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+  <!-- Load KaTeX -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1.1/katex.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1.1/katex.min.js"></script>
+</head>
+<body><header class="site-header" role="banner">
+
+    <div class="wrapper">
+
+        <a class="site-title" href="/lia/">Logic in Agda</a>
+
+        <nav class="site-nav">
+            <span class="menu-icon">
+                <svg viewBox="0 0 18 15" width="18px" height="15px">
+                    <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+                    <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+                    <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+                </svg>
+            </span>
+
+            <div class="trigger">
+                <a class="page-link" href="/lia/part0/index/">Part 0</a>
+                <a class="page-link" href="/lia/part1/index/">Part 1</a>
+                <a class="page-link" href="/lia/part2/index/">Part 2</a>
+                <a class="page-link" href="/lia/part3/index/">Part 3</a>
+                <a class="page-link" href="/lia/part4/index/">Part 4</a>
+            </div>
+        </nav>
+
+    </div>
+
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post">
+
+    <header class="post-header">
+        <h1 class="post-title">Permutationss 🚧</h1>
+    </header>
+  
+    <p style="text-align:center;">
+    
+    
+    
+    <a alt="Part" href="/lia/part0/index/">Part</a>
+    &bullet;
+    
+    
+    <a alt="Source code" href="https://github.com/lclem/lia/blob/main/src/part0/Permutations.lagda.md">Source</a>
+    
+    
+    
+</p>
+
+  
+    <div class="post-content">
+        <h2>Contents</h2>    
+        <ul class="section-nav">
+<li class="toc-entry toc-h1"><a href="#references">References</a></li>
+<li class="toc-entry toc-h1"><a href="#solutions">Solutions</a></li>
+</ul><pre class="Agda"><a id="39" class="Symbol">{-#</a> <a id="43" class="Keyword">OPTIONS</a> <a id="51" class="Pragma">--allow-unsolved-metas</a> <a id="74" class="Symbol">#-}</a>
+
+<a id="79" class="Keyword">module</a> <a id="86" href="/lia/part0/Permutations/" class="Module">part0.Permutations</a> <a id="105" class="Keyword">where</a>
+<a id="111" class="Keyword">open</a> <a id="116" class="Keyword">import</a> <a id="123" href="/lia/part0/List/" class="Module">part0.List</a> <a id="134" class="Keyword">public</a>
+
+<a id="142" class="Keyword">private</a>
+  <a id="152" class="Keyword">variable</a>
+    <a id="165" href="/lia/part0/Permutations/#165" class="Generalizable">ℓ</a> <a id="167" class="Symbol">:</a> <a id="169" href="Agda.Primitive.html#423" class="Postulate">Level</a>
+    <a id="179" href="/lia/part0/Permutations/#179" class="Generalizable">A</a> <a id="181" class="Symbol">:</a> <a id="183" class="PrimitiveType">Set</a> <a id="187" href="/lia/part0/Permutations/#165" class="Generalizable">ℓ</a>
+    <a id="193" href="/lia/part0/Permutations/#193" class="Generalizable">a</a> <a id="195" href="/lia/part0/Permutations/#195" class="Generalizable">b</a> <a id="197" class="Symbol">:</a> <a id="199" href="/lia/part0/Permutations/#179" class="Generalizable">A</a>
+    <a id="205" href="/lia/part0/Permutations/#205" class="Generalizable">as</a> <a id="208" href="/lia/part0/Permutations/#208" class="Generalizable">bs</a> <a id="211" href="/lia/part0/Permutations/#211" class="Generalizable">cs</a> <a id="214" class="Symbol">:</a> <a id="216" href="/lia/part0/Permutations/#179" class="Generalizable">A</a> <a id="218" href="/lia/part0/List/#450" class="Datatype Operator">*</a>
+
+
+<a id="222" class="Keyword">data</a> <a id="Perm"></a><a id="227" href="/lia/part0/Permutations/#227" class="Datatype">Perm</a> <a id="232" class="Symbol">{</a><a id="233" href="/lia/part0/Permutations/#233" class="Bound">ℓ</a><a id="234" class="Symbol">}</a> <a id="236" class="Symbol">{</a><a id="237" href="/lia/part0/Permutations/#237" class="Bound">A</a> <a id="239" class="Symbol">:</a> <a id="241" class="PrimitiveType">Set</a> <a id="245" href="/lia/part0/Permutations/#233" class="Bound">ℓ</a><a id="246" class="Symbol">}</a> <a id="248" class="Symbol">:</a> <a id="250" href="/lia/part0/Permutations/#237" class="Bound">A</a> <a id="252" href="/lia/part0/List/#450" class="Datatype Operator">*</a> <a id="254" class="Symbol">→</a> <a id="256" href="/lia/part0/Permutations/#237" class="Bound">A</a> <a id="258" href="/lia/part0/List/#450" class="Datatype Operator">*</a> <a id="260" class="Symbol">→</a> <a id="262" class="PrimitiveType">Set</a> <a id="266" href="/lia/part0/Permutations/#233" class="Bound">ℓ</a> <a id="268" class="Keyword">where</a>
+  <a id="Perm.stop"></a><a id="276" href="/lia/part0/Permutations/#276" class="InductiveConstructor">stop</a> <a id="281" class="Symbol">:</a> <a id="283" href="/lia/part0/Permutations/#227" class="Datatype">Perm</a> <a id="288" href="/lia/part0/Permutations/#205" class="Generalizable">as</a> <a id="291" href="/lia/part0/Permutations/#205" class="Generalizable">as</a>
+  <a id="Perm.skip"></a><a id="296" href="/lia/part0/Permutations/#296" class="InductiveConstructor">skip</a> <a id="301" class="Symbol">:</a> <a id="303" href="/lia/part0/Permutations/#227" class="Datatype">Perm</a> <a id="308" href="/lia/part0/Permutations/#205" class="Generalizable">as</a> <a id="311" href="/lia/part0/Permutations/#208" class="Generalizable">bs</a> <a id="314" class="Symbol">→</a> <a id="316" href="/lia/part0/Permutations/#227" class="Datatype">Perm</a> <a id="321" class="Symbol">(</a><a id="322" href="/lia/part0/Permutations/#193" class="Generalizable">a</a> <a id="324" href="/lia/part0/List/#499" class="InductiveConstructor Operator">∷</a> <a id="326" href="/lia/part0/Permutations/#205" class="Generalizable">as</a><a id="328" class="Symbol">)</a> <a id="330" class="Symbol">(</a><a id="331" href="/lia/part0/Permutations/#193" class="Generalizable">a</a> <a id="333" href="/lia/part0/List/#499" class="InductiveConstructor Operator">∷</a> <a id="335" href="/lia/part0/Permutations/#208" class="Generalizable">bs</a><a id="337" class="Symbol">)</a>
+  <a id="Perm.swap"></a><a id="341" href="/lia/part0/Permutations/#341" class="InductiveConstructor">swap</a> <a id="346" class="Symbol">:</a> <a id="348" href="/lia/part0/Permutations/#227" class="Datatype">Perm</a> <a id="353" href="/lia/part0/Permutations/#205" class="Generalizable">as</a> <a id="356" href="/lia/part0/Permutations/#208" class="Generalizable">bs</a> <a id="359" class="Symbol">→</a> <a id="361" href="/lia/part0/Permutations/#227" class="Datatype">Perm</a> <a id="366" class="Symbol">(</a><a id="367" href="/lia/part0/Permutations/#193" class="Generalizable">a</a> <a id="369" href="/lia/part0/List/#499" class="InductiveConstructor Operator">∷</a> <a id="371" href="/lia/part0/Permutations/#195" class="Generalizable">b</a> <a id="373" href="/lia/part0/List/#499" class="InductiveConstructor Operator">∷</a> <a id="375" href="/lia/part0/Permutations/#205" class="Generalizable">as</a><a id="377" class="Symbol">)</a> <a id="379" class="Symbol">(</a><a id="380" href="/lia/part0/Permutations/#195" class="Generalizable">b</a> <a id="382" href="/lia/part0/List/#499" class="InductiveConstructor Operator">∷</a> <a id="384" href="/lia/part0/Permutations/#193" class="Generalizable">a</a> <a id="386" href="/lia/part0/List/#499" class="InductiveConstructor Operator">∷</a> <a id="388" href="/lia/part0/Permutations/#208" class="Generalizable">bs</a><a id="390" class="Symbol">)</a>
+  <a id="Perm.tran"></a><a id="394" href="/lia/part0/Permutations/#394" class="InductiveConstructor">tran</a> <a id="399" class="Symbol">:</a> <a id="401" href="/lia/part0/Permutations/#227" class="Datatype">Perm</a> <a id="406" href="/lia/part0/Permutations/#205" class="Generalizable">as</a> <a id="409" href="/lia/part0/Permutations/#208" class="Generalizable">bs</a> <a id="412" class="Symbol">→</a> <a id="414" href="/lia/part0/Permutations/#227" class="Datatype">Perm</a> <a id="419" href="/lia/part0/Permutations/#208" class="Generalizable">bs</a> <a id="422" href="/lia/part0/Permutations/#211" class="Generalizable">cs</a> <a id="425" class="Symbol">→</a> <a id="427" href="/lia/part0/Permutations/#227" class="Datatype">Perm</a> <a id="432" href="/lia/part0/Permutations/#205" class="Generalizable">as</a> <a id="435" href="/lia/part0/Permutations/#211" class="Generalizable">cs</a>
+
+<a id="439" class="Comment">-- _∼_ : ∀ {ℓ} {A : Set ℓ} → A * → A * → Set ℓ</a>
+<a id="486" class="Comment">-- as ∼ bs = Perm as bs</a>
+
+<a id="sym-perm"></a><a id="511" href="/lia/part0/Permutations/#511" class="Function">sym-perm</a> <a id="520" class="Symbol">:</a> <a id="522" href="/lia/part0/Permutations/#227" class="Datatype">Perm</a> <a id="527" href="/lia/part0/Permutations/#205" class="Generalizable">as</a> <a id="530" href="/lia/part0/Permutations/#208" class="Generalizable">bs</a> <a id="533" class="Symbol">→</a> <a id="535" href="/lia/part0/Permutations/#227" class="Datatype">Perm</a> <a id="540" href="/lia/part0/Permutations/#208" class="Generalizable">bs</a> <a id="543" href="/lia/part0/Permutations/#205" class="Generalizable">as</a>
+<a id="546" href="/lia/part0/Permutations/#511" class="Function">sym-perm</a> <a id="555" href="/lia/part0/Permutations/#555" class="Bound">perm</a> <a id="560" class="Symbol">=</a> <a id="562" class="Symbol">{!!}</a>
+
+<a id="perm-ε"></a><a id="568" href="/lia/part0/Permutations/#568" class="Function">perm-ε</a> <a id="575" class="Symbol">:</a> <a id="577" href="/lia/part0/Permutations/#227" class="Datatype">Perm</a> <a id="582" href="/lia/part0/List/#487" class="InductiveConstructor">ε</a> <a id="584" href="/lia/part0/Permutations/#205" class="Generalizable">as</a> <a id="587" class="Symbol">→</a> <a id="589" href="/lia/part0/Permutations/#205" class="Generalizable">as</a> <a id="592" href="/lia/part0/Equality/#214" class="Datatype Operator">≡</a> <a id="594" href="/lia/part0/List/#487" class="InductiveConstructor">ε</a>
+<a id="596" href="/lia/part0/Permutations/#568" class="Function">perm-ε</a> <a id="603" href="/lia/part0/Permutations/#276" class="InductiveConstructor">stop</a> <a id="608" class="Symbol">=</a> <a id="610" href="/lia/part0/Equality/#262" class="InductiveConstructor">refl</a>
+<a id="615" href="/lia/part0/Permutations/#568" class="Function">perm-ε</a> <a id="622" class="Symbol">(</a><a id="623" href="/lia/part0/Permutations/#394" class="InductiveConstructor">tran</a> <a id="628" href="/lia/part0/Permutations/#628" class="Bound">π</a> <a id="630" href="/lia/part0/Permutations/#630" class="Bound">ρ</a><a id="631" class="Symbol">)</a>
+  <a id="635" class="Keyword">with</a> <a id="640" href="/lia/part0/Permutations/#568" class="Function">perm-ε</a> <a id="647" href="/lia/part0/Permutations/#628" class="Bound">π</a>
+<a id="649" class="Symbol">...</a> <a id="653" class="Symbol">|</a> <a id="655" href="/lia/part0/Permutations/#655" class="Bound">eq-π</a> <a id="660" class="Keyword">rewrite</a> <a id="668" href="/lia/part0/Permutations/#655" class="Bound">eq-π</a>
+  <a id="675" class="Keyword">with</a> <a id="680" href="/lia/part0/Permutations/#568" class="Function">perm-ε</a> <a id="687" class="Bound">ρ</a>
+<a id="689" class="Symbol">...</a> <a id="693" class="Symbol">|</a> <a id="695" href="/lia/part0/Permutations/#695" class="Bound">eq-ρ</a> <a id="700" class="Symbol">=</a> <a id="702" href="/lia/part0/Permutations/#695" class="Bound">eq-ρ</a>
+
+<a id="perm-singleton"></a><a id="708" href="/lia/part0/Permutations/#708" class="Function">perm-singleton</a> <a id="723" class="Symbol">:</a> <a id="725" href="/lia/part0/Permutations/#227" class="Datatype">Perm</a> <a id="730" class="Symbol">(</a><a id="731" href="/lia/part0/List/#1774" class="Function">[</a> <a id="733" href="/lia/part0/Permutations/#193" class="Generalizable">a</a> <a id="735" href="/lia/part0/List/#2025" class="Function Operator">]</a><a id="736" class="Symbol">)</a> <a id="738" href="/lia/part0/Permutations/#208" class="Generalizable">bs</a> <a id="741" class="Symbol">→</a> <a id="743" href="/lia/part0/Permutations/#208" class="Generalizable">bs</a> <a id="746" href="/lia/part0/Equality/#214" class="Datatype Operator">≡</a> <a id="748" href="/lia/part0/List/#1774" class="Function">[</a> <a id="750" href="/lia/part0/Permutations/#193" class="Generalizable">a</a> <a id="752" href="/lia/part0/List/#2025" class="Function Operator">]</a>
+<a id="754" href="/lia/part0/Permutations/#708" class="Function">perm-singleton</a> <a id="769" href="/lia/part0/Permutations/#276" class="InductiveConstructor">stop</a> <a id="774" class="Symbol">=</a> <a id="776" href="/lia/part0/Equality/#262" class="InductiveConstructor">refl</a>
+<a id="781" href="/lia/part0/Permutations/#708" class="Function">perm-singleton</a> <a id="796" class="Symbol">(</a><a id="797" href="/lia/part0/Permutations/#296" class="InductiveConstructor">skip</a> <a id="802" href="/lia/part0/Permutations/#802" class="Bound">π</a><a id="803" class="Symbol">)</a> <a id="805" class="Keyword">rewrite</a> <a id="813" href="/lia/part0/Permutations/#568" class="Function">perm-ε</a> <a id="820" href="/lia/part0/Permutations/#802" class="Bound">π</a> <a id="822" class="Symbol">=</a> <a id="824" href="/lia/part0/Equality/#262" class="InductiveConstructor">refl</a>
+<a id="829" href="/lia/part0/Permutations/#708" class="Function">perm-singleton</a> <a id="844" class="Symbol">(</a><a id="845" href="/lia/part0/Permutations/#394" class="InductiveConstructor">tran</a> <a id="850" href="/lia/part0/Permutations/#850" class="Bound">π</a> <a id="852" href="/lia/part0/Permutations/#852" class="Bound">ρ</a><a id="853" class="Symbol">)</a>
+  <a id="857" class="Keyword">with</a> <a id="862" href="/lia/part0/Permutations/#708" class="Function">perm-singleton</a> <a id="877" href="/lia/part0/Permutations/#850" class="Bound">π</a>
+<a id="879" class="Symbol">...</a> <a id="883" class="Symbol">|</a> <a id="885" href="/lia/part0/Permutations/#885" class="Bound">eq-π</a> <a id="890" class="Keyword">rewrite</a> <a id="898" href="/lia/part0/Permutations/#885" class="Bound">eq-π</a>
+  <a id="905" class="Keyword">with</a> <a id="910" href="/lia/part0/Permutations/#708" class="Function">perm-singleton</a> <a id="925" class="Bound">ρ</a>
+<a id="927" class="Symbol">...</a> <a id="931" class="Symbol">|</a> <a id="933" href="/lia/part0/Permutations/#933" class="Bound">eq-ρ</a> <a id="938" class="Symbol">=</a> <a id="940" href="/lia/part0/Permutations/#933" class="Bound">eq-ρ</a></pre>
+
+<div id="refs">
+
+  <h1 id="references">
+<a class="anchor" href="#references" aria-hidden="true"><span class="octicon octicon-link"></span></a>References</h1>
+
+</div>
+
+<h1 id="solutions">
+<a class="anchor" href="#solutions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Solutions</h1>
+
+<p>!solutions</p>
+
+<hr>
+
+    </div>
+  
+    <p style="text-align:center;">
+    
+    
+    
+    <a alt="Part" href="/lia/part0/index/">Part</a>
+    &bullet;
+    
+    
+    <a alt="Source code" href="https://github.com/lclem/lia/blob/main/src/part0/Permutations.lagda.md">Source</a>
+    
+    
+    
+</p>
+
+    <p class="p-name"> Last-modified: Dec  5 14:58:56 2020 </p>
+  </article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/lia/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Logic in Agda</h2><div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Lorenzo Clemente</li>
+          <li><a class="u-email" href="mailto:clementelorenzo@gmail.com">clementelorenzo@gmail.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/lclem"><svg class="svg-icon"><use xlink:href="/lia/assets/minima-social-icons.svg#github"></use></svg> <span class="username">lclem</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3"></div>
+    </div>This work is licensed under a <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>
+  </div>
+</footer>
+
+<!-- Parse the Latex divs with Katex
+<script type="text/javascript">
+  $("script[type='math/tex']").replaceWith(
+    function(){
+      var tex = $(this).text();
+      return katex.renderToString(tex, {displayMode: false});
+  });
+  
+  $("script[type='math/tex; mode=display']").replaceWith(
+    function(){
+      var tex = $(this).text();
+      return katex.renderToString(tex.replace(/%.*/g, ''), {displayMode: true});
+  });
+</script>
+-->
+
+<script type="text/javascript" src="/lia/assets/hidebox.js"></script>
+</body>
+
+</html>
