@@ -848,7 +848,7 @@ and that they are *logically equivalent*, written `φ ⟺ ψ`,
 if they satisfy the same valuations:
 
 ```
-infix 9 _⇛_ _⟺_
+infix 8 _⇛_ _⟺_
 
 _⇛_ : Formula → Formula → Set
 φ ⇛ ψ = ∀[ ϱ ] (⟦ φ ⟧ ϱ ≡ tt → ⟦ ψ ⟧ ϱ ≡ tt)
@@ -1467,7 +1467,7 @@ if every valuation that satisfies every formula in `Γ`
 satisfies `ψ` as well:
 
 ```
-infix 9 _⊨_
+infix 8 _⊨_
 _⊨_ : Context → Formula → Set
 Γ ⊨ ψ = ∀ ϱ → All (λ φ → ⟦ φ ⟧ ϱ ≡ tt) Γ → ⟦ ψ ⟧ ϱ ≡ tt
 ```
@@ -1512,7 +1512,7 @@ perm-sat {Γ} {Δ} (tran {bs = Ξ} perm1 perm2) AllΓ
   with perm-sat perm1 AllΓ
 ... | AllΞ = perm-sat perm2 AllΞ
                             
-perm-⊨ φ perm Γ⊨φ ϱ AllΔ = Γ⊨φ ϱ (perm-sat (perm-sym perm) AllΔ)
+perm-⊨ φ perm Γ⊨φ ϱ AllΔ = Γ⊨φ ϱ (perm-sat (sym-perm perm) AllΔ)
 ```
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -1546,6 +1546,41 @@ context1 {Γ} φ Γ⊨φ ϱ ⟦⋀Γ⟧ϱ≡tt = Γ⊨φ ϱ (conjProp1 Γ ϱ ⟦
 context2 Γ {φ} ⋀Γ⇛φ ϱ AllΓ = ⋀Γ⇛φ ϱ (conjProp2 Γ ϱ AllΓ)
 ```
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+TODO: arrange.
+
+```
+permOr : Perm Γ Δ →
+         ----------
+         ⋁ Γ ⟺ ⋁ Δ
+
+permOr {ε} π ϱ rewrite perm-ε π = refl
+
+permOr {φ ∷ ε} π ϱ rewrite perm-singleton π = refl
+
+permOr {φ ∷ Γ@(_ ∷ _)} stop ϱ = refl
+
+permOr {φ ∷ Γ@(_ ∷ _)} {φ ∷ ε} (skip π) ϱ
+  rewrite perm-ε (sym-perm π) = refl
+permOr {φ ∷ Γ@(_ ∷ _)} {φ ∷ Δ@(_ ∷ _)} (skip π) ϱ
+  rewrite permOr π ϱ = refl
+
+permOr {φ ∷ ψ ∷ ε} {ψ ∷ φ ∷ ε} (swap π) ϱ
+  rewrite permOr π ϱ | commOr φ ψ ϱ = refl
+permOr {φ ∷ ψ ∷ ε} {ψ ∷ φ ∷ Δ@(_ ∷ _)} (swap π) ϱ
+  rewrite perm-ε π | permOr π ϱ | commOr φ ψ ϱ = refl
+permOr {φ ∷ ψ ∷ _ ∷ _} {ψ ∷ φ ∷ ε} (swap π) ϱ
+  rewrite perm-ε (sym-perm π) | permOr π ϱ | commOr φ ψ ϱ = refl
+permOr {φ ∷ ψ ∷ Γ@(_ ∷ _)} {ψ ∷ φ ∷ Δ@(_ ∷ _)} (swap π) ϱ
+  rewrite sym (assocOr φ ψ (⋁ Γ) ϱ) |
+          sym (assocOr ψ φ (⋁ Δ) ϱ) |
+          commOr φ ψ ϱ |
+          permOr π ϱ = refl
+
+permOr {Γ} {Δ} (tran π ρ) ϱ
+  rewrite permOr π ϱ |
+          permOr ρ ϱ = refl
+```
 
 ### Deduction theorem
 

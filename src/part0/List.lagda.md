@@ -1354,19 +1354,3 @@ a ∈1? b ∷ as with a ≡? b
 ... | yes refl = here
 ... | no a≢b = there a≢b (∈→∈1 a∈as)
 ```
-
-# Permutations
-
-```
-data Perm {ℓ} {A : Set ℓ} : A * → A * → Set ℓ where
-  stop : ∀ {as} → Perm as as
-  skip : ∀ {a as bs} → Perm as bs → Perm (a ∷ as) (a ∷ bs)
-  swap : ∀ {a b as bs} → Perm as bs → Perm (a ∷ b ∷ as) (b ∷ a ∷ bs)
-  tran : ∀ {as bs cs} → Perm as bs → Perm bs cs → Perm as cs
-
--- _∼_ : ∀ {ℓ} {A : Set ℓ} → A * → A * → Set ℓ
--- as ∼ bs = Perm as bs
-
-perm-sym : ∀ {ℓ} {A : Set ℓ} {as bs : A *} → Perm as bs → Perm bs as
-perm-sym perm = {!!}
-```

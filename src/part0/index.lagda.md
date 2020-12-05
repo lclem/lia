@@ -10,6 +10,7 @@ open import part0.Logic public
 open import part0.Decidable public
 open import part0.Booleans public
 open import part0.List public
+open import part0.Permutations public
 open import part0.TList public
 open import part0.Finite public
 open import part0.Enumerable public
