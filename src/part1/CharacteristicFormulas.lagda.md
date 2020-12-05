@@ -386,7 +386,8 @@ Formula[⊥,⊤,¬,∨,∧]-⋀-closed (φ ∷ φs@(_ ∷ _)) all
 
 Formula[⊥,⊤,¬,∨,∧]-⋁-closed : ∀ φs → All Formula[⊥,⊤,¬,∨,∧] φs → Formula[⊥,⊤,¬,∨,∧] (⋁ φs)
 Formula[⊥,⊤,¬,∨,∧]-⋁-closed ε all = ⊥
-Formula[⊥,⊤,¬,∨,∧]-⋁-closed (φ ∷ φs) all
+Formula[⊥,⊤,¬,∨,∧]-⋁-closed (φ ∷ ε) all = all here
+Formula[⊥,⊤,¬,∨,∧]-⋁-closed (φ ∷ φs@(_ ∷ _)) all
   with Formula[⊥,⊤,¬,∨,∧]-⋁-closed φs (λ φ∈φs → all (there φ∈φs))
 ... | ind = all here ∨ ind
 ```
@@ -857,7 +858,8 @@ Formula[⊥,⊤,∨,∧]-⋀-closed (φ ∷ φs@(_ ∷ _)) all
 ... | ind = all here ∧ ind
 
 Formula[⊥,⊤,∨,∧]-⋁-closed ε all = ⊥
-Formula[⊥,⊤,∨,∧]-⋁-closed (φ ∷ φs) all
+Formula[⊥,⊤,∨,∧]-⋁-closed (φ ∷ ε) all = all here
+Formula[⊥,⊤,∨,∧]-⋁-closed (φ ∷ φs@(_ ∷ _)) all
   with Formula[⊥,⊤,∨,∧]-⋁-closed φs (λ φ∈φs → all (there φ∈φs))
 ... | ind = all here ∨ ind
 ```

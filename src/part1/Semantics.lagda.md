@@ -1398,7 +1398,7 @@ The corresponding two defining properties are dual to those of long conjunctions
 ```
 infix 9 ⋁_
 ⋁_ : Formula * → Formula
-⋁ φs = foldr _∨_ ⊥ φs
+⋁ φs = foldr1 _∨_ ⊥ φs
 
 disjProp-tt : ∀ φs ϱ φ →
   φ ∈ φs →
@@ -1419,13 +1419,15 @@ Prove the two defining properties !ref(disjProp-tt) and !ref(disjProp-ff) above.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
-disjProp-tt (φ ∷ _) ϱ φ here ⟦φ⟧ϱ≡tt rewrite ⟦φ⟧ϱ≡tt = refl
-disjProp-tt (ψ ∷ _) ϱ φ (there φ∈φs) ⟦φ⟧ϱ≡tt
+disjProp-tt (φ ∷ ε) ϱ φ here ⟦φ⟧ϱ≡tt rewrite ⟦φ⟧ϱ≡tt = refl
+disjProp-tt (φ ∷ _ ∷ _) ϱ φ here ⟦φ⟧ϱ≡tt rewrite ⟦φ⟧ϱ≡tt = refl
+disjProp-tt (ψ ∷ _ ∷ _) ϱ φ (there φ∈φs) ⟦φ⟧ϱ≡tt
   with disjProp-tt _ ϱ φ φ∈φs ⟦φ⟧ϱ≡tt
 ... | ind = 𝔹disjProp2 (⟦ ψ ⟧ ϱ) _ ind
 
 disjProp-ff ε ϱ ass = refl
-disjProp-ff (φ ∷ φs) ϱ ass
+disjProp-ff (φ ∷ ε) ϱ ass = ass here
+disjProp-ff (φ ∷ φs@(_ ∷ _)) ϱ ass
   with disjProp-ff φs ϱ λ ψ∈φs → ass (there ψ∈φs)
 ... | ind = 𝔹disjProp3 _ _ (ass here) ind
 ```
