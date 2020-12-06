@@ -14,7 +14,7 @@ private
   variable
     p q r : PropName
     φ ψ θ ξ : Formula
-    Γ Δ Ξ : Context
+    Γ Δ Ψ Ξ : Context
 ```
 
 # Natural deduction
@@ -284,8 +284,6 @@ More examples...
 
 Useful examples:
 
-
-
 ```
 A1-ND : Γ ⊢ φ ⇒ ψ ⇒ φ
 A1-ND {Γ} {φ} {ψ} =
@@ -528,12 +526,12 @@ ND→hilbert {Γ} {(φ ⇒ ψ) ∧ (ψ ⇒ φ)} (⇔E Γ⊢NDφ⇔ψ)
 ```
 
 ```
-soundness : 
+soundness-ND : 
   Γ ⊢ND φ →
   -----
   Γ ⊨ φ
 
-soundness Γ⊢NDφ = soundness-H (ND→hilbert Γ⊢NDφ)
+soundness-ND Γ⊢NDφ = soundness-H (ND→hilbert Γ⊢NDφ)
 ```
 
 Notice how:
@@ -576,12 +574,12 @@ The application of modus ponens is simulated by the `⇒`-elimination rule !ref(
 We obtain completeness for natural deduction thanks to completness of the Hilbert-style proof system and the fact that natural deduction simulates it:
 
 ```
-completeness : 
+completeness-ND : 
   Γ ⊨ φ →
   -----
   Γ ⊢ND φ
 
-completeness Γ⊨φ = hilbert→ND (completeness-H Γ⊨φ)
+completeness-ND Γ⊨φ = hilbert→ND (completeness-H Γ⊨φ)
 ```
 
 Invariance under context permutation.
@@ -616,10 +614,10 @@ perm-ND-right : Perm Δ Ξ →
 -- perm-ND-right {φ ∷ Δ@(_ ∷ _)} {Ξ} (tran π π₁) Γ⊢⋁Δ = {!   !}
 perm-ND-right {Δ} {Ξ} {Γ} π Γ⊢⋁Δ =
   BEGIN
-  have Γ ⊨ ⋁ Δ        by soundness Γ⊢⋁Δ
+  have Γ ⊨ ⋁ Δ        by soundness-ND Γ⊢⋁Δ
   have ⋁ Δ ⟺ ⋁ Ξ    by permOr π
   have Γ ⊨ ⋁ Ξ        apply semantics-⟺ {Γ} {⋁ Δ} {⋁ Ξ} at back 1 , here
-  have Γ ⊢ ⋁ Ξ        apply completeness at here
+  have Γ ⊢ ⋁ Ξ        apply completeness-ND at here
   END
 ```
 
@@ -659,4 +657,324 @@ case-split {Γ} {φ} {ψ} Γ·φ⊢ψ Γ·φ⇒⊥⊢ψ =
   have Γ ⊢ ((φ ⇒ ⊥) ⇒ ψ) ⇒ ψ              apply ⇒E at here , back 3
   have Γ ⊢ ψ                              apply ⇒E at here , back 2
   END
+```
+
+Bring a disjunct to the left by negating it:
+
+```
+swap-Neg-Or-ND : Γ ⊢ φ ∨ ψ →
+                 --------------
+                 Γ · ψ ⇒ ⊥ ⊢ φ
+
+swap-Neg-Or-ND {Γ} {φ} {ψ} Γ⊢φ∨ψ =
+  BEGIN
+    have Γ ⊢ φ ∨ ψ              by Γ⊢φ∨ψ
+    have Γ ⊆ Γ · ψ ⇒ ⊥          by there
+    have Γ · ψ ⇒ ⊥ ⊢ φ ∨ ψ      apply weakening-ND at back 1 , here
+
+    have Γ · ψ ⇒ ⊥ · φ ⊢ φ      by Ass here
+
+    have Γ · ψ ⇒ ⊥ · ψ ⊢ ψ ⇒ ⊥  by Ass back 1
+    have Γ · ψ ⇒ ⊥ · ψ ⊢ ψ      by Ass here
+    have Γ · ψ ⇒ ⊥ · ψ ⊢ ⊥      apply ⇒E at back 1 , here
+    have Γ · ψ ⇒ ⊥ · ψ ⊢ φ      apply ⊥E at here
+
+    have Γ · ψ ⇒ ⊥ ⊢ φ          apply ∨E at back 5 , back 4 , here
+  END
+```
+
+```
+commOr-ND : Γ ⊢ (φ ∨ ψ) ⇒ (ψ ∨ φ)
+
+commOr-ND {Γ} {φ} {ψ} =
+  BEGIN
+    have Γ · φ ∨ ψ ⊢ φ ∨ ψ            by Ass here
+    have Γ · φ ∨ ψ · ψ ⊢ND ψ          by Ass here
+    have Γ · φ ∨ ψ · ψ ⊢ND ψ ∨ φ      apply ∨I-left at here
+    have Γ · φ ∨ ψ · φ ⊢ND φ          by Ass here
+    have Γ · φ ∨ ψ · φ ⊢ND ψ ∨ φ      apply ∨I-right at here
+    have Γ · φ ∨ ψ ⊢ ψ ∨ φ            apply ∨E at back 4 , here , back 2
+    have Γ ⊢ (φ ∨ ψ) ⇒ (ψ ∨ φ)        apply DT2-ND at here
+  END
+
+assocOr-ND : Γ ⊢ φ ∨ ψ ∨ ξ →
+             -----------------
+             Γ ⊢ (φ ∨ ψ) ∨ ξ
+
+assocOr-ND {Γ} {φ} {ψ} {ξ} Γ⊢φ∨ψ∨ξ =
+  BEGIN
+    have Γ ⊢ φ ∨ ψ ∨ ξ                  by Γ⊢φ∨ψ∨ξ
+
+    have Γ · φ ⊢ φ                      by Ass here
+    have Γ · φ ⊢ (φ ∨ ψ) ∨ ξ            apply ∨I-left ∘ ∨I-left at here
+
+    have Γ · ψ ∨ ξ · ψ ⊢ ψ              by Ass here
+    have Γ · ψ ∨ ξ · ψ ⊢ (φ ∨ ψ) ∨ ξ    apply ∨I-left ∘ ∨I-right at here
+    have Γ · ψ ∨ ξ · ξ ⊢ ξ              by Ass here
+    have Γ · ψ ∨ ξ · ξ ⊢ (φ ∨ ψ) ∨ ξ    apply ∨I-right at here
+    have Γ · ψ ∨ ξ ⊢ ψ ∨ ξ              by Ass here
+    have Γ · ψ ∨ ξ ⊢ (φ ∨ ψ) ∨ ξ        apply ∨E at here , back 3 , back 1
+
+    have Γ ⊢ (φ ∨ ψ) ∨ ξ                apply ∨E at back 8 , back 6 , here
+  END
+
+attachOr-ND : Γ ⊢ φ ∨ ψ →
+              Γ ⊢ φ ⇒ ξ →
+              -----------
+              Γ ⊢ ξ ∨ ψ
+
+attachOr-ND {Γ} {φ} {ψ} {ξ} Γ⊢φ∨ψ Γ⊢φ⇒ξ =
+  BEGIN
+  have Γ ⊢ φ ∨ ψ        by Γ⊢φ∨ψ
+  have Γ ⊢ φ ⇒ ξ        by Γ⊢φ⇒ξ
+  have Γ ⊢ ξ ∨ ψ        by {!   !}
+  END
+
+
+    -- have Γ · ψ ⊢ND ψ                                by Ass here
+    -- have Γ · ψ ⊢ND (φ ∨ ψ) ∨ (⋁ Ξ)                  apply ∨I-left ∘ ∨I-right at here
+
+    -- have Γ · φ ∨ (⋁ Ξ) ⊢ND φ ∨ (⋁ Ξ)                by Ass here
+    -- have Γ · φ ∨ (⋁ Ξ) · φ ⊢ND φ                    by Ass here
+    -- have Γ · φ ∨ (⋁ Ξ) · φ ⊢ND (φ ∨ ψ) ∨ (⋁ Ξ)      apply ∨I-left ∘ ∨I-left at here
+    -- have Γ · φ ∨ (⋁ Ξ) · (⋁ Ξ) ⊢ND ⋁ Ξ              by Ass here
+    -- have Γ · φ ∨ (⋁ Ξ) · (⋁ Ξ) ⊢ND (φ ∨ ψ) ∨ (⋁ Ξ)  apply ∨I-right at here
+    -- have Γ · φ ∨ (⋁ Ξ) ⊢ND (φ ∨ ψ) ∨ (⋁ Ξ)          apply ∨E at back 4 , back 2 , here
+    -- have Γ ⊢ND (φ ∨ ψ) ∨ (⋁ Ξ)
+
+
+longDisjunction-++-ND : ∀ Ψ → 
+                        Γ ⊢ (⋁ Ψ) ∨ (⋁ Ξ) →
+                        --------------------
+                        Γ ⊢ ⋁ (Ψ ++ Ξ)
+
+longDisjunction-++-ND {Γ} {Ξ} Ψ Γ⊢Ψ∨Ξ = {!   !}
+```
+
+
+# Preparation for sequent calculus
+
+We show some reasoning rules which will be helpful in studying sequent calculus.
+
+```
+∧-left-ND : Γ · φ · ψ ⊢ ξ →
+            ---------------
+            Γ · φ ∧ ψ ⊢ ξ
+
+∧-left-ND {Γ} {φ} {ψ} {ξ} Γφψ⊢ξ = 
+  BEGIN
+  have Γ · φ ∧ ψ ⊢ φ ∧ ψ        by Ass here
+  have Γ · φ ∧ ψ ⊢ φ            apply ∧E-left at here
+  have Γ · φ ∧ ψ ⊢ ψ            apply ∧E-right at back 1
+
+  have Γ · φ · ψ ⊢ ξ            by Γφψ⊢ξ
+  have Γ ⊢ φ ⇒ ψ ⇒ ξ            apply DT2-ND ∘ DT2-ND at here
+  have Γ ⊆ Γ · φ ∧ ψ            by there
+  have Γ · φ ∧ ψ ⊢ φ ⇒ ψ ⇒ ξ    apply weakening-ND at back 1 , here
+  have Γ · φ ∧ ψ ⊢ ψ ⇒ ξ        apply ⇒E at here , back 5
+  have Γ · φ ∧ ψ ⊢ ξ            apply ⇒E at here , back 5
+  END
+
+∨-left-ND : Γ · φ ⊢ ξ →
+            Γ · ψ ⊢ ξ →
+            -------------
+            Γ · φ ∨ ψ ⊢ ξ
+
+∨-left-ND {Γ} {φ} {ξ} {ψ} Γ·φ⊢ξ Γ·ψ⊢ξ = 
+  BEGIN
+  have Γ · φ ⊢ ξ                  by Γ·φ⊢ξ
+  have Γ · φ ⊆ Γ · φ ∨ ψ · φ      by (λ{ here → here; (there x) → there (there x)}) -- can this be automated?
+  have Γ · φ ∨ ψ · φ ⊢ ξ          apply weakening-ND at back 1 , here
+
+  have Γ · ψ ⊢ ξ                  by Γ·ψ⊢ξ
+  have Γ · ψ ⊆ Γ · φ ∨ ψ · ψ      by (λ{ here → here; (there x) → there (there x)}) -- can this be automated?
+  have Γ · φ ∨ ψ · ψ ⊢ ξ          apply weakening-ND at back 1 , here
+
+  have Γ · φ ∨ ψ ⊢ φ ∨ ψ          by Ass here
+  have Γ · φ ∨ ψ ⊢ ξ              apply ∨E at here , back 4 , back 1
+  END
+
+⇒-left-ND : Γ ⊢ φ ∨ ξ →
+            Γ · ψ ⊢ θ →
+            -------------------
+            Γ · φ ⇒ ψ ⊢ ξ ∨ θ
+
+⇒-left-ND {Γ} {φ} {ξ} {ψ} {θ} = {!   !}
+
+    -- have Γ ⊢ND φ ∨ (⋁ Ψ)                    by Γ⊢NDΔ·φ
+    -- have Γ ⊆ Γ · φ ⇒ ψ                      by there
+    -- have Γ · φ ⇒ ψ ⊢ND φ ∨ (⋁ Ψ)            apply weakening-ND at back 1 , here
+    -- have Γ · φ ⇒ ψ ⊢ND φ ⇒ ψ                by Ass here
+    -- have Γ · φ ⇒ ψ ⊢ND ψ ∨ (⋁ Ψ)            by ? -- apply ⇒E at here , back 1
+
+    -- have Γ · ψ ⊢ND ⋁ Ξ                      by Γ·ψ⊢NDΞ
+    -- have Γ ⊢ND ψ ⇒ (⋁ Ξ)                    apply DT2-ND at here
+    
+    -- have Γ · φ ⇒ ψ ⊢ND ψ ⇒ (⋁ Ξ)            apply weakening-ND at here , back 5
+    -- have Γ · φ ⇒ ψ ⊢ND ⋁ Ξ                  apply ⇒E at here , back 3
+
+    -- have Γ · φ ⇒ ψ ⊢ND (⋁ Ψ) ∨ (⋁ Ξ)        by ?
+
+    -- have Γ · φ ⇒ ψ ⊢ND ⋁ (Ψ ++ Ξ)           by {!   !} -- apply ⇒E at here , back 3
+
+⇒-right-ND : Γ · φ ⊢ ψ ∨ ξ →
+             ---------------
+             Γ ⊢ (φ ⇒ ψ) ∨ ξ
+
+⇒-right-ND {Γ} {φ} {ψ} {ξ} Γ·φ⊢ψ∨ξ = 
+  BEGIN
+    have Γ · φ ⊢ ψ ∨ ξ              by Γ·φ⊢ψ∨ξ
+
+    have Γ · φ · ψ · φ ⊢ ψ          by Ass back 1
+    have Γ · φ · ψ ⊢ φ ⇒ ψ          apply DT2-ND at here
+    have Γ · φ · ψ ⊢ (φ ⇒ ψ) ∨ ξ    apply ∨I-left at here
+
+    have Γ · φ · ξ ⊢ ξ              by Ass here
+    have Γ · φ · ξ ⊢ (φ ⇒ ψ) ∨ ξ    apply ∨I-right at here
+
+    have Γ · φ ⊢ (φ ⇒ ψ) ∨ ξ        apply ∨E at back 5 , back 2 , here
+
+    have Γ · φ ⇒ ⊥ · φ ⊢ φ ⇒ ⊥      by Ass back 1
+    have Γ · φ ⇒ ⊥ · φ ⊢ φ          by Ass here
+    have Γ · φ ⇒ ⊥ · φ ⊢ ⊥          apply ⇒E at back 1 , here
+    have Γ · φ ⇒ ⊥ · φ ⊢ ψ          apply ⊥E at here
+
+    have Γ · φ ⇒ ⊥ ⊢ φ ⇒ ψ          apply DT2-ND at here
+    have Γ · φ ⇒ ⊥ ⊢ (φ ⇒ ψ) ∨ ξ    apply ∨I-left at here
+
+    have Γ ⊢ (φ ⇒ ψ) ∨ ξ            apply case-split at back 6 , here
+  END
+
+⇔-left-ND : Γ ⊢ ψ ∨ φ →
+            Γ · φ · ψ ⊢ ξ →
+            ----------------
+            Γ · φ ⇔ ψ ⊢ ξ
+
+⇔-left-ND {Γ} {ψ} {φ} {ξ} Γ⊢φ∨ψ Γ·φ·ψ⊢ξ =
+  BEGIN
+    have Γ ⊢ ψ ∨ φ                      by Γ⊢φ∨ψ
+    have Γ ⊆ Γ · φ ⇔ ψ                  by there
+    have Γ · φ ⇔ ψ ⊢ ψ ∨ φ              apply weakening-ND at back 1 , here
+
+    have Γ · φ · ψ ⊢ ξ                  by Γ·φ·ψ⊢ξ
+    have Γ ⊢ φ ⇒ ψ ⇒ ξ                  apply DT2-ND ∘ DT2-ND at here
+    have Γ · φ ⇔ ψ ⊢ φ ⇒ ψ ⇒ ξ          apply weakening-ND at here , back 3
+
+    have Γ · φ ⇔ ψ ⊢ φ ⇔ ψ              by Ass here
+    have Γ · φ ⇔ ψ ⊢ (φ ⇒ ψ) ∧ (ψ ⇒ φ)  apply ⇔E at here
+    have Γ · φ ⇔ ψ ⊢ φ ⇒ ψ              apply ∧E-left at here
+    have Γ · φ ⇔ ψ ⊢ ψ ⇒ φ              apply ∧E-right at back 1
+
+    have Γ · φ ⇔ ψ ⊆ Γ · φ ⇔ ψ · φ      by there
+    have Γ · φ ⇔ ψ · φ ⊢ φ ⇒ ψ          apply weakening-ND at back 2 , here
+    have Γ · φ ⇔ ψ · φ ⊢ φ              by Ass here
+    have Γ · φ ⇔ ψ · φ ⊢ ψ              apply ⇒E at back 1 , here
+    have Γ · φ ⇔ ψ · φ ⊢ φ ⇒ ψ ⇒ ξ      apply weakening-ND at back 8 , back 3
+    have Γ · φ ⇔ ψ · φ ⊢ ψ ⇒ ξ          apply ⇒E at here , back 2
+    have Γ · φ ⇔ ψ · φ ⊢ ξ              apply ⇒E at here , back 2
+
+    have Γ · φ ⇔ ψ ⊆ Γ · φ ⇔ ψ · ψ      by there
+    have Γ · φ ⇔ ψ · ψ ⊢ ψ ⇒ φ          apply weakening-ND at back 8 , here
+    have Γ · φ ⇔ ψ · ψ ⊢ ψ              by Ass here
+    have Γ · φ ⇔ ψ · ψ ⊢ φ              apply ⇒E at back 1 , here
+    have Γ · φ ⇔ ψ · ψ ⊢ φ ⇒ ψ ⇒ ξ      apply weakening-ND at back 15 , back 3
+    have Γ · φ ⇔ ψ · ψ ⊢ ψ ⇒ ξ          apply ⇒E at here , back 1
+    have Γ · φ ⇔ ψ · ψ ⊢ ξ              apply ⇒E at here , back 3
+
+    have Γ · φ ⇔ ψ ⊢ ξ                  apply ∨E at back 21 , here , back 7
+  END
+
+⇔-left'-ND : Γ ⊢ ψ ∨ φ ∨ ξ →
+             Γ · φ · ψ ⊢ θ →
+             -----------------
+             Γ · φ ⇔ ψ ⊢ ξ ∨ θ
+
+⇔-left'-ND {Γ} {ψ} {φ} {ξ} {θ} Γ⊢φ∨ψ∨ξ Γ·φ·ψ⊢θ =
+  BEGIN
+    have Γ ⊢ ψ ∨ φ ∨ ξ                      by Γ⊢φ∨ψ∨ξ
+    have Γ ⊢ (ψ ∨ φ) ∨ ξ                    apply assocOr-ND at here
+    have Γ ⊆ Γ · φ ⇔ ψ                      by there
+    have Γ · φ ⇔ ψ ⊢ (ψ ∨ φ) ∨ ξ            apply weakening-ND at back 1 , here
+
+    have Γ · ψ ∨ φ ⊢ ψ ∨ φ                  by Ass here
+
+    have Γ · φ · ψ ⊢ θ                      by Γ·φ·ψ⊢θ
+    have Γ · φ · ψ ⊆ Γ · ψ ∨ φ · φ · ψ      by (λ{here → here
+                                                ; (there here) → there here
+                                                ; (there (there x)) → there (there (there x))})
+    have Γ · ψ ∨ φ · φ · ψ ⊢ θ              apply weakening-ND at back 1 , here
+    have Γ · ψ ∨ φ · φ ⇔ ψ ⊢ θ              apply ⇔-left-ND at back 3 , here
+    have Perm (Γ · ψ ∨ φ · φ ⇔ ψ)
+              (Γ · φ ⇔ ψ · ψ ∨ φ)           by swap stop
+    have Γ · φ ⇔ ψ · ψ ∨ φ ⊢ θ              apply perm-ND-left at here , back 1
+    have Γ · φ ⇔ ψ · ψ ∨ φ ⊢ ξ ∨ θ          apply ∨I-right at here
+
+    have Γ · φ ⇔ ψ · ξ ⊢ ξ ∨ θ              by ∨I-left (Ass here)
+
+    have Γ · φ ⇔ ψ ⊢ ξ ∨ θ                  apply ∨E at back 9 , back 1 , here
+  END
+
+ 
+
+↔-right-ND : Γ · φ ⊢ ψ →
+             Γ · ψ ⊢ φ →
+             --------------
+             Γ ⊢ φ ⇔ ψ
+
+↔-right-ND {Γ} {φ} {ψ} Γ·φ⊢ψ Γ·ψ⊢φ =
+  BEGIN
+  have Γ · φ ⊢ ψ              by Γ·φ⊢ψ
+  have Γ ⊢ φ ⇒ ψ              apply DT2-ND at here
+
+  have Γ · ψ ⊢ φ              by Γ·ψ⊢φ
+  have Γ ⊢ ψ ⇒ φ              apply DT2-ND at here
+
+  have Γ ⊢ (φ ⇒ ψ) ∧ (ψ ⇒ φ)  apply ∧I at back 2 , here
+  have Γ ⊢ φ ⇔ ψ              apply ⇔I at here
+  END
+
+↔-right'-ND : Γ · φ ⊢ ψ ∨ ξ →
+             Γ · ψ ⊢ φ ∨ ξ →
+             ----------------
+             Γ ⊢ (φ ⇔ ψ) ∨ ξ
+
+↔-right'-ND {Γ} {φ} {ψ} {ξ} Γ·φ⊢ψ∨ξ Γ·ψ⊢φ∨ξ =
+  BEGIN
+  have Γ · φ ⊢ ψ ∨ ξ                  by Γ·φ⊢ψ∨ξ
+  have Γ ⊢ (φ ⇒ ψ) ∨ ξ                apply ⇒-right-ND at here
+  have Γ · ξ ⇒ ⊥ ⊢ φ ⇒ ψ              apply swap-Neg-Or-ND at here
+
+  have Γ · ψ ⊢ φ ∨ ξ                  by Γ·ψ⊢φ∨ξ
+  have Γ ⊢ (ψ ⇒ φ) ∨ ξ                apply ⇒-right-ND at here
+  have Γ · ξ ⇒ ⊥ ⊢ ψ ⇒ φ              apply swap-Neg-Or-ND at here
+
+  have Γ · ξ ⇒ ⊥ ⊢ (φ ⇒ ψ) ∧ (ψ ⇒ φ)  apply ∧I at back 3 , here
+  have Γ · ξ ⇒ ⊥ ⊢ φ ⇔ ψ              apply ⇔I at here
+  have Γ · ξ ⇒ ⊥ ⊢ (φ ⇔ ψ) ∨ ξ        apply ∨I-left at here
+
+  have Γ · ξ ⊢ ξ                      by Ass here
+  have Γ · ξ ⊢ (φ ⇔ ψ) ∨ ξ            apply ∨I-right at here
+
+  have Γ ⊢ (φ ⇔ ψ) ∨ ξ                apply case-split at here , back 2
+  END
+
+cut-ND : Γ ⊢ φ ∨ ψ →
+         Γ · φ ⊢ ξ →
+         -----------
+         Γ ⊢ ψ ∨ ξ
+
+cut-ND {Γ} {φ} {ψ} {ξ} Γ⊢φ∨ψ Γ·φ⊢ξ =
+  BEGIN
+    have Γ ⊢ φ ∨ ψ           by Γ⊢φ∨ψ
+
+    have Γ · φ ⊢ ξ           by Γ·φ⊢ξ
+    have Γ · φ ⊢ ψ ∨ ξ       apply ∨I-right at here
+
+    have Γ · ψ ⊢ ψ            by Ass here
+    have Γ · ψ ⊢ ψ ∨ ξ        apply ∨I-left at here
+
+    have Γ ⊢ ψ ∨ ξ           apply ∨E at back 4 , back 2 , here
+  END
+
+
 ```

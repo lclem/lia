@@ -8,7 +8,7 @@ title: "Gentzen's sequent calculus 🚧"
 open import part0.index
 
 module part1.SequentCalculus (n′ : ℕ) where
-open import part1.NaturalDeduction n′ public hiding (_⊢ND_; _⊨_) renaming (_⊢_ to _⊢ND_) 
+open import part1.NaturalDeduction n′ public hiding (_⊢ND_) renaming (_⊢_ to _⊢ND_) 
 
 private
   variable
@@ -102,7 +102,7 @@ data _⊢_ : Context → Context → Set where
 
     ⇔-right : Γ · φ ⊢ Δ · ψ →
               Γ · ψ ⊢ Δ · φ →
-              -------------
+              ---------------
               Γ ⊢ Δ · φ ⇔ ψ
 
     cut : Γ ⊢ Δ · φ →
@@ -120,7 +120,8 @@ perm-left1 : ∀ Ψ → Perm Γ Δ →
              Ψ ++ Δ ⊢ Ξ
 
 perm-left1 _ stop Ψ++Γ⊢Ξ = Ψ++Γ⊢Ξ
-perm-left1 {φ ∷ Γ} {φ ∷ Δ} {Ξ} Ψ (skip π) ΨφΓ⊢Ξ rewrite ++-middle Ψ φ Δ = perm-left1 (Ψ ++ [ φ ]) π have where
+perm-left1 {φ ∷ Γ} {φ ∷ Δ} {Ξ} Ψ (skip π) ΨφΓ⊢Ξ
+    rewrite ++-middle Ψ φ Δ = perm-left1 (Ψ ++ [ φ ]) π have where
 
     have : (Ψ ++ [ φ ]) ++ Γ ⊢ Ξ
     have rewrite sym (++-middle Ψ φ Γ) = ΨφΓ⊢Ξ
@@ -149,13 +150,41 @@ perm-left : Perm Γ Δ →
 perm-left = perm-left1 ∅
 ```
 
+The proof for permutations on the right is analogous.
+
 ```
+perm-right1 : ∀ Ψ →
+              Perm Δ Ξ →
+              Γ ⊢ Ψ ++ Δ →
+              ------------
+              Γ ⊢ Ψ ++ Ξ
+
+perm-right1 {Δ} {Δ} {Γ} Ψ stop Γ⊢Ψ++Δ = Γ⊢Ψ++Δ
+
+perm-right1 {(φ ∷ Δ)} {(φ ∷ Ξ)} {Γ} Ψ (skip π) Γ⊢Ψ++Δ
+    rewrite ++-middle Ψ φ Ξ = perm-right1 (Ψ ++ [ φ ]) π have where
+
+    have : Γ ⊢ (Ψ ++ [ φ ]) ++ Δ
+    have rewrite sym (++-middle Ψ φ Δ) = Γ⊢Ψ++Δ
+
+perm-right1 {φ ∷ ψ ∷ Δ} {ψ ∷ φ ∷ Ξ} {Γ} Ψ (swap π) Γ⊢ΨφψΔ
+    with exchange-right {Ψ} Γ Γ⊢ΨφψΔ
+... | Γ⊢ΨψφΔ = goal where
+
+    have : Γ ⊢ (Ψ ++ [ ψ φ ]) ++ Δ
+    have rewrite sym (assoc-++ Ψ ([ ψ φ ]) Δ) = Γ⊢ΨψφΔ
+
+    goal : Γ ⊢ Ψ ++ [ ψ φ ] ++ Ξ
+    goal rewrite sym (assoc-++ Ψ ([ ψ φ ]) Ξ) = perm-right1 (Ψ ++ [ ψ φ ]) π have
+
+perm-right1 {Δ} {Ξ} {Γ} Ψ (tran π ρ) = perm-right1 Ψ ρ ∘ perm-right1 Ψ π 
+
 perm-right : Perm Δ Ξ →
              Γ ⊢ Δ →
              --------
              Γ ⊢ Ξ
 
-perm-right = {!   !}
+perm-right = perm-right1 ∅
 ```
 
 ```
@@ -164,7 +193,26 @@ weakening-left-SC : Γ ⊢ Ξ →
                     -----------
                     Δ ⊢ Ξ
 
-weakening-left-SC Γ⊢Ξ Γ⊆Δ = {!   !}
+weakening-left-SC {.(_ ∷ ε)} {.(_ ∷ ε)} {Δ} Ax Γ⊆Δ = {!   !}
+weakening-left-SC {.(_ ∷ _)} {Ξ} {Δ} (weakening-left Γ⊢Ξ) Γ⊆Δ = {!   !}
+weakening-left-SC {Γ} {.(_ ∷ _)} {Δ} (weakening-right Γ⊢Ξ) Γ⊆Δ = {!   !}
+weakening-left-SC {.(Γ ++ _ ∷ _ ∷ _)} {Ξ} {Δ} (exchange-left Γ Γ⊢Ξ) Γ⊆Δ = {!   !}
+weakening-left-SC {Γ} {.(_ ++ _ ∷ _ ∷ _)} {Δ} (exchange-right .Γ Γ⊢Ξ) Γ⊆Δ = {!   !}
+weakening-left-SC {.(_ ∷ _)} {Ξ} {Δ} (contraction-left Γ⊢Ξ) Γ⊆Δ = {!   !}
+weakening-left-SC {Γ} {.(_ ∷ _)} {Δ} (contraction-right Γ⊢Ξ) Γ⊆Δ = {!   !}
+weakening-left-SC {.(⊥ ∷ ε)} {.ε} {Δ} ⊥-left Γ⊆Δ = {!   !}
+weakening-left-SC {.ε} {.(⊤ ∷ ε)} {Δ} ⊤-right Γ⊆Δ = {!   !}
+weakening-left-SC {.((¬ _) ∷ _)} {Ξ} {Δ} (¬-left Γ⊢Ξ) Γ⊆Δ = {!   !}
+weakening-left-SC {Γ} {.((¬ _) ∷ _)} {Δ} (¬-right Γ⊢Ξ) Γ⊆Δ = {!   !}
+weakening-left-SC {.((_ ∧ _) ∷ _)} {Ξ} {Δ} (∧-left Γ⊢Ξ) Γ⊆Δ = {!   !}
+weakening-left-SC {Γ} {.((_ ∧ _) ∷ _)} {Δ} (∧-right Γ⊢Ξ Γ⊢Ξ₁) Γ⊆Δ = {!   !}
+weakening-left-SC {.((_ ∨ _) ∷ _)} {Ξ} {Δ} (∨-left Γ⊢Ξ Γ⊢Ξ₁) Γ⊆Δ = {!   !}
+weakening-left-SC {Γ} {.((_ ∨ _) ∷ _)} {Δ} (∨-right Γ⊢Ξ) Γ⊆Δ = {!   !}
+weakening-left-SC {.((_ ⇒ _) ∷ _)} {.(_ ++ _)} {Δ} (⇒-left Γ⊢Ξ Γ⊢Ξ₁) Γ⊆Δ = {!   !}
+weakening-left-SC {Γ} {.((_ ⇒ _) ∷ _)} {Δ} (⇒-right Γ⊢Ξ) Γ⊆Δ = {!   !}
+weakening-left-SC {.((_ ⇔ _) ∷ _)} {.(_ ++ _)} {Δ} (⇔-left Γ⊢Ξ Γ⊢Ξ₁) Γ⊆Δ = {!   !}
+weakening-left-SC {Γ} {.((_ ⇔ _) ∷ _)} {Δ} (⇔-right Γ⊢Ξ Γ⊢Ξ₁) Γ⊆Δ = {!   !}
+weakening-left-SC {Γ} {.(_ ++ _)} {Δ} (cut Γ⊢Ξ Γ⊢Ξ₁) Γ⊆Δ = {!   !}
 
 weakening-right-SC : Γ ⊢ Δ →
                      Δ ⊆ Ξ →
@@ -501,19 +549,7 @@ SC→ND (¬-right {Γ} {φ} {Δ} Γ·φ⊢Δ)
 
 SC→ND (∧-left {Γ} {φ} {ψ} {Δ} Γφψ⊢Δ)
     with SC→ND Γφψ⊢Δ
-... | Γφψ⊢ND⋁Δ =
-    BEGIN
-    have Γ · φ ∧ ψ ⊢ND φ ∧ ψ            by Ass here
-    have Γ · φ ∧ ψ ⊢ND φ                apply ∧E-left at here
-    have Γ · φ ∧ ψ ⊢ND ψ                apply ∧E-right at back 1
-
-    have Γ · φ · ψ ⊢ND ⋁ Δ              by Γφψ⊢ND⋁Δ
-    have Γ ⊢ND φ ⇒ ψ ⇒ (⋁ Δ)            apply DT2-ND ∘ DT2-ND at here
-    have Γ ⊆ Γ · φ ∧ ψ                  by there
-    have Γ · φ ∧ ψ ⊢ND φ ⇒ ψ ⇒ (⋁ Δ)    apply weakening-ND at back 1 , here
-    have Γ · φ ∧ ψ ⊢ND ψ ⇒ (⋁ Δ)        apply ⇒E at here , back 5
-    have Γ · φ ∧ ψ ⊢ND ⋁ Δ              apply ⇒E at here , back 5
-    END
+... | Γφψ⊢ND⋁Δ = ∧-left-ND Γφψ⊢ND⋁Δ
 
 SC→ND (∧-right {Γ} {Δ} {φ} {ψ} Γ⊢Δ·φ Γ⊢Δ·ψ)
     with SC→ND Γ⊢Δ·φ | SC→ND Γ⊢Δ·ψ
@@ -529,22 +565,12 @@ SC→ND (∧-right {Γ} {Δ} {φ} {ψ} Γ⊢Δ·φ Γ⊢Δ·ψ)
 ... | Ξ@(_ ∷ _ ) =
     BEGIN
     have Γ ⊢ND φ ∨ (⋁ Ξ)                        by Γ⊢ND⋁Δφ
-    have Γ ⊆ Γ · (⋁ Ξ) ⇒ ⊥                      by there
-    have Γ · (⋁ Ξ) ⇒ ⊥ ⊢ND φ ∨ (⋁ Ξ)            apply weakening-ND at back 1 , here
-    have Γ · (⋁ Ξ) ⇒ ⊥ · φ ⊢ND φ                by Ass here
-    have Γ · (⋁ Ξ) ⇒ ⊥ · (⋁ Ξ) ⊢ND (⋁ Ξ) ⇒ ⊥    by Ass back 1
-    have Γ · (⋁ Ξ) ⇒ ⊥ · (⋁ Ξ) ⊢ND ⋁ Ξ          by Ass here
-    have Γ · (⋁ Ξ) ⇒ ⊥ · (⋁ Ξ) ⊢ND ⊥            apply ⇒E at back 1 , here
-    have Γ · (⋁ Ξ) ⇒ ⊥ · (⋁ Ξ) ⊢ND φ            apply ⊥E at here
-    have Γ · (⋁ Ξ) ⇒ ⊥ ⊢ND φ                    apply ∨E at back 5 , back 4 , here
+    have Γ · (⋁ Ξ) ⇒ ⊥ ⊢ND φ                    apply swap-Neg-Or-ND at here
 
     have Γ ⊢ND ψ ∨ (⋁ Ξ)                        by Γ⊢ND⋁Δψ
-    have Γ · (⋁ Ξ) ⇒ ⊥ ⊢ND ψ ∨ (⋁ Ξ)            apply weakening-ND at here , back 8
-    have Γ · (⋁ Ξ) ⇒ ⊥ · ψ ⊢ND ψ                by Ass here
-    have Γ · (⋁ Ξ) ⇒ ⊥ · (⋁ Ξ) ⊢ND ψ            apply ⊥E at back 5
-    have Γ · (⋁ Ξ) ⇒ ⊥ ⊢ND ψ                    apply ∨E at back 2 , back 1 , here
+    have Γ · (⋁ Ξ) ⇒ ⊥ ⊢ND ψ                    apply swap-Neg-Or-ND at here
 
-    have Γ · (⋁ Ξ) ⇒ ⊥ ⊢ND φ ∧ ψ                apply ∧I at back 5 , here
+    have Γ · (⋁ Ξ) ⇒ ⊥ ⊢ND φ ∧ ψ                apply ∧I at back 2 , here
     have Γ · (⋁ Ξ) ⇒ ⊥ ⊢ND φ ∧ ψ ∨ (⋁ Ξ)        apply ∨I-left at here
 
     have Γ · (⋁ Ξ) ⊢ND ⋁ Ξ                      by Ass here
@@ -555,42 +581,110 @@ SC→ND (∧-right {Γ} {Δ} {φ} {ψ} Γ⊢Δ·φ Γ⊢Δ·ψ)
 
 SC→ND (∨-left {Γ} {φ} {Δ} {ψ} Γ·φ⊢Δ Γ·ψ⊢Δ)
     with SC→ND Γ·φ⊢Δ | SC→ND Γ·ψ⊢Δ
-... | Γ·φ⊢ND⋁Δ | Γ·ψ⊢ND⋁Δ =
+... | Γ·φ⊢ND⋁Δ | Γ·ψ⊢ND⋁Δ = ∨-left-ND Γ·φ⊢ND⋁Δ Γ·ψ⊢ND⋁Δ
+
+SC→ND (∨-right {Γ} {Δ} {φ} {ψ} Γ⊢Δ·φ·ψ)
+    with SC→ND Γ⊢Δ·φ·ψ
+... | Γ⊢NDΔ·φ·ψ
+    with Δ
+... | ε = ⇒E commOr-ND Γ⊢NDΔ·φ·ψ
+
+... | Ξ@(_ ∷ _) =
     BEGIN
-    have Γ · φ ⊢ND ⋁ Δ                  by Γ·φ⊢ND⋁Δ
-    have Γ · φ ⊆ Γ · φ ∨ ψ · φ          by (λ{ here → here; (there x) → there (there x)}) -- can this be automated?
-    have Γ · φ ∨ ψ · φ ⊢ND ⋁ Δ          apply weakening-ND at back 1 , here
-
-    have Γ · ψ ⊢ND ⋁ Δ                  by Γ·ψ⊢ND⋁Δ
-    have Γ · ψ ⊆ Γ · φ ∨ ψ · ψ          by (λ{ here → here; (there x) → there (there x)}) -- can this be automated?
-    have Γ · φ ∨ ψ · ψ ⊢ND ⋁ Δ          apply weakening-ND at back 1 , here
-
-    have Γ · φ ∨ ψ ⊢ND φ ∨ ψ            by Ass here
-    have Γ · φ ∨ ψ ⊢ND ⋁ Δ              apply ∨E at here , back 4 , back 1
+    have Γ ⊢ND ψ ∨ φ ∨ (⋁ Ξ)                        by Γ⊢NDΔ·φ·ψ
+    have Γ ⊢ND (ψ ∨ φ) ∨ (⋁ Ξ)                      apply assocOr-ND at here
+    have Γ ⊢ND (ψ ∨ φ) ⇒ (φ ∨ ψ)                    by commOr-ND
+    have Γ ⊢ND (φ ∨ ψ) ∨ (⋁ Ξ)                      apply attachOr-ND at back 1 , here
     END
 
-SC→ND (∨-right Γ⊢Δ) = {!   !}
+SC→ND (⇒-left {Γ} {Δ} {φ} {ψ} {Ξ} Γ⊢Δ·φ Γ·ψ⊢Ξ)
+    with SC→ND Γ⊢Δ·φ | SC→ND Γ·ψ⊢Ξ
+... | Γ⊢NDΔ·φ | Γ·ψ⊢NDΞ
+    with Δ
+... | ε =
+    BEGIN
+    have Γ ⊢ND φ                    by Γ⊢NDΔ·φ
+    have Γ ⊆ Γ · φ ⇒ ψ              by there
+    have Γ · φ ⇒ ψ ⊢ND φ            apply weakening-ND at back 1 , here
+    have Γ · φ ⇒ ψ ⊢ND φ ⇒ ψ        by Ass here
+    have Γ · φ ⇒ ψ ⊢ND ψ            apply ⇒E at here , back 1
 
-SC→ND (⇒-left Γ⊢Δ Γ⊢Δ₁) = {!   !}
+    have Γ · ψ ⊢ND ⋁ Ξ              by Γ·ψ⊢NDΞ
+    have Γ ⊢ND ψ ⇒ (⋁ Ξ)            apply DT2-ND at here
+    have Γ · φ ⇒ ψ ⊢ND ψ ⇒ (⋁ Ξ)    apply weakening-ND at here , back 5
+    have Γ · φ ⇒ ψ ⊢ND ⋁ Ξ          apply ⇒E at here , back 3
+    END
+    
+... | Ψ@(_ ∷ _) =
+    BEGIN
+    have Γ ⊢ND φ ∨ (⋁ Ψ)                    by Γ⊢NDΔ·φ
+    have Γ · ψ ⊢ND ⋁ Ξ                      by Γ·ψ⊢NDΞ
+    have Γ · φ ⇒ ψ ⊢ND (⋁ Ψ) ∨ (⋁ Ξ)        apply ⇒-left-ND at back 1 , here
+    have Γ · φ ⇒ ψ ⊢ND ⋁ (Ψ ++ Ξ)           apply longDisjunction-++-ND Ψ at here
+    END
 
-SC→ND (⇒-right Γ⊢Δ) = {!   !}
+SC→ND (⇒-right {Γ} {φ} {Δ} {ψ} Γ·φ⊢Δ·ψ)
+    with SC→ND Γ·φ⊢Δ·ψ
+... | Γ·φ⊢NDΔ·ψ
+    with Δ
+... | ε = ⇒I Γ·φ⊢NDΔ·ψ
+... | Ψ@(_ ∷ _) = ⇒-right-ND Γ·φ⊢NDΔ·ψ
 
-SC→ND (⇔-left Γ⊢Δ Γ⊢Δ₁) = {!   !}
+SC→ND (⇔-left {Γ} {Δ} {φ} {ψ} {Ξ} Γ⊢Δ·φ·ψ Γ·φ·ψ⊢Ξ)
+    with SC→ND Γ⊢Δ·φ·ψ | SC→ND Γ·φ·ψ⊢Ξ
+... | Γ⊢NDΔ·φ·ψ | Γ·φ·ψ⊢NDΞ
+    with Δ
+... | ε = ⇔-left-ND Γ⊢NDΔ·φ·ψ Γ·φ·ψ⊢NDΞ
 
-SC→ND (⇔-right Γ⊢Δ Γ⊢Δ₁) = {!   !}
+... | Ψ@(_ ∷ _) =
+    BEGIN
+    have Γ ⊢ND ψ ∨ φ ∨ (⋁ Ψ)                by Γ⊢NDΔ·φ·ψ
+    have Γ · φ · ψ ⊢ND ⋁ Ξ                  by Γ·φ·ψ⊢NDΞ
+    have Γ · φ ⇔ ψ ⊢ND (⋁ Ψ) ∨ (⋁ Ξ)        apply ⇔-left'-ND at back 1 , here
+    have Γ · φ ⇔ ψ ⊢ND ⋁ (Ψ ++ Ξ)           apply longDisjunction-++-ND Ψ at here
+    END
 
-SC→ND (cut Γ⊢Δ Γ⊢Δ₁) = {!   !}
+SC→ND (⇔-right {Γ} {φ} {Δ} {ψ} Γ·φ⊢Δ·ψ Γ·ψ⊢Δ·φ)
+    with SC→ND Γ·φ⊢Δ·ψ | SC→ND Γ·ψ⊢Δ·φ
+... | Γ·φ⊢NDΔ·ψ | Γ·ψ⊢NDΔ·φ
+    with Δ
+... | ε = ↔-right-ND Γ·φ⊢NDΔ·ψ Γ·ψ⊢NDΔ·φ
+
+... | Ψ@(_ ∷ _) = ↔-right'-ND Γ·φ⊢NDΔ·ψ Γ·ψ⊢NDΔ·φ
+
+SC→ND (cut {Γ} {Δ} {φ} {Ξ} Γ⊢Δ·φ Γ·φ⊢Ξ)
+    with SC→ND Γ⊢Δ·φ | SC→ND Γ·φ⊢Ξ
+... | Γ⊢NDΔ·φ | Γ·φ⊢NDΞ
+    with Δ
+... | ε =
+    BEGIN
+    have Γ ⊢ND φ            by Γ⊢NDΔ·φ
+    have Γ · φ ⊢ND ⋁ Ξ      by Γ·φ⊢NDΞ
+    have Γ ⊢ND φ ⇒ (⋁ Ξ)    apply ⇒I at here
+    have Γ ⊢ND ⋁ Ξ          apply ⇒E at here , back 2
+    END
+
+... | Ψ@(_ ∷ _) =
+    BEGIN
+    have Γ ⊢ND φ ∨ (⋁ Ψ)           by Γ⊢NDΔ·φ
+    have Γ · φ ⊢ND ⋁ Ξ             by Γ·φ⊢NDΞ
+    have Γ ⊢ND (⋁ Ψ) ∨ (⋁ Ξ)       apply cut-ND at back 1 , here
+    have Γ ⊢ND ⋁ (Ψ ++ Ξ)          apply longDisjunction-++-ND Ψ at here
+    END
 ```
 
+# Soundness and completeness
+
 ```
-infix 8 _⊨_
-
-_⊨_ : Formula → Formula → Set
-φ ⊨ ψ = ∀ ϱ → ⟦ φ ⟧ ϱ ≡ tt → ⟦ ψ ⟧ ϱ ≡ tt
-
 soundness-SC : Γ ⊢ Δ →
-               ----------
-               ⋀ Γ ⊨ ⋁ Δ
+               --------
+               Γ ⊨ ⋁ Δ
 
-soundness-SC {Γ} {Δ} Γ⊢Δ = {!   !}
+soundness-SC Γ⊢Δ = soundness-ND (SC→ND Γ⊢Δ)
+
+completeness-SC : Γ ⊨ φ →
+                  ----------
+                  Γ ⊢ [ φ ]
+
+completeness-SC Γ⊨⋁Δ = ND→SC (completeness-ND Γ⊨⋁Δ)
 ```
