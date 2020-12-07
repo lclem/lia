@@ -188,62 +188,89 @@ perm-right = perm-right1 ∅
 ```
 
 ```
-weakening-left-SC : Γ ⊢ Ξ →
-                    Γ ⊆ Δ →
-                    -----------
-                    Δ ⊢ Ξ
-
-weakening-left-SC {.(_ ∷ ε)} {.(_ ∷ ε)} {Δ} Ax Γ⊆Δ = {!   !}
-weakening-left-SC {.(_ ∷ _)} {Ξ} {Δ} (weakening-left Γ⊢Ξ) Γ⊆Δ = {!   !}
-weakening-left-SC {Γ} {.(_ ∷ _)} {Δ} (weakening-right Γ⊢Ξ) Γ⊆Δ = {!   !}
-weakening-left-SC {.(Γ ++ _ ∷ _ ∷ _)} {Ξ} {Δ} (exchange-left Γ Γ⊢Ξ) Γ⊆Δ = {!   !}
-weakening-left-SC {Γ} {.(_ ++ _ ∷ _ ∷ _)} {Δ} (exchange-right .Γ Γ⊢Ξ) Γ⊆Δ = {!   !}
-weakening-left-SC {.(_ ∷ _)} {Ξ} {Δ} (contraction-left Γ⊢Ξ) Γ⊆Δ = {!   !}
-weakening-left-SC {Γ} {.(_ ∷ _)} {Δ} (contraction-right Γ⊢Ξ) Γ⊆Δ = {!   !}
-weakening-left-SC {.(⊥ ∷ ε)} {.ε} {Δ} ⊥-left Γ⊆Δ = {!   !}
-weakening-left-SC {.ε} {.(⊤ ∷ ε)} {Δ} ⊤-right Γ⊆Δ = {!   !}
-weakening-left-SC {.((¬ _) ∷ _)} {Ξ} {Δ} (¬-left Γ⊢Ξ) Γ⊆Δ = {!   !}
-weakening-left-SC {Γ} {.((¬ _) ∷ _)} {Δ} (¬-right Γ⊢Ξ) Γ⊆Δ = {!   !}
-weakening-left-SC {.((_ ∧ _) ∷ _)} {Ξ} {Δ} (∧-left Γ⊢Ξ) Γ⊆Δ = {!   !}
-weakening-left-SC {Γ} {.((_ ∧ _) ∷ _)} {Δ} (∧-right Γ⊢Ξ Γ⊢Ξ₁) Γ⊆Δ = {!   !}
-weakening-left-SC {.((_ ∨ _) ∷ _)} {Ξ} {Δ} (∨-left Γ⊢Ξ Γ⊢Ξ₁) Γ⊆Δ = {!   !}
-weakening-left-SC {Γ} {.((_ ∨ _) ∷ _)} {Δ} (∨-right Γ⊢Ξ) Γ⊆Δ = {!   !}
-weakening-left-SC {.((_ ⇒ _) ∷ _)} {.(_ ++ _)} {Δ} (⇒-left Γ⊢Ξ Γ⊢Ξ₁) Γ⊆Δ = {!   !}
-weakening-left-SC {Γ} {.((_ ⇒ _) ∷ _)} {Δ} (⇒-right Γ⊢Ξ) Γ⊆Δ = {!   !}
-weakening-left-SC {.((_ ⇔ _) ∷ _)} {.(_ ++ _)} {Δ} (⇔-left Γ⊢Ξ Γ⊢Ξ₁) Γ⊆Δ = {!   !}
-weakening-left-SC {Γ} {.((_ ⇔ _) ∷ _)} {Δ} (⇔-right Γ⊢Ξ Γ⊢Ξ₁) Γ⊆Δ = {!   !}
-weakening-left-SC {Γ} {.(_ ++ _)} {Δ} (cut Γ⊢Ξ Γ⊢Ξ₁) Γ⊆Δ = {!   !}
-
-weakening-right-SC : Γ ⊢ Δ →
-                     Δ ⊆ Ξ →
-                     -----------
-                     Γ ⊢ Ξ
-
-weakening-right-SC Γ⊢Δ Δ⊆Ξ = {!   !}
-
-weakening-left'-SC :
-                    Γ ⊢ Δ →
-                    -----------
+weakening-left-⊑1 : Γ ⊢ Δ →
+                    ----------
                     Γ ++ Ξ ⊢ Δ
 
-weakening-left'-SC {Γ} {Ξ = ε} Γ⊢Δ rewrite ++ε Γ = Γ⊢Δ
-weakening-left'-SC {Γ} {Ξ = ξ ∷ Ξ} Γ⊢Δ = perm-left (π Γ) (weakening-left (weakening-left'-SC Γ⊢Δ)) where
+weakening-left-⊑1 {Γ} {Δ} {Ξ = ε} Γ⊢Δ rewrite ++ε Γ = Γ⊢Δ
+weakening-left-⊑1 {Γ} {Δ} {Ξ = ξ ∷ Ξ} Γ⊢Δ =
+    BEGIN
+        have Γ ++ Ξ ⊢ Δ             by weakening-left-⊑1 Γ⊢Δ
+        have ξ ∷ Γ ++ Ξ ⊢ Δ         apply weakening-left at here
+        have Perm (ξ ∷ Γ ++ Ξ)
+                  (Γ ++ ξ ∷ Ξ)      by perm-middle Γ
+        have Γ ++ ξ ∷ Ξ ⊢ Δ         apply perm-left at here , back 1
+    END
 
-    π : ∀ Γ → Perm (ξ ∷ Γ ++ Ξ) (Γ ++ ξ ∷ Ξ)
-    π ε = stop
-    π (φ ∷ Γ) =
-        BEGIN
-        have Perm (Γ ++ Ξ) (Γ ++ Ξ)                     by stop
-        have Perm (ξ ∷ φ ∷ Γ ++ Ξ) (φ ∷ ξ ∷ Γ ++ Ξ)     apply swap at here
-        have Perm (φ ∷ ξ ∷ Γ ++ Ξ) (φ ∷ Γ ++ ξ ∷ Ξ)     by skip (π Γ)
-        have Perm (ξ ∷ φ ∷ Γ ++ Ξ) (φ ∷ Γ ++ ξ ∷ Ξ)     apply tran at back 1 , here
-        END
+weakening-left-⊑2 : ∀ Ψ → Ψ ++ Γ ⊢ Ξ →
+                    Γ ⊑ Δ →
+                    -----------
+                    Ψ ++ Δ ⊢ Ξ
+
+weakening-left-⊑2 {.ε} {Ξ} {Δ} Ψ Γ⊢Ξ stop rewrite ++ε Ψ = weakening-left-⊑1 Γ⊢Ξ
+
+weakening-left-⊑2 {φ ∷ Γ} {Ξ} {φ ∷ Δ} Ψ Γ·φ⊢Ξ (match Γ⊑Δ)
+    rewrite ++-middle Ψ φ Δ |
+            ++-middle Ψ φ Γ = weakening-left-⊑2 (Ψ ++ [ φ ]) Γ·φ⊢Ξ Γ⊑Δ
+
+weakening-left-⊑2 {Γ} {Ξ} {φ ∷ Δ} Ψ Γ⊢Ξ (skip Γ⊑Δ) =
+    BEGIN
+    have Ψ ++ Δ ⊢ Ξ             by weakening-left-⊑2 Ψ Γ⊢Ξ Γ⊑Δ
+    have φ ∷ Ψ ++ Δ ⊢ Ξ         apply weakening-left at here
+    have Ψ ++ φ ∷ Δ ⊢ Ξ         apply perm-left (perm-middle Ψ) at here
+    END
+
+weakening-left-⊑ : Γ ⊢ Ξ →
+                   Γ ⊑ Δ →
+                   -------
+                   Δ ⊢ Ξ
+
+weakening-left-⊑ = weakening-left-⊑2 ε
+
+weakening-right-⊑1 : Γ ⊢ Δ →
+                    ----------
+                    Γ ⊢ Δ ++ Ξ
+
+weakening-right-⊑1 {Γ} {Δ} {ε} Γ⊢Δ rewrite ++ε Δ = Γ⊢Δ
+weakening-right-⊑1 {Γ} {Δ} {ξ ∷ Ξ} Γ⊢Δ =
+    BEGIN
+        have Γ ⊢ Δ ++ Ξ                     by weakening-right-⊑1 Γ⊢Δ
+        have Γ ⊢ ξ ∷ Δ ++ Ξ                 apply weakening-right at here
+        have Perm (ξ ∷ Δ ++ Ξ) (Δ ++ ξ ∷ Ξ) by perm-middle Δ
+        have Γ ⊢ Δ ++ ξ ∷ Ξ                 apply perm-right at here , back 1
+    END
+
+weakening-right-⊑2 : ∀ Ψ →
+                     Γ ⊢ Ψ ++ Δ →
+                     Δ ⊑ Ξ →
+                     -----------
+                     Γ ⊢ Ψ ++ Ξ
+
+weakening-right-⊑2 {Γ} {ε} {Ξ} Ψ Γ⊢Δ stop rewrite ++ε Ψ = weakening-right-⊑1 Γ⊢Δ
+
+weakening-right-⊑2 {Γ} {φ ∷ Δ} {φ ∷ Ξ} Ψ Γ⊢Δ·φ (match Δ⊑Ξ)
+    rewrite ++-middle Ψ φ Δ |
+            ++-middle Ψ φ Ξ = weakening-right-⊑2 (Ψ ++ [ φ ]) Γ⊢Δ·φ Δ⊑Ξ
+
+weakening-right-⊑2 {Γ} {Δ} {φ ∷ Ξ} Ψ Γ⊢Δ (skip Δ⊑Ξ) =
+    BEGIN
+    have Γ ⊢ Ψ ++ Ξ             by weakening-right-⊑2 Ψ Γ⊢Δ Δ⊑Ξ
+    have Γ ⊢ φ ∷ Ψ ++ Ξ         apply weakening-right at here
+    have Γ ⊢ Ψ ++ φ ∷ Ξ         apply perm-right (perm-middle Ψ) at here
+    END
+
+weakening-right-⊑ : Γ ⊢ Δ →
+                    Δ ⊑ Ξ →
+                    --------
+                    Γ ⊢ Ξ
+
+weakening-right-⊑ = weakening-right-⊑2 ε
 
 Ax-left-SC_ : φ ∈ Γ →
              ---------
              Γ ⊢ [ φ ]
 
-Ax-left-SC_ {Γ = φ ∷ Ξ} here = weakening-left'-SC Ax
+Ax-left-SC_ {Γ = φ ∷ Ξ} here = weakening-left-⊑1 Ax
 Ax-left-SC_ (there φ∈Γ) = weakening-left (Ax-left-SC φ∈Γ)
 
 -- Ax-SC : φ ∈ Γ →
@@ -269,7 +296,7 @@ ND→SC : Γ ⊢ND φ →
         
 ND→SC (Ass φ∈Γ) = Ax-left-SC φ∈Γ
 
-ND→SC ⊤I = weakening-left'-SC ⊤-right
+ND→SC ⊤I = weakening-left-⊑1 ⊤-right
 
 ND→SC (⇒I Γ·φ⊢NDψ)
     with ND→SC Γ·φ⊢NDψ
@@ -281,7 +308,7 @@ ND→SC {Γ} {ψ} (⇒E {φ = φ} Γ⊢NDφ⇒ψ Γ⊢NDφ)
 ... | Γ⊢φ⇒ψ | Γ⊢φ =
     BEGIN
     have [ ψ ] ⊢ [ ψ ]      by Ax
-    have Γ · ψ ⊢ [ ψ ]      apply weakening-left'-SC at here
+    have Γ · ψ ⊢ [ ψ ]      apply weakening-left-⊑1 at here
     have Γ ⊢ [ φ ]          by Γ⊢φ
     have Γ · φ ⇒ ψ ⊢ [ ψ ]  apply ⇒-left at here , back 1
     have Γ ⊢ [ (φ ⇒ ψ) ]    by Γ⊢φ⇒ψ
@@ -326,8 +353,8 @@ ND→SC {Γ} {φ ∨ ψ} (∨I-right Γ⊢NDψ)
 ... | Γ⊢ψ =
     BEGIN
     have Γ ⊢ [ ψ ]          by Γ⊢ψ
-    have [ ψ ] ⊆ ∅ · φ · ψ  by (λ{here → here}) -- can we mechanise this check? (inclusion of two given finite lists)
-    have Γ ⊢ ∅ · φ · ψ      apply weakening-right-SC at back 1 , here
+    have [ ψ ] ⊑ ∅ · φ · ψ  by match stop -- can we mechanise this check? (subsequence of two given finite lists)
+    have Γ ⊢ ∅ · φ · ψ      apply weakening-right-⊑ at back 1 , here
     have Γ ⊢ [ (φ ∨ ψ) ]    apply ∨-right at here
     END
 
@@ -348,7 +375,7 @@ ND→SC {Γ} {φ} (⊥E Γ⊢ND⊥)
     BEGIN
     have [ ⊥ ] ⊢ ∅         by ⊥-left
     have [ ⊥ ] ⊢ [ φ ]     apply weakening-right at here
-    have Γ · ⊥ ⊢ [ φ ]     apply weakening-left'-SC at here
+    have Γ · ⊥ ⊢ [ φ ]     apply weakening-left-⊑1 at here
     have Γ ⊢ [ ⊥ ]         by Γ⊢⊥
     have Γ ⊢ [ φ ]         apply cut at here , back 1
     END
@@ -358,13 +385,13 @@ ND→SC {Γ} {φ} (⊥⊥E Γ⊢NDφ⇒⊥⇒⊥)
 ... | Γ⊢φ⇒⊥⇒⊥ =
     BEGIN
     have [ φ ] ⊢ [ φ ]                  by Ax
-    have Γ · φ ⊢ [ φ ]                  apply weakening-left'-SC at here
+    have Γ · φ ⊢ [ φ ]                  apply weakening-left-⊑1 at here
     have Γ · φ ⊢ ∅ · φ · ⊥             apply weakening-right at here
     have Γ ⊢ ∅ · φ · φ ⇒ ⊥             apply ⇒-right at here
 
     have [ ⊥ ] ⊢ ∅                    by ⊥-left
     have [ ⊥ ] ⊢ [ φ ]                apply weakening-right at here
-    have Γ · ⊥ ⊢ [ φ ]                apply weakening-left'-SC at here
+    have Γ · ⊥ ⊢ [ φ ]                apply weakening-left-⊑1 at here
     have Γ · (φ ⇒ ⊥) ⇒ ⊥ ⊢ ∅ · φ · φ  apply ⇒-left at back 3 , here
     have Γ · (φ ⇒ ⊥) ⇒ ⊥ ⊢ [ φ ]      apply contraction-right at here
     have Γ ⊢ [ ((φ ⇒ ⊥) ⇒ ⊥) ]        by Γ⊢φ⇒⊥⇒⊥
@@ -375,8 +402,8 @@ ND→SC {Γ} {¬ φ} (¬I Γ⊢NDφ⇒⊥)
     with ND→SC Γ⊢NDφ⇒⊥
 ... | Γ⊢φ⇒⊥ =
     BEGIN
-    have Γ · φ · ⊥ ⊢ ∅              by weakening-left'-SC ⊥-left
-    have Γ · φ ⊢ [ φ ]              by weakening-left'-SC Ax
+    have Γ · φ · ⊥ ⊢ ∅              by weakening-left-⊑1 ⊥-left
+    have Γ · φ ⊢ [ φ ]              by weakening-left-⊑1 Ax
     have Γ · φ · φ ⇒ ⊥ ⊢ ∅          apply ⇒-left at here , back 1
     have Γ ⊢ [ (φ ⇒ ⊥) ]            by Γ⊢φ⇒⊥
     have Γ · φ ⊢ [ (φ ⇒ ⊥) ]        apply weakening-left at here
@@ -390,8 +417,8 @@ ND→SC {Γ} {φ ⇒ ⊥} (¬E Γ⊢ND¬φ)
 ... | Γ⊢¬φ =
     BEGIN
     have Γ · φ ⊢ [ φ ]            by Ax-left-SC here
-    have [ φ ] ⊆ ∅ · ⊥ · φ        by (λ{here → here}) -- can this inclusion check be automated?
-    have Γ · φ ⊢ ∅ · ⊥ · φ        apply weakening-right-SC at back 1 , here
+    have [ φ ] ⊑ ∅ · ⊥ · φ        by match stop -- can this be automated?
+    have Γ · φ ⊢ ∅ · ⊥ · φ        apply weakening-right-⊑ at back 1 , here
     have Γ · φ · ¬ φ ⊢ [ ⊥ ]      apply ¬-left at here
     have Γ ⊢ [ (¬ φ) ]            by Γ⊢¬φ
     have Γ · φ ⊢ [ (¬ φ) ]        apply weakening-left at here
@@ -440,7 +467,7 @@ ND→SC {Γ} {(φ ⇒ ψ) ∧ (ψ ⇒ φ)} (⇔E Γ⊢NDφ⇔ψ)
     have Γ ⊢ [ (φ ⇒ ψ) ]                    apply ⇒-right at here
 
     have Γ · ψ ⊢ [ (φ ⇔ ψ) ]                apply weakening-left at back 6
-    have Γ · ψ ⊢ ∅ · φ · ψ                  by weakening-right-SC (Ax-left-SC here) (λ{here → here}) 
+    have Γ · ψ ⊢ ∅ · φ · ψ                  by weakening-right-⊑ (Ax-left-SC here) (match stop)
     have Γ · ψ · φ · ψ ⊢ [ φ ]              by weakening-left (Ax-left-SC here)
     have Γ · ψ · φ ⇔ ψ ⊢ [ φ ]              apply ⇔-left at back 1 , here
     have Γ · ψ ⊢ [ φ ]                      apply cut at back 3 , here

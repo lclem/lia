@@ -17,26 +17,26 @@ data TList {ℓ} : Set ℓ * → Set ℓ where
     BEGIN : TList ε
     _,_ : ∀ {A : Set ℓ} {As : Set ℓ *} → A → TList As → TList (A ∷ As)
 
-fetchElem : ∀ {A : Set} {As : Set *} → TList As → A ∈ As → A
+fetchElem : ∀ {ℓ} {A : Set ℓ} {As : Set ℓ *} → TList As → A ∈ As → A
 fetchElem (a , _) here = a
 fetchElem (_ , as) (there A∈As) = fetchElem as A∈As
 
-Funs : (As : Set *) (B : Set) → Set
+Funs : ∀ {ℓ} (As : Set ℓ *) (B : Set ℓ) → Set ℓ
 Funs ε B = B
 Funs (A ∷ As) B = A → Funs As B
 
 infixl 7.2 _have_by_ _have_apply_at_ -- haveApplyAt
 
-_have_by_ : ∀ {As : Set *} → TList As → (A : Set) → A → TList (A ∷ As)
+_have_by_ : ∀ {ℓ} {As : Set ℓ *} → TList As → (A : Set ℓ) → A → TList (A ∷ As)
 as have A by a = a , as
 
-_have_apply_at_ : ∀ {As Bs : Set *} → TList Bs → (B : Set) → Funs As B → X (map (λ A → A ∈ Bs) As) → TList (B ∷ Bs)
-_have_apply_at_ {ε} {Bs} bs B b tt = b , bs
-_have_apply_at_ {A ∷ ε} {Bs} bs B f A∈Bs = f (fetchElem bs A∈Bs) , bs
-_have_apply_at_ {A ∷ As@(A' ∷ As')} {Bs} bs B f (A∈Bs , pr) = _have_apply_at_ {As} {Bs} bs B (f (fetchElem bs A∈Bs)) pr
+_have_apply_at_ : ∀ {ℓ} {As Bs : Set ℓ *} → TList Bs → (B : Set ℓ) → Funs As B → X (map (λ A → A ∈ Bs) As) → TList (B ∷ Bs)
+_have_apply_at_ {ℓ} {ε} {Bs} bs B b tt = b , bs
+_have_apply_at_ {ℓ} {A ∷ ε} {Bs} bs B f A∈Bs = f (fetchElem bs A∈Bs) , bs
+_have_apply_at_ {ℓ} {A ∷ As@(A' ∷ As')} {Bs} bs B f (A∈Bs , pr) = _have_apply_at_ {ℓ} {As} {Bs} bs B (f (fetchElem bs A∈Bs)) pr
 
 infixl 7.1 _haveit haveit-syntax
-_haveit : {A : Set} {As : Set *} → TList (A ∷ As) → A
+_haveit : ∀ {ℓ} {A : Set ℓ} {As : Set ℓ *} → TList (A ∷ As) → A
 (a , _) haveit = a
 
 haveit-syntax = _haveit
