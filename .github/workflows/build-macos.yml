@@ -27,9 +27,7 @@ jobs:
         run: brew install agda pandoc pandoc-crossref gsed
         # deprecated: pandoc-citeproc
       - name: Install pandoc-numbering
-        run: pip install pandoc-numbering
-      - name: Update pandoc-numbering
-        run: pip install --upgrade pandoc-numbering
+        run: pip3 install pandoc-numbering
       - name: Bundle install
         run: bundle install  
         #agda-mode setup
