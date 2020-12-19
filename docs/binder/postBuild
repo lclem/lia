@@ -8,6 +8,7 @@
 make kernel-install
 make codemirror-install
 
+sudo apt-get update agda
 sudo apt-get install agda-mode
 sudo apt-get install agda-stdlib
 agda-mode setup
