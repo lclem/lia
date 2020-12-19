@@ -1,9 +1,9 @@
 #!/bin/bash
 
-cabal update
-cabal install alex
-cabal install happy
-cabal install Agda-2.6.1
+# cabal update
+# cabal install alex
+# cabal install happy
+# cabal install Agda-2.6.1
 
 make kernel-install
 make codemirror-install
