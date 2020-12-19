@@ -6,10 +6,16 @@
 # apt-get install --yes agda-stdlib
 
 export PATH="$PATH:$HOME/.cabal/bin/"
-echo PATH=$PATH:$HOME/.cabal/bin/ > /srv/conda/etc/conda/activate.d
 echo PATH=$PATH:$HOME/.cabal/bin/ >> $HOME/.bashrc
 
 source $HOME/.bashrc
+
+cd $CONDA_PREFIX
+mkdir -p ./etc/conda/activate.d
+mkdir -p ./etc/conda/deactivate.d
+touch ./etc/conda/activate.d/env_vars.sh
+touch ./etc/conda/deactivate.d/env_vars.sh
+echo PATH=$PATH:$HOME/.cabal/bin/ > ./etc/conda/activate.d/env_vars.sh
 
 echo PATH=$PATH
 
