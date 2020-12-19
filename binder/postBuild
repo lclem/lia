@@ -5,13 +5,15 @@
 # cabal install happy
 # cabal install Agda-2.6.1
 
+sudo apt-get update
+sudo apt-get install --yes agda=2.6.1
+sudo apt-get install --yes agda-mode
+sudo apt-get install --yes agda-stdlib
+
+agda-mode setup
+
 make kernel-install
 make codemirror-install
-
-sudo apt-get reinstall agda=2.6.1
-sudo apt-get install agda-mode
-sudo apt-get install agda-stdlib
-agda-mode setup
 
 export PATH=$PATH:$HOME/.cabal/bin/
 echo PATH=$PATH:$HOME/.cabal/bin/ > /srv/conda/etc/conda/activate.d
