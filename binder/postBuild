@@ -11,6 +11,8 @@ echo PATH=$PATH:$HOME/.cabal/bin/ >> $HOME/.bashrc
 
 source $HOME/.bashrc
 
+echo PATH=$PATH
+
 cabal update
 cabal install alex
 cabal install happy
