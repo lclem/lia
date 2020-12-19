@@ -1,34 +1,35 @@
 #!/bin/bash
 
-apt-get update
-apt-get install --yes agda=2.6.1
-apt-get install --yes agda-mode
-apt-get install --yes agda-stdlib
+# apt-get update
+# apt-get install --yes agda=2.6.1
+# apt-get install --yes agda-mode
+# apt-get install --yes agda-stdlib
+
+export PATH="$PATH:$HOME/.cabal/bin/"
+echo PATH=$PATH:$HOME/.cabal/bin/ >> $HOME/.bashrc
+
+source $HOME/.bashrc
+
+cd $CONDA_PREFIX
+mkdir -p ./etc/conda/activate.d
+mkdir -p ./etc/conda/deactivate.d
+touch ./etc/conda/activate.d/env_vars.sh
+touch ./etc/conda/deactivate.d/env_vars.sh
+echo PATH=$PATH:$HOME/.cabal/bin/ > ./etc/conda/activate.d/env_vars.sh
+
+echo PATH=$PATH
 
 cabal update
 cabal install alex
 cabal install happy
 cabal install Agda-2.6.1
 
+which agda
+
 agda-mode setup
-
-make kernel-install
-make codemirror-install
-
-export PATH=$PATH:$HOME/.cabal/bin/
-echo PATH=$PATH:$HOME/.cabal/bin/ > /srv/conda/etc/conda/activate.d
-echo PATH=$PATH:$HOME/.cabal/bin/ > $HOME/.bashrc
 
 pip install agda_kernel
 python -m agda_kernel.install
-
-#curl https://gitlab.haskell.org/haskell/ghcup/raw/master/bootstrap-haskell -sSf | sh
-#ghcup install-cabal
-
-#cabal install Cabal cabal-install
-#cabal update
-#cabal install Agda
-#agda-mode setup
 
 jupyter contrib nbextension install --user
 jupyter nbextension enable --py widgetsnbextension

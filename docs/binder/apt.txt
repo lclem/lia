@@ -1,5 +1,10 @@
+apt-utils
 ghc
 cabal-install
+
+#agda
+#agda-mode
+#agda-stdlib
 
 zlib1g-dev
 libncurses5-dev

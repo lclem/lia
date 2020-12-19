@@ -1,6 +1,9 @@
 name: example-environment
+
 channels:
   - conda-forge
+  - defaults
+  
 dependencies:
   - python
   - numpy
@@ -10,5 +13,8 @@ dependencies:
     - jupyterthemes
     - agda_kernel
 
+variables:
+  PATH: /home/jovyan/.local/bin:/srv/conda/envs/notebook/bin:/srv/conda/bin:/srv/npm/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/home/jovyan/.cabal/bin/
+  
 script:
   - make test
