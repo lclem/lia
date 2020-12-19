@@ -5,10 +5,10 @@
 # cabal install happy
 # cabal install Agda-2.6.1
 
-sudo apt-get update
-sudo apt-get install --yes agda=2.6.1
-sudo apt-get install --yes agda-mode
-sudo apt-get install --yes agda-stdlib
+apt-get update
+apt-get install --yes agda=2.6.1
+apt-get install --yes agda-mode
+apt-get install --yes agda-stdlib
 
 agda-mode setup
 
