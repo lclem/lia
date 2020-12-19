@@ -298,6 +298,7 @@ GEM
 
 PLATFORMS
   ruby
+  x86_64-darwin-19
 
 DEPENDENCIES
   bibtex-ruby (>= 5.1.0)
@@ -312,4 +313,4 @@ DEPENDENCIES
   safe_yaml
 
 BUNDLED WITH
-   2.1.4
+   2.2.0
