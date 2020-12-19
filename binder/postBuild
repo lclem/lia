@@ -5,16 +5,20 @@
 # apt-get install --yes agda-mode
 # apt-get install --yes agda-stdlib
 
+export PATH=$PATH:$HOME/.cabal/bin/
+echo PATH=$PATH:$HOME/.cabal/bin/ >> /srv/conda/etc/conda/activate.d
+echo PATH=$PATH:$HOME/.cabal/bin/ >> $HOME/.bashrc
+
+source $HOME/.bashrc
+
 cabal update
 cabal install alex
 cabal install happy
 cabal install Agda-2.6.1
 
-agda-mode setup
+which agda
 
-export PATH=$PATH:$HOME/.cabal/bin/
-echo PATH=$PATH:$HOME/.cabal/bin/ > /srv/conda/etc/conda/activate.d
-echo PATH=$PATH:$HOME/.cabal/bin/ > $HOME/.bashrc
+agda-mode setup
 
 pip install agda_kernel
 python -m agda_kernel.install
