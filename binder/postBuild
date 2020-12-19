@@ -5,8 +5,8 @@
 # apt-get install --yes agda-mode
 # apt-get install --yes agda-stdlib
 
-export PATH=$PATH:$HOME/.cabal/bin/
-echo PATH=$PATH:$HOME/.cabal/bin/ >> /srv/conda/etc/conda/activate.d
+export PATH="$PATH:$HOME/.cabal/bin/"
+echo PATH=$PATH:$HOME/.cabal/bin/ > /srv/conda/etc/conda/activate.d
 echo PATH=$PATH:$HOME/.cabal/bin/ >> $HOME/.bashrc
 
 source $HOME/.bashrc
