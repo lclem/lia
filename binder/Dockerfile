@@ -8,11 +8,11 @@ FROM banacorn/agda:2.6.0.1
 RUN apt-get update
 RUN apt-get install --yes python3-pip
 
-RUN pip3 install --no-cache --upgrade pip && \
-    pip3 install --no-cache notebook
+RUN python3 -m pip install --no-cache --upgrade pip && \
+    python3 -m pip install --no-cache notebook
     
-RUN pip3 install agda_kernel
-RUN python -m agda_kernel.install
+RUN python3 -m pip install agda_kernel
+RUN python3 -m agda_kernel.install
 
 USER root
 
