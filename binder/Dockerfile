@@ -14,8 +14,8 @@ RUN apt-get install --yes python3-pip
 
 USER $NB_UID
 
-RUN python3 -m pip install --no-cache --upgrade pip && \
-    python3 -m pip install --no-cache notebook
+RUN python3 -m pip install --upgrade pip && \
+    python3 -m pip install notebook
     
 RUN python3 -m pip install agda_kernel
 RUN python3 -m agda_kernel.install
