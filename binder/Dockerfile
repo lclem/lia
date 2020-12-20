@@ -1,4 +1,6 @@
-FROM banacorn/agda:2.6.0.1
+FROM yossarianlives/agda-notebook:1c60c1aa52a8
+
+#banacorn/agda:2.6.0.1
 
 # crosscompass/ihaskell-notebook:62631e7176e8
 
