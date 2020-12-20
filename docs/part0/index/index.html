@@ -80,18 +80,20 @@
 <li class="toc-entry toc-h1"><a href="#references">References</a></li>
 <li class="toc-entry toc-h1"><a href="#references-1">References</a></li>
 <li class="toc-entry toc-h1"><a href="#solutions">Solutions</a></li>
-</ul><pre class="Agda"><a id="59" class="Keyword">module</a> <a id="66" href="/lia/part0/index/" class="Module">part0.index</a> <a id="78" class="Keyword">where</a>
-<a id="84" class="Keyword">open</a> <a id="89" class="Keyword">import</a> <a id="96" href="/lia/part0/Utils/" class="Module">part0.Utils</a> <a id="108" class="Keyword">public</a>
-<a id="115" class="Keyword">open</a> <a id="120" class="Keyword">import</a> <a id="127" href="/lia/part0/Equality/" class="Module">part0.Equality</a> <a id="142" class="Keyword">public</a>
-<a id="149" class="Keyword">open</a> <a id="154" class="Keyword">import</a> <a id="161" href="/lia/part0/Logic/" class="Module">part0.Logic</a> <a id="173" class="Keyword">public</a>
-<a id="180" class="Keyword">open</a> <a id="185" class="Keyword">import</a> <a id="192" href="/lia/part0/Decidable/" class="Module">part0.Decidable</a> <a id="208" class="Keyword">public</a>
-<a id="215" class="Keyword">open</a> <a id="220" class="Keyword">import</a> <a id="227" href="/lia/part0/Booleans/" class="Module">part0.Booleans</a> <a id="242" class="Keyword">public</a>
-<a id="249" class="Keyword">open</a> <a id="254" class="Keyword">import</a> <a id="261" href="/lia/part0/List/" class="Module">part0.List</a> <a id="272" class="Keyword">public</a>
-<a id="279" class="Keyword">open</a> <a id="284" class="Keyword">import</a> <a id="291" href="/lia/part0/Permutations/" class="Module">part0.Permutations</a> <a id="310" class="Keyword">public</a>
-<a id="317" class="Keyword">open</a> <a id="322" class="Keyword">import</a> <a id="329" href="/lia/part0/TList/" class="Module">part0.TList</a> <a id="341" class="Keyword">public</a>
-<a id="348" class="Keyword">open</a> <a id="353" class="Keyword">import</a> <a id="360" href="/lia/part0/Finite/" class="Module">part0.Finite</a> <a id="373" class="Keyword">public</a>
-<a id="380" class="Keyword">open</a> <a id="385" class="Keyword">import</a> <a id="392" href="/lia/part0/Enumerable/" class="Module">part0.Enumerable</a> <a id="409" class="Keyword">public</a>
-<a id="416" class="Keyword">open</a> <a id="421" class="Keyword">import</a> <a id="428" href="/lia/part0/Tree/" class="Module">part0.Tree</a> <a id="439" class="Keyword">public</a></pre>
+</ul><pre class="Agda"><a id="59" class="Symbol">{-#</a> <a id="63" class="Keyword">OPTIONS</a> <a id="71" class="Pragma">--allow-unsolved-metas</a> <a id="94" class="Symbol">#-}</a>
+
+<a id="99" class="Keyword">module</a> <a id="106" href="/lia/part0/index/" class="Module">part0.index</a> <a id="118" class="Keyword">where</a>
+<a id="124" class="Keyword">open</a> <a id="129" class="Keyword">import</a> <a id="136" href="/lia/part0/Utils/" class="Module">part0.Utils</a> <a id="148" class="Keyword">public</a>
+<a id="155" class="Keyword">open</a> <a id="160" class="Keyword">import</a> <a id="167" href="/lia/part0/Equality/" class="Module">part0.Equality</a> <a id="182" class="Keyword">public</a>
+<a id="189" class="Keyword">open</a> <a id="194" class="Keyword">import</a> <a id="201" href="/lia/part0/Logic/" class="Module">part0.Logic</a> <a id="213" class="Keyword">public</a>
+<a id="220" class="Keyword">open</a> <a id="225" class="Keyword">import</a> <a id="232" href="/lia/part0/Decidable/" class="Module">part0.Decidable</a> <a id="248" class="Keyword">public</a>
+<a id="255" class="Keyword">open</a> <a id="260" class="Keyword">import</a> <a id="267" href="/lia/part0/Booleans/" class="Module">part0.Booleans</a> <a id="282" class="Keyword">public</a>
+<a id="289" class="Keyword">open</a> <a id="294" class="Keyword">import</a> <a id="301" href="/lia/part0/List/" class="Module">part0.List</a> <a id="312" class="Keyword">public</a>
+<a id="319" class="Keyword">open</a> <a id="324" class="Keyword">import</a> <a id="331" href="/lia/part0/Permutations/" class="Module">part0.Permutations</a> <a id="350" class="Keyword">public</a>
+<a id="357" class="Keyword">open</a> <a id="362" class="Keyword">import</a> <a id="369" href="/lia/part0/TList/" class="Module">part0.TList</a> <a id="381" class="Keyword">public</a>
+<a id="388" class="Keyword">open</a> <a id="393" class="Keyword">import</a> <a id="400" href="/lia/part0/Finite/" class="Module">part0.Finite</a> <a id="413" class="Keyword">public</a>
+<a id="420" class="Keyword">open</a> <a id="425" class="Keyword">import</a> <a id="432" href="/lia/part0/Enumerable/" class="Module">part0.Enumerable</a> <a id="449" class="Keyword">public</a>
+<a id="456" class="Keyword">open</a> <a id="461" class="Keyword">import</a> <a id="468" href="/lia/part0/Tree/" class="Module">part0.Tree</a> <a id="479" class="Keyword">public</a></pre>
 
 <p>An example citation to [<a href="#ref-Craig:JSL:1957">Craig(1957)</a>] and
 another to the same [<a href="#ref-Craig:JSL:1957">Craig(1957)</a>], then
@@ -167,7 +169,7 @@ Mathematics</em>. 28(1/4):459–471, 1926.</p>
     
 </p>
 
-    <p class="p-name"> Last-modified: Dec 20 13:44:00 2020 </p>
+    <p class="p-name"> Last-modified: Dec 20 18:11:38 2020 </p>
   </article>
       </div>
     </main><footer class="site-footer h-card">
