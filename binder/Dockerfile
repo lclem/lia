@@ -1,4 +1,4 @@
-FROM yossarianlives/agda-notebook:1c60c1aa52a8
+FROM yossarianlives/agda-notebook:latest
 
 #banacorn/agda:2.6.0.1
 
