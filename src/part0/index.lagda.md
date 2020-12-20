@@ -3,6 +3,8 @@ title: "Part 0: Basic programming in Agda 🚧"
 ---
 
 ```
+{-# OPTIONS --allow-unsolved-metas #-}
+
 module part0.index where
 open import part0.Utils public
 open import part0.Equality public

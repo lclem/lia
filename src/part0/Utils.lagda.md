@@ -6,6 +6,11 @@ title: Utilities 🚧
 module part0.Utils where
 open import Agda.Primitive public
 
+private
+  variable
+    ℓ : Level
+    A : Set ℓ
+
 whatever : Setω
 whatever = ∀ {ℓ} {A : Set ℓ} → A
 
@@ -40,7 +45,13 @@ _∘_ : ∀ {ℓ m o} {A : Set ℓ} {B : A → Set m} {C : A → Set o} →
 _﹔_ : ∀ {ℓ m o} {A : Set ℓ} {B : Set m} {C : Set o} →  (A → B) → (B → C) → A → C
 f ﹔ g = g ∘ f
 
--- guest the argument!
+-- guess the argument!
 auto : ∀ {ℓ m} {A : Set ℓ} {B : A → Set m} → ((a : A) → B a) → {a : A} → B a
 auto f {a} = f a
+
+inst-auto : ∀ {ℓ m} {A : Set ℓ} {B : A → Set m} → ((a : A) → B a) → {{a : A}} → B a
+inst-auto f {{a}} = f a
+
+by-inst : ∀ {a} {A : Set a} → {{A}} → A -- {{_ : A}} → A
+by-inst {{x}} = x
 ```

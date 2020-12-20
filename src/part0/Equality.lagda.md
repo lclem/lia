@@ -10,8 +10,10 @@ open import part0.Decidable public
 
 private
   variable
-    ℓ m : Level
+    ℓ m n : Level
     A : Set ℓ
+    B : Set m
+    x y z : A
 
 infix 4 _≡_ _≢_
 data _≡_ {ℓ} {A : Set ℓ} (x : A) : A → Set where
@@ -21,14 +23,29 @@ data _≡_ {ℓ} {A : Set ℓ} (x : A) : A → Set where
 {-# BUILTIN EQUALITY _≡_ #-}
 {-# BUILTIN REWRITE _≡_ #-}
 
-sym : ∀ {ℓ} {A : Set ℓ} {x y : A} → x ≡ y → y ≡ x
+sym : x ≡ y → y ≡ x
 sym refl = refl
 
-trans : ∀ {ℓ} {A : Set ℓ} {x y z : A} → x ≡ y → y ≡ z → x ≡ z
+inst1 : ∀ {B : Set m} → (A → B) → {{A}} → B
+inst1 f {{a}} = f a
+
+-- inst2 : ∀ {B : Set m} {C : Set n} → (A → B → C) → {{A}} → {{B}} → C
+-- inst2 f {{a}} {{b}} = f a b
+
+instance inst-sym : {{x ≡ y}} → y ≡ x
+inst-sym {{x≡y}} = sym x≡y
+
+trans : x ≡ y → y ≡ z → x ≡ z
 trans refl refl = refl
 
-cong : ∀ {ℓ m} {A : Set ℓ} {B : Set m} (f : A → B) {x y : A} → x ≡ y → f x ≡ f y
+instance inst-trans : {{x ≡ y}} → {{y ≡ z}} → x ≡ z
+inst-trans {{arg1}} {{arg2}} = trans arg1 arg2
+
+cong : (f : A → B) {x y : A} → x ≡ y → f x ≡ f y
 cong f refl = refl
+
+instance inst-cong : {{f : {A} → B}} {x y : A} → {{x ≡ y}} → f {x} ≡ f {y}
+inst-cong {{f}} {{arg2}} = cong (λ x → f {x}) arg2
 
 -- not very useful since higher-order unification is undecidable...
 cong-auto : ∀ {ℓ m} {A : Set ℓ} {B : Set m} {f : A → B} {x y : A} → x ≡ y → f x ≡ f y
@@ -42,6 +59,11 @@ subst P refl px = px
 
 repl : ∀ {ℓ} {A B : Set ℓ} → A → A ≡ B → B
 repl a refl = a
+
+-- doesn't work since ends in "B"
+-- "Terms marked as eligible for instance search should end with a name, so `instance' is ignored here."
+--instance inst-repl : ∀ {A B : Set ℓ} → {{A}} → {{A ≡ B}} → B
+--inst-repl {{a}} {{A≡B}} = repl a A≡B
 
 infix  1 begin_
 infixr 2 _≡⟨⟩_ _≡⟨_⟩_

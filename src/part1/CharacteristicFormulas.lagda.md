@@ -42,7 +42,7 @@ Under the assumption that there are only three propositions `p₀, p₁, p₂` i
 a characteristic formula for `ϱ₁` is, e.g.,
 
 ```
-ψ₁ : Formula
+private ψ₁ : Formula
 ψ₁ = ¬ ` p₀ ∧ ¬ ` p₁ ∧ ` p₂
 ```
 

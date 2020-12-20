@@ -1456,7 +1456,7 @@ then we can add `φ` to `Γ` and form the new context `Γ · φ`
 (this is just adding an element in front of a list but written on the right).
 
 ```
-infixl 50 _·_  
+infixl 26 _·_  
 _·_ : Context → Formula → Context
 Γ · φ = φ ∷ Γ
 -- pattern _·_ Γ φ = φ ∷ Γ

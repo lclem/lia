@@ -3,7 +3,8 @@ title: Natural numbers🚧
 ---
 
 ```
-{-# OPTIONS --allow-unsolved-metas --rewriting --confluence-check #-}
+{-# OPTIONS --rewriting --confluence-check #-}
+{-# OPTIONS --allow-unsolved-metas #-}
 
 module part0.Naturals where
 open import part0.Equality public
@@ -13,6 +14,10 @@ data ℕ : Set where
   suc : ℕ → ℕ
 
 {-# BUILTIN NATURAL ℕ #-}
+
+private
+  variable
+    k m n : ℕ
 
 suc-inj : ∀ {m n : ℕ} → suc m ≡ suc n → m ≡ n
 suc-inj refl = refl
@@ -32,32 +37,31 @@ instance
 infix 5 _≤_ _<_ _≥_ _>_
 
 data _≤_ : ℕ → ℕ → Set where
-  0≤n : ∀ {n : ℕ} → zero ≤ n
-  s≤s : ∀ {m n : ℕ} → m ≤ n → suc m ≤ suc n
-```
+  instance 0≤n : ∀ {n : ℕ} → zero ≤ n
+  s≤s : m ≤ n → suc m ≤ suc n
 
-Examples:
-
-```
-1≤2 : 1 ≤ 2
-1≤2 = {!!}
-
+instance inst-s≤s : {{m ≤ n}} → suc m ≤ suc n
+inst-s≤s {{arg}} = s≤s arg
 ```
 
 ```
 postulate n≤n : ∀ (n : ℕ) → n ≤ n
-postulate refl-≤ : ∀ {n : ℕ} → n ≤ n
+
+refl-≤ : n ≤ n
+refl-≤ {zero} = 0≤n
+refl-≤ {suc n} = s≤s refl-≤
 
 suc-≤ : ∀ {m n : ℕ} → suc m ≤ suc n → m ≤ n
 suc-≤ (s≤s p) = p
 
 -- TODO
-postulate _≤?_ : ∀ (m n : ℕ) → Dec (m ≤ n)
-
-max : ℕ → ℕ → ℕ
-max m n with m ≤? n
-... | yes _ = n
-... | no _ = m
+_≤?_ : ∀ m n → Dec (m ≤ n)
+zero ≤? n = yes 0≤n
+suc m ≤? zero = no λ ()
+suc m ≤? suc n
+  with m ≤? n
+... | yes m≤n = yes (s≤s m≤n)
+... | no ~m≤n = no λ{ (s≤s m≤n) → ~m≤n m≤n}
 
 _≥_ _<_ _>_ : ℕ → ℕ → Set
 m ≥ n = n ≤ m
@@ -91,6 +95,12 @@ trans-≤ : ∀ {l m n} → l ≤ m → m ≤ n → l ≤ n
 trans-≤ 0≤n _ = 0≤n
 trans-≤ (s≤s l≤m) (s≤s m≤n) = s≤s (trans-≤ l≤m m≤n)
 
+_ : 1 ≤ 2
+_ = by-inst
+
+-- instance inst-trans-≤ : ∀ {l m n} → {{l ≤ m}} → {{m ≤ n}} → l ≤ n
+-- inst-trans-≤ {{arg1}} {{arg2}} = trans-≤ arg1 arg2
+
 postulate <trans-≤ : ∀ {l m n} → l < m → m ≤ n → l < n
 postulate ≤trans-< : ∀ {l m n} → l ≤ m → m < n → l < n
 postulate trans-< : ∀ {l m n} → l < m → m < n → l < n
@@ -98,6 +108,51 @@ postulate trans-> : ∀ {l m n} → l > m → m > n → l > n
 
 antisym-≤ : ∀ {m n} → m ≤ n → n ≤ m → m ≡ n
 antisym-≤ = {!!}
+
+max : ℕ → ℕ → ℕ
+max m n with m ≤? n
+... | yes _ = n
+... | no _ = m
+
+max-zero-left : ∀ m → max 0 m ≡ m
+max-zero-left _ = refl
+
+max-zero-right : ∀ m → max m 0 ≡ m
+max-zero-right zero = refl
+max-zero-right (suc m) = refl
+
+-- {-# REWRITE  #-}
+
+-- instance
+max-prop-left : m ≤ max m n 
+max-prop-left {m} {n}
+  with m ≤? n
+... | yes m≤n = m≤n
+... | (no _) = refl-≤
+
+-- instance
+sym-max : max m n ≡ max n m
+sym-max = {!   !}
+
+max-≤-left : max k m ≤ n → k ≤ n
+max-≤-left {k} {m} {n} maxkm≤n
+  with k ≤? m
+... | yes k≤m = trans-≤ k≤m maxkm≤n
+... | no _ = maxkm≤n
+
+max-≤-right : max k m ≤ n → m ≤ n
+max-≤-right {k} {m} {n} maxkm≤n rewrite sym-max {k} {m} = max-≤-left maxkm≤n
+
+-- instance
+inst-max-≤-left : {{max k m ≤ n}} → k ≤ n
+inst-max-≤-left {{arg}} = max-≤-left arg
+
+-- instance
+inst-max-≤-right : {{max k m ≤ n}} → m ≤ n
+inst-max-≤-right {{arg}} = max-≤-right arg
+
+_ : max m n ≤ m
+_ = {!   !}
 
 n<suc2n : ∀ {n} → n < suc (suc n)
 n<suc2n {n} = trans-< (n<sucn {n}) (n<sucn {suc n})
@@ -171,7 +226,7 @@ test x0 x y z p0 p q =
 ~n<n {suc n} q with ~n<n {n}
 ... | p = p (suc-≤ q)
 
-infixl 6 _+_
+infixl 11 _+_
 
 _+_ : ℕ → ℕ → ℕ
 zero + m = m
@@ -194,9 +249,9 @@ postulate suc-lemma : {m n : ℕ} → m + suc n ≡ suc m + n -- the commuting v
 
 ≤+ : ∀ {m n} → m ≤ m + n
 ≤+ {zero} {n} = 0≤n
-≤+ {suc m} {n} = s≤s ≤+
+≤+ {suc m} {n} = s≤s (≤+ {m} {n})
 
-infixl 7 _*_
+infixl 12 _*_
 
 _*_ : ℕ → ℕ → ℕ
 zero * m = zero
@@ -209,7 +264,7 @@ Examples (these will be useful thorough the book)
 
 ```
 1≤2*1 : 1 ≤ 2 * 1
-1≤2*1 = {!!}
+1≤2*1 = by-inst
 ```
 
 ```
@@ -224,8 +279,14 @@ postulate comm-+ : ∀ {m n} → m + n ≡ n + m
 
 {-# REWRITE n*1≡n  #-}
 
+m≤1+n→~m≤n→m≡1+n : m ≤ 1 + n → ~ (m ≤ n) → m ≡ 1 + n
+m≤1+n→~m≤n→m≡1+n = ?
+
+m≤1+n→~m≡1+n→m≤n : m ≤ 1 + n → ~ (m ≡ 1 + n) → m ≤ n
+m≤1+n→~m≡1+n→m≤n = ?
+
 -- monus
-infixl 6 _∸_
+infixl 11 _∸_
 
 _∸_ : ℕ → ℕ → ℕ
 m     ∸ zero   =  m

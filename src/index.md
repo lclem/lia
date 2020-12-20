@@ -7,6 +7,49 @@ csl: chicago.csl
 notes-after-punctuation: false
 ---
 
+<script type="text/x-thebe-config">
+      {
+        bootstrap: true,
+	    requestKernel: true,
+        selector: "pre",
+        binderOptions: {
+            repo: "lclem/lia",
+            ref: "main",
+            binderUrl: "https://mybinder.org",
+            repoProvider: "github",
+        },
+        kernelOptions: {
+            name: "agda",
+            kernelName: "agda",
+            path: "./src/",
+            // notebook server configuration; not needed with binder
+            // serverSettings: {
+            //      "baseUrl": "http://127.0.0.1:8888",
+            //      "token": "test-secret"
+            //    }
+        },
+      }
+</script>
+
+<script type="text/javascript" src="https://unpkg.com/thebelab@latest"></script>
+
+<pre>
+module test where
+
+open import part0.Naturals
+
+variable
+    ℓ m : Level
+    A : Set ℓ
+    B : Set m
+
+proj1 : A → B → A
+proj1 x y = x
+
+proj2 : A → B → B
+proj2 x y = ?
+</pre>
+
 This book is an introduction to propositional and first-order logic.
 The material is developed using the proof assistant Agda.
 

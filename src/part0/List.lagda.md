@@ -4,8 +4,9 @@ title: Lists🚧
 
 ```
 -- {-# OPTIONS --termination-depth=10 #-}
-{-# OPTIONS --allow-unsolved-metas --overlapping-instance #-}
-{-# OPTIONS --rewriting  #-}
+{-# OPTIONS --instance-search-depth=3 #-}
+{-# OPTIONS --allow-unsolved-metas #-}
+{-# OPTIONS --rewriting #-}
 
 -- --confluence-check gives:
 -- An internal error has occurred. Please report this as a bug.
@@ -213,6 +214,26 @@ filter P? (a ∷ as) with P? a
 ```
 remove : ∀ {ℓ} {A : Set ℓ} {{_ : Eq A}} → A → A * → A *
 remove a = filter λ x → ~? (x ≡? a)
+
+infixl 30 _∖_
+
+_∖_ : ∀ {ℓ} {A : Set ℓ} {{_ : Eq A}} → A * → A → A *
+as ∖ a = remove a as
+
+remove-sing : ∀ {ℓ} {A : Set ℓ} {{_ : Eq A}} (a : A) → remove a ([ a ]) ≡ ε
+remove-sing a
+  with a ≡? a
+... | yes _ = refl
+... | no a≢a = x≢x-elim a≢a
+
+remove-∷ : ∀ {ℓ} {A : Set ℓ} {{_ : Eq A}} (a : A) (as : A *) → remove a (a ∷ as) ≡ remove a as
+remove-∷ a as = {!   !}
+
+remove-≢-∷ : ∀ {ℓ} {A : Set ℓ} {{_ : Eq A}} {a b : A} (as : A *) → a ≢ b → remove a (b ∷ as) ≡ b ∷ remove a as
+remove-≢-∷ {a} {b} as a≢b = {!   !}
+
+remove-++ : ∀ {ℓ} {A : Set ℓ} {{_ : Eq A}} (a : A) (as bs : A *) → remove a (as ++ bs) ≡ remove a as ++ remove a bs
+remove-++ a as bs = {!   !}
 
 remove-map : ∀ {ℓ m} {A : Set ℓ} {B : Set m} {{_ : Eq A}} {{_ : Eq B}}
   {f : A → B} →
@@ -422,8 +443,8 @@ head (a ∷ _) = right (a , here)
 instance
   eq∈ : ∀ {ℓ} {A : Set ℓ} {a : A} {as : A *} → Eq (a ∈ as)
   _≡?_ {{eq∈}} here here = yes refl
-  _≡?_ {{eq∈}} here (there _) = no (λ ())
-  _≡?_ {{eq∈}} (there _) here = no (λ ())
+  _≡?_ {{eq∈}} here (there _) = no λ ()
+  _≡?_ {{eq∈}} (there _) here = no λ ()
   _≡?_ {{eq∈}} (there a∈as1) (there a∈as2) with a∈as1 ≡? a∈as2
   ... | yes refl = yes refl
   ... | no a∈as1≢a∈as2 = no λ{refl → x≢x-elim a∈as1≢a∈as2}
@@ -553,6 +574,9 @@ data _∉_ {ℓ} {A : Set ℓ} : A → A * → Set ℓ where
 
 remove-~∈ : ∀ {ℓ} {A : Set ℓ} {{_ : Eq A}} (a : A) (as : A *) → a ~∈ remove a as
 remove-~∈ a as = {!   !}
+
+remove-~∈-2 : ∀ {ℓ} {A : Set ℓ} {{_ : Eq A}} {a : A} {as : A *} → ~ (a ∈ as) → remove a as ≡ as
+remove-~∈-2 {a = a} {as} ~a∈as = {!   !}
 
 infix 6 _∈_!_
 data _∈_!_ {ℓ} {A : Set ℓ} : A → A * → ℕ → Set where
@@ -1035,16 +1059,23 @@ idempotent-support = {!!}
 -- noncontiguous subword embedding
 infixl 9 _⊑_ _⊏_
 data _⊑_ {ℓ} {A : Set ℓ} : A * → A * → Set where
-  stop : ∀ {bs : A *} → ε ⊑ bs
+  instance stop : ∀ {bs : A *} → ε ⊑ bs
   match : ∀ {a : A} {as bs : A *} → as ⊑ bs → a ∷ as ⊑ a ∷ bs
   skip : ∀ {a : A} {as bs : A *} → as ⊑ bs → as ⊑ a ∷ bs
 
-refl-⊑ : ∀ {ℓ} {A : Set ℓ} {as : A *} → as ⊑ as
+instance refl-⊑ : ∀ {ℓ} {A : Set ℓ} {as : A *} → as ⊑ as
 refl-⊑ {as = ε} = stop
 refl-⊑ {as = a ∷ as} = match refl-⊑
 
-trans-⊑ :  ∀ {ℓ} {A : Set ℓ} {as  bs cs : A *} → as ⊑ bs → bs ⊑ cs → as ⊑ cs
+trans-⊑ : ∀ {ℓ} {A : Set ℓ} {as bs cs : A *} → as ⊑ bs → bs ⊑ cs → as ⊑ cs
 trans-⊑ = {!!}
+
+instance inst-trans-⊑ : ∀ {ℓ} {A : Set ℓ} {as bs cs : A *} → {{as ⊑ bs}} → {{bs ⊑ cs}} → as ⊑ cs
+inst-trans-⊑ {{x}} {{y}} = trans-⊑ x y
+
+-- the magic of instance arguments
+-- _ : ∀ {ℓ} {A : Set ℓ} {as bs cs ds : A *} → {{as ⊑ bs}} → {{bs ⊑ cs}} → {{cs ⊑ ds}} → as ⊑ ds
+-- _ = by-inst
 
 antisym-⊑ : ∀ {ℓ} {A : Set ℓ} {as bs : A *} →
   as ⊑ bs →
@@ -1103,10 +1134,15 @@ length-⊏ {as = as} {bs} (as⊑bs , ~bs⊑as) = lenas<lenbs where
 
 ```
 -- in fact it follows from a more general congruence property
-++-⊑ : ∀ {ℓ} {A : Set ℓ} {as bs : A *} (cs : A *) →
+++-⊑-left : ∀ {ℓ} {A : Set ℓ} {as bs : A *} (cs : A *) →
   as ⊑ bs →
   cs ++ as ⊑ cs ++ bs
-++-⊑ = {!!}
+++-⊑-left = {!!}
+
+++-⊑-right : ∀ {ℓ} {A : Set ℓ} {as bs : A *} (cs : A *) →
+  as ⊑ bs →
+  as ++ cs ⊑ bs ++ cs
+++-⊑-right = {!!}
 
 ++-⊑2 : ∀ {ℓ} {A : Set ℓ} {as bs : A *} (cs : A *) →
   as ⊑ bs →
@@ -1225,7 +1261,7 @@ concat-⊑ (as ∷ ass) (as ∷ bss) (match ass⊑bss)
   with concat-⊑ ass bss ass⊑bss
 ... | ind
   rewrite concat-∷ as ass |
-          concat-∷ as bss = ++-⊑ as ind 
+          concat-∷ as bss = ++-⊑-left as ind 
 concat-⊑ ass (bs ∷ bss) (skip ass⊑bss)
   with concat-⊑ ass bss ass⊑bss
 ... | ind
