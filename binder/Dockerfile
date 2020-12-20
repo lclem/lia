@@ -5,6 +5,12 @@ FROM banacorn/agda:2.6.0.1
 #RUN cabal update
 #RUN cabal install alex happy Agda-2.6.1
 
+RUN pip install --no-cache --upgrade pip && \
+    pip install --no-cache notebook
+    
+RUN pip install agda_kernel
+RUN python -m agda_kernel.install
+
 USER root
 
 #RUN mkdir /home/$NB_USER/learn_you_a_haskell
