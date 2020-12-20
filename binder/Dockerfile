@@ -5,6 +5,9 @@ FROM banacorn/agda:2.6.0.1
 #RUN cabal update
 #RUN cabal install alex happy Agda-2.6.1
 
+RUN apt-get update
+RUN apt-get install --yes python3-pip
+
 RUN pip install --no-cache --upgrade pip && \
     pip install --no-cache notebook
     
