@@ -28,4 +28,4 @@ RUN chown --recursive $NB_UID:users /home/$NB_USER/
 
 USER $NB_UID
 
-ENV JUPYTER_ENABLE_LAB=yes
+#ENV JUPYTER_ENABLE_LAB=yes
