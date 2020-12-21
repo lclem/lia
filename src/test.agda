@@ -11,7 +11,7 @@ proj1 : A → B → A
 proj1 x y = x
 
 proj2 : A → B → B
-proj2 x y = y
+proj2 x y = ?
 
 data Two : Set where
     one : Two
@@ -19,8 +19,3 @@ data Two : Set where
 
 select : Two → A → A → A
 select x a₀ a₁ = {! x !}
-
-
-
-
-
