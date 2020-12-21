@@ -12,28 +12,47 @@ notes-after-punctuation: false
         bootstrap: true,
 	    requestKernel: true,
         selector: "pre",
-        binderOptions: {
-            repo: "lclem/lia",
-            ref: "main",
-            binderUrl: "https://mybinder.org",
-            repoProvider: "github",
+        codeMirrorConfig: {
+            //theme: "abcdef",
+            language: "agda",
+            readOnly: false,
+            lineNumbers: true,
+            keyMap: "default",
         },
         kernelOptions: {
             name: "agda",
             kernelName: "agda",
-            path: "./src/",
+            path: "src/",
             // notebook server configuration; not needed with binder
-            // serverSettings: {
-            //      "baseUrl": "http://127.0.0.1:8888",
-            //      "token": "test-secret"
-            //    }
+            serverSettings: {
+                  baseUrl: "http://127.0.0.1:8888",
+                  token: "test-secret",
+                },
         },
+//        binderOptions: {
+//            repo: "lclem/lia",
+//            ref: "main",
+//            binderUrl: "https://mybinder.org",
+//            repoProvider: "github",
+//            savedSession: {
+//                enabled: true,
+//                maxAge: 86400, // the max age in seconds to consider re-using a session
+//                storagePrefix: "thebe-binder-"
+//            },
+//      },
       }
 </script>
 
-<script type="text/javascript" src="https://unpkg.com/thebelab@latest"></script>
+<!-- <script type="text/javascript" src="https://unpkg.com/thebelab@latest"></script> -->
 
-<pre>
+<!-- own version of thebe library: -->
+<script type="text/javascript" src="thebe/lib/index.js"></script>
+
+<!-- proper highlighting for Agda -->
+<script src="codemirror-agda/lib/index.js"></script>
+
+<pre data-executable="true" data-language="agda">
+
 module test where
 
 open import part0.Naturals
@@ -49,6 +68,7 @@ proj1 x y = x
 proj2 : A → B → B
 proj2 x y = ?
 </pre>
+
 
 This book is an introduction to propositional and first-order logic.
 The material is developed using the proof assistant Agda.

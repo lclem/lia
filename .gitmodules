@@ -4,3 +4,9 @@
 [submodule "agda-stdlib"]
 	path = agda-stdlib
 	url = https://github.com/lclem/agda-stdlib
+[submodule "thebe"]
+	path = thebe
+	url = https://github.com/lclem/thebe.git
+[submodule "codemirror-agda"]
+	path = codemirror-agda
+	url = https://github.com/codewars/codemirror-agda.git

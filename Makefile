@@ -73,6 +73,13 @@ PART_DIRS := $(patsubst %,$(OUTDIR)/%,$(PARTS))
 
 all: build
 
+# no idea why it does not work when started from the Makefile!
+jupyter-start:
+	./jupyter-start.sh
+
+codemirror-agda:
+	cd codemirror-agda && npm ci && npm install
+	
 docs: build
 	rm -fr $(DOCSDIR)/ && rsync -aP $(SITEDIR)/ $(DOCSDIR)/
 
