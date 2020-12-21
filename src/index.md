@@ -67,6 +67,13 @@ proj1 x y = x
 
 proj2 : A → B → B
 proj2 x y = ?
+
+data Two : Set where
+    one : Two
+    two : Two
+
+select : Two → A → A → A
+select x a₀ a₁ = {! x !}
 </pre>
 
 
