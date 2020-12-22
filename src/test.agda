@@ -14,8 +14,6 @@ proj2 : A → B → B
 
 proj2 x y = x
 
-
-
 data Two : Set where
     one : Two
     two : Two
