@@ -24,21 +24,6 @@
 <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1.1/katex.min.css">
 <script src="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1.1/katex.min.js"></script>
 
-<!--
-
-    kernelOptions: {
-        name: "agda",
-        kernelName: "agda",
-        path: "src/",
-        // notebook server configuration; not needed with binder
-        serverSettings: {
-              baseUrl: "http://127.0.0.1:8888",
-              token: "test-secret",
-            },
-    },
-
--->
-
 <script type="text/x-thebe-config">
   {
     bootstrap: true,
@@ -51,7 +36,16 @@
         lineNumbers: true,
         keyMap: "default",
     },
-
+    kernelOptions: {
+        name: "agda",
+        kernelName: "agda",
+        path: "src/",
+        // notebook server configuration; not needed with binder
+        //serverSettings: {
+        //      baseUrl: "http://127.0.0.1:8888",
+        //      token: "test-secret",
+        //    },
+    },
     binderOptions: {
       repo: "lclem/lia", // need to put here the actual github repo (if it is a fork)
       ref: "main",
@@ -236,7 +230,7 @@ Mathematics</em>. 28(1/4):459–471, 1926.</p>
     
 </p>
 
-    <p class="p-name"> Last-modified: Dec 22 18:18:30 2020 </p>
+    <p class="p-name"> Last-modified: Dec 22 18:59:44 2020 </p>
   </article>
       </div>
     </main><footer class="site-footer h-card">
