@@ -48,10 +48,16 @@ jobs:
       - name: Add docs
         run: git add docs
       - name: Commit
-        uses: stefanzweifel/git-auto-commit-action@v4.1.6
+#         uses: stefanzweifel/git-auto-commit-action@v4.1.6
+#         with:
+#           #repository: 'somewhereelse'
+#           commit_message: Update docs
+        uses: Automattic/action-commit-to-branch@master
         with:
-          #repository: 'somewhereelse'
-          commit_message: Update docs
+          branch: 'web'
+          commit_message: 'Update docs on web branch'
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Required
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
