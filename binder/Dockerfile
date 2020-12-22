@@ -28,12 +28,9 @@ COPY . /home/$NB_USER/
 
 #RUN chown --recursive $NB_UID:users /home/$NB_USER/
 
-USER $NB_UID
-
 RUN mkdir -p /home/$NB_USER/.agda/
 RUN touch /home/$NB_USER/.agda/libraries
 RUN echo "/home/$NB_USER/agda-stdlib/standard-library.agda-lib" > /home/$NB_USER/.agda/libraries
 
+#USER $NB_UID
 #ENV JUPYTER_ENABLE_LAB=yes
-
-
