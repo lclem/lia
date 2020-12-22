@@ -27,6 +27,8 @@ RUN chown --recursive $NB_UID:users /home/$NB_USER/
 
 USER $NB_UID
 
+RUN echo "/home/$NB_USER/agda-stdlib/standard-library.agda-lib" > /home/$NB_USER/.agda/libraries
+
 #ENV JUPYTER_ENABLE_LAB=yes
 
 
