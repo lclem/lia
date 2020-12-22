@@ -30,7 +30,7 @@ COPY . /home/$NB_USER/
 
 USER $NB_UID
 
-RUN mkdir /home/$NB_USER/.agda/
+RUN mkdir -p /home/$NB_USER/.agda/
 RUN touch /home/$NB_USER/.agda/libraries
 RUN echo "/home/$NB_USER/agda-stdlib/standard-library.agda-lib" > /home/$NB_USER/.agda/libraries
 
