@@ -22,9 +22,9 @@ RUN python3 -m agda_kernel.install
 
 USER root
 
-#COPY . /home/$NB_USER/
-COPY ./agda-stdlib /home/$NB_USER/agda-stdlib
-COPY ./src /home/$NB_USER/
+COPY . /home/$NB_USER/
+#COPY ./agda-stdlib /home/$NB_USER/agda-stdlib
+#COPY ./src /home/$NB_USER/
 
 #RUN chown --recursive $NB_UID:users /home/$NB_USER/
 
