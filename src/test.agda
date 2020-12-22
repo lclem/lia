@@ -12,7 +12,7 @@ proj1 x y = x
 
 proj2 : A → B → B
 
-proj2 x y = y
+proj2 x y = ?
 
 
 data Two : Set where
