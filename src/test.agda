@@ -18,3 +18,4 @@ data Two : Set where
     two : Two
 
 select : Two → A → A → A
+select x a₀ a₁ = {! x !}
