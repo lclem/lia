@@ -7,6 +7,3 @@
 [submodule "thebe"]
 	path = thebe
 	url = https://github.com/lclem/thebe.git
-[submodule "agda-kernel"]
-	path = agda-kernel
-	url = https://github.com/lclem/agda-kernel
