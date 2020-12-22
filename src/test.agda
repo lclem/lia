@@ -18,5 +18,5 @@ data Two : Set where
     two : Two
 
 select : Two → A → A → A
-select one a₀ a₁ = a₁
+select one a₀ a₁ = a₀
 select two a₀ a₁ = a₁
