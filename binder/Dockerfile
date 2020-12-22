@@ -30,6 +30,8 @@ COPY ./src /home/$NB_USER/
 
 USER $NB_UID
 
+RUN mkdir /home/$NB_USER/.agda/
+RUN touch /home/$NB_USER/.agda/libraries
 RUN echo "/home/$NB_USER/agda-stdlib/standard-library.agda-lib" > /home/$NB_USER/.agda/libraries
 
 #ENV JUPYTER_ENABLE_LAB=yes
