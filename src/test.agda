@@ -17,7 +17,6 @@ data Two : Set where
     one : Two
     two : Two
 
-
 -- a comment
 
 select : Two → A → A → A
