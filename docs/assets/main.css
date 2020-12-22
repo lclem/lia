@@ -538,7 +538,7 @@ table td { border: 1px solid #e8e8e8; }
 
 /** Syntax highlighting styles */
 .highlight { background: #fff; }
-.highlighter-rouge .highlight { background: #eef !important; }
+.highlighter-rouge .highlight { background: #eef; }
 .highlight .c { color: #998; font-style: italic; }
 .highlight .err { color: #a61717; background-color: #e3d2d2; }
 .highlight .k { font-weight: bold; }
@@ -603,14 +603,14 @@ table td { border: 1px solid #e8e8e8; }
 @font-face { font-family: 'DejaVu Sans Mono'; src: url("fonts/DejaVuSansMono.woff2") format("woff2"), url("fonts/DejaVuSansMono.woff") format("woff"); font-weight: normal; font-style: normal; }
 @font-face { font-family: 'FreeMono'; src: url("fonts/FreeMono.woff") format("woff"); font-stretch: normal; font-style: normal; unicode-range: U+20-7E, U+A0-220, U+224-233, U+237, U+250-36F, U+374-375, U+37A, U+37E, U+384-38A, U+38C, U+38E-3A1, U+3A3-3CE, U+3D0-3D6, U+3DA-3DD, U+3F0-3F1, U+3F4-3F5, U+400-47F, U+483-487, U+48A-4FF, U+510-513, U+51A-51F, U+524-527, U+531-556, U+559-55F, U+561-587, U+589-58A, U+58F, U+5B0-5C7, U+5D0-5EA, U+5F0-5F4, U+606-60F, U+61B, U+61E-657, U+659-6D5, U+6EE-6FF, U+10D0-10F5, U+10F9, U+10FB-10FC, U+13A0-13F4, U+16A0-16F0, U+1E00-1E9B, U+1EA0-1EF9, U+1F00-1F15, U+1F18-1F1D, U+1F20-1F45, U+1F48-1F4D, U+1F50-1F57, U+1F59, U+1F5B, U+1F5D, U+1F5F-1F7D, U+1F80-1FB4, U+1FB6-1FC4, U+1FC6-1FD3, U+1FD6-1FDB, U+1FDD-1FEF, U+1FF2-1FF4, U+1FF6-1FFE, U+2000-2064, U+20A1-20B5, U+20B8-20B9, U+20D0-20D2, U+20D6-20D7, U+20DB-20E3, U+20E5-20E6, U+20E8, U+20EA-20EF, U+2100-2109, U+210D-211A, U+211C-211E, U+2120-2122, U+2124, U+2126-2127, U+2129-212B, U+212E, U+2132, U+2135-213B, U+2141-2144, U+214B, U+214D-214E, U+2153-217F, U+2190-21D5, U+21DC-21DD, U+21E6-21E9, U+21F3, U+2200-22F1, U+2300, U+2302-2306, U+2308-2310, U+2312, U+2314-2315, U+2318-2319, U+231C-2327, U+2329-232C, U+2336-237A, U+237C-23B7, U+23BA-23CF, U+23DA-23DB, U+23DE-23DF, U+23E2-23E6, U+2400-2426, U+2440-244A, U+2460-2469, U+2500-2609, U+2610-2614, U+261A-261F, U+2626-2629, U+262E-2653, U+2660-2667, U+2669-266F, U+2680-2685, U+27C0-27CA, U+27CC, U+27D0-27D7, U+27E4-27EB, U+27F2-27F3, U+27F5-27FC, U+2800-28FF, U+2A00-2A06, U+2A1D, U+2A3F, U+2B00-2B0D, U+2B12-2B19, U+2B1B-2B2B, U+2B53-2B54, U+2E16-2E18, U+2E1A-2E1B, U+2E1E-2E1F, U+2E28-2E2E, U+2E30, U+A788-A78C, U+A900-A92F, U+FB00-FB05, U+FB1D-FB36, U+FB38-FB3C, U+FB3E, U+FB40-FB41, U+FB43-FB44, U+FB46-FBBE, U+FBC0-FBC1, U+FBD3-FBE9, U+FBFC-FBFF, U+FE70-FE74, U+FE76-FEFC, U+FEFF, U+FFF9-FFFD; }
 /* Code. */
-pre.highlight { padding: .4em .4em; background: #e8f2fb; border: 1px solid #c9e1f6; border-radius: 3px; border-style: dashed !important; }
+pre.highlight { padding: .4em .4em !important; background: #e8f2fb !important; border: 1px solid #c9e1f6; border-radius: 3px !important; border-style: dashed !important; }
 
-code { font-family: 'DejaVu Sans Mono', 'Source Code Pro', 'Bitstream Vera Sans Mono', 'FreeMono', 'Courier New', 'Monaco', 'Menlo', monospace, serif; font-size: .85em; }
+code { font-family: 'DejaVu Sans Mono', 'Source Code Pro', 'Bitstream Vera Sans Mono', 'FreeMono', 'Courier New', 'Monaco', 'Menlo', monospace, serif !important; font-size: .85em !important; }
 
 /* Agda. */
-pre.Agda { font-family: 'DejaVu Sans Mono', 'Source Code Pro', 'Bitstream Vera Sans Mono', 'FreeMono', 'Courier New', 'Monaco', 'Menlo', monospace, serif; font-size: .85em; padding: .4em .4em; background: #e8f2fb; border: 1px solid #c9e1f6; border-radius: 3px; }
+pre.Agda { font-family: 'DejaVu Sans Mono', 'Source Code Pro', 'Bitstream Vera Sans Mono', 'FreeMono', 'Courier New', 'Monaco', 'Menlo', monospace, serif !important; font-size: .85em !important; padding: .4em .4em !important; background: #e8f2fb !important; border: 1px solid #c9e1f6; border-radius: 3px !important; }
 
-pre.Spec { font-family: 'DejaVu Sans Mono', 'Source Code Pro', 'Bitstream Vera Sans Mono', 'FreeMono', 'Courier New', 'Monaco', 'Menlo', monospace, serif; font-size: .85em; padding: .4em .4em; background: #e8f2fb; border: 1px solid #c9e1f6; border-radius: 3px; border-style: dashed !important; color: #B22222; }
+pre.Spec { font-family: 'DejaVu Sans Mono', 'Source Code Pro', 'Bitstream Vera Sans Mono', 'FreeMono', 'Courier New', 'Monaco', 'Menlo', monospace, serif !important; font-size: .85em !important; padding: .4em .4em !important; background: #e8f2fb !important; border: 1px solid #c9e1f6; border-radius: 3px !important; border-style: dashed !important; color: #B22222; }
 
 /* Aspects. */
 .Comment { color: #B22222; }
@@ -663,6 +663,217 @@ pre.Spec { font-family: 'DejaVu Sans Mono', 'Source Code Pro', 'Bitstream Vera S
 .Agda a { text-decoration: none; }
 
 .Agda a[href]:hover { background-color: #B4EEB4; }
+
+/* BASICS */
+.CodeMirror { /* Set height, width, borders, and global font properties here */ font-family: 'DejaVu Sans Mono', 'Source Code Pro', 'Bitstream Vera Sans Mono', 'FreeMono', 'Courier New', 'Monaco', 'Menlo', monospace, serif !important; font-size: .85em !important; height: 300px; color: black; direction: ltr; }
+
+/* PADDING */
+.CodeMirror-lines { padding: 4px 0; /* Vertical padding around content */ }
+
+.CodeMirror pre.CodeMirror-line, .CodeMirror pre.CodeMirror-line-like { padding: 0 4px; /* Horizontal padding of content */ }
+
+.CodeMirror-scrollbar-filler, .CodeMirror-gutter-filler { background-color: white; /* The little square between H and V scrollbars */ }
+
+/* GUTTER */
+.CodeMirror-gutters { border-right: 1px solid #ddd; background-color: #e8f2fb !important; white-space: nowrap; }
+
+.CodeMirror-linenumber { padding: 0 3px 0 5px; min-width: 20px; text-align: right; color: #999; white-space: nowrap; }
+
+.CodeMirror-guttermarker { color: black; }
+
+.CodeMirror-guttermarker-subtle { color: #999; }
+
+/* CURSOR */
+.CodeMirror-cursor { border-left: 1px solid black; border-right: none; width: 0; }
+
+/* Shown when moving in bi-directional text */
+.CodeMirror div.CodeMirror-secondarycursor { border-left: 1px solid silver; }
+
+.cm-fat-cursor .CodeMirror-cursor { width: auto; border: 0 !important; background: #7e7; }
+
+.cm-fat-cursor div.CodeMirror-cursors { z-index: 1; }
+
+.cm-fat-cursor-mark { background-color: rgba(20, 255, 20, 0.5); -webkit-animation: blink 1.06s steps(1) infinite; -moz-animation: blink 1.06s steps(1) infinite; animation: blink 1.06s steps(1) infinite; }
+
+.cm-animate-fat-cursor { width: auto; border: 0; -webkit-animation: blink 1.06s steps(1) infinite; -moz-animation: blink 1.06s steps(1) infinite; animation: blink 1.06s steps(1) infinite; background-color: #7e7; }
+
+@-moz-keyframes blink { 50% { background-color: transparent; } }
+@-webkit-keyframes blink { 50% { background-color: transparent; } }
+@keyframes blink { 50% { background-color: transparent; } }
+/* Can style cursor different in overwrite (non-insert) mode */
+.cm-tab { display: inline-block; text-decoration: inherit; }
+
+.CodeMirror-rulers { position: absolute; left: 0; right: 0; top: -50px; bottom: 0; overflow: hidden; }
+
+.CodeMirror-ruler { border-left: 1px solid #ccc; top: 0; bottom: 0; position: absolute; }
+
+/* DEFAULT THEME */
+.cm-s-default .cm-header { color: blue; }
+
+.cm-s-default .cm-quote { color: #090; }
+
+.cm-negative { color: #d44; }
+
+.cm-positive { color: #292; }
+
+.cm-header, .cm-strong { font-weight: bold; }
+
+.cm-em { font-style: italic; }
+
+.cm-link { text-decoration: underline; }
+
+.cm-strikethrough { text-decoration: line-through; }
+
+.cm-s-default .cm-keyword { line-height: 1em; color: #CD6600 !important; }
+
+.cm-s-default .cm-atom { color: #219; }
+
+.cm-s-default .cm-number { color: #164; }
+
+.cm-s-default .cm-def { color: #00f; }
+
+/* .cm-s-default .cm-variable {color: #0000CD !important;} */
+.cm-s-default .cm-variable-2 { color: #05a; }
+
+.cm-s-default .cm-variable-3, .cm-s-default .cm-type { color: #085; }
+
+.cm-s-default .cm-comment { color: #B22222 !important; }
+
+.cm-s-default .cm-string { color: #a11; }
+
+.cm-s-default .cm-string-2 { color: #f50; }
+
+.cm-s-default .cm-meta { color: #555; }
+
+.cm-s-default .cm-qualifier { color: #555; }
+
+/* .cm-s-default .cm-builtin {color: #30a;} */
+.cm-s-default .cm-builtin { color: #0000CD !important; }
+
+.cm-s-default .cm-bracket { color: #997; }
+
+.cm-s-default .cm-tag { color: #170; }
+
+.cm-s-default .cm-attribute { color: #00c; }
+
+.cm-s-default .cm-hr { color: #999; }
+
+.cm-s-default .cm-link { color: #00c; }
+
+.cm-s-default .cm-error { color: #f00; }
+
+.cm-invalidchar { color: #f00; }
+
+.CodeMirror-composing { border-bottom: 2px solid; }
+
+/* Default styles for common addons */
+div.CodeMirror span.CodeMirror-matchingbracket { color: #0b0; }
+
+div.CodeMirror span.CodeMirror-nonmatchingbracket { color: #a22; }
+
+.CodeMirror-matchingtag { background: rgba(255, 150, 0, 0.3); }
+
+.CodeMirror-activeline-background { background: #e8f2fb !important; }
+
+/* STOP */
+/* The rest of this file contains styles related to the mechanics of the editor. You probably shouldn't touch them. */
+.CodeMirror { position: relative; overflow: hidden; background: #e8f2fb !important; }
+
+.CodeMirror-scroll { overflow: scroll !important; /* Things will break if this is overridden */ /* 50px is the magic margin used to hide the element's real scrollbars */ /* See overflow: hidden in .CodeMirror */ margin-bottom: -50px; margin-right: -50px; padding-bottom: 50px; height: 100%; outline: none; /* Prevent dragging from highlighting the element */ position: relative; }
+
+.CodeMirror-sizer { position: relative; border-right: 50px solid transparent; }
+
+/* The fake, visible scrollbars. Used to force redraw during scrolling before actual scrolling happens, thus preventing shaking and flickering artifacts. */
+.CodeMirror-vscrollbar, .CodeMirror-hscrollbar, .CodeMirror-scrollbar-filler, .CodeMirror-gutter-filler { position: absolute; z-index: 6; display: none; }
+
+.CodeMirror-vscrollbar { right: 0; top: 0; overflow-x: hidden; overflow-y: scroll; }
+
+.CodeMirror-hscrollbar { bottom: 0; left: 0; overflow-y: hidden; overflow-x: scroll; }
+
+.CodeMirror-scrollbar-filler { right: 0; bottom: 0; }
+
+.CodeMirror-gutter-filler { left: 0; bottom: 0; }
+
+.CodeMirror-gutters { position: absolute; left: 0; top: 0; min-height: 100%; z-index: 3; }
+
+.CodeMirror-gutter { white-space: normal; height: 100%; display: inline-block; vertical-align: top; margin-bottom: -50px; }
+
+.CodeMirror-gutter-wrapper { position: absolute; z-index: 4; background: none !important; border: none !important; }
+
+.CodeMirror-gutter-background { position: absolute; top: 0; bottom: 0; z-index: 4; }
+
+.CodeMirror-gutter-elt { position: absolute; cursor: default; z-index: 4; }
+
+.CodeMirror-gutter-wrapper ::selection { background-color: #d3e7f8 !important; }
+
+.CodeMirror-gutter-wrapper ::-moz-selection { background-color: #d3e7f8 !important; }
+
+.CodeMirror-lines { cursor: text; min-height: 1px; /* prevents collapsing before first draw */ }
+
+.CodeMirror pre.CodeMirror-line, .CodeMirror pre.CodeMirror-line-like { /* Reset some styles that the rest of the page might have set */ -moz-border-radius: 0; -webkit-border-radius: 0; border-radius: 0; border-width: 0; margin: 0; white-space: pre; word-wrap: normal; line-height: inherit; color: inherit; z-index: 2; position: relative; overflow: visible; -webkit-tap-highlight-color: transparent; -webkit-font-variant-ligatures: contextual; font-variant-ligatures: contextual; }
+
+.CodeMirror-wrap pre.CodeMirror-line, .CodeMirror-wrap pre.CodeMirror-line-like { word-wrap: break-word; white-space: pre-wrap; word-break: normal; }
+
+.CodeMirror-linebackground { position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 0; }
+
+.CodeMirror-linewidget { position: relative; z-index: 2; padding: 0.1px; /* Force widget margins to stay inside of the container */ }
+
+.CodeMirror-rtl pre { direction: rtl; }
+
+.CodeMirror-code { outline: none; }
+
+/* Force content-box sizing for the elements where we expect it */
+.CodeMirror-scroll, .CodeMirror-sizer, .CodeMirror-gutter, .CodeMirror-gutters, .CodeMirror-linenumber { -moz-box-sizing: content-box; box-sizing: content-box; }
+
+.CodeMirror-measure { position: absolute; width: 100%; height: 0; overflow: hidden; visibility: hidden; }
+
+.CodeMirror-cursor { position: absolute; pointer-events: none; }
+
+.CodeMirror-measure pre { position: static; }
+
+div.CodeMirror-cursors { visibility: hidden; position: relative; z-index: 3; }
+
+div.CodeMirror-dragcursors { visibility: visible; }
+
+.CodeMirror-focused div.CodeMirror-cursors { visibility: visible; }
+
+.CodeMirror-selected { background: #d3e7f8 !important; }
+
+.CodeMirror-focused .CodeMirror-selected { background: #d3e7f8 !important; }
+
+.CodeMirror-crosshair { cursor: crosshair; }
+
+.CodeMirror-line::selection, .CodeMirror-line > span::selection, .CodeMirror-line > span > span::selection { background: #d3e7f8 !important; }
+
+.CodeMirror-line::-moz-selection, .CodeMirror-line > span::-moz-selection, .CodeMirror-line > span > span::-moz-selection { background: #d3e7f8 !important; }
+
+.cm-searching { background-color: #ffa; background-color: rgba(255, 255, 0, 0.4); }
+
+/* Used to force a border model for a node */
+.cm-force-border { padding-right: .1px; }
+
+@media print { /* Hide the cursor when printing */
+  .CodeMirror div.CodeMirror-cursors { visibility: hidden; } }
+/* See issue #2901 */
+.cm-tab-wrap-hack:after { content: ''; }
+
+/* Help users use markselection to safely style text background */
+span.CodeMirror-selectedtext { background: none; }
+
+.p-Widget, .lm-Widget { box-sizing: border-box; position: relative; overflow: visible !important; cursor: default; }
+
+/* agda-specific extensions */
+.compile-error { background: #ff9696 !important; color: black !important; margin-right: -5px; }
+
+.compile-error:link { color: black; }
+
+.compile-ok { background: #e1ffe1 !important; border-radius: 3px; }
+
+.compile-ok-border { border: 1px solid #cde9cc !important; }
+
+.compile-hole { background: #ffffe1; margin-right: -5px; /* !important; */ }
+
+.highlighter-rouge .highlight { background: #eef !important; }
 
 .trigger { display: none; }
 
@@ -750,3 +961,5 @@ pre.highlight { padding: .4em .4em; background: #e8f2fb; border: 1px solid #e0de
 div .solutionlink { text-align: end; }
 
 .hidden { visibility: hidden; }
+
+.highlighter-rouge .highlight { background: #eef !important; }
