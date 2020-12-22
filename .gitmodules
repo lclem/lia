@@ -7,3 +7,6 @@
 [submodule "thebe"]
 	path = thebe
 	url = https://github.com/lclem/thebe.git
+[submodule "codemirror-agda"]
+	path = codemirror-agda
+	url = https://github.com/lclem/codemirror-agda.git

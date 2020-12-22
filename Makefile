@@ -71,7 +71,7 @@ PART_DIRS := $(patsubst %,$(OUTDIR)/%,$(PARTS))
 
 #$(TMPDIR)/all.dep.txt $(TMPDIR)/keys.dep.txt $(TMPDIR)/all_keys.dep.txt
 
-all: build
+all: codemirror-agda thebe build
 
 # no idea why it does not work when started from the Makefile!
 jupyter-start:
@@ -80,6 +80,9 @@ jupyter-start:
 codemirror-agda:
 	cd codemirror-agda && npm ci && npm install
 	
+thebe:
+	cd thebe && npm ci && npm install
+
 docs: build
 	rm -fr $(DOCSDIR)/ && rsync -aP $(SITEDIR)/ $(DOCSDIR)/
 
