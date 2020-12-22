@@ -17,6 +17,9 @@ data Two : Set where
     one : Two
     two : Two
 
+
+-- a comment
+
 select : Two → A → A → A
 select one a₀ a₁ = {! halo  !}
 select two a₀ a₁ = a₁
