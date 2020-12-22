@@ -66,7 +66,7 @@ PART_DIRS := $(patsubst %,$(OUTDIR)/%,$(PARTS))
 
 #agda: $(AGDA_MD)
 
-.PHONY: all build agda markdown serve server-start server-stop clean keys refs spellcheck
+.PHONY: all build agda markdown serve server-start server-stop clean keys refs spellcheck codemirror-agda thebe docs jupyter-start
 #html/part1/NormalForms.md tmp/part1.NormalForms.md html/part1/Interpolation.md tmp/part1.Interpolation.md
 
 #$(TMPDIR)/all.dep.txt $(TMPDIR)/keys.dep.txt $(TMPDIR)/all_keys.dep.txt
