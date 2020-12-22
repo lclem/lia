@@ -49,6 +49,11 @@ jobs:
         run: make docs
 #      - name: Add docs
 #        run: git add docs
+      - name: Git voodoo
+        run: git remote update && git fetch --all && git stash && git checkout web && git stash pop && git add .
+#git commit -m "${INPUT_COMMIT_MESSAGE}"
+#git push --set-upstream origin "${INPUT_BRANCH}"
+
       - name: Commit
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
