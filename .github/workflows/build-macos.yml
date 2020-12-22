@@ -47,21 +47,26 @@ jobs:
         run: make agda; make agda
       - name: Build the book 2
         run: make docs
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
 #      - name: Add docs
 #        run: git add docs
-      - name: Git voodoo
-        run: git remote update && git fetch --all && git stash && git add . && git stash && git checkout web && git stash pop && git add .
+#       - name: Git voodoo
+#         run: git remote update && git fetch --all && git stash && git add . && git stash && git checkout web && git stash pop && git add .
 #git commit -m "${INPUT_COMMIT_MESSAGE}"
 #git push --set-upstream origin "${INPUT_BRANCH}"
 
-      - name: Commit
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          #repository: 'somewhereelse'
-          branch: web
-          commit_message: Update docs
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Required
+#       - name: Commit
+#         uses: stefanzweifel/git-auto-commit-action@v4
+#         with:
+#           #repository: 'somewhereelse'
+#           branch: web
+#           commit_message: Update docs
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Required
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
