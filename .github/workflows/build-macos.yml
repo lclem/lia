@@ -58,8 +58,8 @@ jobs:
         with:
           branch: 'web'
           commit_message: 'Update docs on web branch'
-  env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Required
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Required
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
