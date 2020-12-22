@@ -19,4 +19,4 @@ data Two : Set where
 
 select : Two → A → A → A
 select one a₀ a₁ = a₁
-select two a₀ a₁ = ?
+select two a₀ a₁ = {! !}
