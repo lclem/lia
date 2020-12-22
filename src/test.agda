@@ -20,5 +20,5 @@ data Two : Set where
 -- a comment
 
 select : Two → A → A → A
-select one a₀ a₁ = {! halo  !}
+select one a₀ a₁ = {! one   !}
 select two a₀ a₁ = a₁
