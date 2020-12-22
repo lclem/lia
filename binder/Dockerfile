@@ -24,7 +24,7 @@ USER root
 
 COPY . /home/$NB_USER/
 #COPY ./agda-stdlib /home/$NB_USER/agda-stdlib
-#COPY ./src /home/$NB_USER/
+COPY ./src /home/$NB_USER/
 
 #RUN chown --recursive $NB_UID:users /home/$NB_USER/
 
