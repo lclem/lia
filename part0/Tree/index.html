@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Trees | Logic in Agda</title><!-- Begin Jekyll SEO tag v2.6.1 -->
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Trees" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Propositional and fist-order logic developed with the proof assistant Agda." />
+<meta property="og:description" content="Propositional and fist-order logic developed with the proof assistant Agda." />
+<link rel="canonical" href="/lia/part0/Tree/" />
+<meta property="og:url" content="/lia/part0/Tree/" />
+<meta property="og:site_name" content="Logic in Agda" />
+<script type="application/ld+json">
+{"url":"/lia/part0/Tree/","headline":"Trees","description":"Propositional and fist-order logic developed with the proof assistant Agda.","@type":"WebPage","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/lia/assets/main.css">
+  <!-- <link rel="stylesheet" href="/lia/assets/custom.css"> --><!-- Mathjax Support -->
+  <script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+  <!-- Load KaTeX -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1.1/katex.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1.1/katex.min.js"></script>
+
+<!--
+
+    kernelOptions: {
+        name: "agda",
+        kernelName: "agda",
+        path: "src/",
+        // notebook server configuration; not needed with binder
+        serverSettings: {
+              baseUrl: "http://127.0.0.1:8888",
+              token: "test-secret",
+            },
+    },
+
+-->
+
+<script type="text/x-thebe-config">
+  {
+    bootstrap: true,
+    requestKernel: true,
+    selector: "executable-pre",
+    codeMirrorConfig: {
+        //theme: "idea",
+        language: "agda",
+        readOnly: false,
+        lineNumbers: true,
+        keyMap: "default",
+    },
+
+    binderOptions: {
+      repo: "lclem/lia", // need to put here the actual github repo (if it is a fork)
+      ref: "main",
+      binderUrl: "https://mybinder.org",
+      repoProvider: "github",
+      savedSession: {
+        enabled: true,
+        maxAge: 86400, // the max age in seconds to consider re-using a session
+        storagePrefix: "thebe-binder-"
+      },
+    },
+  }
+</script>
+
+<!-- <script type="text/javascript" src="https://unpkg.com/thebelab@latest"></script> -->
+
+<!-- our own version of the thebe library: -->
+<script type="text/javascript" src="/lia/thebe/lib/index.js"></script>
+
+<!-- highlighting for Agda -->
+<script src="/lia/codemirror-agda/lib/index.js"></script>
+
+</head>
+<body><header class="site-header" role="banner">
+
+    <div class="wrapper">
+
+        <a class="site-title" href="/lia/">Logic in Agda</a>
+
+        <nav class="site-nav">
+            <span class="menu-icon">
+                <svg viewBox="0 0 18 15" width="18px" height="15px">
+                    <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+                    <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+                    <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+                </svg>
+            </span>
+
+            <div class="trigger">
+                <a class="page-link" href="/lia/part0/index/">Part 0</a>
+                <a class="page-link" href="/lia/part1/index/">Part 1</a>
+                <a class="page-link" href="/lia/part2/index/">Part 2</a>
+                <a class="page-link" href="/lia/part3/index/">Part 3</a>
+                <a class="page-link" href="/lia/part4/index/">Part 4</a>
+            </div>
+        </nav>
+
+    </div>
+
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post">
+
+    <header class="post-header">
+        <h1 class="post-title">Trees</h1>
+    </header>
+  
+    <p style="text-align:center;">
+    
+    
+    
+    <a alt="Part" href="/lia/part0/index/">Part</a>
+    &bullet;
+    
+    
+    <a alt="Source code" href="https://github.com/lclem/lia/blob/main/src/part0/Tree.lagda.md">Source</a>
+    
+    
+    
+</p>
+
+  
+    <div class="post-content">
+        <h2>Contents</h2>    
+        <ul class="section-nav">
+<li class="toc-entry toc-h2"><a href="#injectivity-of-constructors">Injectivity of constructors</a></li>
+<li class="toc-entry toc-h1"><a href="#decidable-equality">Decidable equality</a></li>
+<li class="toc-entry toc-h1"><a href="#references">References</a></li>
+<li class="toc-entry toc-h1"><a href="#solutions">Solutions</a></li>
+</ul><p>In this chapter we study labelled unranked trees.</p>
+
+<p>For the moment, this is only used to decide equality of formulas.</p>
+
+<pre class="Agda"><a id="145" class="Symbol">{-#</a> <a id="149" class="Keyword">OPTIONS</a> <a id="157" class="Pragma">--allow-unsolved-metas</a> <a id="180" class="Symbol">#-}</a>
+
+<a id="185" class="Keyword">module</a> <a id="192" href="/lia/part0/Tree/" class="Module">part0.Tree</a> <a id="203" class="Keyword">where</a>
+<a id="209" class="Keyword">open</a> <a id="214" class="Keyword">import</a> <a id="221" href="/lia/part0/Naturals/" class="Module">part0.Naturals</a> <a id="236" class="Keyword">public</a>
+<a id="243" class="Keyword">open</a> <a id="248" class="Keyword">import</a> <a id="255" href="/lia/part0/List/" class="Module">part0.List</a> <a id="266" class="Keyword">public</a>
+
+<a id="274" class="Keyword">private</a>
+  <a id="284" class="Keyword">variable</a>
+    <a id="297" href="/lia/part0/Tree/#297" class="Generalizable">ℓ</a> <a id="299" class="Symbol">:</a> <a id="301" href="Agda.Primitive.html#423" class="Postulate">Level</a>
+    <a id="311" href="/lia/part0/Tree/#311" class="Generalizable">A</a> <a id="313" class="Symbol">:</a> <a id="315" class="PrimitiveType">Set</a> <a id="319" href="/lia/part0/Tree/#297" class="Generalizable">ℓ</a>
+
+    <a id="326" href="/lia/part0/Tree/#326" class="Generalizable">a</a> <a id="328" href="/lia/part0/Tree/#328" class="Generalizable">a'</a> <a id="331" class="Symbol">:</a> <a id="333" href="/lia/part0/Tree/#311" class="Generalizable">A</a>
+    <a id="339" href="/lia/part0/Tree/#339" class="Generalizable">as</a> <a id="342" href="/lia/part0/Tree/#342" class="Generalizable">as'</a> <a id="346" class="Symbol">:</a> <a id="348" href="/lia/part0/Tree/#311" class="Generalizable">A</a> <a id="350" href="/lia/part0/List/#468" class="Datatype Operator">*</a>
+
+<a id="353" class="Keyword">data</a> <a id="Tree"></a><a id="358" href="/lia/part0/Tree/#358" class="Datatype">Tree</a> <a id="363" class="Symbol">{</a><a id="364" href="/lia/part0/Tree/#364" class="Bound">ℓ</a><a id="365" class="Symbol">}</a> <a id="367" class="Symbol">(</a><a id="368" href="/lia/part0/Tree/#368" class="Bound">A</a> <a id="370" class="Symbol">:</a> <a id="372" class="PrimitiveType">Set</a> <a id="376" href="/lia/part0/Tree/#364" class="Bound">ℓ</a><a id="377" class="Symbol">)</a> <a id="379" class="Symbol">:</a> <a id="381" class="PrimitiveType">Set</a> <a id="385" href="/lia/part0/Tree/#364" class="Bound">ℓ</a> <a id="387" class="Keyword">where</a>
+    <a id="Tree.Nil"></a><a id="397" href="/lia/part0/Tree/#397" class="InductiveConstructor">Nil</a> <a id="401" class="Symbol">:</a> <a id="403" href="/lia/part0/Tree/#358" class="Datatype">Tree</a> <a id="408" href="/lia/part0/Tree/#368" class="Bound">A</a>
+    <a id="Tree.Node"></a><a id="414" href="/lia/part0/Tree/#414" class="InductiveConstructor">Node</a> <a id="419" class="Symbol">:</a> <a id="421" href="/lia/part0/Tree/#368" class="Bound">A</a> <a id="423" class="Symbol">→</a> <a id="425" href="/lia/part0/Tree/#358" class="Datatype">Tree</a> <a id="430" href="/lia/part0/Tree/#368" class="Bound">A</a> <a id="432" href="/lia/part0/List/#468" class="Datatype Operator">*</a> <a id="434" class="Symbol">→</a> <a id="436" href="/lia/part0/Tree/#358" class="Datatype">Tree</a> <a id="441" href="/lia/part0/Tree/#368" class="Bound">A</a></pre>
+
+<h2 id="injectivity-of-constructors">
+<a class="anchor" href="#injectivity-of-constructors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Injectivity of constructors</h2>
+
+<pre class="Agda"><a id="Node-inj-left"></a><a id="484" href="/lia/part0/Tree/#484" class="Function">Node-inj-left</a> <a id="498" class="Symbol">:</a> <a id="500" href="/lia/part0/Tree/#414" class="InductiveConstructor">Node</a> <a id="505" href="/lia/part0/Tree/#326" class="Generalizable">a</a> <a id="507" href="/lia/part0/Tree/#339" class="Generalizable">as</a> <a id="510" href="/lia/part0/Equality/#244" class="Datatype Operator">≡</a> <a id="512" href="/lia/part0/Tree/#414" class="InductiveConstructor">Node</a> <a id="517" href="/lia/part0/Tree/#328" class="Generalizable">a'</a> <a id="520" href="/lia/part0/Tree/#342" class="Generalizable">as'</a> <a id="524" class="Symbol">→</a> <a id="526" href="/lia/part0/Tree/#326" class="Generalizable">a</a> <a id="528" href="/lia/part0/Equality/#244" class="Datatype Operator">≡</a> <a id="530" href="/lia/part0/Tree/#328" class="Generalizable">a'</a>
+<a id="533" href="/lia/part0/Tree/#484" class="Function">Node-inj-left</a> <a id="547" href="/lia/part0/Equality/#292" class="InductiveConstructor">refl</a> <a id="552" class="Symbol">=</a> <a id="554" href="/lia/part0/Equality/#292" class="InductiveConstructor">refl</a>
+
+<a id="Node-inj-right"></a><a id="560" href="/lia/part0/Tree/#560" class="Function">Node-inj-right</a> <a id="575" class="Symbol">:</a> <a id="577" href="/lia/part0/Tree/#414" class="InductiveConstructor">Node</a> <a id="582" href="/lia/part0/Tree/#326" class="Generalizable">a</a> <a id="584" href="/lia/part0/Tree/#339" class="Generalizable">as</a> <a id="587" href="/lia/part0/Equality/#244" class="Datatype Operator">≡</a> <a id="589" href="/lia/part0/Tree/#414" class="InductiveConstructor">Node</a> <a id="594" href="/lia/part0/Tree/#328" class="Generalizable">a'</a> <a id="597" href="/lia/part0/Tree/#342" class="Generalizable">as'</a> <a id="601" class="Symbol">→</a> <a id="603" href="/lia/part0/Tree/#339" class="Generalizable">as</a> <a id="606" href="/lia/part0/Equality/#244" class="Datatype Operator">≡</a> <a id="608" href="/lia/part0/Tree/#342" class="Generalizable">as'</a>
+<a id="612" href="/lia/part0/Tree/#560" class="Function">Node-inj-right</a> <a id="627" href="/lia/part0/Equality/#292" class="InductiveConstructor">refl</a> <a id="632" class="Symbol">=</a> <a id="634" href="/lia/part0/Equality/#292" class="InductiveConstructor">refl</a></pre>
+
+<h1 id="decidable-equality">
+<a class="anchor" href="#decidable-equality" aria-hidden="true"><span class="octicon octicon-link"></span></a>Decidable equality</h1>
+
+<p>Equality on <code class="language-plaintext highlighter-rouge">Tree A</code> is decidable provided it is decidable on <code class="language-plaintext highlighter-rouge">A</code>.</p>
+
+<pre class="Agda"><a id="740" class="Keyword">instance</a>
+  <a id="eqTree"></a><a id="751" href="/lia/part0/Tree/#751" class="Function">eqTree</a> <a id="758" class="Symbol">:</a> <a id="760" class="Symbol">∀</a> <a id="762" class="Symbol">{</a><a id="763" href="/lia/part0/Tree/#763" class="Bound">ℓ</a><a id="764" class="Symbol">}</a> <a id="766" class="Symbol">{</a><a id="767" href="/lia/part0/Tree/#767" class="Bound">A</a> <a id="769" class="Symbol">:</a> <a id="771" class="PrimitiveType">Set</a> <a id="775" href="/lia/part0/Tree/#763" class="Bound">ℓ</a><a id="776" class="Symbol">}</a> <a id="778" class="Symbol">→</a> <a id="780" class="Symbol">{{</a><a id="782" href="/lia/part0/Equality/#2790" class="Record">Eq</a> <a id="785" href="/lia/part0/Tree/#767" class="Bound">A</a><a id="786" class="Symbol">}}</a> <a id="789" class="Symbol">→</a> <a id="791" href="/lia/part0/Equality/#2790" class="Record">Eq</a> <a id="794" class="Symbol">(</a><a id="795" href="/lia/part0/Tree/#358" class="Datatype">Tree</a> <a id="800" href="/lia/part0/Tree/#767" class="Bound">A</a><a id="801" class="Symbol">)</a>
+  <a id="805" href="/lia/part0/Equality/#2851" class="Field Operator">_≡?_</a> <a id="810" class="Symbol">{{</a><a id="812" href="/lia/part0/Tree/#751" class="Function">eqTree</a><a id="818" class="Symbol">}}</a> <a id="821" class="Symbol">=</a> <a id="823" href="/lia/part0/Tree/#837" class="Function">go</a> <a id="826" class="Keyword">where</a>
+
+    <a id="837" href="/lia/part0/Tree/#837" class="Function">go</a> <a id="840" class="Symbol">:</a> <a id="842" class="Symbol">∀</a> <a id="844" href="/lia/part0/Tree/#844" class="Bound">s</a> <a id="846" href="/lia/part0/Tree/#846" class="Bound">t</a> <a id="848" class="Symbol">→</a> <a id="850" href="/lia/part0/Decidable/#150" class="Datatype">Dec</a> <a id="854" class="Symbol">(</a><a id="855" href="/lia/part0/Tree/#844" class="Bound">s</a> <a id="857" href="/lia/part0/Equality/#244" class="Datatype Operator">≡</a> <a id="859" href="/lia/part0/Tree/#846" class="Bound">t</a><a id="860" class="Symbol">)</a>
+    <a id="866" href="/lia/part0/Tree/#866" class="Function">go*</a> <a id="870" class="Symbol">:</a> <a id="872" class="Symbol">∀</a> <a id="874" href="/lia/part0/Tree/#874" class="Bound">as</a> <a id="877" href="/lia/part0/Tree/#877" class="Bound">bs</a> <a id="880" class="Symbol">→</a> <a id="882" href="/lia/part0/Decidable/#150" class="Datatype">Dec</a> <a id="886" class="Symbol">(</a><a id="887" href="/lia/part0/Tree/#874" class="Bound">as</a> <a id="890" href="/lia/part0/Equality/#244" class="Datatype Operator">≡</a> <a id="892" href="/lia/part0/Tree/#877" class="Bound">bs</a><a id="894" class="Symbol">)</a>
+
+    <a id="901" href="/lia/part0/Tree/#837" class="Function">go</a> <a id="904" href="/lia/part0/Tree/#397" class="InductiveConstructor">Nil</a> <a id="908" href="/lia/part0/Tree/#397" class="InductiveConstructor">Nil</a> <a id="912" class="Symbol">=</a> <a id="914" href="/lia/part0/Decidable/#186" class="InductiveConstructor">yes</a> <a id="918" href="/lia/part0/Equality/#292" class="InductiveConstructor">refl</a>
+    <a id="927" href="/lia/part0/Tree/#837" class="Function">go</a> <a id="930" href="/lia/part0/Tree/#397" class="InductiveConstructor">Nil</a> <a id="934" class="Symbol">(</a><a id="935" href="/lia/part0/Tree/#414" class="InductiveConstructor">Node</a> <a id="940" class="Symbol">_</a> <a id="942" class="Symbol">_)</a> <a id="945" class="Symbol">=</a> <a id="947" href="/lia/part0/Decidable/#204" class="InductiveConstructor">no</a> <a id="950" class="Symbol">(λ</a> <a id="953" class="Symbol">())</a>
+    <a id="961" href="/lia/part0/Tree/#837" class="Function">go</a> <a id="964" class="Symbol">(</a><a id="965" href="/lia/part0/Tree/#414" class="InductiveConstructor">Node</a> <a id="970" class="Symbol">_</a> <a id="972" class="Symbol">_)</a> <a id="975" href="/lia/part0/Tree/#397" class="InductiveConstructor">Nil</a> <a id="979" class="Symbol">=</a> <a id="981" href="/lia/part0/Decidable/#204" class="InductiveConstructor">no</a> <a id="984" class="Symbol">(λ</a> <a id="987" class="Symbol">())</a>
+    <a id="995" href="/lia/part0/Tree/#837" class="Function">go</a> <a id="998" class="Symbol">(</a><a id="999" href="/lia/part0/Tree/#414" class="InductiveConstructor">Node</a> <a id="1004" href="/lia/part0/Tree/#1004" class="Bound">a</a> <a id="1006" href="/lia/part0/Tree/#1006" class="Bound">as</a><a id="1008" class="Symbol">)</a> <a id="1010" class="Symbol">(</a><a id="1011" href="/lia/part0/Tree/#414" class="InductiveConstructor">Node</a> <a id="1016" href="/lia/part0/Tree/#1016" class="Bound">b</a> <a id="1018" href="/lia/part0/Tree/#1018" class="Bound">bs</a><a id="1020" class="Symbol">)</a>
+      <a id="1028" class="Keyword">with</a> <a id="1033" href="/lia/part0/Tree/#1004" class="Bound">a</a> <a id="1035" href="/lia/part0/Equality/#2851" class="Field Operator">≡?</a> <a id="1038" href="/lia/part0/Tree/#1016" class="Bound">b</a>
+    <a id="1044" class="Symbol">...</a> <a id="1048" class="Symbol">|</a> <a id="1050" href="/lia/part0/Decidable/#204" class="InductiveConstructor">no</a> <a id="1053" href="/lia/part0/Tree/#1053" class="Bound">a≢b</a> <a id="1057" class="Symbol">=</a> <a id="1059" href="/lia/part0/Decidable/#204" class="InductiveConstructor">no</a> <a id="1062" class="Symbol">λ{</a><a id="1064" href="/lia/part0/Equality/#292" class="InductiveConstructor">refl</a> <a id="1069" class="Symbol">→</a> <a id="1071" href="/lia/part0/Equality/#2161" class="Function">~x≢x</a> <a id="1076" href="/lia/part0/Tree/#1053" class="Bound">a≢b</a><a id="1079" class="Symbol">}</a>
+    <a id="1085" class="Symbol">...</a> <a id="1089" class="Symbol">|</a> <a id="1091" href="/lia/part0/Decidable/#186" class="InductiveConstructor">yes</a> <a id="1095" href="/lia/part0/Equality/#292" class="InductiveConstructor">refl</a>
+      <a id="1106" class="Keyword">with</a> <a id="1111" href="/lia/part0/Tree/#866" class="Function">go*</a> <a id="1115" class="Bound">as</a> <a id="1118" class="Bound">bs</a>
+    <a id="1125" class="Symbol">...</a> <a id="1129" class="Symbol">|</a> <a id="1131" href="/lia/part0/Decidable/#204" class="InductiveConstructor">no</a> <a id="1134" href="/lia/part0/Tree/#1134" class="Bound">as≢bs</a> <a id="1140" class="Symbol">=</a> <a id="1142" href="/lia/part0/Decidable/#204" class="InductiveConstructor">no</a> <a id="1145" class="Symbol">λ{</a><a id="1147" href="/lia/part0/Equality/#292" class="InductiveConstructor">refl</a> <a id="1152" class="Symbol">→</a> <a id="1154" href="/lia/part0/Equality/#2161" class="Function">~x≢x</a> <a id="1159" href="/lia/part0/Tree/#1134" class="Bound">as≢bs</a><a id="1164" class="Symbol">}</a>
+    <a id="1170" class="Symbol">...</a> <a id="1174" class="Symbol">|</a> <a id="1176" href="/lia/part0/Decidable/#186" class="InductiveConstructor">yes</a> <a id="1180" href="/lia/part0/Equality/#292" class="InductiveConstructor">refl</a> <a id="1185" class="Symbol">=</a> <a id="1187" href="/lia/part0/Decidable/#186" class="InductiveConstructor">yes</a> <a id="1191" href="/lia/part0/Equality/#292" class="InductiveConstructor">refl</a>
+
+    <a id="1201" class="Comment">-- need an extra case analysis to satisfy the termination checker</a>
+    <a id="1271" class="Comment">-- (essentially reproving decidability of list equality);</a>
+    <a id="1333" class="Comment">-- alternative: define "go" by well-founded induction on the size of the tree...</a>
+    <a id="1418" href="/lia/part0/Tree/#866" class="Function">go*</a> <a id="1422" href="/lia/part0/List/#505" class="InductiveConstructor">ε</a> <a id="1424" href="/lia/part0/List/#505" class="InductiveConstructor">ε</a> <a id="1426" class="Symbol">=</a> <a id="1428" href="/lia/part0/Decidable/#186" class="InductiveConstructor">yes</a> <a id="1432" href="/lia/part0/Equality/#292" class="InductiveConstructor">refl</a>
+    <a id="1441" href="/lia/part0/Tree/#866" class="Function">go*</a> <a id="1445" href="/lia/part0/List/#505" class="InductiveConstructor">ε</a> <a id="1447" class="Symbol">(_</a> <a id="1450" href="/lia/part0/List/#517" class="InductiveConstructor Operator">∷</a> <a id="1452" class="Symbol">_)</a> <a id="1455" class="Symbol">=</a> <a id="1457" href="/lia/part0/Decidable/#204" class="InductiveConstructor">no</a> <a id="1460" class="Symbol">(λ</a> <a id="1463" class="Symbol">())</a>
+    <a id="1471" href="/lia/part0/Tree/#866" class="Function">go*</a> <a id="1475" class="Symbol">(_</a> <a id="1478" href="/lia/part0/List/#517" class="InductiveConstructor Operator">∷</a> <a id="1480" class="Symbol">_)</a> <a id="1483" href="/lia/part0/List/#505" class="InductiveConstructor">ε</a> <a id="1485" class="Symbol">=</a> <a id="1487" href="/lia/part0/Decidable/#204" class="InductiveConstructor">no</a> <a id="1490" class="Symbol">(λ</a> <a id="1493" class="Symbol">())</a>
+    <a id="1501" href="/lia/part0/Tree/#866" class="Function">go*</a> <a id="1505" class="Symbol">(</a><a id="1506" href="/lia/part0/Tree/#1506" class="Bound">a</a> <a id="1508" href="/lia/part0/List/#517" class="InductiveConstructor Operator">∷</a> <a id="1510" href="/lia/part0/Tree/#1510" class="Bound">as</a><a id="1512" class="Symbol">)</a> <a id="1514" class="Symbol">(</a><a id="1515" href="/lia/part0/Tree/#1515" class="Bound">b</a> <a id="1517" href="/lia/part0/List/#517" class="InductiveConstructor Operator">∷</a> <a id="1519" href="/lia/part0/Tree/#1519" class="Bound">bs</a><a id="1521" class="Symbol">)</a>
+      <a id="1529" class="Keyword">with</a> <a id="1534" href="/lia/part0/Tree/#1506" class="Bound">a</a> <a id="1536" href="/lia/part0/Equality/#2851" class="Field Operator">≡?</a> <a id="1539" href="/lia/part0/Tree/#1515" class="Bound">b</a>
+    <a id="1545" class="Symbol">...</a> <a id="1549" class="Symbol">|</a> <a id="1551" href="/lia/part0/Decidable/#204" class="InductiveConstructor">no</a> <a id="1554" href="/lia/part0/Tree/#1554" class="Bound">a≢b</a> <a id="1558" class="Symbol">=</a> <a id="1560" href="/lia/part0/Decidable/#204" class="InductiveConstructor">no</a> <a id="1563" class="Symbol">λ{</a><a id="1565" href="/lia/part0/Equality/#292" class="InductiveConstructor">refl</a> <a id="1570" class="Symbol">→</a> <a id="1572" href="/lia/part0/Equality/#2161" class="Function">~x≢x</a> <a id="1577" href="/lia/part0/Tree/#1554" class="Bound">a≢b</a><a id="1580" class="Symbol">}</a>
+    <a id="1586" class="Symbol">...</a> <a id="1590" class="Symbol">|</a> <a id="1592" href="/lia/part0/Decidable/#186" class="InductiveConstructor">yes</a> <a id="1596" href="/lia/part0/Equality/#292" class="InductiveConstructor">refl</a>
+      <a id="1607" class="Keyword">with</a> <a id="1612" href="/lia/part0/Tree/#866" class="Function">go*</a> <a id="1616" class="Bound">as</a> <a id="1619" class="Bound">bs</a>
+    <a id="1626" class="Symbol">...</a> <a id="1630" class="Symbol">|</a> <a id="1632" href="/lia/part0/Decidable/#204" class="InductiveConstructor">no</a> <a id="1635" href="/lia/part0/Tree/#1635" class="Bound">as≢bs</a> <a id="1641" class="Symbol">=</a> <a id="1643" href="/lia/part0/Decidable/#204" class="InductiveConstructor">no</a> <a id="1646" class="Symbol">λ{</a><a id="1648" href="/lia/part0/Equality/#292" class="InductiveConstructor">refl</a> <a id="1653" class="Symbol">→</a> <a id="1655" href="/lia/part0/Equality/#2161" class="Function">~x≢x</a> <a id="1660" href="/lia/part0/Tree/#1635" class="Bound">as≢bs</a><a id="1665" class="Symbol">}</a>
+    <a id="1671" class="Symbol">...</a> <a id="1675" class="Symbol">|</a> <a id="1677" href="/lia/part0/Decidable/#186" class="InductiveConstructor">yes</a> <a id="1681" href="/lia/part0/Equality/#292" class="InductiveConstructor">refl</a> <a id="1686" class="Symbol">=</a> <a id="1688" href="/lia/part0/Decidable/#186" class="InductiveConstructor">yes</a> <a id="1692" href="/lia/part0/Equality/#292" class="InductiveConstructor">refl</a></pre>
+
+<div id="refs">
+
+  <h1 id="references">
+<a class="anchor" href="#references" aria-hidden="true"><span class="octicon octicon-link"></span></a>References</h1>
+
+</div>
+
+<h1 id="solutions">
+<a class="anchor" href="#solutions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Solutions</h1>
+
+<p>!solutions</p>
+
+<hr>
+
+    </div>
+  
+    <p style="text-align:center;">
+    
+    
+    
+    <a alt="Part" href="/lia/part0/index/">Part</a>
+    &bullet;
+    
+    
+    <a alt="Source code" href="https://github.com/lclem/lia/blob/main/src/part0/Tree.lagda.md">Source</a>
+    
+    
+    
+</p>
+
+    <p class="p-name"> Last-modified: Dec 22 17:48:52 2020 </p>
+  </article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/lia/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Logic in Agda</h2><div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Lorenzo Clemente</li>
+          <li><a class="u-email" href="mailto:clementelorenzo@gmail.com">clementelorenzo@gmail.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/lclem"><svg class="svg-icon"><use xlink:href="/lia/assets/minima-social-icons.svg#github"></use></svg> <span class="username">lclem</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3"></div>
+    </div>This work is licensed under a <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>
+  </div>
+</footer>
+
+<!-- Parse the Latex divs with Katex
+<script type="text/javascript">
+  $("script[type='math/tex']").replaceWith(
+    function(){
+      var tex = $(this).text();
+      return katex.renderToString(tex, {displayMode: false});
+  });
+  
+  $("script[type='math/tex; mode=display']").replaceWith(
+    function(){
+      var tex = $(this).text();
+      return katex.renderToString(tex.replace(/%.*/g, ''), {displayMode: true});
+  });
+</script>
+-->
+
+<script type="text/javascript" src="/lia/assets/hidebox.js"></script>
+</body>
+
+</html>
