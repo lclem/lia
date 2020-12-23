@@ -839,7 +839,7 @@ div.CodeMirror-dragcursors { visibility: visible; }
 
 .CodeMirror-selected { background: #d3e7f8 !important; }
 
-.CodeMirror-focused .CodeMirror-selected { background: #d3e7f8 !important; }
+.CodeMirror-focused .CodeMirror-selected { background: #d3e7f8 !important; border-color: #cce7ff !important; }
 
 .CodeMirror-crosshair { cursor: crosshair; }
 
