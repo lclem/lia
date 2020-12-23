@@ -279,8 +279,7 @@ Prove that the mapping `Formula2Tree` is injective.
 Formula2Tree-inj : Injective Formula2Tree
 ```
 
-<executable-pre data-executable="true" data-language="agda">
-
+<pre data-executable="true" data-language="agda">
 module part1.Semantics.ex-Formula2Tree-inj where
 open import part0.index
 
@@ -290,8 +289,7 @@ open import part1.Semantics n' hiding (Formula2Tree-inj)
 
 Formula2Tree-inj : Injective Formula2Tree
 Formula2Tree-inj = ?
-
-</executable-pre>
+</pre>
 
 *Hint:* Exploit the fact that the list constructor `_∷_` is injective on both arguments
 (c.f. !remoteRef(part0)(List)(∷-inj-left) and !remoteRef(part0)(List)(∷-inj-right) from !chapterRef(part0)(List)).

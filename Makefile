@@ -353,6 +353,9 @@ $(OUTDIR)/$1/$2.md: $(TMPDIR)/$1.$2.md
 #	@cp -f $(TMPDIR)/$1.$2.md $(OUTDIR)/$1/$2.md
 
 	@sed -i "" 's|<pre class="Agda">|{% raw %}<pre class="Agda">|g' $(OUTDIR)/$1/$2.md
+	@sed -i "" 's|<pre data-executable|{% raw %}<pre data-executable|g' $(OUTDIR)/$1/$2.md
+#	@sed -i "" 's|<pre|{% raw %}<pre|g' $(OUTDIR)/$1/$2.md
+
 	@sed -i "" 's|</pre>|</pre>{% endraw %}|g' $(OUTDIR)/$1/$2.md
 
 # this removes the newline before </pre>, 

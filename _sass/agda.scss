@@ -340,6 +340,7 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {color: #a22;}
   cursor: text;
   min-height: 1px; /* prevents collapsing before first draw */
 }
+
 .CodeMirror pre.CodeMirror-line,
 .CodeMirror pre.CodeMirror-line-like {
     /* Reset some styles that the rest of the page might have set */
@@ -357,6 +358,7 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {color: #a22;}
     -webkit-font-variant-ligatures: contextual;
     font-variant-ligatures: contextual;
 }
+
 .CodeMirror-wrap pre.CodeMirror-line,
 .CodeMirror-wrap pre.CodeMirror-line-like {
   word-wrap: break-word;
@@ -406,6 +408,7 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {color: #a22;}
   position: absolute;
   pointer-events: none;
 }
+
 .CodeMirror-measure pre { position: static; }
 
 div.CodeMirror-cursors {
@@ -413,6 +416,7 @@ div.CodeMirror-cursors {
   position: relative;
   z-index: 3;
 }
+
 div.CodeMirror-dragcursors {
   visibility: visible;
 }
@@ -422,7 +426,13 @@ div.CodeMirror-dragcursors {
 }
 
 .CodeMirror-selected { background: #d3e7f8 !important; }
-.CodeMirror-focused .CodeMirror-selected { background: #d3e7f8 !important; }
+
+.CodeMirror-focused .CodeMirror-selected {
+  background: #d3e7f8 !important;
+  border-color: #cce7ff !important;
+}
+
+
 .CodeMirror-crosshair { cursor: crosshair; }
 .CodeMirror-line::selection, .CodeMirror-line > span::selection, .CodeMirror-line > span > span::selection { background: #d3e7f8 !important; }
 .CodeMirror-line::-moz-selection, .CodeMirror-line > span::-moz-selection, .CodeMirror-line > span > span::-moz-selection { background: #d3e7f8 !important; }
@@ -448,14 +458,12 @@ div.CodeMirror-dragcursors {
 /* Help users use markselection to safely style text background */
 span.CodeMirror-selectedtext { background: none; }
 
-
 .p-Widget, .lm-Widget {
     box-sizing: border-box;
     position: relative;
     overflow: visible !important;
     cursor: default;
 }
-
 
 /* agda-specific extensions */
 
