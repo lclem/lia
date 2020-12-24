@@ -100,6 +100,7 @@ exclude:
   - "thebe/README.md"
   - "thebe/test/"
   - "thebe/webpack.config.js"
+  - "thebe/tmp"
   - "codemirror-agda/node_modules/"
   - "codemirror-agda/docs"
   - "codemirror-agda/index.html"

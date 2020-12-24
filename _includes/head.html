@@ -27,7 +27,9 @@
   {
     bootstrap: true,
     requestKernel: true,
-    selector: "[data-executable]", // "executable-pre",
+    runAllCells: false,
+    selector: "[data-executable]",
+    predefinedOutput: false,
     codeMirrorConfig: {
         //theme: "idea",
         language: "agda",
@@ -38,12 +40,13 @@
     kernelOptions: {
         name: "agda",
         kernelName: "agda",
-        path: "/src/",
+        path: "src/",
+        loadFromStore: false,
         // notebook server configuration; not needed with binder
-        //serverSettings: {
-        //      baseUrl: "http://127.0.0.1:8888",
-        //      token: "test-secret",
-        //    },
+        serverSettings: {
+              baseUrl: "http://127.0.0.1:8888",
+              token: "test-secret",
+            },
     },
     binderOptions: {
       repo: "lclem/lia", // need to put here the actual github repo (if it is a fork)
@@ -53,7 +56,7 @@
       savedSession: {
         enabled: true,
         maxAge: 86400, // the max age in seconds to consider re-using a session
-        storagePrefix: "thebe-binder-"
+        storagePrefix: "thebe-binder-lia-"
       },
     },
   }
@@ -62,7 +65,7 @@
 <!-- <script type="text/javascript" src="https://unpkg.com/thebelab@latest"></script> -->
 
 <!-- our own version of the thebe library: -->
-<script type="text/javascript" src="{{ "thebe/lib/index.js" | relative_url }}"></script>
+<script type="text/javascript" src="{{ "/thebe/lib/index.js" | relative_url }}"></script>
 
 <!-- highlighting for Agda -->
 <script src="{{ "/codemirror-agda/lib/index.js" | relative_url }}"></script>

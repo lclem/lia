@@ -281,6 +281,7 @@ Formula2Tree-inj : Injective Formula2Tree
 
 <pre data-executable="true" data-language="agda">
 module part1.Semantics.ex-Formula2Tree-inj where
+
 open import part0.index
 
 postulate n' : ℕ
