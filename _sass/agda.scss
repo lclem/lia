@@ -511,19 +511,22 @@ span.CodeMirror-selectedtext { background: none; }
 @mixin buttons-badges {
   background-color: transparent;
   background-repeat: no-repeat;
-  background-size: contain;
+  background-size: 10px;
+  background-position: center;
   border: none;
   mix-blend-mode: multiply;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: normal;
+  // padding: 3.5px;
 
-  padding: 3.5px;
+  // margin-top: 10px;
+  // margin-right: 10px;
+  // margin-bottom: 10px;
+  // margin-left: 18px;
 
-  margin-top: 10px;
-  margin-right: 10px;
-  margin-bottom: 10px;
-  margin-left: 18px;
-
-  height: 4px; 
-  width: 4px; 
+  height: 15px; 
+  width: 15px; 
 
 //  max-width: 6px;
 //  max-height: 6px;
@@ -534,7 +537,10 @@ span.CodeMirror-selectedtext { background: none; }
 .play-button-class {
   @include buttons-badges;
   background-image: url(../assets/images/play.png);
-  margin-left: 18px;
+  padding-left: 5px;
+  padding-right: 12px;
+  border-right: 1px solid #aaaaaa;
+  border-radius: 0px;
 }
 
 .play-button-class:hover {
@@ -575,26 +581,214 @@ span.CodeMirror-selectedtext { background: none; }
 
 // the per-cell status badge on the right
 
-.status-badge {
-  @include buttons-badges;
-  transition: none;
+// .status-badge {
+//   @include buttons-badges;
+//   transition: none;
+//   float: right;
+//   // display: inline-block;
+//   vertical-align: middle;
+//   // center: right;
+//   line-height: normal;
+//   padding: 5px;
+// //  margin-top: 5px;
+// }
+
+// .status-badge-unknown {
+//   background-image: url(../assets/images/unknown.png);
+// }
+
+// .status-badge-ok {
+//   background-image: url(../assets/images/checkmark.png);
+// }
+
+// .status-badge-error {
+//   background-image: url(../assets/images/error.png);
+// }
+
+// loading animation
+
+// .status-badge-running {
+//   background-image: url(../assets/images/running.png);
+// //  animation: lds-dual-ring 1.2s linear infinite;
+//   animation: lds-heart 1.5s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+//   // animation: pulse 2s infinite;
+// }
+
+@mixin status-badge-common {
+
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  margin-top: 5px;
   float: right;
-}
 
-.status-badge-unknown {
-  background-image: url(../assets/images/unknown.png);
-}
+  stroke-width: 4;
+  stroke: #fff;
+  stroke-miterlimit: 10;
 
-.status-badge-ok {
-  background-image: url(../assets/images/checkmark.png);
 }
 
 .status-badge-error {
-  background-image: url(../assets/images/error.png);
+  @include status-badge-common;
+  stroke-width: 1;
+}
+
+.status-badge-warning {
+  @include status-badge-common;
+  stroke-width: 1;
+}
+
+.status-badge-ok {
+  @include status-badge-common;
+  box-shadow: inset 0px 0px 0px #7ac142;
+  animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+}
+
+.checkmark__circle {
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  stroke-width: 2;
+  stroke-miterlimit: 10;
+  stroke: #7ac142;
+  fill: none;
+  animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.checkmark__check {
+  transform-origin: 50% 50%;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+}
+
+@keyframes stroke {
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes scale {
+  0%, 100% {
+    transform: none;
+  }
+  50% {
+    transform: scale3d(1.1, 1.1, 1);
+  }
+}
+
+@keyframes fill {
+  100% {
+    box-shadow: inset 0px 0px 0px 30px #7ac142;
+  }
 }
 
 .status-badge-running {
-  background-image: url(../assets/images/running.png);
+  @include status-badge-common;
+  box-shadow: inset 0px 0px 0px 30px #ec9f6e;
+//  animation: fill-running .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+  animation: lds-heart 1.5s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+.running__circle {
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  stroke-width: 2;
+  stroke-miterlimit: 10;
+  stroke: #ec9f6e;
+  fill: #ec9f6e;
+  animation: fill-running 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+@keyframes fill-running {
+  100% {
+    box-shadow: inset 0px 0px 0px 30px #ec9f6e;
+  }
+}
+
+.status-badge-unknown {
+  @include status-badge-common;
+  box-shadow: inset 0px 0px 0px 30px #94959f;
+  fill: #94959f;
+}
+
+@keyframes fill-unknown {
+  100% {
+    box-shadow: inset 0px 0px 0px 30px #94959f;
+  }
+}
+
+.unknown__circle {
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  stroke-width: 2;
+  stroke-miterlimit: 10;
+  stroke: #94959f;
+  fill: #94959f;
+//  animation: fill-unknown 0.6s cubic-bezier(1, 0, 1, 1) forwards;
+}
+
+// .lds-dual-ring {
+//   display: inline-block;
+//   width: 80px;
+//   height: 80px;
+// }
+
+// .status-badge-running:after {
+//   content: " ";
+//   display: block;
+//   width: 15px;
+//   height: 15px;
+//   margin: 2px;
+//   border-radius: 50%;
+//   border: 4px solid #fed;
+//   border-color: #fed transparent #fed transparent;
+//   animation: lds-dual-ring 1.2s linear infinite;
+// }
+
+@keyframes lds-dual-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes lds-heart {
+  0% {
+    transform: scale(0.95);
+  }
+  5% {
+    transform: scale(1.1);
+  }
+  39% {
+    transform: scale(0.85);
+  }
+  45% {
+    transform: scale(1);
+  }
+  60% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(0.9);
+  }
+}
+
+@keyframes pulse {
+	0% {
+		transform: scale(0.95);
+		box-shadow: 0 0 0 0 rgba(0, 0, 0, 0.7);
+	}
+
+	70% {
+		transform: scale(1);
+		box-shadow: 0 0 0 10px rgba(0, 0, 0, 0);
+	}
+
+	100% {
+		transform: scale(0.95);
+		box-shadow: 0 0 0 0 rgba(0, 0, 0, 0);
+	}
 }
 
 .thebelab-cell {
@@ -680,57 +874,80 @@ content > div {
 .tooltip {
   position: relative;
   display: inline-block;
+  z-index: 100;
   //border-bottom: 1px dotted black;
 }
 
-.tooltip .tooltiptext {
-  //visibility: hidden;
+@mixin tooltip-defaults {
 
   opacity:0;
-  transition: .3s opacity;  
+  //transition: .3s visibility;
+
+  background-color: rgb(73, 73, 73);
+  color: rgb(226, 226, 226);
+
+  border-radius: 6px;
+  z-index: 1000;
+  position: fixed;
+
+  padding: 10px;
+  top: 150%;
+
+}
+
+.tooltip .tooltiptext {
+  
+  @include tooltip-defaults;
 
   width: 120px;
-  background-color: black;
-  color: #fff;
   text-align: center;
-  border-radius: 6px;
-//  padding: 2px; // 0;
-//  margin: 5px;
 
   /* Position the tooltip */
-  position: absolute;
-  z-index: 100;
-  top: 100%;
-  left: 50%;
-  margin-left: -60px; /* Use half of the width (120/2 = 60), to center the tooltip */
+  //margin-bottom: 100px;
+  top: -6px;
+  //margin-left: -60px; /* Use half of the width (120/2 = 60), to center the tooltip */
+  margin-left: 15px;
+  padding: 5px;
 }
 
 .tooltip:hover .tooltiptext {
-//  visibility: visible;
   opacity:1;
 }
 
 .kernel-messages {
 
-  //visibility: hidden;
-  opacity:0;
-  transition: .3s opacity;
-
+  @include tooltip-defaults;
   width: 600px;
-  background-color: rgb(105, 105, 105);
-  color: #fff;
-  text-align: center;
-  border-radius: 6px;
+  text-align: left;
 
   z-index: 100;
-  top: 150%;
   left: 100%;
   margin-left: -600px;
 
-  position: absolute;
 }
 
 .kernel-status-button:hover .kernel-messages {
-  //visibility: visible;
   opacity:1;
 }
+
+// .kernel-status-button:hover {
+//   filter: brightness(150%) !important;
+// }
+
+.cell-info {
+  color: #808080;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: normal;
+//  padding-top: 10px;
+  padding-left: 10px;
+//  position: absolute;
+  display: inline-block;
+  font-size: 10pt;
+//  margin-top: 5px;
+}
+
+div.cell-toolbar {
+  padding: 5px;
+}
+
