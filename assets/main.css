@@ -885,11 +885,11 @@ span.CodeMirror-selectedtext { background: none; }
 
 .play-button-class:hover { filter: brightness(130%); cursor: pointer; }
 
-.kernel-status-button { background-image: url(../assets/images/kernel.png); background-color: transparent; background-repeat: no-repeat; background-size: contain; border: none; mix-blend-mode: multiply; margin-top: 10px; margin-right: 10px; margin-bottom: 10px; margin-left: 18px; height: 10px; width: 10px; transition: none; filter: blur(0.2px); padding: 5px; }
+.kernel-status-button { background-color: transparent; background-repeat: no-repeat; background-size: 10px; background-position: center; border: none; mix-blend-mode: multiply; display: inline-block; vertical-align: middle; line-height: normal; height: 15px; width: 15px; transition: all .3s ease-in-out; filter: blur(0.2px); background-image: url(../assets/images/kernel.png); background-size: 25px; height: 25px; width: 25px; transition: none; padding: 5px; filter: opacity(25%); }
 
-.kernel-status-button:hover { cursor: pointer; }
+button.kernel-status-button:hover { cursor: pointer; }
 
-.kernel-status-button-ok { background-image: url(../assets/images/checkmark.png); }
+button.kernel-status-button-connected { filter: opacity(100%); }
 
 .status-badge-error { width: 15px; height: 15px; border-radius: 50%; margin-top: 5px; float: right; stroke-width: 4; stroke: #fff; stroke-miterlimit: 10; stroke-width: 1; }
 
@@ -953,13 +953,13 @@ content > div { height: 50px; }
 
 .tooltip { position: relative; display: inline-block; z-index: 100; }
 
-.tooltip .tooltiptext { opacity: 0; background-color: #494949; color: #e2e2e2; border-radius: 6px; z-index: 1000; position: fixed; padding: 10px; top: 150%; width: 120px; text-align: center; /* Position the tooltip */ top: -6px; margin-left: 15px; padding: 5px; }
+.tooltip .tooltiptext { opacity: 0; visibility: hidden; background-color: #494949; color: #e2e2e2; border-radius: 6px; z-index: 1000; position: fixed; padding: 10px; top: 150%; width: 120px; text-align: center; /* Position the tooltip */ top: -6px; margin-left: 15px; padding: 5px; }
 
 .tooltip:hover .tooltiptext { opacity: 1; }
 
-.kernel-messages { opacity: 0; background-color: #494949; color: #e2e2e2; border-radius: 6px; z-index: 1000; position: fixed; padding: 10px; top: 150%; width: 600px; text-align: left; z-index: 100; left: 100%; margin-left: -600px; }
+span.kernel-messages { opacity: 0; visibility: hidden; background-color: #494949; color: #e2e2e2; border-radius: 6px; z-index: 1000; position: fixed; padding: 10px; top: 150%; width: 600px; text-align: left; z-index: 100; margin-left: -600px; top: 125%; position: absolute; line-height: normal; opacity: 50%; }
 
-.kernel-status-button:hover .kernel-messages { opacity: 1; }
+span.kernel-status:hover span.kernel-messages { visibility: visible; opacity: 1; filter: opacity(100%) !important; }
 
 .cell-info { color: #808080; display: inline-block; vertical-align: middle; line-height: normal; padding-left: 10px; display: inline-block; font-size: 10pt; }
 
