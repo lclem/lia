@@ -914,6 +914,13 @@ span.kernel-messages {
 
   z-index: 100;
   margin-left: -600px;
+
+  max-height: 500px;
+
+  // only vertical scrollbars
+  overflow-y: auto;
+  overflow-x: none;
+
   top: 125%;
   position: absolute;
   line-height: normal;
