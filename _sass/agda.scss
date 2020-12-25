@@ -924,6 +924,11 @@ content > div {
   left: 100%;
   margin-left: -600px;
 
+  max-height: 500px;
+
+  // only vertical scrollbars
+  overflow-y: auto;
+  overflow-x: none;
 }
 
 .kernel-status-button:hover .kernel-messages {
