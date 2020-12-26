@@ -17,8 +17,10 @@ USER $NB_UID
 RUN python3 -m pip install --upgrade pip && \
     python3 -m pip install notebook
     
-RUN python3 -m pip install agda_kernel
-RUN python3 -m agda_kernel.install
+# RUN python3 -m pip install agda_kernel
+# RUN python3 -m agda_kernel.install
+
+RUN cd agda-kernel && make kernel-install
 
 USER root
 
