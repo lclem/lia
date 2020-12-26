@@ -114,9 +114,14 @@
                         <input type="text" placeholder="token" id="token" name="token" value="test-secret">
                     </div>
                     <div>
-                        <label for="repository" style="color: white;">Use binder:</label>
+                        <label for="useBinder" style="color: white;">Use binder:</label>
                         <label class="switch" style="vertical-align: middle; margin: 10px;">
                             <input type="checkbox" id="useBinder" name="useBinder">
+                            <span class="slider round"></span>
+                        </label>
+                        <label for="savedSession" style="color: white;">Reuse session:</label>
+                        <label class="switch" style="vertical-align: middle; margin: 10px;">
+                            <input type="checkbox" id="savedSession" name="savedSession">
                             <span class="slider round"></span>
                         </label>
                     </div>
@@ -297,6 +302,7 @@
                     persistInput(document.getElementById("token"));
 
                     persistInput(document.getElementById("useBinder"));
+                    persistInput(document.getElementById("savedSession"));
                     persistInput(document.getElementById("repository"));
                     persistInput(document.getElementById("ref"));
                     persistInput(document.getElementById("binderUrl"));
@@ -445,7 +451,7 @@
     </p>
 </header>
 
-    <p class="p-name"> Last-modified: Dec 26 16:12:44 2020 </p>
+    <p class="p-name"> Last-modified: Dec 26 17:01:05 2020 </p>
   </article>
       </div>
     </main><footer class="site-footer h-card">
