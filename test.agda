@@ -21,4 +21,4 @@ data Two : Set where
 
 select : Two → A → A → A
 select one a₀ a₁ = proj1 a₀ one
-select two a₀ a₁ = {! a₁ !}
+select two a₀ a₁ = {! a₁ !}CIAO
