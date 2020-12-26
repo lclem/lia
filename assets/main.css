@@ -885,7 +885,7 @@ span.CodeMirror-selectedtext { background: none; }
 
 .play-button-class:hover { filter: brightness(130%); cursor: pointer; }
 
-.kernel-status-button { background-color: transparent; background-repeat: no-repeat; background-size: 10px; background-position: center; border: none; mix-blend-mode: multiply; display: inline-block; vertical-align: middle; line-height: normal; height: 15px; width: 15px; transition: all .3s ease-in-out; filter: blur(0.2px); background-image: url(../assets/images/kernel.png); background-size: 25px; height: 25px; width: 25px; transition: none; padding: 5px; filter: opacity(25%); }
+.kernel-status-button { background-color: transparent; background-repeat: no-repeat; background-size: 10px; background-position: center; border: none; mix-blend-mode: multiply; display: inline-block; vertical-align: middle; line-height: normal; height: 15px; width: 15px; transition: all .3s ease-in-out; filter: blur(0.2px); background-image: url(../assets/images/kernel.png); background-size: 25px; height: 25px; width: 25px; transition: none; padding: 5px; border: 0; filter: opacity(25%); -webkit-appearance: button; outline: transparent; }
 
 button.kernel-status-button:hover { cursor: pointer; }
 
@@ -957,7 +957,7 @@ content > div { height: 50px; }
 
 .tooltip:hover .tooltiptext { opacity: 1; }
 
-span.kernel-messages { opacity: 0; visibility: hidden; background-color: #494949; color: #e2e2e2; border-radius: 6px; z-index: 1000; position: fixed; padding: 10px; top: 150%; width: 600px; text-align: left; z-index: 100; margin-left: -600px; max-height: 500px; overflow-y: auto; overflow-x: none; top: 125%; position: absolute; line-height: normal; opacity: 50%; }
+span.kernel-messages { opacity: 0; visibility: hidden; background-color: #494949; color: #e2e2e2; border-radius: 6px; z-index: 1000; position: fixed; padding: 10px; top: 150%; width: 600px; text-align: left; z-index: 100; margin-left: -600px; max-height: 400px; overflow-y: auto; overflow-x: scroll; top: 125%; position: absolute; line-height: normal; opacity: 50%; }
 
 span.kernel-status:hover span.kernel-messages { visibility: visible; opacity: 1; filter: opacity(100%) !important; }
 

@@ -95,20 +95,243 @@
                 <a class="page-link" href="/lia/part3/index/">Part 3</a>
                 <a class="page-link" href="/lia/part4/index/">Part 4</a>
                 <span class="kernel-status">
-                    <button class="kernel-status-button" title="kernel status"></button>
-                    <span class="kernel-messages"></span>
+                    <button class="kernel-status-button" onclick="kernel_status_clicked()" title="kernel status"></button>
+                    <span id="kernel-messages" class="kernel-messages"></span>
                 </span>
+                <div id="connection_options" class="options sidebar" style="text-align: left; line-height: normal; max-width: 800px; padding: 10px; border-radius: 15px;">
+                    <!-- display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: space-between; -->
+                    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+                    <div>
+                        <label for="username" style="color: white;">User:</label>
+                        <input type="text" placeholder="github username" id="username" name="username">
+                        <label for="password" style="color: white;">Password:</label>
+                        <input type="password" placeholder="password" id="password" name="password">
+                    </div>
+                    <div>
+                        <label for="baseUrl" style="color: white;">Base URL:</label>
+                        <input type="text" placeholder="baseUrl" id="baseUrl" name="baseUrl" value="http://127.0.0.1:8888">
+                        <label for="token" style="color: white;">Token:</label>
+                        <input type="text" placeholder="token" id="token" name="token" value="test-secret">
+                    </div>
+                    <div>
+                        <label for="repository" style="color: white;">Use binder:</label>
+                        <label class="switch" style="vertical-align: middle; margin: 10px;">
+                            <input type="checkbox" id="useBinder" name="useBinder">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div>
+                        <label for="repository" style="color: white;">Github repo:</label>
+                        <input type="text" placeholder="repository" id="repository" name="repository" value="">
+
+                        <label for="ref" style="color: white;">Branch:</label>
+                        <input type="text" placeholder="ref" id="ref" name="ref" value="main">
+
+                        <label for="binderUrl" style="color: white;">Binder URL:</label>                        
+                        <input type="text" placeholder="binderUrl" id="binderUrl" name="binderUrl" value="https://mybinder.org">
+                    </div>
+                </div>
             </div>
 
+            <style>
+                .switch {
+                    position: relative;
+                    display: inline-block;
+                    width: 40px;
+                    height: 20px;
+                }
+
+                /* Hide default HTML checkbox */
+                .switch input {
+                    opacity: 0;
+                    width: 0;
+                    height: 0;
+                }
+
+                /* The slider */
+                .slider {
+                    position: absolute;
+                    cursor: pointer;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background-color: #ccc;
+                    -webkit-transition: .4s;
+                    transition: .4s;
+                }
+
+                .slider:before {
+                    position: absolute;
+                    content: "";
+                    height: 16px;
+                    width: 16px;
+                    left: 2px;
+                    /* right: 4px; */
+                    bottom: 2px;
+                    top: 2px;
+                    background-color: white;
+                    -webkit-transition: .4s;
+                    transition: .4s;
+                }
+
+                input:checked + .slider {
+                    background-color: #2196F3;
+                }
+
+                input:focus + .slider {
+                    box-shadow: 0 0 1px #2196F3;
+                }
+
+                input:checked + .slider:before {
+                    -webkit-transform: translateX(18px);
+                    -ms-transform: translateX(18px);
+                    transform: translateX(18px);
+                }
+
+                /* Rounded sliders */
+                .slider.round {
+                    border-radius: 30px;
+                }
+
+                .slider.round:before {
+                border-radius: 50%;
+                }
+
+                .sidebar input[type=text] {
+                    padding: 6px;
+                    margin-top: 8px;
+                    /* font-size: 17px; */
+                    border: none;
+                    /* width: 150px; */
+                }
+
+                .sidebar {
+                    /* height: 100%; */
+                    width: 0;
+                    position: fixed;
+                    z-index: 1000;
+                    top: 0;
+                    right: 20px;
+                    background-color: rgba(17, 17, 17, 0.637);
+                    /* overflow-x: hidden; */
+                    transition: 0.5s;
+                    padding-top: 60px;
+                    display: none;
+                    margin-top: 60px;
+                }
+
+                .sidebar .closebtn {
+                    position: absolute;
+                    color: white;
+                    top: 0;
+                    right: 10px;
+                    font-size: 24px;
+                    margin-left: 20px;
+                }
+
+            </style>
+
+            <script>
+                //  var storedUsername = localStorage.getItem("username");
+                //  localStorage.setItem("username", storedUsername.value);
+            
+                function persistInput(input) {
+                    var key = "input-" + input.id;
+                    var storedValue = localStorage.getItem(key);
+                
+                    console.info("Persisting input: ", input);
+                
+                    if (storedValue) {
+
+                        console.info("restoring value ", storedValue, " for ", input);
+
+                        if(input.type == "checkbox") {
+                            if(storedValue=="yes") {
+                                input.setAttribute("checked", "");
+                            }
+                            else {
+                                input.removeAttribute("checked");
+                            }
+                        }
+                        else {
+                            input.value = storedValue;
+                        }
+                    }
+
+                    input.addEventListener('input', function () {
+                        console.info("input changed: key = ", key, "; value = ", input);
+
+                        if(input.type == "checkbox") {
+
+                            var checked = localStorage.getItem(key);
+
+                            if (checked == "yes") {
+                                localStorage.setItem(key, "no");
+                            }
+                            else {
+                                localStorage.setItem(key, "yes");
+                            }
+
+                            // if(input.hasAttribute("checked")) {
+                            //     checked = true;
+                            // }
+                            // else {
+                            //     checked = false;
+                            // }
+
+                            console.info("checked: ", checked);
+                            // localStorage.setItem(key, checked);
+                        }
+                        else {
+                            console.info("value: ", input.value);
+                            localStorage.setItem(key, input.value);
+                        }
+                    });
+                    }
+                
+                    persistInput(document.getElementById("username"));
+                    persistInput(document.getElementById("password"));
+
+                    persistInput(document.getElementById("baseUrl"));
+                    persistInput(document.getElementById("token"));
+
+                    persistInput(document.getElementById("useBinder"));
+                    persistInput(document.getElementById("repository"));
+                    persistInput(document.getElementById("ref"));
+                    persistInput(document.getElementById("binderUrl"));
+
+                    // init
+                    document.getElementById("connection_options").style.display = "none";
+
+                    function kernel_status_clicked() {
+                
+                        console.info("Clicked kernel status");
+
+                        document.getElementById("kernel-messages").style.display="none";
+
+                        document.getElementById("connection_options").style.width = "750px";
+                        document.getElementById("connection_options").style.display = "block";
+                        //document.getElementById("header").style.marginLeft = "250px";
+
+                    }
+
+                    function closeNav() {
+
+                        document.getElementById("kernel-messages").style.display="inline";
+
+                        document.getElementById("connection_options").style.width = "0";
+                        document.getElementById("connection_options").style.display = "none";
+                        //document.getElementById("header").style.marginLeft= "0";
+                    }
+
+            </script>
             
         </nav>
 
-        
-
     </div>
 
-</header>
-<main class="page-content" aria-label="Content">
+</header><main class="page-content" aria-label="Content">
       <div class="wrapper">
         <article class="post">
 
@@ -222,7 +445,7 @@
     </p>
 </header>
 
-    <p class="p-name"> Last-modified: Dec 25 22:52:26 2020 </p>
+    <p class="p-name"> Last-modified: Dec 26 08:32:36 2020 </p>
   </article>
       </div>
     </main><footer class="site-footer h-card">
