@@ -1,5 +1,0 @@
-jupyter
-codecov
-pytest
-pytest-cov
-git+https://github.com/lclem/jupyter_contrib_nbextensions
