@@ -73,7 +73,7 @@
 <script src="/lia/codemirror-agda/lib/index.js"></script>
 
 </head>
-<body><header class="site-header">
+<body><header class="site-header" id="site-header">
 
     <div class="wrapper">
 
@@ -330,6 +330,24 @@
                         document.getElementById("connection_options").style.display = "none";
                         //document.getElementById("header").style.marginLeft= "0";
                     }
+
+                var prevScrollpos = window.pageYOffset;
+                var header = document.getElementById("site-header");
+                var boxShadow = header.style.boxShadow;
+
+                window.onscroll = function() {
+                    var currentScrollPos = window.pageYOffset;
+                    // detect scroll down
+                    if (prevScrollpos > currentScrollPos) {
+                        header.style.top = "0";
+                        header.style.boxShadow = boxShadow;
+                        prevScrollpos = currentScrollPos;
+                    } else if (prevScrollpos <= currentScrollPos) {
+                        header.style.top = "-55px";
+                        header.style.boxShadow = "none"
+                        prevScrollpos = currentScrollPos;
+                    }
+                }
 
             </script>
             
@@ -745,7 +763,7 @@
     </p>
 </header>
 
-    <p class="p-name"> Last-modified: Dec 26 21:29:37 2020 </p>
+    <p class="p-name"> Last-modified: Dec 26 21:57:26 2020 </p>
   </article>
       </div>
     </main><footer class="site-footer h-card">
