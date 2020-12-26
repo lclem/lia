@@ -557,7 +557,13 @@ span.CodeMirror-selectedtext { background: none; }
   width: 25px; 
   transition: none;
   padding: 5px;
+  border: 0;
   filter: opacity(25%);
+  -webkit-appearance: button;
+  outline: transparent;
+}
+
+.kernel-status-button:focus {
 }
 
 button.kernel-status-button:hover {
@@ -915,11 +921,11 @@ span.kernel-messages {
   z-index: 100;
   margin-left: -600px;
 
-  max-height: 500px;
+  max-height: 400px;
 
   // only vertical scrollbars
   overflow-y: auto;
-  overflow-x: none;
+  overflow-x: scroll;
 
   top: 125%;
   position: absolute;
