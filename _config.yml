@@ -109,3 +109,4 @@ exclude:
   - "codemirror-agda/package.json"
   - "codemirror-agda/README.md"
   - "codemirror-agda/src"
+  - "agda-kernel/"
