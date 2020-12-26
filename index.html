@@ -236,12 +236,33 @@
                 //  var storedUsername = localStorage.getItem("username");
                 //  localStorage.setItem("username", storedUsername.value);
             
+                function doStore(input) {
+
+                    if(input.type == "checkbox") {
+                        var checked = localStorage.getItem(key);
+
+                        if (checked == "yes") {
+                            localStorage.setItem(key, "no");
+                        }
+                        else {
+                            localStorage.setItem(key, "yes");
+                        }
+
+                        console.info("checked: ", localStorage.getItem(key));
+                    }
+                    else {
+                        console.info("value: ", input.value);
+                        localStorage.setItem(key, input.value);
+                    }
+                }
+
                 function persistInput(input) {
                     var key = "input-" + input.id;
                     var storedValue = localStorage.getItem(key);
                 
                     console.info("Persisting input: ", input);
                 
+                    // if there is a stored value, use it
                     if (storedValue) {
 
                         console.info("restoring value ", storedValue, " for ", input);
@@ -258,27 +279,14 @@
                             input.value = storedValue;
                         }
                     }
+                    // if there is no stored value, store the current value
+                    else {
+                        doStore(input);
+                    }
 
                     input.addEventListener('input', function () {
                         console.info("input changed: key = ", key, "; value = ", input);
-
-                        if(input.type == "checkbox") {
-
-                            var checked = localStorage.getItem(key);
-
-                            if (checked == "yes") {
-                                localStorage.setItem(key, "no");
-                            }
-                            else {
-                                localStorage.setItem(key, "yes");
-                            }
-
-                            console.info("checked: ", localStorage.getItem(key));
-                        }
-                        else {
-                            console.info("value: ", input.value);
-                            localStorage.setItem(key, input.value);
-                        }
+                        doStore(input);
                     });
                     }
                 
