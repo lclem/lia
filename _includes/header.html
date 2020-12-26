@@ -161,7 +161,7 @@
                 //  var storedUsername = localStorage.getItem("username");
                 //  localStorage.setItem("username", storedUsername.value);
             
-                function doStore(input) {
+                function doStore(input, key) {
 
                     if(input.type == "checkbox") {
                         var checked = localStorage.getItem(key);
@@ -206,12 +206,12 @@
                     }
                     // if there is no stored value, store the current value
                     else {
-                        doStore(input);
+                        doStore(input, key);
                     }
 
                     input.addEventListener('input', function () {
                         console.info("input changed: key = ", key, "; value = ", input);
-                        doStore(input);
+                        doStore(input, key);
                     });
                     }
                 
