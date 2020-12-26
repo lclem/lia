@@ -957,7 +957,7 @@ content > div { height: 50px; }
 
 .tooltip:hover .tooltiptext { opacity: 1; }
 
-span.kernel-messages { opacity: 0; visibility: hidden; background-color: #494949; color: #e2e2e2; border-radius: 6px; z-index: 1000; position: fixed; padding: 10px; top: 150%; width: 600px; text-align: left; z-index: 100; margin-left: -600px; max-height: 250px; overflow-y: auto; overflow-x: scroll; top: 125%; position: absolute; line-height: normal; opacity: 50%; }
+span.kernel-messages { opacity: 0; visibility: hidden; background-color: #494949; color: #e2e2e2; border-radius: 6px; z-index: 1000; position: fixed; padding: 10px; top: 150%; width: 600px; text-align: left; z-index: 100; margin-left: -600px; height: 250px; overflow: auto; top: 125%; position: absolute; line-height: normal; opacity: 50%; }
 
 span.kernel-status:hover span.kernel-messages { visibility: visible; opacity: 1; filter: opacity(100%) !important; }
 
