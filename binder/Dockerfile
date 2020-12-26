@@ -36,12 +36,15 @@ COPY --chown=$NB_UID:users ./src /home/$NB_USER/
 
 USER $NB_UID
 
-RUN cd /home/$NB_USER/agda-kernel && make kernel-install
+WORKDIR /home/$NB_USER/
+RUN cd agda-kernel && make kernel-install
 
-RUN cd /home/$NB_USER/ && git stash && git checkout -f store && git pull
+RUN git stash && git checkout -f store && git pull
+RUN git config --global user.email "xxx@mybinder.com" && \
+    git config --global user.name "mybinder"
 
-RUN mkdir -p /home/$NB_USER/.agda/
-RUN touch /home/$NB_USER/.agda/libraries
-RUN echo "/home/$NB_USER/agda-stdlib/standard-library.agda-lib" > /home/$NB_USER/.agda/libraries
+RUN mkdir -p .agda/
+RUN touch .agda/libraries
+RUN echo "/home/$NB_USER/agda-stdlib/standard-library.agda-lib" > .agda/libraries
 
 #ENV JUPYTER_ENABLE_LAB=yes
