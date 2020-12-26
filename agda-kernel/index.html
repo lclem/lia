@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title> | Logic in Agda</title><!-- Begin Jekyll SEO tag v2.6.1 -->
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Logic in Agda" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Propositional and fist-order logic developed with the proof assistant Agda." />
+<meta property="og:description" content="Propositional and fist-order logic developed with the proof assistant Agda." />
+<link rel="canonical" href="/lia/agda-kernel/" />
+<meta property="og:url" content="/lia/agda-kernel/" />
+<meta property="og:site_name" content="Logic in Agda" />
+<script type="application/ld+json">
+{"url":"/lia/agda-kernel/","headline":"Logic in Agda","description":"Propositional and fist-order logic developed with the proof assistant Agda.","@type":"WebPage","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/lia/assets/main.css">
+  <!-- <link rel="stylesheet" href="/lia/assets/custom.css"> --><!-- Mathjax Support -->
+  <script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+  <!-- Load KaTeX -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1.1/katex.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1.1/katex.min.js"></script>
+
+<script type="text/x-thebe-config">
+  {
+    bootstrap: true,
+    requestKernel: true,
+    runAllCells: false,
+    selector: "[data-executable]",
+    predefinedOutput: false,
+    codeMirrorConfig: {
+        //theme: "idea",
+        language: "agda",
+        readOnly: false,
+        lineNumbers: true,
+        keyMap: "default",
+    },
+    kernelOptions: {
+        name: "agda",
+        kernelName: "agda",
+        path: "src/",
+        loadFromStore: true,
+        persistent: true,
+        // notebook server configuration; not needed with binder
+        serverSettings: {
+              baseUrl: "http://127.0.0.1:8888",
+              token: "test-secret",
+            },
+    },
+    binderOptions: {
+      repo: "lclem/lia", // need to put here the actual github repo (if it is a fork)
+      ref: "main",
+      binderUrl: "https://mybinder.org",
+      repoProvider: "github",
+      savedSession: {
+        enabled: true,
+        maxAge: 86400, // the max age in seconds to consider re-using a session
+        storagePrefix: "thebe-binder-lia-"
+      },
+    },
+  }
+</script>
+
+<!-- <script type="text/javascript" src="https://unpkg.com/thebelab@latest"></script> -->
+
+<!-- our own version of the thebe library: -->
+<script type="text/javascript" src="/lia/thebe/lib/index.js"></script>
+
+<!-- highlighting for Agda -->
+<script src="/lia/codemirror-agda/lib/index.js"></script>
+
+</head>
+<body><header class="site-header">
+
+    <div class="wrapper">
+
+        <a class="site-title" href="/lia/">Logic in Agda</a>
+
+        <nav class="site-nav">
+            <!-- <span class="menu-icon">
+                <svg viewBox="0 0 18 15" width="18px" height="15px">
+                    <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+                    <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+                    <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+                </svg>
+            </span> -->
+
+            <div class="trigger">
+                <a class="page-link" href="/lia/part0/index/">Part 0</a>
+                <a class="page-link" href="/lia/part1/index/">Part 1</a>
+                <a class="page-link" href="/lia/part2/index/">Part 2</a>
+                <a class="page-link" href="/lia/part3/index/">Part 3</a>
+                <a class="page-link" href="/lia/part4/index/">Part 4</a>
+                <span class="kernel-status">
+                    <button class="kernel-status-button" onclick="kernel_status_clicked()" title="kernel status"></button>
+                    <span id="kernel-messages" class="kernel-messages"></span>
+                </span>
+                <div id="connection_options" class="options sidebar" style="text-align: left; line-height: normal; max-width: 800px; padding: 10px; border-radius: 15px;">
+                    <!-- display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: space-between; -->
+                    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+                    <div>
+                        <label for="username" style="color: white;">User:</label>
+                        <input type="text" placeholder="github username" id="username" name="username">
+                        <label for="password" style="color: white;">Password:</label>
+                        <input type="password" placeholder="password" id="password" name="password">
+                    </div>
+                    <div>
+                        <label for="baseUrl" style="color: white;">Base URL:</label>
+                        <input type="text" placeholder="baseUrl" id="baseUrl" name="baseUrl" value="http://127.0.0.1:8888">
+                        <label for="token" style="color: white;">Token:</label>
+                        <input type="text" placeholder="token" id="token" name="token" value="test-secret">
+                    </div>
+                    <div>
+                        <label for="repository" style="color: white;">Use binder:</label>
+                        <label class="switch" style="vertical-align: middle; margin: 10px;">
+                            <input type="checkbox" id="useBinder" name="useBinder">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div>
+                        <label for="repository" style="color: white;">Github repo:</label>
+                        <input type="text" placeholder="repository" id="repository" name="repository" value="">
+
+                        <label for="ref" style="color: white;">Branch:</label>
+                        <input type="text" placeholder="ref" id="ref" name="ref" value="main">
+
+                        <label for="binderUrl" style="color: white;">Binder URL:</label>                        
+                        <input type="text" placeholder="binderUrl" id="binderUrl" name="binderUrl" value="https://mybinder.org">
+                    </div>
+                </div>
+            </div>
+
+            <style>
+                .switch {
+                    position: relative;
+                    display: inline-block;
+                    width: 40px;
+                    height: 20px;
+                }
+
+                /* Hide default HTML checkbox */
+                .switch input {
+                    opacity: 0;
+                    width: 0;
+                    height: 0;
+                }
+
+                /* The slider */
+                .slider {
+                    position: absolute;
+                    cursor: pointer;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background-color: #ccc;
+                    -webkit-transition: .4s;
+                    transition: .4s;
+                }
+
+                .slider:before {
+                    position: absolute;
+                    content: "";
+                    height: 16px;
+                    width: 16px;
+                    left: 2px;
+                    /* right: 4px; */
+                    bottom: 2px;
+                    top: 2px;
+                    background-color: white;
+                    -webkit-transition: .4s;
+                    transition: .4s;
+                }
+
+                input:checked + .slider {
+                    background-color: #2196F3;
+                }
+
+                input:focus + .slider {
+                    box-shadow: 0 0 1px #2196F3;
+                }
+
+                input:checked + .slider:before {
+                    -webkit-transform: translateX(18px);
+                    -ms-transform: translateX(18px);
+                    transform: translateX(18px);
+                }
+
+                /* Rounded sliders */
+                .slider.round {
+                    border-radius: 30px;
+                }
+
+                .slider.round:before {
+                border-radius: 50%;
+                }
+
+                .sidebar input[type=text] {
+                    padding: 6px;
+                    margin-top: 8px;
+                    /* font-size: 17px; */
+                    border: none;
+                    /* width: 150px; */
+                }
+
+                .sidebar {
+                    /* height: 100%; */
+                    width: 0;
+                    position: fixed;
+                    z-index: 1000;
+                    top: 0;
+                    right: 20px;
+                    background-color: rgba(17, 17, 17, 0.637);
+                    /* overflow-x: hidden; */
+                    transition: 0.5s;
+                    padding-top: 60px;
+                    display: none;
+                    margin-top: 60px;
+                }
+
+                .sidebar .closebtn {
+                    position: absolute;
+                    color: white;
+                    top: 0;
+                    right: 10px;
+                    font-size: 24px;
+                    margin-left: 20px;
+                }
+
+            </style>
+
+            <script>
+                //  var storedUsername = localStorage.getItem("username");
+                //  localStorage.setItem("username", storedUsername.value);
+            
+                function persistInput(input) {
+                    var key = "input-" + input.id;
+                    var storedValue = localStorage.getItem(key);
+                
+                    console.info("Persisting input: ", input);
+                
+                    if (storedValue) {
+
+                        console.info("restoring value ", storedValue, " for ", input);
+
+                        if(input.type == "checkbox") {
+                            if(storedValue=="yes") {
+                                input.setAttribute("checked", "");
+                            }
+                            else {
+                                input.removeAttribute("checked");
+                            }
+                        }
+                        else {
+                            input.value = storedValue;
+                        }
+                    }
+
+                    input.addEventListener('input', function () {
+                        console.info("input changed: key = ", key, "; value = ", input);
+
+                        if(input.type == "checkbox") {
+
+                            var checked = localStorage.getItem(key);
+
+                            if (checked == "yes") {
+                                localStorage.setItem(key, "no");
+                            }
+                            else {
+                                localStorage.setItem(key, "yes");
+                            }
+
+                            console.info("checked: ", localStorage.getItem(key));
+                        }
+                        else {
+                            console.info("value: ", input.value);
+                            localStorage.setItem(key, input.value);
+                        }
+                    });
+                    }
+                
+                    persistInput(document.getElementById("username"));
+                    persistInput(document.getElementById("password"));
+
+                    persistInput(document.getElementById("baseUrl"));
+                    persistInput(document.getElementById("token"));
+
+                    persistInput(document.getElementById("useBinder"));
+                    persistInput(document.getElementById("repository"));
+                    persistInput(document.getElementById("ref"));
+                    persistInput(document.getElementById("binderUrl"));
+
+                    // init
+                    document.getElementById("connection_options").style.display = "none";
+
+                    function kernel_status_clicked() {
+                
+                        console.info("Clicked kernel status");
+
+                        document.getElementById("kernel-messages").style.display="none";
+
+                        document.getElementById("connection_options").style.width = "750px";
+                        document.getElementById("connection_options").style.display = "block";
+                        //document.getElementById("header").style.marginLeft = "250px";
+
+                    }
+
+                    function closeNav() {
+
+                        document.getElementById("kernel-messages").style.display="inline";
+
+                        document.getElementById("connection_options").style.width = "0";
+                        document.getElementById("connection_options").style.display = "none";
+                        //document.getElementById("header").style.marginLeft= "0";
+                    }
+
+            </script>
+            
+        </nav>
+
+    </div>
+
+</header><main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post">
+
+    <header class="post-header">
+        <h1 class="post-title"></h1>
+    </header>
+  
+    <header class="nav-header">
+    <p style="text-align:center;">
+        
+        
+        
+        
+        
+        
+    </p>
+</header>
+
+  
+    <div class="post-content">
+        <h2>Contents</h2>    
+        <p><a href="https://mybinder.org/v2/gh/lclem/agda-kernel/master"><img src="https://mybinder.org/badge_logo.svg" alt="Binder" /></a>
+<a href="https://travis-ci.org/lclem/agda-kernel"><img src="https://travis-ci.org/lclem/agda-kernel.svg" alt="Build Status" /></a>
+<a href="https://codecov.io/github/lclem/agda-kernel"><img src="https://codecov.io/github/lclem/agda-kernel/branch/master/graph/badge.svg" alt="codecov.io" /></a>
+<a href="https://github.com/jupyter/notebook/releases/tag/5.7.8"><img src="https://img.shields.io/badge/jupyter-5.7.8-blue.svg" alt="Jupyter Notebook" /></a>
+<a href="https://github.com/agda/agda/releases/tag/v2.6.0"><img src="https://img.shields.io/badge/agda-2.6.0-blue.svg" alt="Agda" /></a>
+<a href="https://github.com/agda/agda-stdlib/releases/tag/v1.0.1"><img src="https://img.shields.io/badge/agda--stdlib-1.0.1-blue.svg" alt="agda-stdlib" /></a></p>
+
+<h1 id="agda-kernel">agda-kernel</h1>
+<p>An experimental Agda kernel for Jupyter.
+Used at <a href="https://nextjournal.com/plfa/ToC">Nextjournal</a> <a href="https://github.com/nextjournal/agda-kernel">[nextjournal kernel]</a>.</p>
+
+<p><img src="/lia/agda-kernel/demo/demo1.gif" alt="" /></p>
+
+<h2 id="examples">Examples</h2>
+
+<p>You can launch the following examples directly via the mybinder interface:</p>
+
+<!-- - [example/Lab01.ipynb](https://github.com/lclem/agda-kernel/blob/master/example/Lab01.ipynb) [[binder]](https://mybinder.org/v2/gh/lclem/agda-kernel/master?filepath=/example/Lab01.ipynb).
+
+- [example/Lab02.ipynb](https://github.com/lclem/agda-kernel/blob/master/example/Lab02.ipynb) [[binder]](https://mybinder.org/v2/gh/lclem/agda-kernel/master?filepath=/example/Lab02.ipynb).
+
+- [example/Lab03.ipynb](https://github.com/lclem/agda-kernel/blob/master/example/Lab03.ipynb) [[binder]](https://mybinder.org/v2/gh/lclem/agda-kernel/master?filepath=/example/Lab03.ipynb).
+
+-->
+
+<ul>
+  <li><a href="https://github.com/lclem/agda-kernel/blob/master/example/LabImp.ipynb">example/LabImp.ipynb</a> <a href="https://mybinder.org/v2/gh/lclem/agda-kernel/master?filepath=example/LabImp.ipynb">[binder]</a>.</li>
+</ul>
+
+<p>Alternatively, if you have <a href="https://github.com/jupyterhub/binderhub">binder</a>,
+then you can use <a href="https://github.com/jupyter/repo2docker">repo2docker</a> locally:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>repo2docker https://github.com/lclem/agda-kernel
+</code></pre></div></div>
+
+<h2 id="installation">Installation</h2>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pip install agda_kernel
+python -m agda_kernel.install
+</code></pre></div></div>
+
+<h3 id="syntax-highlighting">Syntax highlighting</h3>
+
+<p>Syntax highlighting is done separately by <a href="https://codemirror.net/">Codemirror</a>,
+but unfortunately there is no Agda mode packaged with it.
+A rudimentary Agda mode for Codemirror can be found in <code class="language-plaintext highlighter-rouge">codemirror-agda/agda.js</code>.
+In order to install it, type</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>make codemirror-install
+</code></pre></div></div>
+
+<!-- or follow the manual instructions below:
+Let `dir` be the result of executing the following command
+
+    pip show notebook | grep Location | cut -d ' ' -f 2
+
+(It is something like ``/usr/local/lib/python3.7/site-packages``,
+``~/anaconda3/lib/python3.7/site-packages``,
+or  ``/usr/local/Cellar/jupyter/1.0.0_5/libexec/lib/python3.7/site-packages/``.)
+Then, 
+
+    mkdir -p dir/notebook/static/components/codemirror/mode/agda
+    cp codemirror-agda/agda.js dir/notebook/static/components/codemirror/mode/agda
+-->
+
+<h3 id="agda-extension">Agda extension</h3>
+
+<p>In order to improve the Jupyter interface,
+it is strongly recommended to also install <a href="https://github.com/lclem/jupyter_contrib_nbextensions"><code class="language-plaintext highlighter-rouge">agda-extension</code></a>.</p>
+
+<h2 id="functionality">Functionality</h2>
+
+<p>Each code cell must contain a line of the form <code class="language-plaintext highlighter-rouge">module A.B.C where</code>.
+For instance:</p>
+
+<pre><code class="language-agda">module A.B.C where
+
+id : {A : Set} → A → A
+id x = x
+</code></pre>
+
+<p>Upon execution, the file <code class="language-plaintext highlighter-rouge">A/B/C.agda</code> is created containing the cell’s contents,
+and it is fed to the Agda interpreter (via <code class="language-plaintext highlighter-rouge">agda --interaction</code>).
+The results of typechecking the cell are then displayed.</p>
+
+<p>After a cell has been evaluated, one can</p>
+
+<ul>
+  <li>
+    <p>Run Agsy (auto) by putting the cursor next to a goal <code class="language-plaintext highlighter-rouge">?</code> and hitting TAB.
+The hole <code class="language-plaintext highlighter-rouge">?</code> is replaced by the result returned by Agsy, if any,
+or by <code class="language-plaintext highlighter-rouge">{! !}</code> if no result was found.
+If there is more than one result, the first ten of them are presented for the user to choose from.</p>
+  </li>
+  <li>
+    <p>Refine the current goal by putting the cursor next to a goal <code class="language-plaintext highlighter-rouge">{! !}</code> and hitting TAB.
+An optional variable can be provided for case-splitting <code class="language-plaintext highlighter-rouge">{! m !}</code>.</p>
+  </li>
+  <li>
+    <p>Show information about the current context, goal, etc.: putting the cursor near a goal/literal and hit SHIFT-TAB.
+&lt;!–If the expression is in parentheses <code class="language-plaintext highlighter-rouge">(...)</code>, then the cursor should be near one of the two parentheses.
+If the expression is just a literal, then the cursor should be inside, or in the vicinity of the literal.</p>
+  </li>
+  <li>
+    <p>Normalise a closed expression,
+by putting the cursor near the expression and hitting TAB.
+Expression localisation follows the same rules as in the previous point.
+–&gt;</p>
+  </li>
+</ul>
+
+<h2 id="editing">Editing</h2>
+
+<p>Inputting common UNICODE characters is facilitated by the code-completion feature of Jupyter.</p>
+
+<ul>
+  <li>When the cursor is immediately to the right of one of the <code class="language-plaintext highlighter-rouge">base form</code> symbols
+hitting TAB will replace it by the corresponding <code class="language-plaintext highlighter-rouge">alternate form</code>.
+Hitting TAB again will go back to the base form.</li>
+</ul>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: center">base form</th>
+      <th style="text-align: center">alternate form</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: center">-&gt;</td>
+      <td style="text-align: center">→</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">\</td>
+      <td style="text-align: center">λ</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">&lt;</td>
+      <td style="text-align: center">⟨</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">B</td>
+      <td style="text-align: center">𝔹</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">&gt;</td>
+      <td style="text-align: center">⟩</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">=</td>
+      <td style="text-align: center">≡</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">top</td>
+      <td style="text-align: center">⊤</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">/=</td>
+      <td style="text-align: center">≢</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">bot</td>
+      <td style="text-align: center">⊥</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">alpha</td>
+      <td style="text-align: center">α</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">/\</td>
+      <td style="text-align: center">∧</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">e</td>
+      <td style="text-align: center">ε</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">\/</td>
+      <td style="text-align: center">∨</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">emptyset</td>
+      <td style="text-align: center">∅</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">neg</td>
+      <td style="text-align: center">¬</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">qed</td>
+      <td style="text-align: center">∎</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">forall</td>
+      <td style="text-align: center">∀</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Sigma</td>
+      <td style="text-align: center">Σ</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">exists</td>
+      <td style="text-align: center">∃</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">Pi</td>
+      <td style="text-align: center">Π</td>
+    </tr>
+    <tr>
+      <td style="text-align: center">[=</td>
+      <td style="text-align: center">⊑</td>
+    </tr>
+  </tbody>
+</table>
+
+    </div>
+  
+    <header class="nav-header">
+    <p style="text-align:center;">
+        
+        
+        
+        
+        
+        
+    </p>
+</header>
+
+    <p class="p-name"> Last-modified:  </p>
+  </article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/lia/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Logic in Agda</h2><div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Lorenzo Clemente</li>
+          <li><a class="u-email" href="mailto:clementelorenzo@gmail.com">clementelorenzo@gmail.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/lclem"><svg class="svg-icon"><use xlink:href="/lia/assets/minima-social-icons.svg#github"></use></svg> <span class="username">lclem</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3"></div>
+    </div>This work is licensed under a <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>
+  </div>
+</footer>
+
+<!-- Parse the Latex divs with Katex
+<script type="text/javascript">
+  $("script[type='math/tex']").replaceWith(
+    function(){
+      var tex = $(this).text();
+      return katex.renderToString(tex, {displayMode: false});
+  });
+  
+  $("script[type='math/tex; mode=display']").replaceWith(
+    function(){
+      var tex = $(this).text();
+      return katex.renderToString(tex.replace(/%.*/g, ''), {displayMode: true});
+  });
+</script>
+-->
+
+<script type="text/javascript" src="/lia/assets/hidebox.js"></script>
+</body>
+
+</html>
