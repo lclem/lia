@@ -28,7 +28,9 @@ USER root
 RUN pwd
 RUN ls -la
 
-RUN cd /tmp/repo2docker* && ls -la && cd agda-kernel && make kernel-install
+RUN cd / && find . -name agda-kernel
+
+#tmp/repo2docker* && ls -la && cd agda-kernel && make kernel-install
 
 COPY . /home/$NB_USER/
 #COPY ./agda-stdlib /home/$NB_USER/agda-stdlib
