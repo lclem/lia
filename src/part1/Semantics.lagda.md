@@ -279,7 +279,7 @@ Prove that the mapping `Formula2Tree` is injective.
 Formula2Tree-inj : Injective Formula2Tree
 ```
 
-<pre data-executable="true" data-language="agda">
+<pre data-executable="true" data-language="agda" id="part1.Semantics.ex-Formula2Tree-inj">
 module part1.Semantics.ex-Formula2Tree-inj where
 
 open import part0.index
