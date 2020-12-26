@@ -20,9 +20,9 @@ RUN python3 -m pip install --upgrade pip && \
 # RUN python3 -m pip install agda_kernel
 # RUN python3 -m agda_kernel.install
 
-RUN cd lia/agda-kernel && make kernel-install
-
 USER root
+
+RUN cd lia/agda-kernel && make kernel-install
 
 COPY . /home/$NB_USER/
 #COPY ./agda-stdlib /home/$NB_USER/agda-stdlib
