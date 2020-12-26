@@ -236,7 +236,7 @@
                 //  var storedUsername = localStorage.getItem("username");
                 //  localStorage.setItem("username", storedUsername.value);
             
-                function doStore(input) {
+                function doStore(input, key) {
 
                     if(input.type == "checkbox") {
                         var checked = localStorage.getItem(key);
@@ -281,12 +281,12 @@
                     }
                     // if there is no stored value, store the current value
                     else {
-                        doStore(input);
+                        doStore(input, key);
                     }
 
                     input.addEventListener('input', function () {
                         console.info("input changed: key = ", key, "; value = ", input);
-                        doStore(input);
+                        doStore(input, key);
                     });
                     }
                 
@@ -757,7 +757,7 @@ just interpreted as abbreviations for <code class="language-plaintext highlighte
     </p>
 </header>
 
-    <p class="p-name"> Last-modified: Dec 26 16:03:03 2020 </p>
+    <p class="p-name"> Last-modified: Dec 26 16:12:44 2020 </p>
   </article>
       </div>
     </main><footer class="site-footer h-card">
