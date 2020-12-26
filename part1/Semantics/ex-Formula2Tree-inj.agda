@@ -3,4 +3,6 @@ open import part0.index
 postulate n' : ℕ
 open import part1.Semantics n' hiding (Formula2Tree-inj)
 Formula2Tree-inj : Injective Formula2Tree
+-- BEGIN SOLUTION
+
 Formula2Tree-inj = ?
