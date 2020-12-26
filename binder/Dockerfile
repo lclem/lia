@@ -28,17 +28,16 @@ USER root
 RUN pwd
 RUN ls -la
 
-RUN cd / && find . -name agda-kernel
-
 #tmp/repo2docker* && ls -la && cd agda-kernel && make kernel-install
 
 COPY --chown=$NB_UID:users . /home/$NB_USER/
 #COPY ./agda-stdlib /home/$NB_USER/agda-stdlib
 COPY --chown=$NB_UID:users ./src /home/$NB_USER/
 
-# RUN chown --recursive $NB_UID:users /home/$NB_USER/
-
 USER $NB_UID
+
+RUN cd /home/$NB_USER/agda-kernel && make kernel-install
+
 RUN cd /home/$NB_USER/ && git stash && git checkout -f store && git pull
 
 RUN mkdir -p /home/$NB_USER/.agda/
