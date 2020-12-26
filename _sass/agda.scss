@@ -921,16 +921,17 @@ span.kernel-messages {
   z-index: 100;
   margin-left: -600px;
 
-  max-height: 250px;
+  height: 250px;
 
   // only vertical scrollbars
-  overflow-y: auto;
-  overflow-x: scroll;
+  overflow: auto;
 
   top: 125%;
   position: absolute;
   line-height: normal;
   opacity: 50%;
+
+//  visibility: visible;
 }
 
 span.kernel-status:hover span.kernel-messages  {
