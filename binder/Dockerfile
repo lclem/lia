@@ -20,7 +20,13 @@ RUN python3 -m pip install --upgrade pip && \
 # RUN python3 -m pip install agda_kernel
 # RUN python3 -m agda_kernel.install
 
+RUN pwd
+RUN ls -la
+
 USER root
+
+RUN pwd
+RUN ls -la
 
 RUN cd lia/agda-kernel && make kernel-install
 
