@@ -37,6 +37,7 @@
         readOnly: false,
         lineNumbers: true,
         keyMap: "default",
+//        gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
     },
     kernelOptions: {
         name: "agda",
@@ -270,8 +271,10 @@
                     // if there is a stored value, use it
                     if (storedValue) {
 
-                        console.info("restoring value ", storedValue, " for ", input);
-
+                        if(input.type != "password") {
+                            console.info("restoring value ", storedValue, " for ", input);
+                        }
+                        
                         if(input.type == "checkbox") {
                             if(storedValue=="yes") {
                                 input.setAttribute("checked", "");

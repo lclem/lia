@@ -37,6 +37,7 @@
         readOnly: false,
         lineNumbers: true,
         keyMap: "default",
+//        gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
     },
     kernelOptions: {
         name: "agda",
@@ -270,8 +271,10 @@
                     // if there is a stored value, use it
                     if (storedValue) {
 
-                        console.info("restoring value ", storedValue, " for ", input);
-
+                        if(input.type != "password") {
+                            console.info("restoring value ", storedValue, " for ", input);
+                        }
+                        
                         if(input.type == "checkbox") {
                             if(storedValue=="yes") {
                                 input.setAttribute("checked", "");
@@ -493,7 +496,7 @@ Mathematics</em>. 28(1/4):459–471, 1926.</p>
     </p>
 </header>
 
-    <p class="p-name"> Last-modified: Dec 26 21:57:26 2020 </p>
+    <p class="p-name"> Last-modified: Dec 27 11:16:00 2020 </p>
   </article>
       </div>
     </main><footer class="site-footer h-card">
