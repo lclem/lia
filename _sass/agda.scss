@@ -918,6 +918,17 @@ content > div {
   opacity:1;
 }
 
+span.cell-count {
+
+  text-align: center;
+  height: 10px;
+  position: absolute;
+  top: 125%;
+  line-height: normal;
+  background: transparent;
+  
+}
+
 //.kernel-status-button
 span.kernel-messages {
 
