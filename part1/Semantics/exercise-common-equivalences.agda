@@ -7,4 +7,4 @@ postulate n' : ℕ
 open import part1.Semantics n' -- hiding (#exercise:common-equivalences)
 
 -- BEGIN SOLUTION
-solution = ?
+-- solution = ?
