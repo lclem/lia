@@ -95,12 +95,19 @@
                 <a class="page-link" href="/lia/part2/index/">Part 2</a>
                 <a class="page-link" href="/lia/part3/index/">Part 3</a>
                 <a class="page-link" href="/lia/part4/index/">Part 4</a>
-                <svg class="progress-ring" width="30" height="30">
+                <svg class="progress-ring" width="30" height="30" title="exercise progress">
                         <circle
                             id="progress-circle"
                             class="progress-ring__circle"
                             stroke="black"
-                            stroke-width="2"
+                            stroke-width="2.5"
+                            fill="transparent"
+                            r="14"
+                            cx="15"
+                            cy="15"/>
+                        <circle
+                            stroke="lightgray"
+                            stroke-width="0.5"
                             fill="transparent"
                             r="14"
                             cx="15"
@@ -256,13 +263,13 @@
                     transition: 0.35s stroke-dashoffset;
                     transform: rotate(-90deg);
                     transform-origin: 50% 50%;
+                    visibility: hidden;
                 }
 
                 .progress-text {
                     position: relative;
                     top: 0;
                     left: -25px;
-                    width: -10px;
                     font-size: 8px;
                     vertical-align: middle;
                     align-self: center;
@@ -540,7 +547,7 @@
     </p>
 </header>
 
-    <p class="p-name"> Last-modified: Dec 27 21:24:36 2020 </p>
+    <p class="p-name"> Last-modified: Dec 27 21:40:55 2020 </p>
   </article>
       </div>
     </main><footer class="site-footer h-card">
