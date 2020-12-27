@@ -575,6 +575,11 @@ button.kernel-status-button-connected {
   filter: opacity(100%);
 }
 
+button.kernel-status-button-disconnected {
+  background-image: url(../assets/images/kernel-broken.png);
+  filter: opacity(100%);
+}
+
 // the per-cell status badge on the right
 
 // .status-badge {
