@@ -6,5 +6,5 @@ postulate n' : ℕ
   
 open import part1.Semantics n' hiding (Formula2Tree-inj)
 
--- Formula2Tree-inj : Injective Formula2Tree
--- Formula2Tree-inj = ?
+Formula2Tree-inj : Injective Formula2Tree
+Formula2Tree-inj = ?
