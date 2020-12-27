@@ -326,7 +326,7 @@ $(OUTDIR)/$1/$2.md: $(TMPDIR)/$1.$2.md
 	@echo "1 \c"
 # STEP 0: expand solution entries
 
-	@$(PP) -import pp-macros.txt $(TMPDIR)/$1.$2.1.md > $(TMPDIR)/$1.$2.2.md
+	@$(PP) -import pp-macros.txt -D part=$1 -D chapter=$2 $(TMPDIR)/$1.$2.1.md > $(TMPDIR)/$1.$2.2.md
 	@echo "2 \c"
 
 # 2>/dev/null || true
