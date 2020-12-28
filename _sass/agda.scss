@@ -32,7 +32,7 @@
     border-radius: 3px !important;
 }
 
-a { color: #2a7ae2; text-decoration: none; }
+a, a:-webkit-any-link, a:link, a:toc-entry { color: #2a7ae2; text-decoration: none; }
 a:visited { color: #1756a9; }
 a:hover { color: #111; text-decoration: underline; }
 
@@ -102,7 +102,7 @@ pre.Spec {
   //font-family: monospace;
   @include code-font;
   height: 300px;
-  color: black;
+  //color: black;
   direction: ltr;
 }
 

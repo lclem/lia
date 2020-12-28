@@ -1021,7 +1021,7 @@ as shown in the next exercise.
 
 !exercise(#exercise:common-equivalences)(Common equivalences)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Prove the folowing equivalences.
+Prove the following equivalences.
 *Hint:* Use the method of truth tables.
 
 ```
