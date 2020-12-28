@@ -671,7 +671,7 @@ pre.Spec { font-family: 'DejaVu Sans Mono', 'Source Code Pro', 'Bitstream Vera S
 .Agda a[href]:hover { background-color: #B4EEB4; }
 
 /* BASICS */
-.CodeMirror { /* Set height, width, borders, and global font properties here */ font-family: 'DejaVu Sans Mono', 'Source Code Pro', 'Bitstream Vera Sans Mono', 'FreeMono', 'Courier New', 'Monaco', 'Menlo', monospace, serif !important; font-size: .85em !important; height: 300px; direction: ltr; }
+.CodeMirror { /* Set height, width, borders, and global font properties here */ font-family: 'DejaVu Sans Mono', 'Source Code Pro', 'Bitstream Vera Sans Mono', 'FreeMono', 'Courier New', 'Monaco', 'Menlo', monospace, serif !important; font-size: .85em !important; height: 300px; direction: ltr; -webkit-tap-highlight-color: black; }
 
 /* PADDING */
 .CodeMirror-lines { padding: 4px 0; /* Vertical padding around content */ }
@@ -849,9 +849,11 @@ div.CodeMirror-dragcursors { visibility: visible; }
 
 .CodeMirror-crosshair { cursor: crosshair; }
 
-.CodeMirror-line::selection, .CodeMirror-line > span::selection, .CodeMirror-line > span > span::selection { background: #d3e7f8 !important; }
+.CodeMirror-line::selection, .CodeMirror-line > span::selection, .CodeMirror-line > span > span::selection { background: #d3e7f8; }
 
-.CodeMirror-line::-moz-selection, .CodeMirror-line > span::-moz-selection, .CodeMirror-line > span > span::-moz-selection { background: #d3e7f8 !important; }
+.CodeMirror-line::-moz-selection, .CodeMirror-line > span::-moz-selection, .CodeMirror-line > span > span::-moz-selection { background: #d3e7f8; }
+
+span.CodeMirror-selectedtext { background: #d3e7f8 !important; }
 
 .cm-searching { background-color: #ffa; background-color: rgba(255, 255, 0, 0.4); }
 
@@ -862,9 +864,6 @@ div.CodeMirror-dragcursors { visibility: visible; }
   .CodeMirror div.CodeMirror-cursors { visibility: hidden; } }
 /* See issue #2901 */
 .cm-tab-wrap-hack:after { content: ''; }
-
-/* Help users use markselection to safely style text background */
-span.CodeMirror-selectedtext { background: none; }
 
 .p-Widget, .lm-Widget { box-sizing: border-box; position: relative; overflow: visible !important; cursor: default; }
 
@@ -878,8 +877,6 @@ span.CodeMirror-selectedtext { background: none; }
 .compile-ok-border { border: 1px solid #cde9cc !important; }
 
 .compile-hole { background: #ffffe1; margin-right: -5px; /* !important; */ }
-
-.highlighter-rouge .highlight { background: #eef !important; }
 
 .play-button-class { background-color: transparent; background-repeat: no-repeat; background-size: 10px; background-position: center; border: none; mix-blend-mode: multiply; display: inline-block; vertical-align: middle; line-height: normal; height: 15px; width: 15px; transition: all .3s ease-in-out; filter: blur(0.2px); background-image: url(../assets/images/play.png); padding-left: 5px; padding-right: 12px; border-right: 1px solid #aaaaaa; border-radius: 0px; }
 
