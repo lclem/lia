@@ -104,6 +104,7 @@ pre.Spec {
   height: 300px;
   //color: black;
   direction: ltr;
+  -webkit-tap-highlight-color: black;
 }
 
 /* PADDING */
@@ -344,6 +345,7 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {color: #a22;}
 .CodeMirror-gutter-wrapper ::selection { background-color: #d3e7f8 !important; }
 .CodeMirror-gutter-wrapper ::-moz-selection { background-color: #d3e7f8 !important; }
 
+
 .CodeMirror-lines {
   cursor: text;
   min-height: 1px; /* prevents collapsing before first draw */
@@ -440,10 +442,11 @@ div.CodeMirror-dragcursors {
   border-color: #cce7ff !important;
 }
 
-
 .CodeMirror-crosshair { cursor: crosshair; }
-.CodeMirror-line::selection, .CodeMirror-line > span::selection, .CodeMirror-line > span > span::selection { background: #d3e7f8 !important; }
-.CodeMirror-line::-moz-selection, .CodeMirror-line > span::-moz-selection, .CodeMirror-line > span > span::-moz-selection { background: #d3e7f8 !important; }
+.CodeMirror-line::selection, .CodeMirror-line > span::selection, .CodeMirror-line > span > span::selection { background: #d3e7f8; }
+.CodeMirror-line::-moz-selection, .CodeMirror-line > span::-moz-selection, .CodeMirror-line > span > span::-moz-selection { background: #d3e7f8; }
+
+span.CodeMirror-selectedtext { background: #d3e7f8 !important; }
 
 .cm-searching {
   background-color: #ffa;
@@ -463,8 +466,6 @@ div.CodeMirror-dragcursors {
 /* See issue #2901 */
 .cm-tab-wrap-hack:after { content: ''; }
 
-/* Help users use markselection to safely style text background */
-span.CodeMirror-selectedtext { background: none; }
 
 .p-Widget, .lm-Widget {
     box-sizing: border-box;
@@ -503,7 +504,7 @@ span.CodeMirror-selectedtext { background: none; }
 }
 
 .highlighter-rouge .highlight {
-  background: #eef !important;
+//  background: #eef;
 }
 
 // buttons
