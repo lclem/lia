@@ -1,6 +1,6 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('codemirror')) :
-  typeof define === 'function' && define.amd ? define(['codemirror'], factory) :
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(require('codemirror'), require('codemirror/addon/search/searchcursor'), require('codemirror/addon/dialog/dialog.css'), require('codemirror/addon/dialog/dialog.js'), require('codemirror/addon/display/panel.js'), require('codemirror/addon/search/search.js'), require('codemirror/addon/search/jump-to-line.js'), require('codemirror/addon/hint/show-hint.js'), require('codemirror/addon/selection/mark-selection')) :
+  typeof define === 'function' && define.amd ? define(['codemirror', 'codemirror/addon/search/searchcursor', 'codemirror/addon/dialog/dialog.css', 'codemirror/addon/dialog/dialog.js', 'codemirror/addon/display/panel.js', 'codemirror/addon/search/search.js', 'codemirror/addon/search/jump-to-line.js', 'codemirror/addon/hint/show-hint.js', 'codemirror/addon/selection/mark-selection'], factory) :
   (global = global || self, factory(global.CodeMirror));
 }(this, function (CodeMirror) { 'use strict';
 
@@ -634,6 +634,8 @@
     ["Gm", "μ"], ["GM", "Μ"],
     ["Gn", "ν"], ["GN", "Ν"],
     ["pi", "π"], ["Pi", "Π"],
+    ["varphi", "φ"], ["Phi", "Φ"],
+    ["phi", "ϕ"], ["Varphi", "Φ"],
     ["Gx", "ξ"], ["GX", "Ξ"],
     ["Gr", "ρ"], ["GR", "Ρ"],
     ["Gs", "σ"], ["GS", "Σ"],
@@ -678,6 +680,8 @@
     const list = table.filter(o => o.text.startsWith(combo));
     return { list: list, from: from, to: to };
   };
+
+  console.info("agda-input: registering agda-input hint helper");
 
   CodeMirror.registerGlobalHelper(
     "hint",
