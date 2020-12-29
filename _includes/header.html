@@ -52,6 +52,13 @@
                         <input type="password" placeholder="password" id="password" name="password">
                     </div>
                     <div>
+                        <label for="loadFromStore" style="color: white;">Load code from browser store:</label>
+                        <label class="switch" style="vertical-align: middle; margin: 10px;">
+                            <input type="checkbox" id="loadFromStore" name="loadFromStore">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div>
                         <label for="baseUrl" style="color: white;">Base URL:</label>
                         <input type="text" placeholder="baseUrl" id="baseUrl" name="baseUrl" value="http://127.0.0.1:8888">
                         <label for="token" style="color: white;">Token:</label>
@@ -263,6 +270,8 @@
                 
                     persistInput(document.getElementById("username"));
                     persistInput(document.getElementById("password"));
+
+                    persistInput(document.getElementById("loadFromStore"));
 
                     persistInput(document.getElementById("baseUrl"));
                     persistInput(document.getElementById("token"));

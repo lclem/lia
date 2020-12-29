@@ -7,6 +7,7 @@ title: Equality🚧
 
 module part0.Equality where
 open import part0.Decidable public
+open import Agda.Builtin.Equality public
 
 private
   variable
@@ -15,12 +16,12 @@ private
     B : Set m
     x y z : A
 
-infix 4 _≡_ _≢_
-data _≡_ {ℓ} {A : Set ℓ} (x : A) : A → Set where
-    refl : x ≡ x
+-- infix 4 _≡_ _≢_
+-- data _≡_ {ℓ} {A : Set ℓ} (x : A) : A → Set where
+--     refl : x ≡ x
 
 -- this helps with the rewrite directive
-{-# BUILTIN EQUALITY _≡_ #-}
+-- {-# BUILTIN EQUALITY _≡_ #-}
 {-# BUILTIN REWRITE _≡_ #-}
 
 sym : x ≡ y → y ≡ x
@@ -81,7 +82,7 @@ x ≡⟨ x≡y ⟩ y≡z = trans x≡y y≡z
 _∎ : ∀ {ℓ} {A : Set ℓ} (x : A) → x ≡ x
 x ∎ = refl
 
-_≢_ : ∀ {ℓ} {A : Set ℓ} (x y : A) → Set
+_≢_ : ∀ {ℓ} {A : Set ℓ} (x y : A) → Set ℓ
 x ≢ y = ~ (x ≡ y)
 
 ~x≢x : ∀ {ℓ} {A : Set ℓ} {x : A} → ~ (x ≢ x)

@@ -671,7 +671,7 @@ _l[_↦_] : ∀ {ℓ m} {A : Set ℓ} {B : Set m} → {{Eq A}} → (A → B) →
 ρ l[ _ ↦ ε ] = ρ
 ρ l[ x ∷ xs ↦ a ∷ as ] = ρ l[ xs ↦ as ] [ x ↦ a ]
 
-Agree : ∀ {ℓ m} {A : Set ℓ} {B : Set m} (f g : A → B) (as : A *) → Set ℓ
+Agree : ∀ {ℓ m} {A : Set ℓ} {B : Set m} (f g : A → B) (as : A *) → Set (ℓ ⊔ m)
 Agree f g as = ∀[ a ∈ as ] f a ≡ g a
 
 map-Agree : ∀ {ℓ m} {A : Set ℓ} {B : Set m} (f g : A → B) (as : A *) →

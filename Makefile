@@ -326,7 +326,12 @@ $(OUTDIR)/$1/$2.md: $(TMPDIR)/$1.$2.md
 	@echo "1 \c"
 # STEP 0: expand solution entries
 
-	@$(PP) -import pp-macros.txt -D part=$1 -D chapter=$2 $(TMPDIR)/$1.$2.1.md > $(TMPDIR)/$1.$2.2.md
+ifneq ($(wildcard $(SRCDIR)/$1/$2.pp),)
+# additionally import a chapter-specific pp macrofile, if it exists
+	@$(PP) -import=macros.pp -import=$(SRCDIR)/$1/$2.pp -D part=$1 -D chapter=$2 $(TMPDIR)/$1.$2.1.md > $(TMPDIR)/$1.$2.2.md
+else
+	@$(PP) -import=macros.pp -D part=$1 -D chapter=$2 $(TMPDIR)/$1.$2.1.md > $(TMPDIR)/$1.$2.2.md
+endif
 	@echo "2 \c"
 
 # 2>/dev/null || true

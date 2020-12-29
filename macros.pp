@@ -30,12 +30,22 @@
 
 !define(preamble)
 ~~~~~~~~~~~~~~~~~
-open import part0.index
-
-postulate n' : ℕ
-  
-open import !part().!chapter() n' -- hiding (!1)
+module !part().!chapter().!1 where  
+open !part().!chapter() as !chapter()
 ~~~~~~~~~~~~~~~~~
+
+!define(codemirror)
+~~~~~~~~~~~~~~~~~~~~
+
+<pre data-executable="true" data-language="agda" id="!part().!chapter().!1">
+!preamble(!1)
+!1 : typeOf !chapter().!1
+-- BEGIN SOLUTION
+!1 = ?
+</pre>
+
+~~~~~~~~~~~~~~~~~~~~
+
 
 !define(exercise)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -46,15 +56,6 @@ open import !part().!chapter() n' -- hiding (!1)
 : !ifne(!4)()(!3)(!2)
 <span class="hidden">∎</span>
 <span class="right-aligned">∎</span>
-
-<pre data-executable="true" data-language="agda" id="!part().!chapter().!1">
-module !part().!chapter().!1 where
-
-!preamble(!1)
--- BEGIN SOLUTION
--- solution = ?
-</pre>
-
 
 <!--
 ::::::: {.solutionlink}

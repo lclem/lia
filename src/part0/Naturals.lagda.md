@@ -8,12 +8,15 @@ title: Natural numbers🚧
 
 module part0.Naturals where
 open import part0.Equality public
+open import Agda.Builtin.Nat using (Nat; zero; suc) public
 
-data ℕ : Set where
-  zero : ℕ
-  suc : ℕ → ℕ
+ℕ = Nat
 
-{-# BUILTIN NATURAL ℕ #-}
+-- data ℕ : Set where
+--   zero : ℕ
+--   suc : ℕ → ℕ
+
+-- {-# BUILTIN NATURAL ℕ #-}
 
 private
   variable
@@ -280,10 +283,10 @@ postulate comm-+ : ∀ {m n} → m + n ≡ n + m
 {-# REWRITE n*1≡n  #-}
 
 m≤1+n→~m≤n→m≡1+n : m ≤ 1 + n → ~ (m ≤ n) → m ≡ 1 + n
-m≤1+n→~m≤n→m≡1+n = ?
+m≤1+n→~m≤n→m≡1+n = {!   !}
 
 m≤1+n→~m≡1+n→m≤n : m ≤ 1 + n → ~ (m ≡ 1 + n) → m ≤ n
-m≤1+n→~m≡1+n→m≤n = ?
+m≤1+n→~m≡1+n→m≤n = {!   !}
 
 -- monus
 infixl 11 _∸_

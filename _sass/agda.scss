@@ -41,6 +41,7 @@ pre.highlight {
     @include code-container;
     border-style: dashed !important;
 }
+
 code {
     @include code-font;
     //white-space: normal;
@@ -105,6 +106,11 @@ pre.Spec {
   //color: black;
   direction: ltr;
   -webkit-tap-highlight-color: black;
+}
+
+.CodeMirror-foldmarker {
+  visibility: hidden;
+  display: none;
 }
 
 /* PADDING */
@@ -842,6 +848,10 @@ button.kernel-status-button-disconnected {
   padding: 8px;
 }
 
+.jp-RenderedText pre, .jp-RenderedJavaScript pre, .jp-RenderedHTMLCommon pre {
+  margin-bottom: 0px;
+}
+
 // nope
 .thebelab-input {
   border-bottom: 1px solid #cecedd;
@@ -976,3 +986,6 @@ div.cell-toolbar {
   padding: 5px;
 }
 
+pre {
+  background-color: transparent;
+}
