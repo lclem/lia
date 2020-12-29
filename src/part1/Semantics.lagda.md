@@ -432,7 +432,7 @@ _F2[_,_↦_,_] : Formula → PropName → PropName → Formula → Formula → F
 
 What happens if `p ≡ q` ?
 
-!codemirror(_F2[_,_↦_,_])
+!codemirror2(subst2)(_F2[_,_↦_,_])
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

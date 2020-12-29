@@ -30,7 +30,7 @@
 
 !define(preamble)
 ~~~~~~~~~~~~~~~~~
-module !part().!chapter().!1 where  
+module !part().!chapter().!1 where
 open !part().!chapter() as !chapter()
 ~~~~~~~~~~~~~~~~~
 
@@ -38,14 +38,25 @@ open !part().!chapter() as !chapter()
 ~~~~~~~~~~~~~~~~~~~~
 
 <pre data-executable="true" data-language="agda" id="!part().!chapter().!1">
-!preamble(!1)
-!1 : typeOf !chapter().!1
+!preamble(!1)(!1)
+!1 : typeOf !1-orig -- !chapter().!1
 -- BEGIN SOLUTION
 !1 = ?
 </pre>
 
 ~~~~~~~~~~~~~~~~~~~~
 
+!define(codemirror2)
+~~~~~~~~~~~~~~~~~~~~
+
+<pre data-executable="true" data-language="agda" id="!part().!chapter().!1">
+!preamble(!1)(!2)
+!2 : typeOf !2-orig !chapter().!2
+-- BEGIN SOLUTION
+!2 = ?
+</pre>
+
+~~~~~~~~~~~~~~~~~~~~
 
 !define(exercise)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
