@@ -673,6 +673,8 @@ pre.Spec { font-family: 'DejaVu Sans Mono', 'Source Code Pro', 'Bitstream Vera S
 /* BASICS */
 .CodeMirror { /* Set height, width, borders, and global font properties here */ font-family: 'DejaVu Sans Mono', 'Source Code Pro', 'Bitstream Vera Sans Mono', 'FreeMono', 'Courier New', 'Monaco', 'Menlo', monospace, serif !important; font-size: .85em !important; height: 300px; direction: ltr; -webkit-tap-highlight-color: black; }
 
+.CodeMirror-foldmarker { visibility: hidden; display: none; }
+
 /* PADDING */
 .CodeMirror-lines { padding: 4px 0; /* Vertical padding around content */ }
 
@@ -942,6 +944,8 @@ margin-bottom: 8px; */ transition: all .1s ease-in-out; }
 
 .jp-OutputArea-output { padding: 8px; }
 
+.jp-RenderedText pre, .jp-RenderedJavaScript pre, .jp-RenderedHTMLCommon pre { margin-bottom: 0px; }
+
 .thebelab-input { border-bottom: 1px solid #cecedd; }
 
 main { padding: 0; }
@@ -965,6 +969,8 @@ span.kernel-status:hover span.kernel-messages { visibility: visible; opacity: 1;
 .cell-info { color: #808080; display: inline-block; vertical-align: middle; line-height: normal; padding-left: 10px; display: inline-block; font-size: 10pt; }
 
 div.cell-toolbar { padding: 5px; }
+
+pre { background-color: transparent; }
 
 .trigger { display: none; }
 

@@ -16,6 +16,7 @@
 {"url":"/lia/part0/Permutations/","headline":"Permutationss 🚧","description":"Propositional and fist-order logic developed with the proof assistant Agda.","@type":"WebPage","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/lia/assets/main.css">
+
   <!-- <link rel="stylesheet" href="/lia/assets/custom.css"> --><!-- Mathjax Support -->
   <script type="text/javascript" async
   src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
@@ -126,6 +127,13 @@
                         <input type="text" placeholder="github username" id="username" name="username">
                         <label for="password" style="color: white;">Password:</label>
                         <input type="password" placeholder="password" id="password" name="password">
+                    </div>
+                    <div>
+                        <label for="loadFromStore" style="color: white;">Load code from browser store:</label>
+                        <label class="switch" style="vertical-align: middle; margin: 10px;">
+                            <input type="checkbox" id="loadFromStore" name="loadFromStore">
+                            <span class="slider round"></span>
+                        </label>
                     </div>
                     <div>
                         <label for="baseUrl" style="color: white;">Base URL:</label>
@@ -340,6 +348,8 @@
                     persistInput(document.getElementById("username"));
                     persistInput(document.getElementById("password"));
 
+                    persistInput(document.getElementById("loadFromStore"));
+
                     persistInput(document.getElementById("baseUrl"));
                     persistInput(document.getElementById("token"));
 
@@ -453,17 +463,17 @@
 <a id="sym-perm"></a><a id="542" href="/lia/part0/Permutations/#542" class="Function">sym-perm</a> <a id="551" class="Symbol">:</a> <a id="553" href="/lia/part0/Permutations/#258" class="Datatype">Perm</a> <a id="558" href="/lia/part0/Permutations/#236" class="Generalizable">as</a> <a id="561" href="/lia/part0/Permutations/#239" class="Generalizable">bs</a> <a id="564" class="Symbol">→</a> <a id="566" href="/lia/part0/Permutations/#258" class="Datatype">Perm</a> <a id="571" href="/lia/part0/Permutations/#239" class="Generalizable">bs</a> <a id="574" href="/lia/part0/Permutations/#236" class="Generalizable">as</a>
 <a id="577" href="/lia/part0/Permutations/#542" class="Function">sym-perm</a> <a id="586" href="/lia/part0/Permutations/#586" class="Bound">perm</a> <a id="591" class="Symbol">=</a> <a id="593" class="Symbol">{!!}</a>
 
-<a id="perm-ε"></a><a id="599" href="/lia/part0/Permutations/#599" class="Function">perm-ε</a> <a id="606" class="Symbol">:</a> <a id="608" href="/lia/part0/Permutations/#258" class="Datatype">Perm</a> <a id="613" href="/lia/part0/List/#505" class="InductiveConstructor">ε</a> <a id="615" href="/lia/part0/Permutations/#236" class="Generalizable">as</a> <a id="618" class="Symbol">→</a> <a id="620" href="/lia/part0/Permutations/#236" class="Generalizable">as</a> <a id="623" href="/lia/part0/Equality/#244" class="Datatype Operator">≡</a> <a id="625" href="/lia/part0/List/#505" class="InductiveConstructor">ε</a>
-<a id="627" href="/lia/part0/Permutations/#599" class="Function">perm-ε</a> <a id="634" href="/lia/part0/Permutations/#307" class="InductiveConstructor">stop</a> <a id="639" class="Symbol">=</a> <a id="641" href="/lia/part0/Equality/#292" class="InductiveConstructor">refl</a>
+<a id="perm-ε"></a><a id="599" href="/lia/part0/Permutations/#599" class="Function">perm-ε</a> <a id="606" class="Symbol">:</a> <a id="608" href="/lia/part0/Permutations/#258" class="Datatype">Perm</a> <a id="613" href="/lia/part0/List/#505" class="InductiveConstructor">ε</a> <a id="615" href="/lia/part0/Permutations/#236" class="Generalizable">as</a> <a id="618" class="Symbol">→</a> <a id="620" href="/lia/part0/Permutations/#236" class="Generalizable">as</a> <a id="623" href="Agda.Builtin.Equality.html#151" class="Datatype Operator">≡</a> <a id="625" href="/lia/part0/List/#505" class="InductiveConstructor">ε</a>
+<a id="627" href="/lia/part0/Permutations/#599" class="Function">perm-ε</a> <a id="634" href="/lia/part0/Permutations/#307" class="InductiveConstructor">stop</a> <a id="639" class="Symbol">=</a> <a id="641" href="Agda.Builtin.Equality.html#208" class="InductiveConstructor">refl</a>
 <a id="646" href="/lia/part0/Permutations/#599" class="Function">perm-ε</a> <a id="653" class="Symbol">(</a><a id="654" href="/lia/part0/Permutations/#425" class="InductiveConstructor">tran</a> <a id="659" href="/lia/part0/Permutations/#659" class="Bound">π</a> <a id="661" href="/lia/part0/Permutations/#661" class="Bound">ρ</a><a id="662" class="Symbol">)</a>
   <a id="666" class="Keyword">with</a> <a id="671" href="/lia/part0/Permutations/#599" class="Function">perm-ε</a> <a id="678" href="/lia/part0/Permutations/#659" class="Bound">π</a>
 <a id="680" class="Symbol">...</a> <a id="684" class="Symbol">|</a> <a id="686" href="/lia/part0/Permutations/#686" class="Bound">eq-π</a> <a id="691" class="Keyword">rewrite</a> <a id="699" href="/lia/part0/Permutations/#686" class="Bound">eq-π</a>
   <a id="706" class="Keyword">with</a> <a id="711" href="/lia/part0/Permutations/#599" class="Function">perm-ε</a> <a id="718" class="Bound">ρ</a>
 <a id="720" class="Symbol">...</a> <a id="724" class="Symbol">|</a> <a id="726" href="/lia/part0/Permutations/#726" class="Bound">eq-ρ</a> <a id="731" class="Symbol">=</a> <a id="733" href="/lia/part0/Permutations/#726" class="Bound">eq-ρ</a>
 
-<a id="perm-singleton"></a><a id="739" href="/lia/part0/Permutations/#739" class="Function">perm-singleton</a> <a id="754" class="Symbol">:</a> <a id="756" href="/lia/part0/Permutations/#258" class="Datatype">Perm</a> <a id="761" class="Symbol">(</a><a id="762" href="/lia/part0/List/#1792" class="Function">[</a> <a id="764" href="/lia/part0/Permutations/#224" class="Generalizable">a</a> <a id="766" href="/lia/part0/List/#2043" class="Function Operator">]</a><a id="767" class="Symbol">)</a> <a id="769" href="/lia/part0/Permutations/#239" class="Generalizable">bs</a> <a id="772" class="Symbol">→</a> <a id="774" href="/lia/part0/Permutations/#239" class="Generalizable">bs</a> <a id="777" href="/lia/part0/Equality/#244" class="Datatype Operator">≡</a> <a id="779" href="/lia/part0/List/#1792" class="Function">[</a> <a id="781" href="/lia/part0/Permutations/#224" class="Generalizable">a</a> <a id="783" href="/lia/part0/List/#2043" class="Function Operator">]</a>
-<a id="785" href="/lia/part0/Permutations/#739" class="Function">perm-singleton</a> <a id="800" href="/lia/part0/Permutations/#307" class="InductiveConstructor">stop</a> <a id="805" class="Symbol">=</a> <a id="807" href="/lia/part0/Equality/#292" class="InductiveConstructor">refl</a>
-<a id="812" href="/lia/part0/Permutations/#739" class="Function">perm-singleton</a> <a id="827" class="Symbol">(</a><a id="828" href="/lia/part0/Permutations/#327" class="InductiveConstructor">skip</a> <a id="833" href="/lia/part0/Permutations/#833" class="Bound">π</a><a id="834" class="Symbol">)</a> <a id="836" class="Keyword">rewrite</a> <a id="844" href="/lia/part0/Permutations/#599" class="Function">perm-ε</a> <a id="851" href="/lia/part0/Permutations/#833" class="Bound">π</a> <a id="853" class="Symbol">=</a> <a id="855" href="/lia/part0/Equality/#292" class="InductiveConstructor">refl</a>
+<a id="perm-singleton"></a><a id="739" href="/lia/part0/Permutations/#739" class="Function">perm-singleton</a> <a id="754" class="Symbol">:</a> <a id="756" href="/lia/part0/Permutations/#258" class="Datatype">Perm</a> <a id="761" class="Symbol">(</a><a id="762" href="/lia/part0/List/#1792" class="Function">[</a> <a id="764" href="/lia/part0/Permutations/#224" class="Generalizable">a</a> <a id="766" href="/lia/part0/List/#2043" class="Function Operator">]</a><a id="767" class="Symbol">)</a> <a id="769" href="/lia/part0/Permutations/#239" class="Generalizable">bs</a> <a id="772" class="Symbol">→</a> <a id="774" href="/lia/part0/Permutations/#239" class="Generalizable">bs</a> <a id="777" href="Agda.Builtin.Equality.html#151" class="Datatype Operator">≡</a> <a id="779" href="/lia/part0/List/#1792" class="Function">[</a> <a id="781" href="/lia/part0/Permutations/#224" class="Generalizable">a</a> <a id="783" href="/lia/part0/List/#2043" class="Function Operator">]</a>
+<a id="785" href="/lia/part0/Permutations/#739" class="Function">perm-singleton</a> <a id="800" href="/lia/part0/Permutations/#307" class="InductiveConstructor">stop</a> <a id="805" class="Symbol">=</a> <a id="807" href="Agda.Builtin.Equality.html#208" class="InductiveConstructor">refl</a>
+<a id="812" href="/lia/part0/Permutations/#739" class="Function">perm-singleton</a> <a id="827" class="Symbol">(</a><a id="828" href="/lia/part0/Permutations/#327" class="InductiveConstructor">skip</a> <a id="833" href="/lia/part0/Permutations/#833" class="Bound">π</a><a id="834" class="Symbol">)</a> <a id="836" class="Keyword">rewrite</a> <a id="844" href="/lia/part0/Permutations/#599" class="Function">perm-ε</a> <a id="851" href="/lia/part0/Permutations/#833" class="Bound">π</a> <a id="853" class="Symbol">=</a> <a id="855" href="Agda.Builtin.Equality.html#208" class="InductiveConstructor">refl</a>
 <a id="860" href="/lia/part0/Permutations/#739" class="Function">perm-singleton</a> <a id="875" class="Symbol">(</a><a id="876" href="/lia/part0/Permutations/#425" class="InductiveConstructor">tran</a> <a id="881" href="/lia/part0/Permutations/#881" class="Bound">π</a> <a id="883" href="/lia/part0/Permutations/#883" class="Bound">ρ</a><a id="884" class="Symbol">)</a>
   <a id="888" class="Keyword">with</a> <a id="893" href="/lia/part0/Permutations/#739" class="Function">perm-singleton</a> <a id="908" href="/lia/part0/Permutations/#881" class="Bound">π</a>
 <a id="910" class="Symbol">...</a> <a id="914" class="Symbol">|</a> <a id="916" href="/lia/part0/Permutations/#916" class="Bound">eq-π</a> <a id="921" class="Keyword">rewrite</a> <a id="929" href="/lia/part0/Permutations/#916" class="Bound">eq-π</a>
@@ -518,7 +528,7 @@
     </p>
 </header>
 
-    <p class="p-name"> Last-modified: Dec 28 10:20:45 2020 </p>
+    <p class="p-name"> Last-modified: Dec 29 22:38:42 2020 </p>
   </article>
       </div>
     </main><footer class="site-footer h-card">

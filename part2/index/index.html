@@ -16,6 +16,7 @@
 {"url":"/lia/part2/index/","headline":"Part 2: Intuitionistic propositional logic 🚧","description":"Propositional and fist-order logic developed with the proof assistant Agda.","@type":"WebPage","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/lia/assets/main.css">
+
   <!-- <link rel="stylesheet" href="/lia/assets/custom.css"> --><!-- Mathjax Support -->
   <script type="text/javascript" async
   src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
@@ -126,6 +127,13 @@
                         <input type="text" placeholder="github username" id="username" name="username">
                         <label for="password" style="color: white;">Password:</label>
                         <input type="password" placeholder="password" id="password" name="password">
+                    </div>
+                    <div>
+                        <label for="loadFromStore" style="color: white;">Load code from browser store:</label>
+                        <label class="switch" style="vertical-align: middle; margin: 10px;">
+                            <input type="checkbox" id="loadFromStore" name="loadFromStore">
+                            <span class="slider round"></span>
+                        </label>
                     </div>
                     <div>
                         <label for="baseUrl" style="color: white;">Base URL:</label>
@@ -340,6 +348,8 @@
                     persistInput(document.getElementById("username"));
                     persistInput(document.getElementById("password"));
 
+                    persistInput(document.getElementById("loadFromStore"));
+
                     persistInput(document.getElementById("baseUrl"));
                     persistInput(document.getElementById("token"));
 
@@ -473,7 +483,7 @@
     </p>
 </header>
 
-    <p class="p-name"> Last-modified: Dec 28 10:20:45 2020 </p>
+    <p class="p-name"> Last-modified: Dec 29 22:38:42 2020 </p>
   </article>
       </div>
     </main><footer class="site-footer h-card">
