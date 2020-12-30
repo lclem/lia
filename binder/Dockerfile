@@ -39,9 +39,6 @@ USER $NB_UID
 WORKDIR /home/$NB_USER/
 RUN cd agda-kernel && make kernel-install
 
-# pre-compile the standard library for reduce latency later
-RUN cd "/home/$NB_USER/agda-stdlib/" && make setup
-
 RUN git stash && git checkout -f store && git pull
 RUN git config --global user.email "xxx@mybinder.com" && \
     git config --global user.name "mybinder"
@@ -49,5 +46,8 @@ RUN git config --global user.email "xxx@mybinder.com" && \
 RUN mkdir -p .agda/
 RUN touch .agda/libraries
 RUN echo "/home/$NB_USER/agda-stdlib/standard-library.agda-lib" > .agda/libraries
+
+# pre-compile the standard library for reduce latency later
+RUN cd "/home/$NB_USER/" && agda TypeOf.agda
 
 #ENV JUPYTER_ENABLE_LAB=yes
