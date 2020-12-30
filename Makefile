@@ -324,7 +324,7 @@ $(OUTDIR)/$1/$2.md: $(TMPDIR)/$1.$2.md
 # WARNING: the number of added lines will affect the following!
 
 	@echo "1 \c"
-# STEP 0: expand solution entries
+# STEP 0: apply PP macros
 
 ifneq ($(wildcard $(SRCDIR)/$1/$2.pp),)
 # additionally import a chapter-specific pp macrofile, if it exists

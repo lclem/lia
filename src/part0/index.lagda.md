@@ -19,9 +19,11 @@ open import part0.Enumerable public
 open import part0.Tree public
 ```
 
-<executable-pre data-executable="true" data-language="agda">
-
+!codemirrorCustom(test)
+~~~~
 module test where
+
+-- BEGIN SOLUTION
 
 open import part0.Naturals
 
@@ -42,7 +44,7 @@ data Two : Set where
 
 select : Two → A → A → A
 select x a₀ a₁ = {! x !}
-</executable-pre>
+~~~~
 
 An example citation to [@Craig:JSL:1957]
 and another to the same [@Craig:JSL:1957],
@@ -51,8 +53,3 @@ or even just (@Craig:JSL:1957),
 finally another one [@Langford:AM:1926:B],
 and then Craig again [@Craig:JSL:1957].
 
-::: {#refs}
-
-# References
-
-:::

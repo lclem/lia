@@ -78,6 +78,7 @@ exclude:
   - "*#*"
   - "*!*"
   - "*.md.sed"
+  - "*.pp"
   - "binder"
   - "thebe/node_modules/"
   - "thebe/src"

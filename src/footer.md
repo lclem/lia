@@ -3,8 +3,4 @@
 # References
 :::
 
-# Solutions
-
-!solutions
-
-----------
+!solutionsSection
