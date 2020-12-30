@@ -680,6 +680,8 @@ pre.Spec { font-family: 'DejaVu Sans Mono', 'Source Code Pro', 'Bitstream Vera S
 
 .CodeMirror pre.CodeMirror-line, .CodeMirror pre.CodeMirror-line-like { padding: 0 4px; /* Horizontal padding of content */ }
 
+.CodeMirror-lines .readOnly { background-color: #cccccc !important; }
+
 .CodeMirror-scrollbar-filler, .CodeMirror-gutter-filler { background-color: white; /* The little square between H and V scrollbars */ }
 
 /* GUTTER */
