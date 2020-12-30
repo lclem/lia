@@ -432,7 +432,7 @@ _F2[_,_↦_,_] : Formula → PropName → PropName → Formula → Formula → F
 
 What happens if `p ≡ q` ?
 
-!codemirror2(subst2)(_F2[_,_↦_,_])
+!codemirror(subst2)(_F2[_,_↦_,_])
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -745,9 +745,7 @@ refl-⇛ : ∀ φ → φ ⇛ φ
 trans-⇛ : ∀ φ ψ ξ → φ ⇛ ψ → ψ ⇛ ξ → φ ⇛ ξ
 ```
 
-!codemirror(refl-⇛)
-
-!codemirror(trans-⇛)
+!codemirror2(entailment-preorder)(refl-⇛)(trans-⇛)
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -813,6 +811,8 @@ is explained by the following connection with tautology:
 entailment-implication : ∀ φ ψ → φ ⇛ ψ ↔ Tautology (φ ⇒ ψ)
 entailment-equivalence : ∀ φ ψ → φ ⟺ ψ ↔ Tautology (φ ⇔ ψ)
 ```
+
+!codemirror2(entailment-implication)(entailment-implication)(entailment-equivalence)
 
 Prove the two properties above.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -904,6 +904,23 @@ deMorganImplies : ∀ φ ψ → ¬ (φ ⇒ ψ) ⟺ φ ∧ ¬ ψ
 deMorganIff-left : ∀ φ ψ → ¬ (φ ⇔ ψ) ⟺ ¬ φ ⇔ ψ
 deMorganIff-right : ∀ φ ψ → ¬ (φ ⇔ ψ) ⟺ φ ⇔ ¬ ψ
 ```
+
+!codemirrorCustom(common-equivalences)
+~~~~
+module !part().!chapter().common-equivalences where
+open import TypeOf
+open import !part().!chapter() renaming (idempotAnd to idempotAnd-orig; commAnd to commAnd-orig; commOr to commOr-orig)
+
+idempotAnd : typeOf idempotAnd-orig
+commAnd : typeOf commAnd-orig
+commOr : typeOf commOr-orig
+
+-- BEGIN SOLUTION
+idempotAnd = ?
+commAnd  = ?
+commOr = ?
+~~~~
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
@@ -1036,6 +1053,9 @@ cong2F : ∀ φ₀ φ₁ ψ₀ ψ₁ ξ p₀ p₁ →
   -----------------------------------------------------
   ξ F2[ p₀ , p₁ ↦ φ₀ , φ₁ ] ⟺ ξ F2[ p₀ , p₁ ↦ ψ₀ , ψ₁ ]
 ```
+
+!codemirror(cong2F)
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
@@ -1119,7 +1139,9 @@ p∧¬p-unsat {p} (ϱ , equiv) with ϱ p
 
 !exercise(#exercise:tau-sat)(Tautology and satisfiability)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Elaborate and prove a natural property connecting whether `φ` is a tautology and satisfiability.
+Elaborate and prove a natural property relating tautology and satisfiability.
+
+!codemirror(tau-sat)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 One possible property is the following:
@@ -1148,6 +1170,8 @@ tau-sat φ = tau→sat , sat→tau where
 !exercise(#exercise:equiv-unsat)(Equivalence and unsatisfiability)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Express unsatisfiability in terms of logical equivalence.
+
+!codemirror(equiv-unsat)(equiv↔unsat)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 One possible property is that a formula is unsatisfiable if, and only if, it is logically equivalent to !ref(⊥):
@@ -1226,7 +1250,10 @@ conjProp2 : ∀ φs ϱ →
 
 !exercise(#exercise:long-conjunctions)(Long conjunctions)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Prove the two defining properties !ref(conjProp1) and !ref(conjProp2) of long conjunctions
+Prove the two defining properties !ref(conjProp1) and !ref(conjProp2) of long conjunctions.
+
+!codemirror(conjProp12)(conjProp1)(conjProp2)
+
 *Hint:* Use the corresponding properties for Booleans.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1272,6 +1299,9 @@ disjProp-ff : ∀ φs ϱ →
 !exercise(#exercise:long-disjunctions)(Long disjunctions) 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Prove the two defining properties !ref(disjProp-tt) and !ref(disjProp-ff) above.
+
+!codemirror2(disjProp)(disjProp-tt)(disjProp-ff)
+
 *Hint:* Use the corresponding properties for Booleans.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1341,6 +1371,8 @@ perm-sat : ∀ {Γ Δ ϱ} →
   All (λ φ → ⟦ φ ⟧ ϱ ≡ tt) Δ
 ```
 
+!codemirror(perm-sat)
+
 *Hint*: Proceed by structural induction on permutations.
 Deduce that the logical consequence relation is invariant under context permutation:
 
@@ -1351,6 +1383,9 @@ perm-⊨ : ∀ {Γ Δ} φ →
   -----
   Δ ⊨ φ
 ```
+
+!codemirror(perm-sem)(perm-⊨)
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
@@ -1396,6 +1431,9 @@ context2 : ∀ Γ {φ} →
   -----
   Γ ⊨ φ
 ```
+
+!codemirror2(context12)(context1)(context2)
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
@@ -1478,6 +1516,8 @@ semDT2 : ∀ φ ψ →
 !exercise(#exercise:sem-DT)(Semantic deduction theorem)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Prove the two parts !ref(semDT2) and !ref(semDT1) of the semantic deduction theorem.
+
+!codemirror2(semDT)(semDT1)(semDT2)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
@@ -2054,6 +2094,8 @@ dual-involutive :
   φ ⁻ ⁻  ≡ φ
 ```
 
+!codemirror(dual-involutive)
+
 The extra assumption `Formula[⊥,⊤,¬,∨,∧] φ` dispenses us from considering formulas with implication or bi-implication.
 ~~~~~~
 ~~~~~~
@@ -2135,6 +2177,8 @@ duality-equivalence-1 :
   ---------
   φ ⁻ ⟺ ψ ⁻
 ```
+
+!codemirror(duality-equivalence-1)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
@@ -2156,6 +2200,8 @@ duality-equivalence-2 :
   φ ⟺ ψ
 ```
 
+!codemirror(duality-equivalence-2)
+
 *Hint:* Use !ref(duality-equivalence-1) and the fact that dualisation preserves `{⊥,⊤,¬,∨,∧}` formulas:
 
 ```
@@ -2164,6 +2210,8 @@ dual-preservation :
   ------------------------
   Formula[⊥,⊤,¬,∨,∧] (φ ⁻)
 ```
+
+!codemirror(dual-preservation)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 We begin by proving that dualisation preserves `{⊥,⊤,¬,∨,∧}` formulas:
@@ -2211,6 +2259,8 @@ duality-tautology : ∀ {φ} →
   -----------------
   Tautology (¬ φ ⁻)
 ```
+
+!codemirror(duality-tautology)
 
 *Hint*: Use the fact that a tautology is logically equivalent to !remoteRef(part1)(Semantics)(Formula)(⊤);
 c.f. !remoteRef(part1)(Semantics)(tautology-equivalence).
@@ -2359,6 +2409,8 @@ Prove that the mapping `Formula2Tree` is injective.
 ```
 Formula2Tree-inj : Injective Formula2Tree
 ```
+
+!codemirror(Formula2Tree-inj)
 
 *Hint:* Exploit the fact that the list constructor `_∷_` is injective on both arguments
 (c.f. !remoteRef(part0)(List)(∷-inj-left) and !remoteRef(part0)(List)(∷-inj-right) from !chapterRef(part0)(List)).

@@ -28,34 +28,57 @@
 [this section](!1 "Section %g")
 ~~~~~~~~~~~~~
 
-!define(preamble)
+!define(standardPreamble)
 ~~~~~~~~~~~~~~~~~
 module !part().!chapter().!1 where
+open import TypeOf
 open !part().!chapter() as !chapter()
 ~~~~~~~~~~~~~~~~~
 
-!define(codemirror)
+!define(preamble)
+~~~~~~~~~~~~~~~~~
+!standardPreamble(!1)
+~~~~~~~~~~~~~~~~~
+
+!define(preamble2)
+~~~~~~~~~~~~~~~~~
+!standardPreamble(!1)
+~~~~~~~~~~~~~~~~~
+
+// the extra newlines below are significant
+!define(codemirrorCustom)
 ~~~~~~~~~~~~~~~~~~~~
 
 <pre data-executable="true" data-language="agda" id="!part().!chapter().!1">
-!preamble(!1)(!1)
-!1 : typeOf !1-orig -- !chapter().!1
--- BEGIN SOLUTION
-!1 = ?
+!2
 </pre>
 
+~~~~~~~~~~~~~~~~~~~~
+
+!define(codemirror)
+~~~~~~~~~~~~~~~~~~~~
+!codemirrorCustom(!1)
+~~~~~~~~~
+!define(name)(!ifne(!2)()(!2)(!1))
+!preamble(!1)(!name)
+!name : typeOf !name-orig
+-- BEGIN SOLUTION
+!name = ?
+~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~
 
 !define(codemirror2)
 ~~~~~~~~~~~~~~~~~~~~
+!codemirrorCustom(!1)
+~~~~~~~~~
+!preamble2(!1)(!2)(!3)
+!2 : typeOf !2-orig
+!3 : typeOf !3-orig
 
-<pre data-executable="true" data-language="agda" id="!part().!chapter().!1">
-!preamble(!1)(!2)
-!2 : typeOf !2-orig !chapter().!2
 -- BEGIN SOLUTION
 !2 = ?
-</pre>
-
+!3 = ?
+~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~
 
 !define(exercise)

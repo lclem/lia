@@ -123,6 +123,10 @@ pre.Spec {
   padding: 0 4px; /* Horizontal padding of content */
 }
 
+.CodeMirror-lines .readOnly {
+  background-color: #cccccc !important;
+}
+
 .CodeMirror-scrollbar-filler, .CodeMirror-gutter-filler {
   background-color: white; /* The little square between H and V scrollbars */
 }
