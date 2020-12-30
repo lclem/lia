@@ -472,8 +472,12 @@ data Two : Set where
     one : Two
     two : Two
 
-select : Two → A → A → A
-select x a₀ a₁ = {! x !}</pre>
+G : Two → Set → Set → Set
+G one A _ = A
+G two _ B = B
+
+select : (x : Two) → A → B → G x A B
+select x a b = {!  !}</pre>
 
 <p>An example citation to [<a href="#ref-Craig:JSL:1957">Craig(1957)</a>] and
 another to the same [<a href="#ref-Craig:JSL:1957">Craig(1957)</a>], then
@@ -522,7 +526,7 @@ Mathematics</em>. 28(1/4):459–471, 1926.</p>
     </p>
 </header>
 
-    <p class="p-name"> Last-modified: Dec 30 15:50:26 2020 </p>
+    <p class="p-name"> Last-modified: Dec 30 18:59:22 2020 </p>
   </article>
       </div>
     </main><footer class="site-footer h-card">
