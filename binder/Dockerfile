@@ -39,6 +39,9 @@ USER $NB_UID
 WORKDIR /home/$NB_USER/
 RUN cd agda-kernel && make kernel-install
 
+# pre-compile the standard library for reduce latency later
+RUN cd "/home/$NB_USER/agda-stdlib/" && make setup
+
 RUN git stash && git checkout -f store && git pull
 RUN git config --global user.email "xxx@mybinder.com" && \
     git config --global user.name "mybinder"
