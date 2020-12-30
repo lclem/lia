@@ -42,8 +42,12 @@ data Two : Set where
     one : Two
     two : Two
 
-select : Two → A → A → A
-select x a₀ a₁ = {! x !}
+G : Two → Set → Set → Set
+G one A _ = A
+G two _ B = B
+
+select : (x : Two) → A → B → G x A B
+select x a b = {!  !}
 ~~~~
 
 An example citation to [@Craig:JSL:1957]
