@@ -574,8 +574,8 @@ span.CodeMirror-selectedtext { background: #d3e7f8 !important; }
   outline: transparent;
 }
 
-.kernel-status-button:focus {
-}
+// .kernel-status-button:focus {
+// }
 
 button.kernel-status-button:hover {
   cursor: pointer; 
@@ -654,6 +654,23 @@ button.kernel-status-button-disconnected {
   @include status-badge-common;
   box-shadow: inset 0px 0px 0px #7ac142;
   animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+}
+
+.info-area {
+//  display: none;
+//  visibility: hidden;
+}
+
+// .status-badge-error:hover .info-area,
+// .status-badge-warning:hover .info-area,
+// .status-badge-ok:hover .info-area,
+//.status-badge-unknown:hover .info-area,
+// .status-badge-running:hover .info-area
+
+svg.status-badge-warning:hover {
+  cursor: pointer;
+  display: block;
+  visibility: visible;
 }
 
 .checkmark__circle {
@@ -992,4 +1009,5 @@ div.cell-toolbar {
 
 pre {
   background-color: transparent;
+  border: none;
 }
