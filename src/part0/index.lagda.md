@@ -50,6 +50,68 @@ select : (x : Two) → A → B → G x A B
 select x a b = {!  !}
 ~~~~
 
+
+!codemirrorCustom(test5)
+~~~~
+module test5 where
+
+-- BEGIN SOLUTION
+
+id : {A : Set} → A → A
+id x = ?
+~~~~
+
+!codemirrorCustom(test6)
+~~~~
+module test6 where
+
+-- BEGIN SOLUTION
+
+id : {A : Set} → A → A
+id x = ?
+~~~~
+
+!codemirrorCustom(test7)
+~~~~
+module test7 where
+
+-- BEGIN SOLUTION
+
+id : {A : Set} → A → A
+id x = ?
+~~~~
+
+!codemirrorCustom(test8)
+~~~~
+module test8 where
+
+-- BEGIN SOLUTION
+
+id : {A : Set} → A → A
+id x = ?
+~~~~
+
+!codemirrorCustom(test9)
+~~~~
+module test9 where
+
+-- BEGIN SOLUTION
+
+id : {A : Set} → A → A
+id x = ?
+~~~~
+
+!codemirrorCustom(test10)
+~~~~
+module test10 where
+
+-- BEGIN SOLUTION
+
+id : {A : Set} → A → A
+id x = ?
+~~~~
+
+
 An example citation to [@Craig:JSL:1957]
 and another to the same [@Craig:JSL:1957],
 then @Craig:JSL:1957,
