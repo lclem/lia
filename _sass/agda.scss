@@ -657,7 +657,7 @@ button.kernel-status-button-disconnected {
 }
 
 .info-area {
-//  display: none;
+ display: none;
 //  visibility: hidden;
 }
 
@@ -1010,4 +1010,20 @@ div.cell-toolbar {
 pre {
   background-color: transparent;
   border: none;
+}
+
+.info-area-button {
+  cursor: pointer;
+  position: absolute;
+  bottom: 0px;
+  right: 5px;
+  visibility: hidden;
+}
+
+.show-info-area {
+  content: url("../assets/images/show.svg");
+}
+
+.hide-info-area {
+  content: url("../assets/images/hide.svg");
 }
