@@ -353,7 +353,10 @@ aCtxApply (Suc ctx) e = Suc (aCtxApply ctx e)
 aCtxApply (ctx1 +C ctx2) e = aCtxApply ctx1 e +E aCtxApply ctx2 e
 aCtxApply (ctx1 *C ctx2) e = aCtxApply ctx1 e *E aCtxApply ctx2 e
 
-postulate cong-< : ∀ {a b} → (ctx : ACtx) → a < b → A⟦ aCtxApply ctx (Num a) ⟧ < A⟦ aCtxApply ctx (Num b) ⟧
+-- this is actually false: 0 * □
+-- postulate cong-< : ∀ {a b} → (ctx : ACtx) → a < b → A⟦ aCtxApply ctx (Num a) ⟧ < A⟦ aCtxApply ctx (Num b) ⟧
+
+
 postulate cong-≤ : ∀ {a b} → (ctx : ACtx) → a ≤ b → A⟦ aCtxApply ctx (Num a) ⟧ ≤ A⟦ aCtxApply ctx (Num b) ⟧
 
 longAnd : ∀ {ℓ} → Set ℓ → ℕ → Set ℓ

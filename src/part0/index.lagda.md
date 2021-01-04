@@ -17,6 +17,7 @@ open import part0.TList public
 open import part0.Finite public
 open import part0.Enumerable public
 open import part0.Tree public
+open import part0.WellFounded public
 ```
 
 !codemirrorCustom(test)
