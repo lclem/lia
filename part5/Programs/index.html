@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Imperative programs 🚧 | Logic in Agda</title><!-- Begin Jekyll SEO tag v2.6.1 -->
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Imperative programs 🚧" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Propositional and fist-order logic developed with the proof assistant Agda." />
+<meta property="og:description" content="Propositional and fist-order logic developed with the proof assistant Agda." />
+<link rel="canonical" href="/lia/part5/Programs/" />
+<meta property="og:url" content="/lia/part5/Programs/" />
+<meta property="og:site_name" content="Logic in Agda" />
+<script type="application/ld+json">
+{"url":"/lia/part5/Programs/","description":"Propositional and fist-order logic developed with the proof assistant Agda.","@type":"WebPage","headline":"Imperative programs 🚧","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/lia/assets/main.css">
+
+  <!-- <link rel="stylesheet" href="/lia/assets/custom.css"> --><!-- Mathjax Support -->
+  <script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+  <!-- Load KaTeX -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1.1/katex.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1.1/katex.min.js"></script>
+
+<script type="text/x-thebe-config">
+  {
+    bootstrap: true,
+    requestKernel: true,
+    runAllCells: false,
+    selector: "[data-executable]",
+    predefinedOutput: false,
+    codeMirrorConfig: {
+        //theme: "idea",
+        language: "agda",
+        readOnly: false,
+        lineNumbers: true,
+        keyMap: "default",
+//        gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
+    },
+    kernelOptions: {
+        name: "agda",
+        kernelName: "agda",
+        path: "src/",
+        loadFromStore: true,
+        persistent: false,
+        // notebook server configuration; not needed with binder
+        serverSettings: {
+              baseUrl: "http://127.0.0.1:8888",
+              token: "test-secret",
+            },
+    },
+    binderOptions: {
+      repo: "lclem/lia", // need to put here the actual github repo (if it is a fork)
+      ref: "main",
+      binderUrl: "https://mybinder.org",
+      repoProvider: "github",
+      savedSession: {
+        enabled: true,
+        maxAge: 86400, // the max age in seconds to consider re-using a session
+        storagePrefix: "thebe-binder-lia-"
+      },
+    },
+  }
+</script>
+
+<!-- <script type="text/javascript" src="https://unpkg.com/thebelab@latest"></script> -->
+
+<!-- our own version of the thebe library: -->
+<script type="text/javascript" src="/lia/thebe/lib/index.js"></script>
+
+<!-- highlighting for Agda -->
+<script src="/lia/codemirror-agda/lib/index.js"></script>
+
+</head>
+<body><header class="site-header" id="site-header">
+
+    <div class="wrapper">
+
+        <a class="site-title" href="/lia/">Logic in Agda</a>
+
+        <nav class="site-nav">
+            <!-- <span class="menu-icon">
+                <svg viewBox="0 0 18 15" width="18px" height="15px">
+                    <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+                    <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+                    <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+                </svg>
+            </span> -->
+
+            <div class="trigger">
+                <a class="page-link" href="/lia/part0/index/">Part 0</a>
+                <a class="page-link" href="/lia/part1/index/">Part 1</a>
+                <a class="page-link" href="/lia/part2/index/">Part 2</a>
+                <a class="page-link" href="/lia/part3/index/">Part 3</a>
+                <a class="page-link" href="/lia/part4/index/">Part 4</a>
+                <a class="page-link" href="/lia/part5/index/">Part 5</a>
+
+                <span class="kernel-status">
+                    <button class="kernel-status-button" onclick="kernel_status_clicked()" title="kernel status"></button>
+                    <span id="kernel-messages" class="kernel-messages"></span>
+                </span>
+
+                <div id="connection_options" class="options sidebar" style="text-align: left; line-height: normal; max-width: 800px; padding: 10px; border-radius: 15px;">
+                    <!-- display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: space-between; -->
+                    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+                    <div>
+                        <label for="username" style="color: white;">User:</label>
+                        <input type="text" placeholder="github username" id="username" name="username">
+                        <label for="password" style="color: white;">Password:</label>
+                        <input type="password" placeholder="password" id="password" name="password">
+                    </div>
+                    <div>
+                        <label for="loadFromStore" style="color: white;">Load code from browser store:</label>
+                        <label class="switch" style="vertical-align: middle; margin: 10px;">
+                            <input type="checkbox" id="loadFromStore" name="loadFromStore">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div>
+                        <label for="baseUrl" style="color: white;">Base URL:</label>
+                        <input type="text" placeholder="baseUrl" id="baseUrl" name="baseUrl" value="http://127.0.0.1:8888">
+                        <label for="token" style="color: white;">Token:</label>
+                        <input type="text" placeholder="token" id="token" name="token" value="test-secret">
+                    </div>
+                    <div>
+                        <label for="useBinder" style="color: white;">Use binder:</label>
+                        <label class="switch" style="vertical-align: middle; margin: 10px;">
+                            <input type="checkbox" id="useBinder" name="useBinder">
+                            <span class="slider round"></span>
+                        </label>
+                        <label for="savedSession" style="color: white;">Reuse session:</label>
+                        <label class="switch" style="vertical-align: middle; margin: 10px;">
+                            <input type="checkbox" id="savedSession" name="savedSession">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div>
+                        <label for="repository" style="color: white;">Github repo:</label>
+                        <input type="text" placeholder="repository" id="repository" name="repository" value="">
+
+                        <label for="ref" style="color: white;">Branch:</label>
+                        <input type="text" placeholder="ref" id="ref" name="ref" value="main">
+
+                        <label for="binderUrl" style="color: white;">Binder URL:</label>                        
+                        <input type="text" placeholder="binderUrl" id="binderUrl" name="binderUrl" value="https://mybinder.org">
+                    </div>
+                </div>
+
+                <span class="control-container" id="control-container">
+                    <svg class="progress-ring" id="progress-ring" width="30" height="30" title="exercise progress" onclick="kernel_status_clicked()">
+                        <circle
+                            id="progress-circle"
+                            class="progress-ring__circle"
+                            stroke="black"
+                            stroke-width="2.5"
+                            fill="transparent"
+                            r="14"
+                            cx="15"
+                            cy="15"/>
+                        <circle
+                            stroke="lightgray"
+                            stroke-width="0.5"
+                            fill="transparent"
+                            r="14"
+                            cx="15"
+                            cy="15"/>
+                    </svg>
+                    <div id="connection_options" class="options sidebar" style="text-align: left; line-height: normal; max-width: 800px; padding: 10px; border-radius: 15px;"></div>
+                    <span class="progress-text" id="progress-text" onclick="kernel_status_clicked()"> 0/0 </span>
+
+                    <span id="controls" class="controls">
+                        <svg version="1.1" id="run-all" class="run-all" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                            width="15" height="15" viewBox="0 0 163.861 163.861" style="enable-background:new 0 0 163.861 163.861;"
+                            xml:space="preserve">
+                            <g>
+                                <path d="M34.857,3.613C20.084-4.861,8.107,2.081,8.107,19.106v125.637c0,17.042,11.977,23.975,26.75,15.509L144.67,97.275
+                                    c14.778-8.477,14.778-22.211,0-30.686L34.857,3.613z"/>
+                            </g>
+                        </svg>
+                    </span>
+                </span>
+            </div>
+
+            <style>
+                .switch {
+                    position: relative;
+                    display: inline-block;
+                    width: 40px;
+                    height: 20px;
+                }
+
+                /* Hide default HTML checkbox */
+                .switch input {
+                    opacity: 0;
+                    width: 0;
+                    height: 0;
+                }
+
+                /* The slider */
+                .slider {
+                    position: absolute;
+                    cursor: pointer;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background-color: #ccc;
+                    -webkit-transition: .4s;
+                    transition: .4s;
+                }
+
+                .slider:before {
+                    position: absolute;
+                    content: "";
+                    height: 16px;
+                    width: 16px;
+                    left: 2px;
+                    /* right: 4px; */
+                    bottom: 2px;
+                    top: 2px;
+                    background-color: white;
+                    -webkit-transition: .4s;
+                    transition: .4s;
+                }
+
+                input:checked + .slider {
+                    background-color: #2196F3;
+                }
+
+                input:focus + .slider {
+                    box-shadow: 0 0 1px #2196F3;
+                }
+
+                input:checked + .slider:before {
+                    -webkit-transform: translateX(18px);
+                    -ms-transform: translateX(18px);
+                    transform: translateX(18px);
+                }
+
+                /* Rounded sliders */
+                .slider.round {
+                    border-radius: 30px;
+                }
+
+                .slider.round:before {
+                border-radius: 50%;
+                }
+
+                .sidebar input[type=text] {
+                    padding: 6px;
+                    margin-top: 8px;
+                    /* font-size: 17px; */
+                    border: none;
+                    /* width: 150px; */
+                }
+
+                .sidebar {
+                    /* height: 100%; */
+                    width: 0;
+                    position: fixed;
+                    z-index: 1000;
+                    top: 0;
+                    right: 20px;
+                    background-color: rgba(17, 17, 17, 0.637);
+                    /* overflow-x: hidden; */
+                    transition: 0.5s;
+                    padding-top: 60px;
+                    display: none;
+                    margin-top: 60px;
+                }
+
+                .sidebar .closebtn {
+                    position: absolute;
+                    color: white;
+                    top: 0;
+                    right: 10px;
+                    font-size: 24px;
+                    margin-left: 20px;
+                }
+
+                .progress-ring, .run-all {
+                    vertical-align: middle;
+                }
+
+                .control-container {
+                    transition: all .2s ease-in-out;
+                }
+
+                .controls {
+                    display: none;
+                    opacity: 0;
+                    margin-right: 10px;
+                    transition: all .5s ease-in-out;
+                }
+
+                .run-all:hover {
+                    filter: brightness(135%);
+                }
+
+                .progress-ring__circle {
+                    transition: 0.35s stroke-dashoffset;
+                    transform: rotate(-90deg);
+                    transform-origin: 50% 50%;
+                    visibility: hidden;
+                }
+
+                .progress-text {
+                    position: relative;
+                    top: 0;
+                    left: -25px;
+                    font-size: 8px;
+                    vertical-align: middle;
+                    align-self: center;
+                }
+
+                .progress-text:hover, .progress-ring:hover, .progress-ring__circle:hover, .run-all {
+                    cursor: pointer;
+                }
+            </style>
+
+            <script>
+
+                //  var storedUsername = localStorage.getItem("username");
+                //  localStorage.setItem("username", storedUsername.value);
+            
+                function doStore(input, key) {
+
+                    if(input.type == "checkbox") {
+                        var checked = localStorage.getItem(key);
+
+                        if (checked == "yes") {
+                            localStorage.setItem(key, "no");
+                        }
+                        else {
+                            localStorage.setItem(key, "yes");
+                        }
+
+                        console.info("checked: ", localStorage.getItem(key));
+                    }
+                    else {
+                        console.info("value: ", input.value);
+                        localStorage.setItem(key, input.value);
+                    }
+                }
+
+                function persistInput(input) {
+                    var key = "input-" + input.id;
+                    var storedValue = localStorage.getItem(key);
+                
+                    console.info("Persisting input: ", input);
+                
+                    // if there is a stored value, use it
+                    if (storedValue) {
+
+                        if(input.type != "password") {
+                            console.info("restoring value ", storedValue, " for ", input);
+                        }
+
+                        if(input.type == "checkbox") {
+                            if(storedValue=="yes") {
+                                input.setAttribute("checked", "");
+                            }
+                            else {
+                                input.removeAttribute("checked");
+                            }
+                        }
+                        else {
+                            input.value = storedValue;
+                        }
+                    }
+                    // if there is no stored value, store the current value
+                    else {
+                        doStore(input, key);
+                    }
+
+                    input.addEventListener('input', function () {
+                        console.info("input changed: key = ", key, "; value = ", input);
+                        doStore(input, key);
+                    });
+                    }
+                
+                    persistInput(document.getElementById("username"));
+                    persistInput(document.getElementById("password"));
+
+                    persistInput(document.getElementById("loadFromStore"));
+
+                    persistInput(document.getElementById("baseUrl"));
+                    persistInput(document.getElementById("token"));
+
+                    persistInput(document.getElementById("useBinder"));
+                    persistInput(document.getElementById("savedSession"));
+                    persistInput(document.getElementById("repository"));
+                    persistInput(document.getElementById("ref"));
+                    persistInput(document.getElementById("binderUrl"));
+
+                    // init
+                    document.getElementById("connection_options").style.display = "none";
+
+                    function kernel_status_clicked() {
+                
+                        console.info("Clicked kernel status");
+
+                        document.getElementById("kernel-messages").style.display = "none";
+
+                        document.getElementById("connection_options").style.width = "750px";
+                        document.getElementById("connection_options").style.display = "block";
+                        //document.getElementById("header").style.marginLeft = "250px";
+
+                    }
+
+                    function closeNav() {
+
+                        document.getElementById("kernel-messages").style.display = "inline";
+
+                        document.getElementById("connection_options").style.width = "0";
+                        document.getElementById("connection_options").style.display = "none";
+                        //document.getElementById("header").style.marginLeft= "0";
+                    }
+
+                var prevScrollpos = window.pageYOffset;
+                var header = document.getElementById("site-header");
+                var boxShadow = header.style.boxShadow;
+
+                window.onscroll = function() {
+                    var currentScrollPos = window.pageYOffset;
+                    // detect scroll down
+                    if (prevScrollpos > currentScrollPos) {
+                        header.style.top = "0";
+                        header.style.boxShadow = boxShadow;
+                        prevScrollpos = currentScrollPos;
+                    } else if (prevScrollpos <= currentScrollPos) {
+                        header.style.top = "-55px";
+                        header.style.boxShadow = "none"
+                        prevScrollpos = currentScrollPos;
+                    }
+                }
+
+            let control_container = document.getElementById("control-container");
+            let controls = document.getElementById("controls");
+
+            control_container.addEventListener("mouseenter", function(event) {
+                controls.style.display = "inline";
+//                controls.style.visibility = "visible";
+                controls.style.opacity = 1;
+                console.info("mouseenter");
+            }, false);
+
+            control_container.addEventListener("mouseleave", function(event) {
+                // controls.style.visibility = "hidden";
+                // controls.style.display = "none";
+                controls.style.opacity = 0;
+                console.info("mouseleave");
+            }, false);
+
+            </script>
+            
+        </nav>
+
+    </div>
+
+</header><main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post">
+
+    <header class="post-header">
+        <h1 class="post-title">Imperative programs 🚧</h1>
+    </header>
+  
+    <header class="nav-header">
+    <p style="text-align:center;">
+        
+        
+        
+        <a alt="Part" href="/lia/part5/index/">Part</a>
+        &bullet;
+        
+        
+        <a alt="Source code" href="https://github.com/lclem/lia/blob/main/src/part5/Programs.lagda.md">Source</a>
+        
+        
+        
+    </p>
+</header>
+
+  
+    <div class="post-content">
+        <h2>Contents</h2>    
+        <ul id="toc" class="section-nav">
+<li class="toc-entry toc-h1"><a href="#syntax-of-programs">Syntax of programs</a></li>
+<li class="toc-entry toc-h1"><a href="#denotational-semantics">Denotational semantics</a>
+<ul>
+<li class="toc-entry toc-h2"><a href="#big-steps-operational-semantics">Big-steps operational semantics</a></li>
+<li class="toc-entry toc-h2"><a href="#exercise-do-c-while-b">Exercise: do: c while b</a></li>
+<li class="toc-entry toc-h2"><a href="#exercise-determinism">Exercise: Determinism</a></li>
+<li class="toc-entry toc-h2"><a href="#exercise-loop">Exercise: loop</a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h1"><a href="#small-steps-operational-semantics">Small-steps operational semantics</a>
+<ul>
+<li class="toc-entry toc-h2"><a href="#transitive-closure">Transitive closure ↝*</a></li>
+<li class="toc-entry toc-h2"><a href="#exercise-bigsmall">Exercise: big→small</a></li>
+<li class="toc-entry toc-h2"><a href="#from-small-to-big-steps-first-attempt">From small to big steps: first attempt</a></li>
+<li class="toc-entry toc-h2"><a href="#transitive-closure-with-gas">Transitive closure with gas</a></li>
+<li class="toc-entry toc-h2"><a href="#exercise-smallbig">Exercise: small→big</a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h1"><a href="#references">References</a></li>
+</ul><pre class="Agda"><a id="45" class="Symbol">{-#</a> <a id="49" class="Keyword">OPTIONS</a> <a id="57" class="Pragma">--allow-unsolved-metas</a> <a id="80" class="Symbol">#-}</a>
+<a id="84" class="Keyword">module</a> <a id="91" href="/lia/part5/Programs/" class="Module">part5.Programs</a> <a id="106" class="Keyword">where</a>
+<a id="112" class="Keyword">open</a> <a id="117" class="Keyword">import</a> <a id="124" href="/lia/part5/BExp/" class="Module">part5.BExp</a> <a id="135" class="Keyword">hiding</a> <a id="142" class="Symbol">(</a><a id="143" href="/lia/part5/AExp/#9588" class="Datatype Operator">_,_⇒_</a><a id="148" class="Symbol">;</a> <a id="150" href="/lia/part5/AExp/#9894" class="Function">⇒-det</a><a id="155" class="Symbol">;</a> <a id="157" href="/lia/part5/AExp/#3728" class="Function">↝*-trans</a><a id="165" class="Symbol">;</a> <a id="167" href="/lia/part5/AExp/#6376" class="Function Operator">_↝*⟨⟩_</a><a id="173" class="Symbol">;</a> <a id="175" href="/lia/part5/AExp/#6546" class="Function Operator">_↝⟨_⟩_</a><a id="181" class="Symbol">;</a> <a id="183" href="/lia/part5/AExp/#6443" class="Function Operator">_↝*⟨_⟩_</a><a id="190" class="Symbol">)</a> <a id="192" class="Keyword">public</a></pre>
+<pre class="Agda"><a id="208" class="Keyword">infixr</a> <a id="215" class="Number">20</a> <a id="218" href="/lia/part5/Programs/#437" class="InductiveConstructor Operator">_⨟_</a>
+<a id="222" class="Keyword">infix</a> <a id="228" class="Number">25</a> <a id="231" href="/lia/part5/Programs/#408" class="InductiveConstructor Operator">_≔_</a></pre>
+
+<h1 id="syntax-of-programs">
+<a class="anchor" href="#syntax-of-programs" aria-hidden="true"><span class="octicon octicon-link"></span></a>Syntax of programs</h1>
+
+<p>We define a simple imperative language, leveraging on arithmetic and
+boolean expressions defined above.</p>
+
+<pre class="Agda"><a id="372" class="Keyword">data</a> <a id="Cmd"></a><a id="377" href="/lia/part5/Programs/#377" class="Datatype">Cmd</a> <a id="381" class="Symbol">:</a> <a id="383" class="PrimitiveType">Set</a> <a id="387" class="Keyword">where</a>
+  <a id="Cmd.skip"></a><a id="395" href="/lia/part5/Programs/#395" class="InductiveConstructor">skip</a> <a id="400" class="Symbol">:</a> <a id="402" href="/lia/part5/Programs/#377" class="Datatype">Cmd</a>
+  <a id="Cmd._≔_"></a><a id="408" href="/lia/part5/Programs/#408" class="InductiveConstructor Operator">_≔_</a> <a id="412" class="Symbol">:</a> <a id="414" href="/lia/part5/AExp/#509" class="Function">VarName</a> <a id="422" class="Symbol">→</a> <a id="424" href="/lia/part5/AExp/#709" class="Datatype">AExp</a> <a id="429" class="Symbol">→</a> <a id="431" href="/lia/part5/Programs/#377" class="Datatype">Cmd</a>
+  <a id="Cmd._⨟_"></a><a id="437" href="/lia/part5/Programs/#437" class="InductiveConstructor Operator">_⨟_</a> <a id="441" class="Symbol">:</a> <a id="443" href="/lia/part5/Programs/#377" class="Datatype">Cmd</a> <a id="447" class="Symbol">→</a> <a id="449" href="/lia/part5/Programs/#377" class="Datatype">Cmd</a> <a id="453" class="Symbol">→</a> <a id="455" href="/lia/part5/Programs/#377" class="Datatype">Cmd</a>
+  <a id="Cmd.if_then_else_"></a><a id="461" href="/lia/part5/Programs/#461" class="InductiveConstructor Operator">if_then_else_</a> <a id="475" class="Symbol">:</a> <a id="477" href="/lia/part5/BExp/#368" class="Datatype">BExp</a> <a id="482" class="Symbol">→</a> <a id="484" href="/lia/part5/Programs/#377" class="Datatype">Cmd</a> <a id="488" class="Symbol">→</a> <a id="490" href="/lia/part5/Programs/#377" class="Datatype">Cmd</a> <a id="494" class="Symbol">→</a> <a id="496" href="/lia/part5/Programs/#377" class="Datatype">Cmd</a>
+  <a id="Cmd.while_do:_"></a><a id="502" href="/lia/part5/Programs/#502" class="InductiveConstructor Operator">while_do:_</a> <a id="513" class="Symbol">:</a> <a id="515" href="/lia/part5/BExp/#368" class="Datatype">BExp</a> <a id="520" class="Symbol">→</a> <a id="522" href="/lia/part5/Programs/#377" class="Datatype">Cmd</a> <a id="526" class="Symbol">→</a> <a id="528" href="/lia/part5/Programs/#377" class="Datatype">Cmd</a></pre>
+
+<p>For example, the following is a valid program (piece of syntax).</p>
+
+<pre class="Agda"><a id="loop"></a><a id="607" href="/lia/part5/Programs/#607" class="Function">loop</a> <a id="612" class="Symbol">:</a> <a id="614" href="/lia/part5/Programs/#377" class="Datatype">Cmd</a>
+<a id="618" href="/lia/part5/Programs/#607" class="Function">loop</a> <a id="623" class="Symbol">=</a> <a id="625" href="/lia/part5/Programs/#502" class="InductiveConstructor Operator">while</a> <a id="631" href="/lia/part5/BExp/#387" class="InductiveConstructor">tt</a> <a id="634" href="/lia/part5/Programs/#502" class="InductiveConstructor Operator">do:</a> <a id="638" href="/lia/part5/Programs/#395" class="InductiveConstructor">skip</a></pre>
+
+<p>(We added a colon in the syntax of <code class="language-plaintext highlighter-rouge">while_do:_</code> because <code class="language-plaintext highlighter-rouge">do</code> is a
+reserved keyword.)</p>
+
+<h1 id="denotational-semantics">
+<a class="anchor" href="#denotational-semantics" aria-hidden="true"><span class="octicon octicon-link"></span></a>Denotational semantics</h1>
+
+<p>It may come as a surprise, but it is not possible to define the
+semantics of imperative programs as an Agda function, because Agda
+allows only terminating (i.e., total) functions. On the other hand,
+imperative programs, such as <code class="language-plaintext highlighter-rouge">loop</code> above, may not terminate.</p>
+
+<p>Therefore, we resort to an operational semantics.</p>
+
+<h2 id="big-steps-operational-semantics">
+<a class="anchor" href="#big-steps-operational-semantics" aria-hidden="true"><span class="octicon octicon-link"></span></a>Big-steps operational semantics</h2>
+
+<p>We begin with the notion of state, which is the same as environments as
+of now, but needs not be.</p>
+
+<pre class="Agda"><a id="State"></a><a id="1212" href="/lia/part5/Programs/#1212" class="Function">State</a> <a id="1218" class="Symbol">=</a> <a id="1220" href="/lia/part5/AExp/#509" class="Function">VarName</a> <a id="1228" class="Symbol">→</a> <a id="1230" href="/lia/part0/Naturals/#247" class="Function">ℕ</a></pre>
+
+<p>The definition of the operational semantics of imperative programs
+follows a case analysis.</p>
+
+<pre class="Agda"><a id="1334" class="Keyword">infix</a> <a id="1340" class="Number">4</a> <a id="1342" href="/lia/part5/Programs/#1353" class="Datatype Operator">_,_⇒_</a>
+<a id="1348" class="Keyword">data</a> <a id="_,_⇒_"></a><a id="1353" href="/lia/part5/Programs/#1353" class="Datatype Operator">_,_⇒_</a> <a id="1359" class="Symbol">:</a> <a id="1361" href="/lia/part5/Programs/#377" class="Datatype">Cmd</a> <a id="1365" class="Symbol">→</a> <a id="1367" href="/lia/part5/Programs/#1212" class="Function">State</a> <a id="1373" class="Symbol">→</a> <a id="1375" href="/lia/part5/Programs/#1212" class="Function">State</a> <a id="1381" class="Symbol">→</a> <a id="1383" class="PrimitiveType">Set</a> <a id="1387" class="Keyword">where</a></pre>
+
+<h3 id="skip"><code class="language-plaintext highlighter-rouge">skip</code></h3>
+
+<p>The <code class="language-plaintext highlighter-rouge">skip</code> command terminates immediately without changing the state.</p>
+
+<pre class="Agda">  <a id="_,_⇒_.⇒-skip"></a><a id="1487" href="/lia/part5/Programs/#1487" class="InductiveConstructor">⇒-skip</a> <a id="1494" class="Symbol">:</a> <a id="1496" class="Symbol">∀</a> <a id="1498" class="Symbol">{</a><a id="1499" href="/lia/part5/Programs/#1499" class="Bound">s</a><a id="1500" class="Symbol">}</a> <a id="1502" class="Symbol">→</a>
+    <a id="1508" href="/lia/part5/Programs/#395" class="InductiveConstructor">skip</a> <a id="1513" href="/lia/part5/Programs/#1353" class="Datatype Operator">,</a> <a id="1515" href="/lia/part5/Programs/#1499" class="Bound">s</a> <a id="1517" href="/lia/part5/Programs/#1353" class="Datatype Operator">⇒</a> <a id="1519" href="/lia/part5/Programs/#1499" class="Bound">s</a></pre>
+
+<h3 id="x-e"><code class="language-plaintext highlighter-rouge">x ≔ e</code></h3>
+
+<p>The assignment command modifies the state by updating the value of <code class="language-plaintext highlighter-rouge">x</code>
+to the value of <code class="language-plaintext highlighter-rouge">e</code> in the current state.</p>
+
+<pre class="Agda">  <a id="_,_⇒_.⇒-assign"></a><a id="1659" href="/lia/part5/Programs/#1659" class="InductiveConstructor">⇒-assign</a> <a id="1668" class="Symbol">:</a> <a id="1670" class="Symbol">∀</a> <a id="1672" class="Symbol">{</a><a id="1673" href="/lia/part5/Programs/#1673" class="Bound">s</a> <a id="1675" href="/lia/part5/Programs/#1675" class="Bound">x</a> <a id="1677" href="/lia/part5/Programs/#1677" class="Bound">e</a><a id="1678" class="Symbol">}</a> <a id="1680" class="Symbol">→</a>
+    <a id="1686" href="/lia/part5/Programs/#1675" class="Bound">x</a> <a id="1688" href="/lia/part5/Programs/#408" class="InductiveConstructor Operator">≔</a> <a id="1690" href="/lia/part5/Programs/#1677" class="Bound">e</a> <a id="1692" href="/lia/part5/Programs/#1353" class="Datatype Operator">,</a> <a id="1694" href="/lia/part5/Programs/#1673" class="Bound">s</a> <a id="1696" href="/lia/part5/Programs/#1353" class="Datatype Operator">⇒</a> <a id="1698" href="/lia/part5/Programs/#1673" class="Bound">s</a> <a id="1700" href="/lia/part0/Functions/#568" class="Function Operator">[</a> <a id="1702" href="/lia/part5/Programs/#1675" class="Bound">x</a> <a id="1704" href="/lia/part0/Functions/#568" class="Function Operator">↦</a> <a id="1706" href="/lia/part5/AExp/#1618" class="Function Operator">⟦</a> <a id="1708" href="/lia/part5/Programs/#1677" class="Bound">e</a> <a id="1710" href="/lia/part5/AExp/#1618" class="Function Operator">⟧</a> <a id="1712" href="/lia/part5/Programs/#1673" class="Bound">s</a> <a id="1714" href="/lia/part0/Functions/#568" class="Function Operator">]</a></pre>
+
+<h3 id="c-d"><code class="language-plaintext highlighter-rouge">c ⨟ d</code></h3>
+
+<p>Sequencing two commands amounts to thread the state change.</p>
+
+<pre class="Agda">  <a id="_,_⇒_.⇒-seq"></a><a id="1801" href="/lia/part5/Programs/#1801" class="InductiveConstructor">⇒-seq</a> <a id="1807" class="Symbol">:</a> <a id="1809" class="Symbol">∀</a> <a id="1811" class="Symbol">{</a><a id="1812" href="/lia/part5/Programs/#1812" class="Bound">c</a> <a id="1814" href="/lia/part5/Programs/#1814" class="Bound">d</a> <a id="1816" href="/lia/part5/Programs/#1816" class="Bound">s</a> <a id="1818" href="/lia/part5/Programs/#1818" class="Bound">s'</a> <a id="1821" href="/lia/part5/Programs/#1821" class="Bound">s''</a><a id="1824" class="Symbol">}</a> <a id="1826" class="Symbol">→</a>
+    <a id="1832" href="/lia/part5/Programs/#1812" class="Bound">c</a> <a id="1834" href="/lia/part5/Programs/#1353" class="Datatype Operator">,</a> <a id="1836" href="/lia/part5/Programs/#1816" class="Bound">s</a> <a id="1838" href="/lia/part5/Programs/#1353" class="Datatype Operator">⇒</a> <a id="1840" href="/lia/part5/Programs/#1818" class="Bound">s'</a> <a id="1843" class="Symbol">→</a>
+    <a id="1849" href="/lia/part5/Programs/#1814" class="Bound">d</a> <a id="1851" href="/lia/part5/Programs/#1353" class="Datatype Operator">,</a> <a id="1853" href="/lia/part5/Programs/#1818" class="Bound">s'</a> <a id="1856" href="/lia/part5/Programs/#1353" class="Datatype Operator">⇒</a> <a id="1858" href="/lia/part5/Programs/#1821" class="Bound">s''</a> <a id="1862" class="Symbol">→</a>
+    <a id="1868" href="/lia/part5/Programs/#1812" class="Bound">c</a> <a id="1870" href="/lia/part5/Programs/#437" class="InductiveConstructor Operator">⨟</a> <a id="1872" href="/lia/part5/Programs/#1814" class="Bound">d</a> <a id="1874" href="/lia/part5/Programs/#1353" class="Datatype Operator">,</a> <a id="1876" href="/lia/part5/Programs/#1816" class="Bound">s</a> <a id="1878" href="/lia/part5/Programs/#1353" class="Datatype Operator">⇒</a> <a id="1880" href="/lia/part5/Programs/#1821" class="Bound">s''</a></pre>
+
+<h3 id="if-b-then-c-else-d"><code class="language-plaintext highlighter-rouge">if b then c else d</code></h3>
+
+<p>For conditionals, there are two cases to consider, depending on whether
+the condition evaluates to true or to false.</p>
+
+<pre class="Agda">  <a id="_,_⇒_.⇒-if-tt"></a><a id="2039" href="/lia/part5/Programs/#2039" class="InductiveConstructor">⇒-if-tt</a> <a id="2047" class="Symbol">:</a> <a id="2049" class="Symbol">∀</a> <a id="2051" class="Symbol">{</a><a id="2052" href="/lia/part5/Programs/#2052" class="Bound">b</a> <a id="2054" href="/lia/part5/Programs/#2054" class="Bound">s</a> <a id="2056" href="/lia/part5/Programs/#2056" class="Bound">c</a> <a id="2058" href="/lia/part5/Programs/#2058" class="Bound">s'</a> <a id="2061" href="/lia/part5/Programs/#2061" class="Bound">d</a><a id="2062" class="Symbol">}</a> <a id="2064" class="Symbol">→</a>
+    <a id="2070" href="/lia/part5/BExp/#667" class="Function Operator">⟦</a> <a id="2072" href="/lia/part5/Programs/#2052" class="Bound">b</a> <a id="2074" href="/lia/part5/BExp/#667" class="Function Operator">⟧B</a> <a id="2077" href="/lia/part5/Programs/#2054" class="Bound">s</a> <a id="2079" href="Agda.Builtin.Equality.html#151" class="Datatype Operator">≡</a> <a id="2081" href="/lia/part0/Booleans/#284" class="InductiveConstructor">tt</a> <a id="2084" class="Symbol">→</a>
+    <a id="2090" href="/lia/part5/Programs/#2056" class="Bound">c</a> <a id="2092" href="/lia/part5/Programs/#1353" class="Datatype Operator">,</a> <a id="2094" href="/lia/part5/Programs/#2054" class="Bound">s</a> <a id="2096" href="/lia/part5/Programs/#1353" class="Datatype Operator">⇒</a> <a id="2098" href="/lia/part5/Programs/#2058" class="Bound">s'</a> <a id="2101" class="Symbol">→</a>
+    <a id="2107" href="/lia/part5/Programs/#461" class="InductiveConstructor Operator">if</a> <a id="2110" href="/lia/part5/Programs/#2052" class="Bound">b</a> <a id="2112" href="/lia/part5/Programs/#461" class="InductiveConstructor Operator">then</a> <a id="2117" href="/lia/part5/Programs/#2056" class="Bound">c</a> <a id="2119" href="/lia/part5/Programs/#461" class="InductiveConstructor Operator">else</a> <a id="2124" href="/lia/part5/Programs/#2061" class="Bound">d</a> <a id="2126" href="/lia/part5/Programs/#1353" class="Datatype Operator">,</a> <a id="2128" href="/lia/part5/Programs/#2054" class="Bound">s</a> <a id="2130" href="/lia/part5/Programs/#1353" class="Datatype Operator">⇒</a> <a id="2132" href="/lia/part5/Programs/#2058" class="Bound">s'</a>
+    
+  <a id="_,_⇒_.⇒-if-ff"></a><a id="2142" href="/lia/part5/Programs/#2142" class="InductiveConstructor">⇒-if-ff</a> <a id="2150" class="Symbol">:</a> <a id="2152" class="Symbol">∀</a> <a id="2154" class="Symbol">{</a><a id="2155" href="/lia/part5/Programs/#2155" class="Bound">b</a> <a id="2157" href="/lia/part5/Programs/#2157" class="Bound">s</a> <a id="2159" href="/lia/part5/Programs/#2159" class="Bound">c</a> <a id="2161" href="/lia/part5/Programs/#2161" class="Bound">s'</a> <a id="2164" href="/lia/part5/Programs/#2164" class="Bound">d</a><a id="2165" class="Symbol">}</a> <a id="2167" class="Symbol">→</a>
+    <a id="2173" href="/lia/part5/BExp/#667" class="Function Operator">⟦</a> <a id="2175" href="/lia/part5/Programs/#2155" class="Bound">b</a> <a id="2177" href="/lia/part5/BExp/#667" class="Function Operator">⟧B</a> <a id="2180" href="/lia/part5/Programs/#2157" class="Bound">s</a> <a id="2182" href="Agda.Builtin.Equality.html#151" class="Datatype Operator">≡</a> <a id="2184" href="/lia/part0/Booleans/#275" class="InductiveConstructor">ff</a> <a id="2187" class="Symbol">→</a>
+    <a id="2193" href="/lia/part5/Programs/#2164" class="Bound">d</a> <a id="2195" href="/lia/part5/Programs/#1353" class="Datatype Operator">,</a> <a id="2197" href="/lia/part5/Programs/#2157" class="Bound">s</a> <a id="2199" href="/lia/part5/Programs/#1353" class="Datatype Operator">⇒</a> <a id="2201" href="/lia/part5/Programs/#2161" class="Bound">s'</a> <a id="2204" class="Symbol">→</a>
+    <a id="2210" href="/lia/part5/Programs/#461" class="InductiveConstructor Operator">if</a> <a id="2213" href="/lia/part5/Programs/#2155" class="Bound">b</a> <a id="2215" href="/lia/part5/Programs/#461" class="InductiveConstructor Operator">then</a> <a id="2220" href="/lia/part5/Programs/#2159" class="Bound">c</a> <a id="2222" href="/lia/part5/Programs/#461" class="InductiveConstructor Operator">else</a> <a id="2227" href="/lia/part5/Programs/#2164" class="Bound">d</a> <a id="2229" href="/lia/part5/Programs/#1353" class="Datatype Operator">,</a> <a id="2231" href="/lia/part5/Programs/#2157" class="Bound">s</a> <a id="2233" href="/lia/part5/Programs/#1353" class="Datatype Operator">⇒</a> <a id="2235" href="/lia/part5/Programs/#2161" class="Bound">s'</a></pre>
+
+<h3 id="while-b-do-c"><code class="language-plaintext highlighter-rouge">while b do: c</code></h3>
+
+<p>Similarly, for while loops there are two cases to consider.</p>
+
+<pre class="Agda">  <a id="_,_⇒_.⇒-while-tt"></a><a id="2331" href="/lia/part5/Programs/#2331" class="InductiveConstructor">⇒-while-tt</a> <a id="2342" class="Symbol">:</a> <a id="2344" class="Symbol">∀</a> <a id="2346" class="Symbol">{</a><a id="2347" href="/lia/part5/Programs/#2347" class="Bound">b</a> <a id="2349" href="/lia/part5/Programs/#2349" class="Bound">s</a> <a id="2351" href="/lia/part5/Programs/#2351" class="Bound">c</a> <a id="2353" href="/lia/part5/Programs/#2353" class="Bound">s'</a> <a id="2356" href="/lia/part5/Programs/#2356" class="Bound">s''</a><a id="2359" class="Symbol">}</a> <a id="2361" class="Symbol">→</a>
+    <a id="2367" href="/lia/part5/BExp/#667" class="Function Operator">⟦</a> <a id="2369" href="/lia/part5/Programs/#2347" class="Bound">b</a> <a id="2371" href="/lia/part5/BExp/#667" class="Function Operator">⟧B</a> <a id="2374" href="/lia/part5/Programs/#2349" class="Bound">s</a> <a id="2376" href="Agda.Builtin.Equality.html#151" class="Datatype Operator">≡</a> <a id="2378" href="/lia/part0/Booleans/#284" class="InductiveConstructor">tt</a> <a id="2381" class="Symbol">→</a>
+    <a id="2387" href="/lia/part5/Programs/#2351" class="Bound">c</a> <a id="2389" href="/lia/part5/Programs/#1353" class="Datatype Operator">,</a> <a id="2391" href="/lia/part5/Programs/#2349" class="Bound">s</a> <a id="2393" href="/lia/part5/Programs/#1353" class="Datatype Operator">⇒</a> <a id="2395" href="/lia/part5/Programs/#2353" class="Bound">s'</a> <a id="2398" class="Symbol">→</a>
+    <a id="2404" href="/lia/part5/Programs/#502" class="InductiveConstructor Operator">while</a> <a id="2410" href="/lia/part5/Programs/#2347" class="Bound">b</a> <a id="2412" href="/lia/part5/Programs/#502" class="InductiveConstructor Operator">do:</a> <a id="2416" href="/lia/part5/Programs/#2351" class="Bound">c</a> <a id="2418" href="/lia/part5/Programs/#1353" class="Datatype Operator">,</a> <a id="2420" href="/lia/part5/Programs/#2353" class="Bound">s'</a> <a id="2423" href="/lia/part5/Programs/#1353" class="Datatype Operator">⇒</a> <a id="2425" href="/lia/part5/Programs/#2356" class="Bound">s''</a> <a id="2429" class="Symbol">→</a>
+    <a id="2435" href="/lia/part5/Programs/#502" class="InductiveConstructor Operator">while</a> <a id="2441" href="/lia/part5/Programs/#2347" class="Bound">b</a> <a id="2443" href="/lia/part5/Programs/#502" class="InductiveConstructor Operator">do:</a> <a id="2447" href="/lia/part5/Programs/#2351" class="Bound">c</a> <a id="2449" href="/lia/part5/Programs/#1353" class="Datatype Operator">,</a> <a id="2451" href="/lia/part5/Programs/#2349" class="Bound">s</a> <a id="2453" href="/lia/part5/Programs/#1353" class="Datatype Operator">⇒</a> <a id="2455" href="/lia/part5/Programs/#2356" class="Bound">s''</a>
+  
+  <a id="_,_⇒_.⇒-while-ff"></a><a id="2464" href="/lia/part5/Programs/#2464" class="InductiveConstructor">⇒-while-ff</a> <a id="2475" class="Symbol">:</a> <a id="2477" class="Symbol">∀</a> <a id="2479" class="Symbol">{</a><a id="2480" href="/lia/part5/Programs/#2480" class="Bound">b</a> <a id="2482" href="/lia/part5/Programs/#2482" class="Bound">s</a> <a id="2484" href="/lia/part5/Programs/#2484" class="Bound">c</a><a id="2485" class="Symbol">}</a> <a id="2487" class="Symbol">→</a>
+    <a id="2493" href="/lia/part5/BExp/#667" class="Function Operator">⟦</a> <a id="2495" href="/lia/part5/Programs/#2480" class="Bound">b</a> <a id="2497" href="/lia/part5/BExp/#667" class="Function Operator">⟧B</a> <a id="2500" href="/lia/part5/Programs/#2482" class="Bound">s</a> <a id="2502" href="Agda.Builtin.Equality.html#151" class="Datatype Operator">≡</a> <a id="2504" href="/lia/part0/Booleans/#275" class="InductiveConstructor">ff</a> <a id="2507" class="Symbol">→</a>
+    <a id="2513" href="/lia/part5/Programs/#502" class="InductiveConstructor Operator">while</a> <a id="2519" href="/lia/part5/Programs/#2480" class="Bound">b</a> <a id="2521" href="/lia/part5/Programs/#502" class="InductiveConstructor Operator">do:</a> <a id="2525" href="/lia/part5/Programs/#2484" class="Bound">c</a> <a id="2527" href="/lia/part5/Programs/#1353" class="Datatype Operator">,</a> <a id="2529" href="/lia/part5/Programs/#2482" class="Bound">s</a> <a id="2531" href="/lia/part5/Programs/#1353" class="Datatype Operator">⇒</a> <a id="2533" href="/lia/part5/Programs/#2482" class="Bound">s</a></pre>
+
+<p>This concludes the definition of the operational semantics <code class="language-plaintext highlighter-rouge">c , s ⇒ s'</code>.</p>
+
+<h2 id="exercise-do-c-while-b">
+<a class="anchor" href="#exercise-do-c-while-b" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Exercise</strong>: <code class="language-plaintext highlighter-rouge">do: c while b</code>
+</h2>
+
+<p>Extend the syntax and semantics of imperative programs by adding a new
+construct</p>
+
+<pre class="Agda"><a id="2735" class="Comment">-- do: c while b</a></pre>
+
+<p>where <code class="language-plaintext highlighter-rouge">c</code> is a command and <code class="language-plaintext highlighter-rouge">b</code> a boolean expression. The informal
+semantics of the do-while construct is to first execute <code class="language-plaintext highlighter-rouge">c</code>, and then
+evaluate the guard <code class="language-plaintext highlighter-rouge">b</code>: If it evaluates to true, then we repeat the
+process, otherwise we exit the loop.</p>
+
+<h2 id="exercise-determinism">
+<a class="anchor" href="#exercise-determinism" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Exercise</strong>: Determinism</h2>
+
+<p>Since we cannot encode the semantics of imperative programs as a
+function, we immediately lose some properties which are for free for
+functions.</p>
+
+<p>One example is deterministic evaluation. Consequently, we need to prove
+separately that evaluation of programs is deterministic.</p>
+
+<p>Show that evaluation of imperative programs is deterministic.</p>
+
+<pre class="Agda"><a id="3372" class="Comment">-- convenient to rule out some impossible cases.</a>
+<a id="false≡true"></a><a id="3421" href="/lia/part5/Programs/#3421" class="Function">false≡true</a> <a id="3432" class="Symbol">:</a> <a id="3434" class="Symbol">{</a><a id="3435" href="/lia/part5/Programs/#3435" class="Bound">A</a> <a id="3437" class="Symbol">:</a> <a id="3439" class="PrimitiveType">Set</a><a id="3442" class="Symbol">}</a> <a id="3444" class="Symbol">→</a> <a id="3446" class="UnsolvedMeta InductiveConstructor">tt</a> <a id="3449" href="Agda.Builtin.Equality.html#151" class="UnsolvedMeta Datatype Operator">≡</a> <a id="3451" class="UnsolvedMeta InductiveConstructor">ff</a> <a id="3454" class="Symbol">→</a> <a id="3456" href="/lia/part5/Programs/#3435" class="Bound">A</a>
+<a id="3458" href="/lia/part5/Programs/#3421" class="Function">false≡true</a> <a id="3469" class="UnsolvedConstraint Symbol">()</a>
+
+<a id="⇒-det"></a><a id="3473" href="/lia/part5/Programs/#3473" class="Function">⇒-det</a> <a id="3479" class="Symbol">:</a> <a id="3481" class="Symbol">∀</a> <a id="3483" class="Symbol">{</a><a id="3484" href="/lia/part5/Programs/#3484" class="Bound">c</a> <a id="3486" href="/lia/part5/Programs/#3486" class="Bound">s</a> <a id="3488" href="/lia/part5/Programs/#3488" class="Bound">s'</a> <a id="3491" href="/lia/part5/Programs/#3491" class="Bound">s''</a><a id="3494" class="Symbol">}</a> <a id="3496" class="Symbol">→</a> <a id="3498" href="/lia/part5/Programs/#3484" class="Bound">c</a> <a id="3500" href="/lia/part5/Programs/#1353" class="Datatype Operator">,</a> <a id="3502" href="/lia/part5/Programs/#3486" class="Bound">s</a> <a id="3504" href="/lia/part5/Programs/#1353" class="Datatype Operator">⇒</a> <a id="3506" href="/lia/part5/Programs/#3488" class="Bound">s'</a> <a id="3509" class="Symbol">→</a> <a id="3511" href="/lia/part5/Programs/#3484" class="Bound">c</a> <a id="3513" href="/lia/part5/Programs/#1353" class="Datatype Operator">,</a> <a id="3515" href="/lia/part5/Programs/#3486" class="Bound">s</a> <a id="3517" href="/lia/part5/Programs/#1353" class="Datatype Operator">⇒</a> <a id="3519" href="/lia/part5/Programs/#3491" class="Bound">s''</a> <a id="3523" class="Symbol">→</a> <a id="3525" href="/lia/part5/Programs/#3488" class="Bound">s'</a> <a id="3528" href="Agda.Builtin.Equality.html#151" class="Datatype Operator">≡</a> <a id="3530" href="/lia/part5/Programs/#3491" class="Bound">s''</a>
+<a id="3534" href="/lia/part5/Programs/#3473" class="Function">⇒-det</a> <a id="3540" href="/lia/part5/Programs/#1487" class="InductiveConstructor">⇒-skip</a> <a id="3547" href="/lia/part5/Programs/#1487" class="InductiveConstructor">⇒-skip</a> <a id="3554" class="Symbol">=</a> <a id="3556" class="Symbol">{!   !}</a>
+<a id="3564" href="/lia/part5/Programs/#3473" class="Function">⇒-det</a> <a id="3570" href="/lia/part5/Programs/#1659" class="InductiveConstructor">⇒-assign</a> <a id="3579" href="/lia/part5/Programs/#1659" class="InductiveConstructor">⇒-assign</a> <a id="3588" class="Symbol">=</a> <a id="3590" class="Symbol">{!   !}</a>
+<a id="3598" href="/lia/part5/Programs/#3473" class="Function">⇒-det</a> <a id="3604" class="Symbol">(</a><a id="3605" href="/lia/part5/Programs/#1801" class="InductiveConstructor">⇒-seq</a> <a id="3611" href="/lia/part5/Programs/#3611" class="Bound">der1</a> <a id="3616" href="/lia/part5/Programs/#3616" class="Bound">der2</a><a id="3620" class="Symbol">)</a> <a id="3622" class="Symbol">(</a><a id="3623" href="/lia/part5/Programs/#1801" class="InductiveConstructor">⇒-seq</a> <a id="3629" href="/lia/part5/Programs/#3629" class="Bound">der3</a> <a id="3634" href="/lia/part5/Programs/#3634" class="Bound">der4</a><a id="3638" class="Symbol">)</a> <a id="3640" class="Symbol">=</a> <a id="3642" class="Symbol">{! ⇒-det der1 der2 !}</a>
+<a id="3664" href="/lia/part5/Programs/#3473" class="Function">⇒-det</a> <a id="3670" class="Symbol">(</a><a id="3671" href="/lia/part5/Programs/#2039" class="InductiveConstructor">⇒-if-tt</a> <a id="3679" class="Symbol">_</a> <a id="3681" href="/lia/part5/Programs/#3681" class="Bound">der1</a><a id="3685" class="Symbol">)</a> <a id="3687" class="Symbol">(</a><a id="3688" href="/lia/part5/Programs/#2039" class="InductiveConstructor">⇒-if-tt</a> <a id="3696" class="Symbol">_</a> <a id="3698" href="/lia/part5/Programs/#3698" class="Bound">der2</a><a id="3702" class="Symbol">)</a> <a id="3704" class="Symbol">=</a> <a id="3706" class="Symbol">{!   !}</a>
+<a id="3714" href="/lia/part5/Programs/#3473" class="Function">⇒-det</a> <a id="3720" class="Symbol">(</a><a id="3721" href="/lia/part5/Programs/#2039" class="InductiveConstructor">⇒-if-tt</a> <a id="3729" href="/lia/part5/Programs/#3729" class="Bound">x</a> <a id="3731" class="Symbol">_)</a> <a id="3734" class="Symbol">(</a><a id="3735" href="/lia/part5/Programs/#2142" class="InductiveConstructor">⇒-if-ff</a> <a id="3743" href="/lia/part5/Programs/#3743" class="Bound">y</a> <a id="3745" class="Symbol">_)</a> <a id="3748" class="Symbol">=</a> <a id="3750" class="Symbol">{!   !}</a>
+<a id="3758" href="/lia/part5/Programs/#3473" class="Function">⇒-det</a> <a id="3764" class="Symbol">(</a><a id="3765" href="/lia/part5/Programs/#2142" class="InductiveConstructor">⇒-if-ff</a> <a id="3773" href="/lia/part5/Programs/#3773" class="Bound">x</a> <a id="3775" class="Symbol">_)</a> <a id="3778" class="Symbol">(</a><a id="3779" href="/lia/part5/Programs/#2039" class="InductiveConstructor">⇒-if-tt</a> <a id="3787" href="/lia/part5/Programs/#3787" class="Bound">y</a> <a id="3789" class="Symbol">_)</a> <a id="3792" class="Symbol">=</a> <a id="3794" class="Symbol">{!   !}</a>
+<a id="3802" href="/lia/part5/Programs/#3473" class="Function">⇒-det</a> <a id="3808" class="Symbol">(</a><a id="3809" href="/lia/part5/Programs/#2142" class="InductiveConstructor">⇒-if-ff</a> <a id="3817" class="Symbol">_</a> <a id="3819" href="/lia/part5/Programs/#3819" class="Bound">der1</a><a id="3823" class="Symbol">)</a> <a id="3825" class="Symbol">(</a><a id="3826" href="/lia/part5/Programs/#2142" class="InductiveConstructor">⇒-if-ff</a> <a id="3834" class="Symbol">_</a> <a id="3836" href="/lia/part5/Programs/#3836" class="Bound">der2</a><a id="3840" class="Symbol">)</a> <a id="3842" class="Symbol">=</a> <a id="3844" class="Symbol">{!   !}</a>
+<a id="3852" href="/lia/part5/Programs/#3473" class="Function">⇒-det</a> <a id="3858" class="Symbol">(</a><a id="3859" href="/lia/part5/Programs/#2331" class="InductiveConstructor">⇒-while-tt</a> <a id="3870" href="/lia/part5/Programs/#3870" class="Bound">x</a> <a id="3872" href="/lia/part5/Programs/#3872" class="Bound">der1</a> <a id="3877" href="/lia/part5/Programs/#3877" class="Bound">der2</a><a id="3881" class="Symbol">)</a> <a id="3883" class="Symbol">(</a><a id="3884" href="/lia/part5/Programs/#2331" class="InductiveConstructor">⇒-while-tt</a> <a id="3895" href="/lia/part5/Programs/#3895" class="Bound">y</a> <a id="3897" href="/lia/part5/Programs/#3897" class="Bound">der3</a> <a id="3902" href="/lia/part5/Programs/#3902" class="Bound">der4</a><a id="3906" class="Symbol">)</a> <a id="3908" class="Symbol">=</a> <a id="3910" class="Symbol">{!   !}</a>
+<a id="3918" href="/lia/part5/Programs/#3473" class="Function">⇒-det</a> <a id="3924" class="Symbol">(</a><a id="3925" href="/lia/part5/Programs/#2331" class="InductiveConstructor">⇒-while-tt</a> <a id="3936" href="/lia/part5/Programs/#3936" class="Bound">x</a> <a id="3938" class="Symbol">_</a> <a id="3940" class="Symbol">_)</a> <a id="3943" class="Symbol">(</a><a id="3944" href="/lia/part5/Programs/#2464" class="InductiveConstructor">⇒-while-ff</a> <a id="3955" href="/lia/part5/Programs/#3955" class="Bound">y</a><a id="3956" class="Symbol">)</a> <a id="3958" class="Symbol">=</a> <a id="3960" class="Symbol">{!   !}</a>
+<a id="3968" href="/lia/part5/Programs/#3473" class="Function">⇒-det</a> <a id="3974" class="Symbol">(</a><a id="3975" href="/lia/part5/Programs/#2464" class="InductiveConstructor">⇒-while-ff</a> <a id="3986" href="/lia/part5/Programs/#3986" class="Bound">x</a><a id="3987" class="Symbol">)</a> <a id="3989" class="Symbol">(</a><a id="3990" href="/lia/part5/Programs/#2331" class="InductiveConstructor">⇒-while-tt</a> <a id="4001" href="/lia/part5/Programs/#4001" class="Bound">y</a> <a id="4003" class="Symbol">_</a> <a id="4005" class="Symbol">_)</a> <a id="4008" class="Symbol">=</a> <a id="4010" class="Symbol">{!   !}</a>
+<a id="4018" href="/lia/part5/Programs/#3473" class="Function">⇒-det</a> <a id="4024" class="Symbol">(</a><a id="4025" href="/lia/part5/Programs/#2464" class="InductiveConstructor">⇒-while-ff</a> <a id="4036" class="Symbol">_)</a> <a id="4039" class="Symbol">(</a><a id="4040" href="/lia/part5/Programs/#2464" class="InductiveConstructor">⇒-while-ff</a> <a id="4051" class="Symbol">_)</a> <a id="4054" class="Symbol">=</a> <a id="4056" class="Symbol">{!   !}</a></pre>
+
+<h2 id="exercise-loop">
+<a class="anchor" href="#exercise-loop" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Exercise</strong>: <code class="language-plaintext highlighter-rouge">loop</code>
+</h2>
+
+<p>Show that the program <code class="language-plaintext highlighter-rouge">loop</code> introduced above never stops.</p>
+
+<pre class="Agda"><a id="loop-⊥"></a><a id="4158" href="/lia/part5/Programs/#4158" class="Function">loop-⊥</a> <a id="4165" class="Symbol">:</a> <a id="4167" class="Symbol">∀</a> <a id="4169" class="Symbol">{</a><a id="4170" href="/lia/part5/Programs/#4170" class="Bound">s</a> <a id="4172" href="/lia/part5/Programs/#4172" class="Bound">s'</a><a id="4174" class="Symbol">}</a> <a id="4176" class="Symbol">→</a> <a id="4178" href="/lia/part0/Logic/#2336" class="Function Operator">~</a> <a id="4180" class="Symbol">(</a><a id="4181" href="/lia/part5/Programs/#607" class="Function">loop</a> <a id="4186" href="/lia/part5/Programs/#1353" class="Datatype Operator">,</a> <a id="4188" href="/lia/part5/Programs/#4170" class="Bound">s</a> <a id="4190" href="/lia/part5/Programs/#1353" class="Datatype Operator">⇒</a> <a id="4192" href="/lia/part5/Programs/#4172" class="Bound">s'</a><a id="4194" class="Symbol">)</a>
+<a id="4196" href="/lia/part5/Programs/#4158" class="Function">loop-⊥</a> <a id="4203" class="Symbol">=</a> <a id="4205" class="Symbol">{!   !}</a></pre>
+
+<h1 id="small-steps-operational-semantics">
+<a class="anchor" href="#small-steps-operational-semantics" aria-hidden="true"><span class="octicon octicon-link"></span></a>Small-steps operational semantics</h1>
+
+<p>We provide an alternative small-steps semantics for imperative programs.</p>
+
+<h3 id="configurations">Configurations</h3>
+
+<pre class="Agda"><a id="Conf"></a><a id="4354" href="/lia/part5/Programs/#4354" class="Function">Conf</a> <a id="4359" class="Symbol">=</a> <a id="4361" href="/lia/part5/Programs/#377" class="Datatype">Cmd</a> <a id="4365" href="/lia/part0/Logic/#1770" class="Record Operator">×</a> <a id="4367" href="/lia/part5/Programs/#1212" class="Function">State</a> <a id="4373" class="Comment">-- Cartesian product</a></pre>
+
+<p>We treat configurations of the form <code class="language-plaintext highlighter-rouge">skip , s</code> as final, hence there is
+no rule for the <code class="language-plaintext highlighter-rouge">skip</code> command.</p>
+
+<pre class="Agda"><a id="4508" class="Keyword">infix</a> <a id="4514" class="Number">3</a> <a id="4516" href="/lia/part5/Programs/#4525" class="Datatype Operator">_↝_</a>
+<a id="4520" class="Keyword">data</a> <a id="_↝_"></a><a id="4525" href="/lia/part5/Programs/#4525" class="Datatype Operator">_↝_</a> <a id="4529" class="Symbol">:</a> <a id="4531" href="/lia/part5/Programs/#4354" class="Function">Conf</a> <a id="4536" class="Symbol">→</a> <a id="4538" href="/lia/part5/Programs/#4354" class="Function">Conf</a> <a id="4543" class="Symbol">→</a> <a id="4545" class="PrimitiveType">Set</a> <a id="4549" class="Keyword">where</a></pre>
+
+<h3 id="x-e-1"><code class="language-plaintext highlighter-rouge">x ≔ e</code></h3>
+
+<p>In the rule for assignment, we just evaluate the arithmetic expression
+<code class="language-plaintext highlighter-rouge">e</code> and update the state accordingly.</p>
+
+<p>(We could have used the operational semantics of arithmetic expressions
+here, but we avoid it for simplicity. A similar remark applies to
+boolean expressions below.)</p>
+
+<pre class="Agda">  <a id="_↝_.↝-assign"></a><a id="4856" href="/lia/part5/Programs/#4856" class="InductiveConstructor">↝-assign</a> <a id="4865" class="Symbol">:</a> <a id="4867" class="Symbol">∀</a> <a id="4869" class="Symbol">{</a><a id="4870" href="/lia/part5/Programs/#4870" class="Bound">x</a> <a id="4872" href="/lia/part5/Programs/#4872" class="Bound">e</a> <a id="4874" href="/lia/part5/Programs/#4874" class="Bound">s</a><a id="4875" class="Symbol">}</a> <a id="4877" class="Symbol">→</a>
+    <a id="4883" href="/lia/part5/Programs/#4870" class="Bound">x</a> <a id="4885" href="/lia/part5/Programs/#408" class="InductiveConstructor Operator">≔</a> <a id="4887" href="/lia/part5/Programs/#4872" class="Bound">e</a> <a id="4889" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="4891" href="/lia/part5/Programs/#4874" class="Bound">s</a> <a id="4893" href="/lia/part5/Programs/#4525" class="Datatype Operator">↝</a> <a id="4895" href="/lia/part5/Programs/#395" class="InductiveConstructor">skip</a> <a id="4900" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="4902" href="/lia/part5/Programs/#4874" class="Bound">s</a> <a id="4904" href="/lia/part0/Functions/#568" class="Function Operator">[</a> <a id="4906" href="/lia/part5/Programs/#4870" class="Bound">x</a> <a id="4908" href="/lia/part0/Functions/#568" class="Function Operator">↦</a> <a id="4910" href="/lia/part5/AExp/#1618" class="Function Operator">⟦</a> <a id="4912" href="/lia/part5/Programs/#4872" class="Bound">e</a> <a id="4914" href="/lia/part5/AExp/#1618" class="Function Operator">⟧</a> <a id="4916" href="/lia/part5/Programs/#4874" class="Bound">s</a> <a id="4918" href="/lia/part0/Functions/#568" class="Function Operator">]</a></pre>
+
+<h3 id="c-d-1"><code class="language-plaintext highlighter-rouge">c ⨟ d</code></h3>
+
+<p>In the case of sequencing <code class="language-plaintext highlighter-rouge">c ⨟ d</code>, where are two cases.</p>
+
+<p>In the case <code class="language-plaintext highlighter-rouge">↝-seq-left</code>, we evaluate one step of <code class="language-plaintext highlighter-rouge">c</code>. In the case
+<code class="language-plaintext highlighter-rouge">↝-seq-right</code>, <code class="language-plaintext highlighter-rouge">c</code> has finished and we continue with <code class="language-plaintext highlighter-rouge">d</code>.</p>
+
+<pre class="Agda">  <a id="_↝_.↝-seq-left"></a><a id="5127" href="/lia/part5/Programs/#5127" class="InductiveConstructor">↝-seq-left</a> <a id="5138" class="Symbol">:</a> <a id="5140" class="Symbol">∀</a> <a id="5142" class="Symbol">{</a><a id="5143" href="/lia/part5/Programs/#5143" class="Bound">c</a> <a id="5145" href="/lia/part5/Programs/#5145" class="Bound">s</a> <a id="5147" href="/lia/part5/Programs/#5147" class="Bound">c'</a> <a id="5150" href="/lia/part5/Programs/#5150" class="Bound">s'</a> <a id="5153" href="/lia/part5/Programs/#5153" class="Bound">d</a><a id="5154" class="Symbol">}</a> <a id="5156" class="Symbol">→</a>
+    <a id="5162" href="/lia/part5/Programs/#5143" class="Bound">c</a> <a id="5164" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="5166" href="/lia/part5/Programs/#5145" class="Bound">s</a> <a id="5168" href="/lia/part5/Programs/#4525" class="Datatype Operator">↝</a> <a id="5170" href="/lia/part5/Programs/#5147" class="Bound">c'</a> <a id="5173" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="5175" href="/lia/part5/Programs/#5150" class="Bound">s'</a> <a id="5178" class="Symbol">→</a>
+    <a id="5184" href="/lia/part5/Programs/#5143" class="Bound">c</a> <a id="5186" href="/lia/part5/Programs/#437" class="InductiveConstructor Operator">⨟</a> <a id="5188" href="/lia/part5/Programs/#5153" class="Bound">d</a> <a id="5190" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="5192" href="/lia/part5/Programs/#5145" class="Bound">s</a> <a id="5194" href="/lia/part5/Programs/#4525" class="Datatype Operator">↝</a> <a id="5196" href="/lia/part5/Programs/#5147" class="Bound">c'</a> <a id="5199" href="/lia/part5/Programs/#437" class="InductiveConstructor Operator">⨟</a> <a id="5201" href="/lia/part5/Programs/#5153" class="Bound">d</a> <a id="5203" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="5205" href="/lia/part5/Programs/#5150" class="Bound">s'</a>
+    
+  <a id="_↝_.↝-seq-right"></a><a id="5215" href="/lia/part5/Programs/#5215" class="InductiveConstructor">↝-seq-right</a> <a id="5227" class="Symbol">:</a> <a id="5229" class="Symbol">∀</a> <a id="5231" class="Symbol">{</a><a id="5232" href="/lia/part5/Programs/#5232" class="Bound">d</a> <a id="5234" href="/lia/part5/Programs/#5234" class="Bound">s</a><a id="5235" class="Symbol">}</a> <a id="5237" class="Symbol">→</a>
+    <a id="5243" href="/lia/part5/Programs/#395" class="InductiveConstructor">skip</a> <a id="5248" href="/lia/part5/Programs/#437" class="InductiveConstructor Operator">⨟</a> <a id="5250" href="/lia/part5/Programs/#5232" class="Bound">d</a> <a id="5252" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="5254" href="/lia/part5/Programs/#5234" class="Bound">s</a> <a id="5256" href="/lia/part5/Programs/#4525" class="Datatype Operator">↝</a> <a id="5258" href="/lia/part5/Programs/#5232" class="Bound">d</a> <a id="5260" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="5262" href="/lia/part5/Programs/#5234" class="Bound">s</a></pre>
+
+<h3 id="if-b-then-c-else-d-1"><code class="language-plaintext highlighter-rouge">if b then c else d</code></h3>
+
+<p>The conditional has two symmetric cases, depending on whether the
+condition evaluates to <code class="language-plaintext highlighter-rouge">true</code> or <code class="language-plaintext highlighter-rouge">false</code>.</p>
+
+<pre class="Agda">  <a id="_↝_.↝-if-tt"></a><a id="5410" href="/lia/part5/Programs/#5410" class="InductiveConstructor">↝-if-tt</a> <a id="5418" class="Symbol">:</a> <a id="5420" class="Symbol">∀</a> <a id="5422" class="Symbol">{</a><a id="5423" href="/lia/part5/Programs/#5423" class="Bound">b</a> <a id="5425" href="/lia/part5/Programs/#5425" class="Bound">s</a> <a id="5427" href="/lia/part5/Programs/#5427" class="Bound">c</a> <a id="5429" href="/lia/part5/Programs/#5429" class="Bound">d</a><a id="5430" class="Symbol">}</a> <a id="5432" class="Symbol">→</a>
+    <a id="5438" href="/lia/part5/BExp/#667" class="Function Operator">⟦</a> <a id="5440" href="/lia/part5/Programs/#5423" class="Bound">b</a> <a id="5442" href="/lia/part5/BExp/#667" class="Function Operator">⟧B</a> <a id="5445" href="/lia/part5/Programs/#5425" class="Bound">s</a> <a id="5447" href="Agda.Builtin.Equality.html#151" class="Datatype Operator">≡</a> <a id="5449" href="/lia/part0/Booleans/#284" class="InductiveConstructor">tt</a> <a id="5452" class="Symbol">→</a>
+    <a id="5458" href="/lia/part5/Programs/#461" class="InductiveConstructor Operator">if</a> <a id="5461" href="/lia/part5/Programs/#5423" class="Bound">b</a> <a id="5463" href="/lia/part5/Programs/#461" class="InductiveConstructor Operator">then</a> <a id="5468" href="/lia/part5/Programs/#5427" class="Bound">c</a> <a id="5470" href="/lia/part5/Programs/#461" class="InductiveConstructor Operator">else</a> <a id="5475" href="/lia/part5/Programs/#5429" class="Bound">d</a> <a id="5477" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="5479" href="/lia/part5/Programs/#5425" class="Bound">s</a> <a id="5481" href="/lia/part5/Programs/#4525" class="Datatype Operator">↝</a> <a id="5483" href="/lia/part5/Programs/#5427" class="Bound">c</a> <a id="5485" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="5487" href="/lia/part5/Programs/#5425" class="Bound">s</a>
+    
+  <a id="_↝_.↝-if-ff"></a><a id="5496" href="/lia/part5/Programs/#5496" class="InductiveConstructor">↝-if-ff</a> <a id="5504" class="Symbol">:</a> <a id="5506" class="Symbol">∀</a> <a id="5508" class="Symbol">{</a><a id="5509" href="/lia/part5/Programs/#5509" class="Bound">b</a> <a id="5511" href="/lia/part5/Programs/#5511" class="Bound">s</a> <a id="5513" href="/lia/part5/Programs/#5513" class="Bound">c</a> <a id="5515" href="/lia/part5/Programs/#5515" class="Bound">d</a><a id="5516" class="Symbol">}</a> <a id="5518" class="Symbol">→</a>
+    <a id="5524" href="/lia/part5/BExp/#667" class="Function Operator">⟦</a> <a id="5526" href="/lia/part5/Programs/#5509" class="Bound">b</a> <a id="5528" href="/lia/part5/BExp/#667" class="Function Operator">⟧B</a> <a id="5531" href="/lia/part5/Programs/#5511" class="Bound">s</a> <a id="5533" href="Agda.Builtin.Equality.html#151" class="Datatype Operator">≡</a> <a id="5535" href="/lia/part0/Booleans/#275" class="InductiveConstructor">ff</a> <a id="5538" class="Symbol">→</a>
+    <a id="5544" href="/lia/part5/Programs/#461" class="InductiveConstructor Operator">if</a> <a id="5547" href="/lia/part5/Programs/#5509" class="Bound">b</a> <a id="5549" href="/lia/part5/Programs/#461" class="InductiveConstructor Operator">then</a> <a id="5554" href="/lia/part5/Programs/#5513" class="Bound">c</a> <a id="5556" href="/lia/part5/Programs/#461" class="InductiveConstructor Operator">else</a> <a id="5561" href="/lia/part5/Programs/#5515" class="Bound">d</a> <a id="5563" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="5565" href="/lia/part5/Programs/#5511" class="Bound">s</a> <a id="5567" href="/lia/part5/Programs/#4525" class="Datatype Operator">↝</a> <a id="5569" href="/lia/part5/Programs/#5515" class="Bound">d</a> <a id="5571" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="5573" href="/lia/part5/Programs/#5511" class="Bound">s</a></pre>
+
+<h3 id="while-b-do-c-1"><code class="language-plaintext highlighter-rouge">while b do: c</code></h3>
+
+<p>The while looping construct also has two cases. If the condition <code class="language-plaintext highlighter-rouge">b</code>
+evaluates to true, then the command rewrites to <code class="language-plaintext highlighter-rouge">c ⨟ while b do: c</code>.
+Otherwise, it terminates rewriting to <code class="language-plaintext highlighter-rouge">skip</code>.</p>
+
+<pre class="Agda">  <a id="_↝_.↝-while-tt"></a><a id="5792" href="/lia/part5/Programs/#5792" class="InductiveConstructor">↝-while-tt</a> <a id="5803" class="Symbol">:</a> <a id="5805" class="Symbol">∀</a> <a id="5807" class="Symbol">{</a><a id="5808" href="/lia/part5/Programs/#5808" class="Bound">b</a> <a id="5810" href="/lia/part5/Programs/#5810" class="Bound">c</a> <a id="5812" href="/lia/part5/Programs/#5812" class="Bound">s</a><a id="5813" class="Symbol">}</a> <a id="5815" class="Symbol">→</a>
+    <a id="5821" href="/lia/part5/BExp/#667" class="Function Operator">⟦</a> <a id="5823" href="/lia/part5/Programs/#5808" class="Bound">b</a> <a id="5825" href="/lia/part5/BExp/#667" class="Function Operator">⟧B</a> <a id="5828" href="/lia/part5/Programs/#5812" class="Bound">s</a> <a id="5830" href="Agda.Builtin.Equality.html#151" class="Datatype Operator">≡</a> <a id="5832" href="/lia/part0/Booleans/#284" class="InductiveConstructor">tt</a> <a id="5835" class="Symbol">→</a>
+    <a id="5841" href="/lia/part5/Programs/#502" class="InductiveConstructor Operator">while</a> <a id="5847" href="/lia/part5/Programs/#5808" class="Bound">b</a> <a id="5849" href="/lia/part5/Programs/#502" class="InductiveConstructor Operator">do:</a> <a id="5853" href="/lia/part5/Programs/#5810" class="Bound">c</a> <a id="5855" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="5857" href="/lia/part5/Programs/#5812" class="Bound">s</a> <a id="5859" href="/lia/part5/Programs/#4525" class="Datatype Operator">↝</a> <a id="5861" href="/lia/part5/Programs/#5810" class="Bound">c</a> <a id="5863" href="/lia/part5/Programs/#437" class="InductiveConstructor Operator">⨟</a> <a id="5865" href="/lia/part5/Programs/#502" class="InductiveConstructor Operator">while</a> <a id="5871" href="/lia/part5/Programs/#5808" class="Bound">b</a> <a id="5873" href="/lia/part5/Programs/#502" class="InductiveConstructor Operator">do:</a> <a id="5877" href="/lia/part5/Programs/#5810" class="Bound">c</a> <a id="5879" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="5881" href="/lia/part5/Programs/#5812" class="Bound">s</a>
+    
+  <a id="_↝_.↝-while-ff"></a><a id="5890" href="/lia/part5/Programs/#5890" class="InductiveConstructor">↝-while-ff</a> <a id="5901" class="Symbol">:</a> <a id="5903" class="Symbol">∀</a> <a id="5905" class="Symbol">{</a><a id="5906" href="/lia/part5/Programs/#5906" class="Bound">b</a> <a id="5908" href="/lia/part5/Programs/#5908" class="Bound">c</a> <a id="5910" href="/lia/part5/Programs/#5910" class="Bound">s</a><a id="5911" class="Symbol">}</a> <a id="5913" class="Symbol">→</a>
+    <a id="5919" href="/lia/part5/BExp/#667" class="Function Operator">⟦</a> <a id="5921" href="/lia/part5/Programs/#5906" class="Bound">b</a> <a id="5923" href="/lia/part5/BExp/#667" class="Function Operator">⟧B</a> <a id="5926" href="/lia/part5/Programs/#5910" class="Bound">s</a> <a id="5928" href="Agda.Builtin.Equality.html#151" class="Datatype Operator">≡</a> <a id="5930" href="/lia/part0/Booleans/#275" class="InductiveConstructor">ff</a> <a id="5933" class="Symbol">→</a>
+    <a id="5939" href="/lia/part5/Programs/#502" class="InductiveConstructor Operator">while</a> <a id="5945" href="/lia/part5/Programs/#5906" class="Bound">b</a> <a id="5947" href="/lia/part5/Programs/#502" class="InductiveConstructor Operator">do:</a> <a id="5951" href="/lia/part5/Programs/#5908" class="Bound">c</a> <a id="5953" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="5955" href="/lia/part5/Programs/#5910" class="Bound">s</a> <a id="5957" href="/lia/part5/Programs/#4525" class="Datatype Operator">↝</a> <a id="5959" href="/lia/part5/Programs/#395" class="InductiveConstructor">skip</a> <a id="5964" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="5966" href="/lia/part5/Programs/#5910" class="Bound">s</a></pre>
+
+<h2 id="transitive-closure">
+<a class="anchor" href="#transitive-closure" aria-hidden="true"><span class="octicon octicon-link"></span></a>Transitive closure <code class="language-plaintext highlighter-rouge">↝*</code>
+</h2>
+
+<p>In order to formalise this, we first need to be able to combine many
+small steps together, i.e., we take the transitive closure of <code class="language-plaintext highlighter-rouge">_,_↝_,_</code>.</p>
+
+<pre class="Agda"><a id="6148" class="Keyword">infix</a> <a id="6154" class="Number">3</a> <a id="6156" href="/lia/part5/Programs/#6166" class="Datatype Operator">_↝*_</a>
+<a id="6161" class="Keyword">data</a> <a id="_↝*_"></a><a id="6166" href="/lia/part5/Programs/#6166" class="Datatype Operator">_↝*_</a> <a id="6171" class="Symbol">:</a> <a id="6173" href="/lia/part5/Programs/#4354" class="Function">Conf</a> <a id="6178" class="Symbol">→</a> <a id="6180" href="/lia/part5/Programs/#4354" class="Function">Conf</a> <a id="6185" class="Symbol">→</a> <a id="6187" class="PrimitiveType">Set</a> <a id="6191" class="Keyword">where</a>
+  <a id="_↝*_.stop"></a><a id="6199" href="/lia/part5/Programs/#6199" class="InductiveConstructor">stop</a> <a id="6204" class="Symbol">:</a> <a id="6206" class="Symbol">∀</a> <a id="6208" class="Symbol">{</a><a id="6209" href="/lia/part5/Programs/#6209" class="Bound">x</a><a id="6210" class="Symbol">}</a> <a id="6212" class="Symbol">→</a> <a id="6214" href="/lia/part5/Programs/#6209" class="Bound">x</a> <a id="6216" href="/lia/part5/Programs/#6166" class="Datatype Operator">↝*</a> <a id="6219" href="/lia/part5/Programs/#6209" class="Bound">x</a>
+  <a id="_↝*_.one"></a><a id="6223" href="/lia/part5/Programs/#6223" class="InductiveConstructor">one</a> <a id="6227" class="Symbol">:</a> <a id="6229" class="Symbol">∀</a> <a id="6231" class="Symbol">{</a><a id="6232" href="/lia/part5/Programs/#6232" class="Bound">x</a> <a id="6234" href="/lia/part5/Programs/#6234" class="Bound">y</a> <a id="6236" href="/lia/part5/Programs/#6236" class="Bound">z</a><a id="6237" class="Symbol">}</a> <a id="6239" class="Symbol">→</a> <a id="6241" href="/lia/part5/Programs/#6232" class="Bound">x</a> <a id="6243" href="/lia/part5/Programs/#4525" class="Datatype Operator">↝</a> <a id="6245" href="/lia/part5/Programs/#6234" class="Bound">y</a> <a id="6247" class="Symbol">→</a> <a id="6249" href="/lia/part5/Programs/#6234" class="Bound">y</a> <a id="6251" href="/lia/part5/Programs/#6166" class="Datatype Operator">↝*</a> <a id="6254" href="/lia/part5/Programs/#6236" class="Bound">z</a> <a id="6256" class="Symbol">→</a> <a id="6258" href="/lia/part5/Programs/#6232" class="Bound">x</a> <a id="6260" href="/lia/part5/Programs/#6166" class="Datatype Operator">↝*</a> <a id="6263" href="/lia/part5/Programs/#6236" class="Bound">z</a></pre>
+
+<h3 id="exercise-transitivity">
+<strong>Exercise</strong>: Transitivity</h3>
+
+<p>Show that the relation <code class="language-plaintext highlighter-rouge">↝*</code> on configurations is indeed transitive.
+<em>Hint</em>: Do induction on <code class="language-plaintext highlighter-rouge">der1</code>.</p>
+
+<pre class="Agda"><a id="↝*-trans"></a><a id="6407" href="/lia/part5/Programs/#6407" class="Function">↝*-trans</a> <a id="6416" class="Symbol">:</a> <a id="6418" class="Symbol">∀</a> <a id="6420" class="Symbol">{</a><a id="6421" href="/lia/part5/Programs/#6421" class="Bound">x</a> <a id="6423" href="/lia/part5/Programs/#6423" class="Bound">y</a> <a id="6425" href="/lia/part5/Programs/#6425" class="Bound">z</a><a id="6426" class="Symbol">}</a> <a id="6428" class="Symbol">→</a> <a id="6430" href="/lia/part5/Programs/#6421" class="Bound">x</a> <a id="6432" href="/lia/part5/Programs/#6166" class="Datatype Operator">↝*</a> <a id="6435" href="/lia/part5/Programs/#6423" class="Bound">y</a> <a id="6437" class="Symbol">→</a> <a id="6439" href="/lia/part5/Programs/#6423" class="Bound">y</a> <a id="6441" href="/lia/part5/Programs/#6166" class="Datatype Operator">↝*</a> <a id="6444" href="/lia/part5/Programs/#6425" class="Bound">z</a> <a id="6446" class="Symbol">→</a> <a id="6448" href="/lia/part5/Programs/#6421" class="Bound">x</a> <a id="6450" href="/lia/part5/Programs/#6166" class="Datatype Operator">↝*</a> <a id="6453" href="/lia/part5/Programs/#6425" class="Bound">z</a>
+<a id="6455" href="/lia/part5/Programs/#6407" class="Function">↝*-trans</a> <a id="6464" href="/lia/part5/Programs/#6464" class="Bound">der1</a> <a id="6469" href="/lia/part5/Programs/#6469" class="Bound">der2</a> <a id="6474" class="Symbol">=</a> <a id="6476" class="Symbol">{!   !}</a></pre>
+
+<h3 id="notation-for-transitive-closure">Notation for transitive closure</h3>
+
+<p>The following suggestive notation will be useful for simplyfying
+carrying out proofs involving <code class="language-plaintext highlighter-rouge">↝*</code>. They are entirely analogous to the
+chain of equalities constructed with <code class="language-plaintext highlighter-rouge">≡⟨⟩</code>.</p>
+
+<pre class="Agda"><a id="6712" class="Keyword">infix</a>  <a id="6719" class="Number">1</a> <a id="6721" href="/lia/part5/Programs/#6774" class="Function Operator">start_</a>
+<a id="6728" class="Keyword">infixr</a> <a id="6735" class="Number">2</a> <a id="6737" href="/lia/part5/Programs/#6828" class="Function Operator">_↝*⟨⟩_</a> <a id="6744" href="/lia/part5/Programs/#6883" class="Function Operator">_↝⟨_⟩_</a> <a id="6751" href="/lia/part5/Programs/#6960" class="Function Operator">_↝*⟨_⟩_</a>
+<a id="6759" class="Keyword">infix</a>  <a id="6766" class="Number">3</a> <a id="6768" href="/lia/part5/Programs/#7047" class="Function Operator">_end</a>
+
+<a id="start_"></a><a id="6774" href="/lia/part5/Programs/#6774" class="Function Operator">start_</a> <a id="6781" class="Symbol">:</a> <a id="6783" class="Symbol">∀</a> <a id="6785" class="Symbol">{</a><a id="6786" href="/lia/part5/Programs/#6786" class="Bound">x</a> <a id="6788" href="/lia/part5/Programs/#6788" class="Bound">y</a><a id="6789" class="Symbol">}</a> <a id="6791" class="Symbol">→</a> <a id="6793" href="/lia/part5/Programs/#6786" class="Bound">x</a> <a id="6795" href="/lia/part5/Programs/#6166" class="Datatype Operator">↝*</a> <a id="6798" href="/lia/part5/Programs/#6788" class="Bound">y</a> <a id="6800" class="Symbol">→</a> <a id="6802" href="/lia/part5/Programs/#6786" class="Bound">x</a> <a id="6804" href="/lia/part5/Programs/#6166" class="Datatype Operator">↝*</a> <a id="6807" href="/lia/part5/Programs/#6788" class="Bound">y</a>
+<a id="6809" href="/lia/part5/Programs/#6774" class="Function Operator">start</a> <a id="6815" href="/lia/part5/Programs/#6815" class="Bound">x↝*y</a> <a id="6820" class="Symbol">=</a> <a id="6822" href="/lia/part5/Programs/#6815" class="Bound">x↝*y</a>
+
+<a id="_↝*⟨⟩_"></a><a id="6828" href="/lia/part5/Programs/#6828" class="Function Operator">_↝*⟨⟩_</a> <a id="6835" class="Symbol">:</a> <a id="6837" class="Symbol">∀</a> <a id="6839" href="/lia/part5/Programs/#6839" class="Bound">x</a> <a id="6841" class="Symbol">{</a><a id="6842" href="/lia/part5/Programs/#6842" class="Bound">y</a><a id="6843" class="Symbol">}</a> <a id="6845" class="Symbol">→</a> <a id="6847" href="/lia/part5/Programs/#6839" class="Bound">x</a> <a id="6849" href="/lia/part5/Programs/#6166" class="Datatype Operator">↝*</a> <a id="6852" href="/lia/part5/Programs/#6842" class="Bound">y</a> <a id="6854" class="Symbol">→</a> <a id="6856" href="/lia/part5/Programs/#6839" class="Bound">x</a> <a id="6858" href="/lia/part5/Programs/#6166" class="Datatype Operator">↝*</a> <a id="6861" href="/lia/part5/Programs/#6842" class="Bound">y</a>
+<a id="6863" href="/lia/part5/Programs/#6863" class="Bound">x</a> <a id="6865" href="/lia/part5/Programs/#6828" class="Function Operator">↝*⟨⟩</a> <a id="6870" href="/lia/part5/Programs/#6870" class="Bound">x↝*y</a> <a id="6875" class="Symbol">=</a> <a id="6877" href="/lia/part5/Programs/#6870" class="Bound">x↝*y</a>
+
+<a id="_↝⟨_⟩_"></a><a id="6883" href="/lia/part5/Programs/#6883" class="Function Operator">_↝⟨_⟩_</a> <a id="6890" class="Symbol">:</a> <a id="6892" class="Symbol">∀</a> <a id="6894" href="/lia/part5/Programs/#6894" class="Bound">x</a> <a id="6896" class="Symbol">{</a><a id="6897" href="/lia/part5/Programs/#6897" class="Bound">y</a> <a id="6899" href="/lia/part5/Programs/#6899" class="Bound">z</a><a id="6900" class="Symbol">}</a> <a id="6902" class="Symbol">→</a> <a id="6904" href="/lia/part5/Programs/#6894" class="Bound">x</a> <a id="6906" href="/lia/part5/Programs/#4525" class="Datatype Operator">↝</a> <a id="6908" href="/lia/part5/Programs/#6897" class="Bound">y</a> <a id="6910" class="Symbol">→</a> <a id="6912" href="/lia/part5/Programs/#6897" class="Bound">y</a> <a id="6914" href="/lia/part5/Programs/#6166" class="Datatype Operator">↝*</a> <a id="6917" href="/lia/part5/Programs/#6899" class="Bound">z</a> <a id="6919" class="Symbol">→</a> <a id="6921" href="/lia/part5/Programs/#6894" class="Bound">x</a> <a id="6923" href="/lia/part5/Programs/#6166" class="Datatype Operator">↝*</a> <a id="6926" href="/lia/part5/Programs/#6899" class="Bound">z</a>
+<a id="6928" href="/lia/part5/Programs/#6928" class="Bound">x</a> <a id="6930" href="/lia/part5/Programs/#6883" class="Function Operator">↝⟨</a> <a id="6933" href="/lia/part5/Programs/#6933" class="Bound">x↝y</a> <a id="6937" href="/lia/part5/Programs/#6883" class="Function Operator">⟩</a> <a id="6939" href="/lia/part5/Programs/#6939" class="Bound">y↝*z</a> <a id="6944" class="Symbol">=</a> <a id="6946" href="/lia/part5/Programs/#6223" class="InductiveConstructor">one</a> <a id="6950" href="/lia/part5/Programs/#6933" class="Bound">x↝y</a> <a id="6954" href="/lia/part5/Programs/#6939" class="Bound">y↝*z</a>
+
+<a id="_↝*⟨_⟩_"></a><a id="6960" href="/lia/part5/Programs/#6960" class="Function Operator">_↝*⟨_⟩_</a> <a id="6968" class="Symbol">:</a> <a id="6970" class="Symbol">∀</a> <a id="6972" href="/lia/part5/Programs/#6972" class="Bound">x</a> <a id="6974" class="Symbol">{</a><a id="6975" href="/lia/part5/Programs/#6975" class="Bound">y</a> <a id="6977" href="/lia/part5/Programs/#6977" class="Bound">z</a><a id="6978" class="Symbol">}</a> <a id="6980" class="Symbol">→</a> <a id="6982" href="/lia/part5/Programs/#6972" class="Bound">x</a> <a id="6984" href="/lia/part5/Programs/#6166" class="Datatype Operator">↝*</a> <a id="6987" href="/lia/part5/Programs/#6975" class="Bound">y</a> <a id="6989" class="Symbol">→</a> <a id="6991" href="/lia/part5/Programs/#6975" class="Bound">y</a> <a id="6993" href="/lia/part5/Programs/#6166" class="Datatype Operator">↝*</a> <a id="6996" href="/lia/part5/Programs/#6977" class="Bound">z</a> <a id="6998" class="Symbol">→</a> <a id="7000" href="/lia/part5/Programs/#6972" class="Bound">x</a> <a id="7002" href="/lia/part5/Programs/#6166" class="Datatype Operator">↝*</a> <a id="7005" href="/lia/part5/Programs/#6977" class="Bound">z</a>
+<a id="7007" href="/lia/part5/Programs/#7007" class="Bound">x</a> <a id="7009" href="/lia/part5/Programs/#6960" class="Function Operator">↝*⟨</a> <a id="7013" href="/lia/part5/Programs/#7013" class="Bound">x↝*y</a> <a id="7018" href="/lia/part5/Programs/#6960" class="Function Operator">⟩</a> <a id="7020" href="/lia/part5/Programs/#7020" class="Bound">y↝*z</a> <a id="7025" class="Symbol">=</a> <a id="7027" href="/lia/part5/Programs/#6407" class="Function">↝*-trans</a> <a id="7036" href="/lia/part5/Programs/#7013" class="Bound">x↝*y</a> <a id="7041" href="/lia/part5/Programs/#7020" class="Bound">y↝*z</a>
+
+<a id="_end"></a><a id="7047" href="/lia/part5/Programs/#7047" class="Function Operator">_end</a> <a id="7052" class="Symbol">:</a> <a id="7054" class="Symbol">∀</a> <a id="7056" href="/lia/part5/Programs/#7056" class="Bound">x</a> <a id="7058" class="Symbol">→</a> <a id="7060" href="/lia/part5/Programs/#7056" class="Bound">x</a> <a id="7062" href="/lia/part5/Programs/#6166" class="Datatype Operator">↝*</a> <a id="7065" href="/lia/part5/Programs/#7056" class="Bound">x</a>
+<a id="7067" href="/lia/part5/Programs/#7067" class="Bound">x</a> <a id="7069" href="/lia/part5/Programs/#7047" class="Function Operator">end</a> <a id="7073" class="Symbol">=</a> <a id="7075" href="/lia/part5/Programs/#6199" class="InductiveConstructor">stop</a></pre>
+
+<h3 id="exercise-a-lemma-about">
+<strong>Exercise</strong>: A lemma about <code class="language-plaintext highlighter-rouge">⨟</code>
+</h3>
+
+<p>Our objective is to show that small steps and big steps semantics agree.</p>
+
+<p>Before showing this, we need to prove a lemma connecting sequencing <code class="language-plaintext highlighter-rouge">⨟</code>
+and <code class="language-plaintext highlighter-rouge">↝*</code>.</p>
+
+<pre class="Agda"><a id="⨟-lemma-1"></a><a id="7283" href="/lia/part5/Programs/#7283" class="Function">⨟-lemma-1</a> <a id="7293" class="Symbol">:</a> <a id="7295" class="Symbol">∀</a> <a id="7297" class="Symbol">{</a><a id="7298" href="/lia/part5/Programs/#7298" class="Bound">c</a> <a id="7300" href="/lia/part5/Programs/#7300" class="Bound">d</a> <a id="7302" href="/lia/part5/Programs/#7302" class="Bound">s</a> <a id="7304" href="/lia/part5/Programs/#7304" class="Bound">s'</a> <a id="7307" href="/lia/part5/Programs/#7307" class="Bound">s''</a><a id="7310" class="Symbol">}</a> <a id="7312" class="Symbol">→</a>
+  <a id="7316" href="/lia/part5/Programs/#7298" class="Bound">c</a> <a id="7318" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="7320" href="/lia/part5/Programs/#7302" class="Bound">s</a> <a id="7322" href="/lia/part5/Programs/#6166" class="Datatype Operator">↝*</a> <a id="7325" href="/lia/part5/Programs/#395" class="InductiveConstructor">skip</a> <a id="7330" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="7332" href="/lia/part5/Programs/#7307" class="Bound">s''</a> <a id="7336" class="Symbol">→</a>
+  <a id="7340" href="/lia/part5/Programs/#7300" class="Bound">d</a> <a id="7342" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="7344" href="/lia/part5/Programs/#7307" class="Bound">s''</a> <a id="7348" href="/lia/part5/Programs/#6166" class="Datatype Operator">↝*</a> <a id="7351" href="/lia/part5/Programs/#395" class="InductiveConstructor">skip</a> <a id="7356" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="7358" href="/lia/part5/Programs/#7304" class="Bound">s'</a> <a id="7361" class="Symbol">→</a>
+  <a id="7365" href="/lia/part5/Programs/#7298" class="Bound">c</a> <a id="7367" href="/lia/part5/Programs/#437" class="InductiveConstructor Operator">⨟</a> <a id="7369" href="/lia/part5/Programs/#7300" class="Bound">d</a> <a id="7371" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="7373" href="/lia/part5/Programs/#7302" class="Bound">s</a> <a id="7375" href="/lia/part5/Programs/#6166" class="Datatype Operator">↝*</a> <a id="7378" href="/lia/part5/Programs/#395" class="InductiveConstructor">skip</a> <a id="7383" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="7385" href="/lia/part5/Programs/#7304" class="Bound">s'</a>
+<a id="7388" href="/lia/part5/Programs/#7283" class="Function">⨟-lemma-1</a> <a id="7398" href="/lia/part5/Programs/#6199" class="InductiveConstructor">stop</a> <a id="7403" href="/lia/part5/Programs/#7403" class="Bound">der2</a> <a id="7408" class="Symbol">=</a> <a id="7410" class="Symbol">{!   !}</a>
+<a id="7418" href="/lia/part5/Programs/#7283" class="Function">⨟-lemma-1</a> <a id="7428" class="Symbol">{</a><a id="7429" href="/lia/part5/Programs/#7429" class="Bound">c</a><a id="7430" class="Symbol">}</a> <a id="7432" class="Symbol">{</a><a id="7433" href="/lia/part5/Programs/#7433" class="Bound">d</a><a id="7434" class="Symbol">}</a> <a id="7436" class="Symbol">{</a><a id="7437" href="/lia/part5/Programs/#7437" class="Bound">s</a><a id="7438" class="Symbol">}</a> <a id="7440" class="Symbol">{</a><a id="7441" href="/lia/part5/Programs/#7441" class="Bound">s'</a><a id="7443" class="Symbol">}</a> <a id="7445" class="Symbol">{</a><a id="7446" href="/lia/part5/Programs/#7446" class="Bound">s''</a><a id="7449" class="Symbol">}</a> <a id="7451" class="Symbol">(</a><a id="7452" href="/lia/part5/Programs/#6223" class="InductiveConstructor">one</a> <a id="7456" class="Symbol">{</a><a id="7457" class="Argument">y</a> <a id="7459" class="Symbol">=</a> <a id="7461" href="/lia/part5/Programs/#7461" class="Bound">c'</a> <a id="7464" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="7466" href="/lia/part5/Programs/#7466" class="Bound">s'''</a><a id="7470" class="Symbol">}</a> <a id="7472" href="/lia/part5/Programs/#7472" class="Bound">step</a> <a id="7477" href="/lia/part5/Programs/#7477" class="Bound">der1</a><a id="7481" class="Symbol">)</a> <a id="7483" href="/lia/part5/Programs/#7483" class="Bound">der2</a> <a id="7488" class="Symbol">=</a> <a id="7490" class="Symbol">{!   !}</a></pre>
+
+<h2 id="exercise-bigsmall">
+<a class="anchor" href="#exercise-bigsmall" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Exercise</strong>: <code class="language-plaintext highlighter-rouge">big→small</code>
+</h2>
+
+<p>Once we have two alternative semantics for imperative programs, the
+question arises as to whether they are equivalent.</p>
+
+<p>We show that the big steps and the small steps operational semantics of
+imperative programs yield the same results. There are two directions to
+show.</p>
+
+<p>We begin in this section with the easier direction <code class="language-plaintext highlighter-rouge">big→small</code>: the big
+step semantics implies the small step one.</p>
+
+<pre class="Agda"><a id="big→small"></a><a id="7924" href="/lia/part5/Programs/#7924" class="Function">big→small</a> <a id="7934" class="Symbol">:</a> <a id="7936" class="Symbol">∀</a> <a id="7938" href="/lia/part5/Programs/#7938" class="Bound">c</a> <a id="7940" href="/lia/part5/Programs/#7940" class="Bound">s</a> <a id="7942" href="/lia/part5/Programs/#7942" class="Bound">s'</a> <a id="7945" class="Symbol">→</a> <a id="7947" href="/lia/part5/Programs/#7938" class="Bound">c</a> <a id="7949" href="/lia/part5/Programs/#1353" class="Datatype Operator">,</a> <a id="7951" href="/lia/part5/Programs/#7940" class="Bound">s</a> <a id="7953" href="/lia/part5/Programs/#1353" class="Datatype Operator">⇒</a> <a id="7955" href="/lia/part5/Programs/#7942" class="Bound">s'</a> <a id="7958" class="Symbol">→</a> <a id="7960" href="/lia/part5/Programs/#7938" class="Bound">c</a> <a id="7962" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="7964" href="/lia/part5/Programs/#7940" class="Bound">s</a> <a id="7966" href="/lia/part5/Programs/#6166" class="Datatype Operator">↝*</a> <a id="7969" href="/lia/part5/Programs/#395" class="InductiveConstructor">skip</a> <a id="7974" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="7976" href="/lia/part5/Programs/#7942" class="Bound">s'</a>
+<a id="7979" href="/lia/part5/Programs/#7924" class="Function">big→small</a> <a id="7989" class="Symbol">=</a> <a id="7991" class="Symbol">{!   !}</a></pre>
+
+<h2 id="from-small-to-big-steps-first-attempt">
+<a class="anchor" href="#from-small-to-big-steps-first-attempt" aria-hidden="true"><span class="octicon octicon-link"></span></a>From small to big steps: first attempt</h2>
+
+<p>We turn now our attention to the other direction of the equivalence
+between small and big steps operational semantics, namely</p>
+
+<pre class="Agda"><a id="8178" class="Comment">-- small→big : ∀ c s s' → c , s ↝* skip , s' → c , s ⇒ s'</a></pre>
+
+<p>A natural starting point is the converse of <code class="language-plaintext highlighter-rouge">⨟-lemma-1</code> above.</p>
+
+<pre class="Agda"><a id="8309" class="Comment">-- ⨟-lemma-2 : ∀ {c d s s'} → c ⨟ d , s ↝* skip , s' → ∃[ s'' ] c , s ↝* skip , s'' × d , s'' ↝* skip , s'</a></pre>
+
+<p>However, it turns out that the statement <code class="language-plaintext highlighter-rouge">small→big</code> above creates
+problems for the termination checker in first <code class="language-plaintext highlighter-rouge">while</code> case (all the
+other cases go through):</p>
+
+<pre class="Agda"><a id="8586" class="Comment">-- small→big (while b do: c) s s' (one (↝-while-tt b≡true) ↝*-der)</a>
+<a id="8653" class="Comment">--     with ⨟-lemma-2 ↝*-der</a>
+<a id="8682" class="Comment">-- ... | s'' , ↝*-der1 , ↝*-der2</a>
+<a id="8715" class="Comment">--     with small→big c s s'' ↝*-der1 |</a>
+<a id="8755" class="Comment">--          ? {- small→big (while b do: c) s'' s' ↝*-der2 -}</a>
+<a id="8816" class="Comment">-- ... | ⇒-der1 | ⇒-der2 = ⇒-while-tt b≡true ⇒-der1 ⇒-der2</a>
+<a id="8875" class="Comment">-- small→big _ _ _ _ = ?</a></pre>
+
+<p>The issue with the commented code above is that no argument of the call</p>
+
+<pre class="Agda"><a id="8982" class="Comment">-- small→big (while b do: c) s'' s' ↝*-der2</a></pre>
+
+<p>is structurally smaller than the original call.</p>
+
+<p>What is missing here is an argument to convince the termination checker
+that <code class="language-plaintext highlighter-rouge">↝*-der2</code> is “smaller” than <code class="language-plaintext highlighter-rouge">↝*-der</code>. In order to formalise this,
+we need to refine the <code class="language-plaintext highlighter-rouge">↝*</code> relation in order to take into account the
+<em>number</em> of derivation steps.</p>
+
+<h2 id="transitive-closure-with-gas">
+<a class="anchor" href="#transitive-closure-with-gas" aria-hidden="true"><span class="octicon octicon-link"></span></a>Transitive closure with gas</h2>
+
+<p>The idea is to enrich the transitive closure relation with the
+information about how many derivation steps have been made so far.</p>
+
+<pre class="Agda"><a id="9492" class="Keyword">infix</a> <a id="9498" class="Number">3</a> <a id="9500" href="/lia/part5/Programs/#9512" class="Datatype Operator">_↝*_#_</a>
+<a id="9507" class="Keyword">data</a> <a id="_↝*_#_"></a><a id="9512" href="/lia/part5/Programs/#9512" class="Datatype Operator">_↝*_#_</a> <a id="9519" class="Symbol">:</a> <a id="9521" href="/lia/part5/Programs/#4354" class="Function">Conf</a> <a id="9526" class="Symbol">→</a> <a id="9528" href="/lia/part5/Programs/#4354" class="Function">Conf</a> <a id="9533" class="Symbol">→</a> <a id="9535" href="/lia/part0/Naturals/#247" class="Function">ℕ</a> <a id="9537" class="Symbol">→</a> <a id="9539" class="PrimitiveType">Set</a> <a id="9543" class="Keyword">where</a>
+  <a id="_↝*_#_.stop"></a><a id="9551" href="/lia/part5/Programs/#9551" class="InductiveConstructor">stop</a> <a id="9556" class="Symbol">:</a> <a id="9558" class="Symbol">∀</a> <a id="9560" class="Symbol">{</a><a id="9561" href="/lia/part5/Programs/#9561" class="Bound">x</a><a id="9562" class="Symbol">}</a> <a id="9564" class="Symbol">→</a> <a id="9566" href="/lia/part5/Programs/#9561" class="Bound">x</a> <a id="9568" href="/lia/part5/Programs/#9512" class="Datatype Operator">↝*</a> <a id="9571" href="/lia/part5/Programs/#9561" class="Bound">x</a> <a id="9573" href="/lia/part5/Programs/#9512" class="Datatype Operator">#</a> <a id="9575" class="Number">0</a>
+  <a id="_↝*_#_.one"></a><a id="9579" href="/lia/part5/Programs/#9579" class="InductiveConstructor">one</a> <a id="9583" class="Symbol">:</a> <a id="9585" class="Symbol">∀</a> <a id="9587" class="Symbol">{</a><a id="9588" href="/lia/part5/Programs/#9588" class="Bound">x</a> <a id="9590" href="/lia/part5/Programs/#9590" class="Bound">y</a> <a id="9592" href="/lia/part5/Programs/#9592" class="Bound">z</a> <a id="9594" href="/lia/part5/Programs/#9594" class="Bound">n</a><a id="9595" class="Symbol">}</a> <a id="9597" class="Symbol">→</a> <a id="9599" href="/lia/part5/Programs/#9588" class="Bound">x</a> <a id="9601" href="/lia/part5/Programs/#4525" class="Datatype Operator">↝</a> <a id="9603" href="/lia/part5/Programs/#9590" class="Bound">y</a> <a id="9605" class="Symbol">→</a> <a id="9607" href="/lia/part5/Programs/#9590" class="Bound">y</a> <a id="9609" href="/lia/part5/Programs/#9512" class="Datatype Operator">↝*</a> <a id="9612" href="/lia/part5/Programs/#9592" class="Bound">z</a> <a id="9614" href="/lia/part5/Programs/#9512" class="Datatype Operator">#</a> <a id="9616" href="/lia/part5/Programs/#9594" class="Bound">n</a> <a id="9618" class="Symbol">→</a> <a id="9620" href="/lia/part5/Programs/#9588" class="Bound">x</a> <a id="9622" href="/lia/part5/Programs/#9512" class="Datatype Operator">↝*</a> <a id="9625" href="/lia/part5/Programs/#9592" class="Bound">z</a> <a id="9627" href="/lia/part5/Programs/#9512" class="Datatype Operator">#</a> <a id="9629" href="Agda.Builtin.Nat.html#223" class="InductiveConstructor">suc</a> <a id="9633" href="/lia/part5/Programs/#9594" class="Bound">n</a></pre>
+
+<p>In the base case <code class="language-plaintext highlighter-rouge">stop</code> we terminate the computation immediately with
+<code class="language-plaintext highlighter-rouge">0</code> number of steps, and in the inductive case <code class="language-plaintext highlighter-rouge">one</code> we add an extra
+step to the number of steps <code class="language-plaintext highlighter-rouge">n</code> performed inductively.</p>
+
+<h3 id="exercise-a-second-lemma-about">
+<strong>Exercise</strong>: A second lemma about <code class="language-plaintext highlighter-rouge">⨟</code>
+</h3>
+
+<p>We can now prove the converse of <code class="language-plaintext highlighter-rouge">⨟-lemma-1</code> above in the richer setting
+offered by <code class="language-plaintext highlighter-rouge">_↝*_#_</code>.</p>
+
+<p>(Also <code class="language-plaintext highlighter-rouge">⨟-lemma-1</code> can be generalised to <code class="language-plaintext highlighter-rouge">_↝*_#_</code>, but we won’t need it
+here.)</p>
+
+<pre class="Agda"><a id="⨟-lemma-2"></a><a id="10058" href="/lia/part5/Programs/#10058" class="Function">⨟-lemma-2</a> <a id="10068" class="Symbol">:</a> <a id="10070" class="Symbol">∀</a> <a id="10072" class="Symbol">{</a><a id="10073" href="/lia/part5/Programs/#10073" class="Bound">c</a> <a id="10075" href="/lia/part5/Programs/#10075" class="Bound">d</a> <a id="10077" href="/lia/part5/Programs/#10077" class="Bound">s</a> <a id="10079" href="/lia/part5/Programs/#10079" class="Bound">s'</a> <a id="10082" href="/lia/part5/Programs/#10082" class="Bound">m</a><a id="10083" class="Symbol">}</a> <a id="10085" class="Symbol">→</a>
+  <a id="10089" href="/lia/part5/Programs/#10073" class="Bound">c</a> <a id="10091" href="/lia/part5/Programs/#437" class="InductiveConstructor Operator">⨟</a> <a id="10093" href="/lia/part5/Programs/#10075" class="Bound">d</a> <a id="10095" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="10097" href="/lia/part5/Programs/#10077" class="Bound">s</a> <a id="10099" href="/lia/part5/Programs/#9512" class="Datatype Operator">↝*</a> <a id="10102" href="/lia/part5/Programs/#395" class="InductiveConstructor">skip</a> <a id="10107" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="10109" href="/lia/part5/Programs/#10079" class="Bound">s'</a> <a id="10112" href="/lia/part5/Programs/#9512" class="Datatype Operator">#</a> <a id="10114" href="/lia/part5/Programs/#10082" class="Bound">m</a> <a id="10116" class="Symbol">→</a>
+  <a id="10120" href="/lia/part0/Logic/#461" class="Function">∃[</a> <a id="10123" href="/lia/part5/Programs/#10123" class="Bound">s''</a> <a id="10127" href="/lia/part0/Logic/#461" class="Function">]</a> <a id="10129" href="/lia/part0/Logic/#461" class="Function">∃[</a> <a id="10132" href="/lia/part5/Programs/#10132" class="Bound">m1</a> <a id="10135" href="/lia/part0/Logic/#461" class="Function">]</a> <a id="10137" href="/lia/part0/Logic/#461" class="Function">∃[</a> <a id="10140" href="/lia/part5/Programs/#10140" class="Bound">m2</a> <a id="10143" href="/lia/part0/Logic/#461" class="Function">]</a>
+      <a id="10151" href="/lia/part5/Programs/#10073" class="Bound">c</a> <a id="10153" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="10155" href="/lia/part5/Programs/#10077" class="Bound">s</a> <a id="10157" href="/lia/part5/Programs/#9512" class="Datatype Operator">↝*</a> <a id="10160" href="/lia/part5/Programs/#395" class="InductiveConstructor">skip</a> <a id="10165" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="10167" href="/lia/part5/Programs/#10123" class="Bound">s''</a> <a id="10171" href="/lia/part5/Programs/#9512" class="Datatype Operator">#</a> <a id="10173" href="/lia/part5/Programs/#10132" class="Bound">m1</a> <a id="10176" href="/lia/part0/Logic/#1770" class="Record Operator">×</a>
+      <a id="10184" href="/lia/part5/Programs/#10075" class="Bound">d</a> <a id="10186" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="10188" href="/lia/part5/Programs/#10123" class="Bound">s''</a> <a id="10192" href="/lia/part5/Programs/#9512" class="Datatype Operator">↝*</a> <a id="10195" href="/lia/part5/Programs/#395" class="InductiveConstructor">skip</a> <a id="10200" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="10202" href="/lia/part5/Programs/#10079" class="Bound">s'</a> <a id="10205" href="/lia/part5/Programs/#9512" class="Datatype Operator">#</a> <a id="10207" href="/lia/part5/Programs/#10140" class="Bound">m2</a> <a id="10210" href="/lia/part0/Logic/#1770" class="Record Operator">×</a>
+      <a id="10218" href="Agda.Builtin.Nat.html#223" class="InductiveConstructor">suc</a> <a id="10222" class="Symbol">(</a><a id="10223" href="/lia/part5/Programs/#10132" class="Bound">m1</a> <a id="10226" href="/lia/part0/Naturals/#4948" class="Function Operator">+ℕ</a> <a id="10229" href="/lia/part5/Programs/#10140" class="Bound">m2</a><a id="10231" class="Symbol">)</a> <a id="10233" href="Agda.Builtin.Equality.html#151" class="Datatype Operator">≡</a> <a id="10235" href="/lia/part5/Programs/#10082" class="Bound">m</a>
+<a id="10237" href="/lia/part5/Programs/#10058" class="Function">⨟-lemma-2</a> <a id="10247" class="Symbol">(</a><a id="10248" href="/lia/part5/Programs/#9579" class="InductiveConstructor">one</a> <a id="10252" class="Symbol">(</a><a id="10253" href="/lia/part5/Programs/#5127" class="InductiveConstructor">↝-seq-left</a> <a id="10264" href="/lia/part5/Programs/#10264" class="Bound">step</a><a id="10268" class="Symbol">)</a> <a id="10270" href="/lia/part5/Programs/#10270" class="Bound">↝-der</a><a id="10275" class="Symbol">)</a> <a id="10277" class="Symbol">=</a> <a id="10279" class="Symbol">{!   !}</a>
+<a id="10287" href="/lia/part5/Programs/#10058" class="Function">⨟-lemma-2</a> <a id="10297" class="Symbol">{</a><a id="10298" class="Argument">s</a> <a id="10300" class="Symbol">=</a> <a id="10302" href="/lia/part5/Programs/#10302" class="Bound">s</a><a id="10303" class="Symbol">}</a> <a id="10305" class="Symbol">(</a><a id="10306" href="/lia/part5/Programs/#9579" class="InductiveConstructor">one</a> <a id="10310" class="Symbol">{</a><a id="10311" class="Argument">n</a> <a id="10313" class="Symbol">=</a> <a id="10315" href="/lia/part5/Programs/#10315" class="Bound">n</a><a id="10316" class="Symbol">}</a> <a id="10318" href="/lia/part5/Programs/#5215" class="InductiveConstructor">↝-seq-right</a> <a id="10330" href="/lia/part5/Programs/#10330" class="Bound">↝-der</a><a id="10335" class="Symbol">)</a> <a id="10337" class="Symbol">=</a> <a id="10339" class="Symbol">{!   !}</a></pre>
+
+<h3 id="exercise-skip-and">
+<strong>Exercise</strong>: <code class="language-plaintext highlighter-rouge">skip</code> and <code class="language-plaintext highlighter-rouge">↝*</code>
+</h3>
+
+<p>Show that executing the <code class="language-plaintext highlighter-rouge">skip</code> command necessarily terminates in <code class="language-plaintext highlighter-rouge">0</code>
+steps.</p>
+
+<p><em>Hint</em>: Convince Agda that only the case <code class="language-plaintext highlighter-rouge">stop</code> needs to be considered.</p>
+
+<pre class="Agda"><a id="↝*-skip"></a><a id="10541" href="/lia/part5/Programs/#10541" class="Function">↝*-skip</a> <a id="10549" class="Symbol">:</a> <a id="10551" class="Symbol">∀</a> <a id="10553" class="Symbol">{</a><a id="10554" href="/lia/part5/Programs/#10554" class="Bound">s</a> <a id="10556" href="/lia/part5/Programs/#10556" class="Bound">c</a> <a id="10558" href="/lia/part5/Programs/#10558" class="Bound">s'</a> <a id="10561" href="/lia/part5/Programs/#10561" class="Bound">m</a><a id="10562" class="Symbol">}</a> <a id="10564" class="Symbol">→</a> <a id="10566" href="/lia/part5/Programs/#395" class="InductiveConstructor">skip</a> <a id="10571" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="10573" href="/lia/part5/Programs/#10554" class="Bound">s</a> <a id="10575" href="/lia/part5/Programs/#9512" class="Datatype Operator">↝*</a> <a id="10578" href="/lia/part5/Programs/#10556" class="Bound">c</a> <a id="10580" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="10582" href="/lia/part5/Programs/#10558" class="Bound">s'</a> <a id="10585" href="/lia/part5/Programs/#9512" class="Datatype Operator">#</a> <a id="10587" href="/lia/part5/Programs/#10561" class="Bound">m</a> <a id="10589" class="Symbol">→</a> <a id="10591" href="/lia/part5/Programs/#10556" class="Bound">c</a> <a id="10593" href="Agda.Builtin.Equality.html#151" class="Datatype Operator">≡</a> <a id="10595" href="/lia/part5/Programs/#395" class="InductiveConstructor">skip</a> <a id="10600" href="/lia/part0/Logic/#1770" class="Record Operator">×</a> <a id="10602" href="/lia/part5/Programs/#10554" class="Bound">s</a> <a id="10604" href="Agda.Builtin.Equality.html#151" class="Datatype Operator">≡</a> <a id="10606" href="/lia/part5/Programs/#10558" class="Bound">s'</a> <a id="10609" href="/lia/part0/Logic/#1770" class="Record Operator">×</a> <a id="10611" href="/lia/part5/Programs/#10561" class="Bound">m</a> <a id="10613" href="Agda.Builtin.Equality.html#151" class="Datatype Operator">≡</a> <a id="10615" class="Number">0</a>
+<a id="10617" href="/lia/part5/Programs/#10541" class="Function">↝*-skip</a> <a id="10625" href="/lia/part5/Programs/#10625" class="Bound">der</a> <a id="10629" class="Symbol">=</a> <a id="10631" class="Symbol">{!   !}</a></pre>
+
+<h2 id="exercise-smallbig">
+<a class="anchor" href="#exercise-smallbig" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Exercise</strong>: <code class="language-plaintext highlighter-rouge">small→big</code>
+</h2>
+
+<p>We are now ready to prove that the small step semantics implies the big
+step one.</p>
+
+<pre class="Agda"><a id="small→big"></a><a id="10761" href="/lia/part5/Programs/#10761" class="Function">small→big</a> <a id="10771" class="Symbol">:</a> <a id="10773" class="Symbol">∀</a> <a id="10775" href="/lia/part5/Programs/#10775" class="Bound">c</a> <a id="10777" href="/lia/part5/Programs/#10777" class="Bound">s</a> <a id="10779" href="/lia/part5/Programs/#10779" class="Bound">s'</a> <a id="10782" href="/lia/part5/Programs/#10782" class="Bound">n</a> <a id="10784" class="Symbol">→</a> <a id="10786" href="/lia/part5/Programs/#10775" class="Bound">c</a> <a id="10788" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="10790" href="/lia/part5/Programs/#10777" class="Bound">s</a> <a id="10792" href="/lia/part5/Programs/#9512" class="Datatype Operator">↝*</a> <a id="10795" href="/lia/part5/Programs/#395" class="InductiveConstructor">skip</a> <a id="10800" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="10802" href="/lia/part5/Programs/#10779" class="Bound">s'</a> <a id="10805" href="/lia/part5/Programs/#9512" class="Datatype Operator">#</a> <a id="10807" href="/lia/part5/Programs/#10782" class="Bound">n</a> <a id="10809" class="Symbol">→</a> <a id="10811" href="/lia/part5/Programs/#10775" class="Bound">c</a> <a id="10813" href="/lia/part5/Programs/#1353" class="Datatype Operator">,</a> <a id="10815" href="/lia/part5/Programs/#10777" class="Bound">s</a> <a id="10817" href="/lia/part5/Programs/#1353" class="Datatype Operator">⇒</a> <a id="10819" href="/lia/part5/Programs/#10779" class="Bound">s'</a>
+<a id="10822" href="/lia/part5/Programs/#10761" class="Function">small→big</a> <a id="10832" href="/lia/part5/Programs/#10832" class="Bound">c</a> <a id="10834" href="/lia/part5/Programs/#10834" class="Bound">s</a> <a id="10836" href="/lia/part5/Programs/#10836" class="Bound">s'</a> <a id="10839" href="/lia/part5/Programs/#10839" class="Bound">n</a> <a id="10841" href="/lia/part5/Programs/#10841" class="Bound">↝*-der</a> <a id="10848" class="Symbol">=</a> <a id="10850" class="Symbol">{!   !}</a>
+
+    <a id="10863" class="Comment">-- go c s s' n ↝*-der (&lt;-wf n) where</a>
+
+    <a id="10905" class="Comment">-- go : ∀ c s s' n →  c , s ↝* skip , s' # n → Acc n → c , s ⇒ s'</a>
+    <a id="10975" class="Comment">-- go = ?</a></pre>
+
+<div id="refs">
+
+  <h1 id="references">
+<a class="anchor" href="#references" aria-hidden="true"><span class="octicon octicon-link"></span></a>References</h1>
+
+</div>
+
+    </div>
+  
+    <header class="nav-header">
+    <p style="text-align:center;">
+        
+        
+        
+        <a alt="Part" href="/lia/part5/index/">Part</a>
+        &bullet;
+        
+        
+        <a alt="Source code" href="https://github.com/lclem/lia/blob/main/src/part5/Programs.lagda.md">Source</a>
+        
+        
+        
+    </p>
+</header>
+
+    <p class="p-name"> Last-modified: Jan  4 10:36:16 2021 </p>
+  </article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/lia/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Logic in Agda</h2><div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Lorenzo Clemente</li>
+          <li><a class="u-email" href="mailto:clementelorenzo@gmail.com">clementelorenzo@gmail.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/lclem"><svg class="svg-icon"><use xlink:href="/lia/assets/minima-social-icons.svg#github"></use></svg> <span class="username">lclem</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3"></div>
+    </div>This work is licensed under a <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>
+  </div>
+</footer>
+
+<!-- Parse the Latex divs with Katex
+<script type="text/javascript">
+  $("script[type='math/tex']").replaceWith(
+    function(){
+      var tex = $(this).text();
+      return katex.renderToString(tex, {displayMode: false});
+  });
+  
+  $("script[type='math/tex; mode=display']").replaceWith(
+    function(){
+      var tex = $(this).text();
+      return katex.renderToString(tex.replace(/%.*/g, ''), {displayMode: true});
+  });
+</script>
+-->
+
+<script type="text/javascript" src="/lia/assets/hidebox.js"></script>
+</body>
+
+</html>

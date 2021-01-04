@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Well-founded induction | Logic in Agda</title><!-- Begin Jekyll SEO tag v2.6.1 -->
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Well-founded induction" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Propositional and fist-order logic developed with the proof assistant Agda." />
+<meta property="og:description" content="Propositional and fist-order logic developed with the proof assistant Agda." />
+<link rel="canonical" href="/lia/part0/WellFounded/" />
+<meta property="og:url" content="/lia/part0/WellFounded/" />
+<meta property="og:site_name" content="Logic in Agda" />
+<script type="application/ld+json">
+{"url":"/lia/part0/WellFounded/","description":"Propositional and fist-order logic developed with the proof assistant Agda.","@type":"WebPage","headline":"Well-founded induction","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/lia/assets/main.css">
+
+  <!-- <link rel="stylesheet" href="/lia/assets/custom.css"> --><!-- Mathjax Support -->
+  <script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+  <!-- Load KaTeX -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1.1/katex.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1.1/katex.min.js"></script>
+
+<script type="text/x-thebe-config">
+  {
+    bootstrap: true,
+    requestKernel: true,
+    runAllCells: false,
+    selector: "[data-executable]",
+    predefinedOutput: false,
+    codeMirrorConfig: {
+        //theme: "idea",
+        language: "agda",
+        readOnly: false,
+        lineNumbers: true,
+        keyMap: "default",
+//        gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
+    },
+    kernelOptions: {
+        name: "agda",
+        kernelName: "agda",
+        path: "src/",
+        loadFromStore: true,
+        persistent: false,
+        // notebook server configuration; not needed with binder
+        serverSettings: {
+              baseUrl: "http://127.0.0.1:8888",
+              token: "test-secret",
+            },
+    },
+    binderOptions: {
+      repo: "lclem/lia", // need to put here the actual github repo (if it is a fork)
+      ref: "main",
+      binderUrl: "https://mybinder.org",
+      repoProvider: "github",
+      savedSession: {
+        enabled: true,
+        maxAge: 86400, // the max age in seconds to consider re-using a session
+        storagePrefix: "thebe-binder-lia-"
+      },
+    },
+  }
+</script>
+
+<!-- <script type="text/javascript" src="https://unpkg.com/thebelab@latest"></script> -->
+
+<!-- our own version of the thebe library: -->
+<script type="text/javascript" src="/lia/thebe/lib/index.js"></script>
+
+<!-- highlighting for Agda -->
+<script src="/lia/codemirror-agda/lib/index.js"></script>
+
+</head>
+<body><header class="site-header" id="site-header">
+
+    <div class="wrapper">
+
+        <a class="site-title" href="/lia/">Logic in Agda</a>
+
+        <nav class="site-nav">
+            <!-- <span class="menu-icon">
+                <svg viewBox="0 0 18 15" width="18px" height="15px">
+                    <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+                    <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+                    <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+                </svg>
+            </span> -->
+
+            <div class="trigger">
+                <a class="page-link" href="/lia/part0/index/">Part 0</a>
+                <a class="page-link" href="/lia/part1/index/">Part 1</a>
+                <a class="page-link" href="/lia/part2/index/">Part 2</a>
+                <a class="page-link" href="/lia/part3/index/">Part 3</a>
+                <a class="page-link" href="/lia/part4/index/">Part 4</a>
+                <a class="page-link" href="/lia/part5/index/">Part 5</a>
+
+                <span class="kernel-status">
+                    <button class="kernel-status-button" onclick="kernel_status_clicked()" title="kernel status"></button>
+                    <span id="kernel-messages" class="kernel-messages"></span>
+                </span>
+
+                <div id="connection_options" class="options sidebar" style="text-align: left; line-height: normal; max-width: 800px; padding: 10px; border-radius: 15px;">
+                    <!-- display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: space-between; -->
+                    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+                    <div>
+                        <label for="username" style="color: white;">User:</label>
+                        <input type="text" placeholder="github username" id="username" name="username">
+                        <label for="password" style="color: white;">Password:</label>
+                        <input type="password" placeholder="password" id="password" name="password">
+                    </div>
+                    <div>
+                        <label for="loadFromStore" style="color: white;">Load code from browser store:</label>
+                        <label class="switch" style="vertical-align: middle; margin: 10px;">
+                            <input type="checkbox" id="loadFromStore" name="loadFromStore">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div>
+                        <label for="baseUrl" style="color: white;">Base URL:</label>
+                        <input type="text" placeholder="baseUrl" id="baseUrl" name="baseUrl" value="http://127.0.0.1:8888">
+                        <label for="token" style="color: white;">Token:</label>
+                        <input type="text" placeholder="token" id="token" name="token" value="test-secret">
+                    </div>
+                    <div>
+                        <label for="useBinder" style="color: white;">Use binder:</label>
+                        <label class="switch" style="vertical-align: middle; margin: 10px;">
+                            <input type="checkbox" id="useBinder" name="useBinder">
+                            <span class="slider round"></span>
+                        </label>
+                        <label for="savedSession" style="color: white;">Reuse session:</label>
+                        <label class="switch" style="vertical-align: middle; margin: 10px;">
+                            <input type="checkbox" id="savedSession" name="savedSession">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div>
+                        <label for="repository" style="color: white;">Github repo:</label>
+                        <input type="text" placeholder="repository" id="repository" name="repository" value="">
+
+                        <label for="ref" style="color: white;">Branch:</label>
+                        <input type="text" placeholder="ref" id="ref" name="ref" value="main">
+
+                        <label for="binderUrl" style="color: white;">Binder URL:</label>                        
+                        <input type="text" placeholder="binderUrl" id="binderUrl" name="binderUrl" value="https://mybinder.org">
+                    </div>
+                </div>
+
+                <span class="control-container" id="control-container">
+                    <svg class="progress-ring" id="progress-ring" width="30" height="30" title="exercise progress" onclick="kernel_status_clicked()">
+                        <circle
+                            id="progress-circle"
+                            class="progress-ring__circle"
+                            stroke="black"
+                            stroke-width="2.5"
+                            fill="transparent"
+                            r="14"
+                            cx="15"
+                            cy="15"/>
+                        <circle
+                            stroke="lightgray"
+                            stroke-width="0.5"
+                            fill="transparent"
+                            r="14"
+                            cx="15"
+                            cy="15"/>
+                    </svg>
+                    <div id="connection_options" class="options sidebar" style="text-align: left; line-height: normal; max-width: 800px; padding: 10px; border-radius: 15px;"></div>
+                    <span class="progress-text" id="progress-text" onclick="kernel_status_clicked()"> 0/0 </span>
+
+                    <span id="controls" class="controls">
+                        <svg version="1.1" id="run-all" class="run-all" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                            width="15" height="15" viewBox="0 0 163.861 163.861" style="enable-background:new 0 0 163.861 163.861;"
+                            xml:space="preserve">
+                            <g>
+                                <path d="M34.857,3.613C20.084-4.861,8.107,2.081,8.107,19.106v125.637c0,17.042,11.977,23.975,26.75,15.509L144.67,97.275
+                                    c14.778-8.477,14.778-22.211,0-30.686L34.857,3.613z"/>
+                            </g>
+                        </svg>
+                    </span>
+                </span>
+            </div>
+
+            <style>
+                .switch {
+                    position: relative;
+                    display: inline-block;
+                    width: 40px;
+                    height: 20px;
+                }
+
+                /* Hide default HTML checkbox */
+                .switch input {
+                    opacity: 0;
+                    width: 0;
+                    height: 0;
+                }
+
+                /* The slider */
+                .slider {
+                    position: absolute;
+                    cursor: pointer;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background-color: #ccc;
+                    -webkit-transition: .4s;
+                    transition: .4s;
+                }
+
+                .slider:before {
+                    position: absolute;
+                    content: "";
+                    height: 16px;
+                    width: 16px;
+                    left: 2px;
+                    /* right: 4px; */
+                    bottom: 2px;
+                    top: 2px;
+                    background-color: white;
+                    -webkit-transition: .4s;
+                    transition: .4s;
+                }
+
+                input:checked + .slider {
+                    background-color: #2196F3;
+                }
+
+                input:focus + .slider {
+                    box-shadow: 0 0 1px #2196F3;
+                }
+
+                input:checked + .slider:before {
+                    -webkit-transform: translateX(18px);
+                    -ms-transform: translateX(18px);
+                    transform: translateX(18px);
+                }
+
+                /* Rounded sliders */
+                .slider.round {
+                    border-radius: 30px;
+                }
+
+                .slider.round:before {
+                border-radius: 50%;
+                }
+
+                .sidebar input[type=text] {
+                    padding: 6px;
+                    margin-top: 8px;
+                    /* font-size: 17px; */
+                    border: none;
+                    /* width: 150px; */
+                }
+
+                .sidebar {
+                    /* height: 100%; */
+                    width: 0;
+                    position: fixed;
+                    z-index: 1000;
+                    top: 0;
+                    right: 20px;
+                    background-color: rgba(17, 17, 17, 0.637);
+                    /* overflow-x: hidden; */
+                    transition: 0.5s;
+                    padding-top: 60px;
+                    display: none;
+                    margin-top: 60px;
+                }
+
+                .sidebar .closebtn {
+                    position: absolute;
+                    color: white;
+                    top: 0;
+                    right: 10px;
+                    font-size: 24px;
+                    margin-left: 20px;
+                }
+
+                .progress-ring, .run-all {
+                    vertical-align: middle;
+                }
+
+                .control-container {
+                    transition: all .2s ease-in-out;
+                }
+
+                .controls {
+                    display: none;
+                    opacity: 0;
+                    margin-right: 10px;
+                    transition: all .5s ease-in-out;
+                }
+
+                .run-all:hover {
+                    filter: brightness(135%);
+                }
+
+                .progress-ring__circle {
+                    transition: 0.35s stroke-dashoffset;
+                    transform: rotate(-90deg);
+                    transform-origin: 50% 50%;
+                    visibility: hidden;
+                }
+
+                .progress-text {
+                    position: relative;
+                    top: 0;
+                    left: -25px;
+                    font-size: 8px;
+                    vertical-align: middle;
+                    align-self: center;
+                }
+
+                .progress-text:hover, .progress-ring:hover, .progress-ring__circle:hover, .run-all {
+                    cursor: pointer;
+                }
+            </style>
+
+            <script>
+
+                //  var storedUsername = localStorage.getItem("username");
+                //  localStorage.setItem("username", storedUsername.value);
+            
+                function doStore(input, key) {
+
+                    if(input.type == "checkbox") {
+                        var checked = localStorage.getItem(key);
+
+                        if (checked == "yes") {
+                            localStorage.setItem(key, "no");
+                        }
+                        else {
+                            localStorage.setItem(key, "yes");
+                        }
+
+                        console.info("checked: ", localStorage.getItem(key));
+                    }
+                    else {
+                        console.info("value: ", input.value);
+                        localStorage.setItem(key, input.value);
+                    }
+                }
+
+                function persistInput(input) {
+                    var key = "input-" + input.id;
+                    var storedValue = localStorage.getItem(key);
+                
+                    console.info("Persisting input: ", input);
+                
+                    // if there is a stored value, use it
+                    if (storedValue) {
+
+                        if(input.type != "password") {
+                            console.info("restoring value ", storedValue, " for ", input);
+                        }
+
+                        if(input.type == "checkbox") {
+                            if(storedValue=="yes") {
+                                input.setAttribute("checked", "");
+                            }
+                            else {
+                                input.removeAttribute("checked");
+                            }
+                        }
+                        else {
+                            input.value = storedValue;
+                        }
+                    }
+                    // if there is no stored value, store the current value
+                    else {
+                        doStore(input, key);
+                    }
+
+                    input.addEventListener('input', function () {
+                        console.info("input changed: key = ", key, "; value = ", input);
+                        doStore(input, key);
+                    });
+                    }
+                
+                    persistInput(document.getElementById("username"));
+                    persistInput(document.getElementById("password"));
+
+                    persistInput(document.getElementById("loadFromStore"));
+
+                    persistInput(document.getElementById("baseUrl"));
+                    persistInput(document.getElementById("token"));
+
+                    persistInput(document.getElementById("useBinder"));
+                    persistInput(document.getElementById("savedSession"));
+                    persistInput(document.getElementById("repository"));
+                    persistInput(document.getElementById("ref"));
+                    persistInput(document.getElementById("binderUrl"));
+
+                    // init
+                    document.getElementById("connection_options").style.display = "none";
+
+                    function kernel_status_clicked() {
+                
+                        console.info("Clicked kernel status");
+
+                        document.getElementById("kernel-messages").style.display = "none";
+
+                        document.getElementById("connection_options").style.width = "750px";
+                        document.getElementById("connection_options").style.display = "block";
+                        //document.getElementById("header").style.marginLeft = "250px";
+
+                    }
+
+                    function closeNav() {
+
+                        document.getElementById("kernel-messages").style.display = "inline";
+
+                        document.getElementById("connection_options").style.width = "0";
+                        document.getElementById("connection_options").style.display = "none";
+                        //document.getElementById("header").style.marginLeft= "0";
+                    }
+
+                var prevScrollpos = window.pageYOffset;
+                var header = document.getElementById("site-header");
+                var boxShadow = header.style.boxShadow;
+
+                window.onscroll = function() {
+                    var currentScrollPos = window.pageYOffset;
+                    // detect scroll down
+                    if (prevScrollpos > currentScrollPos) {
+                        header.style.top = "0";
+                        header.style.boxShadow = boxShadow;
+                        prevScrollpos = currentScrollPos;
+                    } else if (prevScrollpos <= currentScrollPos) {
+                        header.style.top = "-55px";
+                        header.style.boxShadow = "none"
+                        prevScrollpos = currentScrollPos;
+                    }
+                }
+
+            let control_container = document.getElementById("control-container");
+            let controls = document.getElementById("controls");
+
+            control_container.addEventListener("mouseenter", function(event) {
+                controls.style.display = "inline";
+//                controls.style.visibility = "visible";
+                controls.style.opacity = 1;
+                console.info("mouseenter");
+            }, false);
+
+            control_container.addEventListener("mouseleave", function(event) {
+                // controls.style.visibility = "hidden";
+                // controls.style.display = "none";
+                controls.style.opacity = 0;
+                console.info("mouseleave");
+            }, false);
+
+            </script>
+            
+        </nav>
+
+    </div>
+
+</header><main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post">
+
+    <header class="post-header">
+        <h1 class="post-title">Well-founded induction</h1>
+    </header>
+  
+    <header class="nav-header">
+    <p style="text-align:center;">
+        
+        
+        
+        <a alt="Part" href="/lia/part0/index/">Part</a>
+        &bullet;
+        
+        
+        <a alt="Source code" href="https://github.com/lclem/lia/blob/main/src/part0/WellFounded.lagda.md">Source</a>
+        
+        
+        
+    </p>
+</header>
+
+  
+    <div class="post-content">
+        <h2>Contents</h2>    
+        <ul id="toc" class="section-nav">
+<li class="toc-entry toc-h2"><a href="#lexicographic-product">Lexicographic product</a></li>
+<li class="toc-entry toc-h2"><a href="#list-inclusion-is-well-founded">List inclusion is well-founded</a></li>
+<li class="toc-entry toc-h1"><a href="#references">References</a></li>
+</ul><p>NOTE: This section is more advanced and will be moved to later parts.</p>
+
+<p>TODO: Turn <code class="language-plaintext highlighter-rouge">WellFounded</code> into a typeclass.</p>
+
+<pre class="Agda"><a id="159" class="Symbol">{-#</a> <a id="163" class="Keyword">OPTIONS</a> <a id="171" class="Pragma">--allow-unsolved-metas</a> <a id="194" class="Symbol">#-}</a>
+
+<a id="199" class="Keyword">module</a> <a id="206" href="/lia/part0/WellFounded/" class="Module">part0.WellFounded</a> <a id="224" class="Keyword">where</a>
+<a id="230" class="Keyword">open</a> <a id="235" class="Keyword">import</a> <a id="242" href="/lia/part0/List/" class="Module">part0.List</a>
+<a id="253" class="Keyword">open</a> <a id="258" class="Keyword">import</a> <a id="265" href="Agda.Primitive.html" class="Module">Agda.Primitive</a></pre>
+
+<p>An element <code class="language-plaintext highlighter-rouge">a</code> is <em>accessible</em> if all smaller elements <code class="language-plaintext highlighter-rouge">b</code> are
+accessible too.</p>
+
+<pre class="Agda"><a id="369" class="Comment">-- generalisation to arbitrary domain and binary relations</a>
+
+<a id="429" class="Keyword">data</a> <a id="Acc"></a><a id="434" href="/lia/part0/WellFounded/#434" class="Datatype">Acc</a> <a id="438" class="Symbol">{</a><a id="439" href="/lia/part0/WellFounded/#439" class="Bound">ℓ</a> <a id="441" href="/lia/part0/WellFounded/#441" class="Bound">m</a><a id="442" class="Symbol">}</a> <a id="444" class="Symbol">{</a><a id="445" href="/lia/part0/WellFounded/#445" class="Bound">A</a> <a id="447" class="Symbol">:</a> <a id="449" class="PrimitiveType">Set</a> <a id="453" href="/lia/part0/WellFounded/#439" class="Bound">ℓ</a><a id="454" class="Symbol">}</a> <a id="456" class="Symbol">(</a><a id="457" href="/lia/part0/WellFounded/#457" class="Bound">R</a> <a id="459" class="Symbol">:</a> <a id="461" href="/lia/part0/WellFounded/#445" class="Bound">A</a> <a id="463" class="Symbol">→</a> <a id="465" href="/lia/part0/WellFounded/#445" class="Bound">A</a> <a id="467" class="Symbol">→</a> <a id="469" class="PrimitiveType">Set</a> <a id="473" href="/lia/part0/WellFounded/#441" class="Bound">m</a><a id="474" class="Symbol">)</a> <a id="476" class="Symbol">(</a><a id="477" href="/lia/part0/WellFounded/#477" class="Bound">a</a> <a id="479" class="Symbol">:</a> <a id="481" href="/lia/part0/WellFounded/#445" class="Bound">A</a><a id="482" class="Symbol">)</a> <a id="484" class="Symbol">:</a> <a id="486" class="PrimitiveType">Set</a> <a id="490" class="Symbol">(</a><a id="491" href="/lia/part0/WellFounded/#439" class="Bound">ℓ</a> <a id="493" href="Agda.Primitive.html#636" class="Primitive Operator">⊔</a> <a id="495" href="/lia/part0/WellFounded/#441" class="Bound">m</a><a id="496" class="Symbol">)</a> <a id="498" class="Keyword">where</a>
+  <a id="Acc.acc"></a><a id="506" href="/lia/part0/WellFounded/#506" class="InductiveConstructor">acc</a> <a id="510" class="Symbol">:</a> <a id="512" href="/lia/part0/Logic/#216" class="Function">∀[</a> <a id="515" href="/lia/part0/WellFounded/#515" class="Bound">b</a> <a id="517" href="/lia/part0/Logic/#216" class="Function">]</a> <a id="519" class="Symbol">(</a><a id="520" href="/lia/part0/WellFounded/#457" class="Bound">R</a> <a id="522" href="/lia/part0/WellFounded/#515" class="Bound">b</a> <a id="524" href="/lia/part0/WellFounded/#477" class="Bound">a</a> <a id="526" class="Symbol">→</a> <a id="528" href="/lia/part0/WellFounded/#434" class="Datatype">Acc</a> <a id="532" href="/lia/part0/WellFounded/#457" class="Bound">R</a> <a id="534" href="/lia/part0/WellFounded/#515" class="Bound">b</a><a id="535" class="Symbol">)</a> <a id="537" class="Symbol">→</a> <a id="539" href="/lia/part0/WellFounded/#434" class="Datatype">Acc</a> <a id="543" href="/lia/part0/WellFounded/#457" class="Bound">R</a> <a id="545" href="/lia/part0/WellFounded/#477" class="Bound">a</a>
+
+<a id="WellFounded"></a><a id="548" href="/lia/part0/WellFounded/#548" class="Function">WellFounded</a> <a id="560" class="Symbol">:</a> <a id="562" class="Symbol">∀</a> <a id="564" class="Symbol">{</a><a id="565" href="/lia/part0/WellFounded/#565" class="Bound">ℓ</a> <a id="567" href="/lia/part0/WellFounded/#567" class="Bound">m</a><a id="568" class="Symbol">}</a> <a id="570" class="Symbol">{</a><a id="571" href="/lia/part0/WellFounded/#571" class="Bound">A</a> <a id="573" class="Symbol">:</a> <a id="575" class="PrimitiveType">Set</a> <a id="579" href="/lia/part0/WellFounded/#565" class="Bound">ℓ</a><a id="580" class="Symbol">}</a> <a id="582" class="Symbol">(</a><a id="583" href="/lia/part0/WellFounded/#583" class="Bound Operator">_≺_</a> <a id="587" class="Symbol">:</a> <a id="589" href="/lia/part0/WellFounded/#571" class="Bound">A</a> <a id="591" class="Symbol">→</a> <a id="593" href="/lia/part0/WellFounded/#571" class="Bound">A</a> <a id="595" class="Symbol">→</a> <a id="597" class="PrimitiveType">Set</a> <a id="601" href="/lia/part0/WellFounded/#567" class="Bound">m</a><a id="602" class="Symbol">)</a> <a id="604" class="Symbol">→</a> <a id="606" class="PrimitiveType">Set</a> <a id="610" class="Symbol">(</a><a id="611" href="/lia/part0/WellFounded/#565" class="Bound">ℓ</a> <a id="613" href="Agda.Primitive.html#636" class="Primitive Operator">⊔</a> <a id="615" href="/lia/part0/WellFounded/#567" class="Bound">m</a><a id="616" class="Symbol">)</a>
+<a id="618" href="/lia/part0/WellFounded/#548" class="Function">WellFounded</a> <a id="630" href="/lia/part0/WellFounded/#630" class="Bound Operator">_≺_</a> <a id="634" class="Symbol">=</a> <a id="636" href="/lia/part0/Logic/#216" class="Function">∀[</a> <a id="639" href="/lia/part0/WellFounded/#639" class="Bound">a</a> <a id="641" href="/lia/part0/Logic/#216" class="Function">]</a> <a id="643" href="/lia/part0/WellFounded/#434" class="Datatype">Acc</a> <a id="647" href="/lia/part0/WellFounded/#630" class="Bound Operator">_≺_</a> <a id="651" href="/lia/part0/WellFounded/#639" class="Bound">a</a>
+
+<a id="&lt;-wf"></a><a id="654" href="/lia/part0/WellFounded/#654" class="Function">&lt;-wf</a> <a id="659" class="Symbol">:</a> <a id="661" href="/lia/part0/WellFounded/#548" class="Function">WellFounded</a> <a id="673" href="/lia/part0/Naturals/#1261" class="Function Operator">_&lt;_</a>
+<a id="677" href="/lia/part0/WellFounded/#654" class="Function">&lt;-wf</a> <a id="682" href="Agda.Builtin.Nat.html#210" class="InductiveConstructor">zero</a> <a id="687" class="Symbol">=</a> <a id="689" href="/lia/part0/WellFounded/#506" class="InductiveConstructor">acc</a> <a id="693" class="Symbol">λ</a> <a id="695" href="/lia/part0/WellFounded/#695" class="Bound">_</a> <a id="697" class="Symbol">()</a>
+<a id="700" href="/lia/part0/WellFounded/#654" class="Function">&lt;-wf</a> <a id="705" class="Symbol">(</a><a id="706" href="Agda.Builtin.Nat.html#223" class="InductiveConstructor">suc</a> <a id="710" href="/lia/part0/WellFounded/#710" class="Bound">n</a><a id="711" class="Symbol">)</a> <a id="713" class="Keyword">with</a> <a id="718" href="/lia/part0/WellFounded/#654" class="Function">&lt;-wf</a> <a id="723" href="/lia/part0/WellFounded/#710" class="Bound">n</a>
+<a id="725" class="Symbol">...</a> <a id="729" class="Symbol">|</a> <a id="731" href="/lia/part0/WellFounded/#506" class="InductiveConstructor">acc</a> <a id="735" href="/lia/part0/WellFounded/#735" class="Bound">f</a> <a id="737" class="Symbol">=</a> <a id="739" href="/lia/part0/WellFounded/#506" class="InductiveConstructor">acc</a> <a id="743" href="/lia/part0/WellFounded/#759" class="Function">g</a>
+    <a id="749" class="Keyword">where</a>
+    <a id="759" href="/lia/part0/WellFounded/#759" class="Function">g</a> <a id="761" class="Symbol">:</a> <a id="763" class="Symbol">∀</a> <a id="765" href="/lia/part0/WellFounded/#765" class="Bound">m</a> <a id="767" class="Symbol">→</a> <a id="769" href="/lia/part0/WellFounded/#765" class="Bound">m</a> <a id="771" href="/lia/part0/Naturals/#1261" class="Function Operator">&lt;</a> <a id="773" href="Agda.Builtin.Nat.html#223" class="InductiveConstructor">suc</a> <a id="777" class="Bound">n</a> <a id="779" class="Symbol">→</a> <a id="781" href="/lia/part0/WellFounded/#434" class="Datatype">Acc</a> <a id="785" href="/lia/part0/Naturals/#1261" class="Function Operator">_&lt;_</a> <a id="789" href="/lia/part0/WellFounded/#765" class="Bound">m</a>
+    <a id="795" href="/lia/part0/WellFounded/#759" class="Function">g</a> <a id="797" href="Agda.Builtin.Nat.html#210" class="InductiveConstructor">zero</a> <a id="802" class="Symbol">_</a> <a id="804" class="Symbol">=</a> <a id="806" href="/lia/part0/WellFounded/#654" class="Function">&lt;-wf</a> <a id="811" href="Agda.Builtin.Nat.html#210" class="InductiveConstructor">zero</a>
+    <a id="820" href="/lia/part0/WellFounded/#759" class="Function">g</a> <a id="822" class="Symbol">(</a><a id="823" href="Agda.Builtin.Nat.html#223" class="InductiveConstructor">suc</a> <a id="827" href="/lia/part0/WellFounded/#827" class="Bound">m</a><a id="828" class="Symbol">)</a> <a id="830" class="Symbol">(</a><a id="831" href="/lia/part0/Naturals/#801" class="InductiveConstructor">s≤s</a> <a id="835" href="/lia/part0/WellFounded/#835" class="Bound">m&lt;n</a><a id="838" class="Symbol">)</a> <a id="840" class="Symbol">=</a> <a id="842" href="/lia/part0/WellFounded/#506" class="InductiveConstructor">acc</a> <a id="846" class="Symbol">λ</a> <a id="848" href="/lia/part0/WellFounded/#848" class="Bound">o</a> <a id="850" href="/lia/part0/WellFounded/#850" class="Bound">o≤m</a> <a id="854" class="Symbol">→</a> <a id="856" href="/lia/part0/WellFounded/#735" class="Bound">f</a> <a id="858" href="/lia/part0/WellFounded/#848" class="Bound">o</a> <a id="860" class="Symbol">(</a><a id="861" href="/lia/part0/Naturals/#1881" class="Function">trans-≤</a> <a id="869" href="/lia/part0/WellFounded/#850" class="Bound">o≤m</a> <a id="873" href="/lia/part0/WellFounded/#835" class="Bound">m&lt;n</a><a id="876" class="Symbol">)</a></pre>
+<pre class="Agda"><a id="887" class="Comment">-- prove it by w.f. induction on R!</a>
+<a id="mon-wf"></a><a id="923" href="/lia/part0/WellFounded/#923" class="Function">mon-wf</a> <a id="930" class="Symbol">:</a> <a id="932" class="Symbol">∀</a> <a id="934" class="Symbol">{</a><a id="935" href="/lia/part0/WellFounded/#935" class="Bound">ℓ</a> <a id="937" href="/lia/part0/WellFounded/#937" class="Bound">m</a> <a id="939" href="/lia/part0/WellFounded/#939" class="Bound">n</a> <a id="941" href="/lia/part0/WellFounded/#941" class="Bound">o</a><a id="942" class="Symbol">}</a> <a id="944" class="Symbol">{</a><a id="945" href="/lia/part0/WellFounded/#945" class="Bound">A</a> <a id="947" class="Symbol">:</a> <a id="949" class="PrimitiveType">Set</a> <a id="953" href="/lia/part0/WellFounded/#935" class="Bound">ℓ</a><a id="954" class="Symbol">}</a> <a id="956" class="Symbol">{</a><a id="957" href="/lia/part0/WellFounded/#957" class="Bound">B</a> <a id="959" class="Symbol">:</a> <a id="961" class="PrimitiveType">Set</a> <a id="965" href="/lia/part0/WellFounded/#937" class="Bound">m</a><a id="966" class="Symbol">}</a>
+  <a id="970" class="Symbol">(</a><a id="971" href="/lia/part0/WellFounded/#971" class="Bound">R</a> <a id="973" class="Symbol">:</a> <a id="975" href="/lia/part0/WellFounded/#945" class="Bound">A</a> <a id="977" class="Symbol">→</a> <a id="979" href="/lia/part0/WellFounded/#945" class="Bound">A</a> <a id="981" class="Symbol">→</a> <a id="983" class="PrimitiveType">Set</a> <a id="987" href="/lia/part0/WellFounded/#939" class="Bound">n</a><a id="988" class="Symbol">)</a>
+  <a id="992" class="Symbol">(</a><a id="993" href="/lia/part0/WellFounded/#993" class="Bound">S</a> <a id="995" class="Symbol">:</a> <a id="997" href="/lia/part0/WellFounded/#957" class="Bound">B</a> <a id="999" class="Symbol">→</a> <a id="1001" href="/lia/part0/WellFounded/#957" class="Bound">B</a> <a id="1003" class="Symbol">→</a> <a id="1005" class="PrimitiveType">Set</a> <a id="1009" href="/lia/part0/WellFounded/#941" class="Bound">o</a><a id="1010" class="Symbol">)</a>
+  <a id="1014" class="Symbol">(</a><a id="1015" href="/lia/part0/WellFounded/#1015" class="Bound">f</a> <a id="1017" class="Symbol">:</a> <a id="1019" href="/lia/part0/WellFounded/#945" class="Bound">A</a> <a id="1021" class="Symbol">→</a> <a id="1023" href="/lia/part0/WellFounded/#957" class="Bound">B</a><a id="1024" class="Symbol">)</a> <a id="1026" class="Symbol">→</a>
+  <a id="1030" href="/lia/part0/WellFounded/#548" class="Function">WellFounded</a> <a id="1042" href="/lia/part0/WellFounded/#993" class="Bound">S</a> <a id="1044" class="Symbol">→</a>
+  <a id="1048" class="Symbol">(∀</a> <a id="1051" class="Symbol">{</a><a id="1052" href="/lia/part0/WellFounded/#1052" class="Bound">a</a> <a id="1054" href="/lia/part0/WellFounded/#1054" class="Bound">b</a><a id="1055" class="Symbol">}</a> <a id="1057" class="Symbol">→</a> <a id="1059" href="/lia/part0/WellFounded/#971" class="Bound">R</a> <a id="1061" href="/lia/part0/WellFounded/#1052" class="Bound">a</a> <a id="1063" href="/lia/part0/WellFounded/#1054" class="Bound">b</a> <a id="1065" class="Symbol">→</a> <a id="1067" href="/lia/part0/WellFounded/#993" class="Bound">S</a> <a id="1069" class="Symbol">(</a><a id="1070" href="/lia/part0/WellFounded/#1015" class="Bound">f</a> <a id="1072" href="/lia/part0/WellFounded/#1052" class="Bound">a</a><a id="1073" class="Symbol">)</a> <a id="1075" class="Symbol">(</a><a id="1076" href="/lia/part0/WellFounded/#1015" class="Bound">f</a> <a id="1078" href="/lia/part0/WellFounded/#1054" class="Bound">b</a><a id="1079" class="Symbol">))</a> <a id="1082" class="Symbol">→</a>
+  <a id="1086" href="/lia/part0/WellFounded/#548" class="Function">WellFounded</a> <a id="1098" href="/lia/part0/WellFounded/#971" class="Bound">R</a>
+<a id="1100" href="/lia/part0/WellFounded/#923" class="Function">mon-wf</a> <a id="1107" href="/lia/part0/WellFounded/#1107" class="Bound">R</a> <a id="1109" href="/lia/part0/WellFounded/#1109" class="Bound">S</a> <a id="1111" href="/lia/part0/WellFounded/#1111" class="Bound">f</a> <a id="1113" href="/lia/part0/WellFounded/#1113" class="Bound">wf-S</a> <a id="1118" href="/lia/part0/WellFounded/#1118" class="Bound">R⊆S</a> <a id="1122" href="/lia/part0/WellFounded/#1122" class="Bound">a</a> <a id="1124" class="Symbol">=</a> <a id="1126" href="/lia/part0/WellFounded/#506" class="InductiveConstructor">acc</a> <a id="1130" class="Symbol">{!!}</a></pre>
+
+<h2 id="lexicographic-product">
+<a class="anchor" href="#lexicographic-product" aria-hidden="true"><span class="octicon octicon-link"></span></a>Lexicographic product</h2>
+
+<pre class="Agda"><a id="_×ₗₑₓ_"></a><a id="1170" href="/lia/part0/WellFounded/#1170" class="Function Operator">_×ₗₑₓ_</a> <a id="1177" class="Symbol">:</a> <a id="1179" class="Symbol">{</a><a id="1180" href="/lia/part0/WellFounded/#1180" class="Bound">A</a> <a id="1182" class="Symbol">:</a> <a id="1184" class="PrimitiveType">Set</a><a id="1187" class="Symbol">}</a> <a id="1189" class="Symbol">{</a><a id="1190" href="/lia/part0/WellFounded/#1190" class="Bound">B</a> <a id="1192" class="Symbol">:</a> <a id="1194" class="PrimitiveType">Set</a><a id="1197" class="Symbol">}</a> <a id="1199" class="Symbol">→</a>
+  <a id="1203" class="Symbol">(</a><a id="1204" href="/lia/part0/WellFounded/#1180" class="Bound">A</a> <a id="1206" class="Symbol">→</a> <a id="1208" href="/lia/part0/WellFounded/#1180" class="Bound">A</a> <a id="1210" class="Symbol">→</a> <a id="1212" class="PrimitiveType">Set</a><a id="1215" class="Symbol">)</a> <a id="1217" class="Symbol">→</a>
+  <a id="1221" class="Symbol">(</a><a id="1222" href="/lia/part0/WellFounded/#1190" class="Bound">B</a> <a id="1224" class="Symbol">→</a> <a id="1226" href="/lia/part0/WellFounded/#1190" class="Bound">B</a> <a id="1228" class="Symbol">→</a> <a id="1230" class="PrimitiveType">Set</a><a id="1233" class="Symbol">)</a> <a id="1235" class="Symbol">→</a>
+  <a id="1239" class="Symbol">(</a><a id="1240" href="/lia/part0/WellFounded/#1180" class="Bound">A</a> <a id="1242" href="/lia/part0/Logic/#1770" class="Record Operator">×</a> <a id="1244" href="/lia/part0/WellFounded/#1190" class="Bound">B</a> <a id="1246" class="Symbol">→</a> <a id="1248" href="/lia/part0/WellFounded/#1180" class="Bound">A</a> <a id="1250" href="/lia/part0/Logic/#1770" class="Record Operator">×</a> <a id="1252" href="/lia/part0/WellFounded/#1190" class="Bound">B</a> <a id="1254" class="Symbol">→</a> <a id="1256" class="PrimitiveType">Set</a><a id="1259" class="Symbol">)</a>
+<a id="1261" class="Symbol">(</a><a id="1262" href="/lia/part0/WellFounded/#1262" class="Bound Operator">_≺A_</a> <a id="1267" href="/lia/part0/WellFounded/#1170" class="Function Operator">×ₗₑₓ</a> <a id="1272" href="/lia/part0/WellFounded/#1272" class="Bound Operator">_≺B_</a><a id="1276" class="Symbol">)</a> <a id="1278" class="Symbol">(</a><a id="1279" href="/lia/part0/WellFounded/#1279" class="Bound">a0</a> <a id="1282" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="1284" href="/lia/part0/WellFounded/#1284" class="Bound">b0</a><a id="1286" class="Symbol">)</a> <a id="1288" class="Symbol">(</a><a id="1289" href="/lia/part0/WellFounded/#1289" class="Bound">a1</a> <a id="1292" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="1294" href="/lia/part0/WellFounded/#1294" class="Bound">b1</a><a id="1296" class="Symbol">)</a> <a id="1298" class="Symbol">=</a> <a id="1300" href="/lia/part0/WellFounded/#1279" class="Bound">a0</a> <a id="1303" href="/lia/part0/WellFounded/#1262" class="Bound Operator">≺A</a> <a id="1306" href="/lia/part0/WellFounded/#1289" class="Bound">a1</a> <a id="1309" href="/lia/part0/Logic/#2456" class="Datatype Operator">⊎</a> <a id="1311" class="Symbol">(</a><a id="1312" href="/lia/part0/WellFounded/#1279" class="Bound">a0</a> <a id="1315" href="Agda.Builtin.Equality.html#151" class="Datatype Operator">≡</a> <a id="1317" href="/lia/part0/WellFounded/#1289" class="Bound">a1</a> <a id="1320" href="/lia/part0/Logic/#1770" class="Record Operator">×</a> <a id="1322" href="/lia/part0/WellFounded/#1284" class="Bound">b0</a> <a id="1325" href="/lia/part0/WellFounded/#1272" class="Bound Operator">≺B</a> <a id="1328" href="/lia/part0/WellFounded/#1294" class="Bound">b1</a><a id="1330" class="Symbol">)</a>
+
+<a id="lex-wf"></a><a id="1333" href="/lia/part0/WellFounded/#1333" class="Function">lex-wf</a> <a id="1340" class="Symbol">:</a> <a id="1342" class="Symbol">{</a><a id="1343" href="/lia/part0/WellFounded/#1343" class="Bound">A</a> <a id="1345" class="Symbol">:</a> <a id="1347" class="PrimitiveType">Set</a><a id="1350" class="Symbol">}</a> <a id="1352" class="Symbol">{</a><a id="1353" href="/lia/part0/WellFounded/#1353" class="Bound">B</a> <a id="1355" class="Symbol">:</a> <a id="1357" class="PrimitiveType">Set</a><a id="1360" class="Symbol">}</a>
+  <a id="1364" class="Symbol">{</a><a id="1365" href="/lia/part0/WellFounded/#1365" class="Bound Operator">_≺A_</a> <a id="1370" class="Symbol">:</a> <a id="1372" href="/lia/part0/WellFounded/#1343" class="Bound">A</a> <a id="1374" class="Symbol">→</a> <a id="1376" href="/lia/part0/WellFounded/#1343" class="Bound">A</a> <a id="1378" class="Symbol">→</a> <a id="1380" class="PrimitiveType">Set</a><a id="1383" class="Symbol">}</a>
+  <a id="1387" class="Symbol">{</a><a id="1388" href="/lia/part0/WellFounded/#1388" class="Bound Operator">_≺B_</a> <a id="1393" class="Symbol">:</a> <a id="1395" href="/lia/part0/WellFounded/#1353" class="Bound">B</a> <a id="1397" class="Symbol">→</a> <a id="1399" href="/lia/part0/WellFounded/#1353" class="Bound">B</a> <a id="1401" class="Symbol">→</a> <a id="1403" class="PrimitiveType">Set</a><a id="1406" class="Symbol">}</a> <a id="1408" class="Symbol">→</a>
+  <a id="1412" href="/lia/part0/WellFounded/#548" class="Function">WellFounded</a> <a id="1424" href="/lia/part0/WellFounded/#1365" class="Bound Operator">_≺A_</a> <a id="1429" class="Symbol">→</a>
+  <a id="1433" href="/lia/part0/WellFounded/#548" class="Function">WellFounded</a> <a id="1445" href="/lia/part0/WellFounded/#1388" class="Bound Operator">_≺B_</a> <a id="1450" class="Symbol">→</a>
+  <a id="1454" href="/lia/part0/WellFounded/#548" class="Function">WellFounded</a> <a id="1466" class="Symbol">(</a><a id="1467" href="/lia/part0/WellFounded/#1365" class="Bound Operator">_≺A_</a> <a id="1472" href="/lia/part0/WellFounded/#1170" class="Function Operator">×ₗₑₓ</a> <a id="1477" href="/lia/part0/WellFounded/#1388" class="Bound Operator">_≺B_</a><a id="1481" class="Symbol">)</a> 
+<a id="1484" href="/lia/part0/WellFounded/#1333" class="Function">lex-wf</a> <a id="1491" class="Symbol">=</a> <a id="1493" class="Symbol">{!!}</a></pre>
+
+<h2 id="list-inclusion-is-well-founded">
+<a class="anchor" href="#list-inclusion-is-well-founded" aria-hidden="true"><span class="octicon octicon-link"></span></a>List inclusion is well-founded</h2>
+
+<p>NOTE: The following is about <em>well-founded induction</em> and it will be
+moved to some later parts.</p>
+
+<pre class="Agda"><a id="1641" class="Comment">-- This is more advanced and will be moved to later parts</a>
+
+<a id="1700" class="Comment">-- the number of distinct elements strictly decreases</a>
+
+<a id="wf-⊂"></a><a id="1755" href="/lia/part0/WellFounded/#1755" class="Function">wf-⊂</a> <a id="1760" class="Symbol">:</a> <a id="1762" class="Symbol">∀</a> <a id="1764" class="Symbol">{</a><a id="1765" href="/lia/part0/WellFounded/#1765" class="Bound">ℓ</a><a id="1766" class="Symbol">}</a> <a id="1768" class="Symbol">{</a><a id="1769" href="/lia/part0/WellFounded/#1769" class="Bound">A</a> <a id="1771" class="Symbol">:</a> <a id="1773" class="PrimitiveType">Set</a> <a id="1777" href="/lia/part0/WellFounded/#1765" class="Bound">ℓ</a><a id="1778" class="Symbol">}</a> <a id="1780" class="Symbol">{{</a><a id="1782" href="/lia/part0/WellFounded/#1782" class="Bound">_</a> <a id="1784" class="Symbol">:</a> <a id="1786" href="/lia/part0/Equality/#2845" class="Record">Eq</a> <a id="1789" href="/lia/part0/WellFounded/#1769" class="Bound">A</a><a id="1790" class="Symbol">}}</a> <a id="1793" class="Symbol">→</a> <a id="1795" href="/lia/part0/WellFounded/#548" class="Function">WellFounded</a> <a id="1807" class="Symbol">{</a><a id="1808" class="Argument">A</a> <a id="1810" class="Symbol">=</a> <a id="1812" href="/lia/part0/WellFounded/#1769" class="Bound">A</a> <a id="1814" href="/lia/part0/List/#468" class="Datatype Operator">*</a><a id="1815" class="Symbol">}</a> <a id="1817" href="/lia/part0/List/#26961" class="Function Operator">_⊂_</a>
+<a id="1821" href="/lia/part0/WellFounded/#1755" class="Function">wf-⊂</a> <a id="1826" class="Symbol">=</a> <a id="1828" href="/lia/part0/WellFounded/#923" class="Function">mon-wf</a> <a id="1835" href="/lia/part0/List/#26961" class="Function Operator">_⊂_</a> <a id="1839" href="/lia/part0/Naturals/#1261" class="Function Operator">_&lt;_</a> <a id="1843" class="Symbol">(</a><a id="1844" href="/lia/part0/List/#2287" class="Function">length</a> <a id="1851" href="/lia/part0/Utils/#686" class="Function Operator">∘</a> <a id="1853" href="/lia/part0/List/#27470" class="Function">support</a><a id="1860" class="Symbol">)</a> <a id="1862" href="/lia/part0/WellFounded/#654" class="Function">&lt;-wf</a> <a id="1867" href="/lia/part0/List/#30754" class="Function">⊂-len-support</a></pre>
+
+<div id="refs">
+
+  <h1 id="references">
+<a class="anchor" href="#references" aria-hidden="true"><span class="octicon octicon-link"></span></a>References</h1>
+
+</div>
+
+    </div>
+  
+    <header class="nav-header">
+    <p style="text-align:center;">
+        
+        
+        
+        <a alt="Part" href="/lia/part0/index/">Part</a>
+        &bullet;
+        
+        
+        <a alt="Source code" href="https://github.com/lclem/lia/blob/main/src/part0/WellFounded.lagda.md">Source</a>
+        
+        
+        
+    </p>
+</header>
+
+    <p class="p-name"> Last-modified: Jan  4 10:36:16 2021 </p>
+  </article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/lia/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Logic in Agda</h2><div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Lorenzo Clemente</li>
+          <li><a class="u-email" href="mailto:clementelorenzo@gmail.com">clementelorenzo@gmail.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/lclem"><svg class="svg-icon"><use xlink:href="/lia/assets/minima-social-icons.svg#github"></use></svg> <span class="username">lclem</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3"></div>
+    </div>This work is licensed under a <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>
+  </div>
+</footer>
+
+<!-- Parse the Latex divs with Katex
+<script type="text/javascript">
+  $("script[type='math/tex']").replaceWith(
+    function(){
+      var tex = $(this).text();
+      return katex.renderToString(tex, {displayMode: false});
+  });
+  
+  $("script[type='math/tex; mode=display']").replaceWith(
+    function(){
+      var tex = $(this).text();
+      return katex.renderToString(tex.replace(/%.*/g, ''), {displayMode: true});
+  });
+</script>
+-->
+
+<script type="text/javascript" src="/lia/assets/hidebox.js"></script>
+</body>
+
+</html>

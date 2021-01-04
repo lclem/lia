@@ -13,7 +13,7 @@
 <meta property="og:url" content="/lia/part0/Enumerable/" />
 <meta property="og:site_name" content="Logic in Agda" />
 <script type="application/ld+json">
-{"url":"/lia/part0/Enumerable/","headline":"Enumerable types 🚧","description":"Propositional and fist-order logic developed with the proof assistant Agda.","@type":"WebPage","@context":"https://schema.org"}</script>
+{"url":"/lia/part0/Enumerable/","description":"Propositional and fist-order logic developed with the proof assistant Agda.","@type":"WebPage","headline":"Enumerable types 🚧","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/lia/assets/main.css">
 
@@ -45,7 +45,7 @@
         kernelName: "agda",
         path: "src/",
         loadFromStore: true,
-        persistent: true,
+        persistent: false,
         // notebook server configuration; not needed with binder
         serverSettings: {
               baseUrl: "http://127.0.0.1:8888",
@@ -96,29 +96,13 @@
                 <a class="page-link" href="/lia/part2/index/">Part 2</a>
                 <a class="page-link" href="/lia/part3/index/">Part 3</a>
                 <a class="page-link" href="/lia/part4/index/">Part 4</a>
-                <svg class="progress-ring" width="30" height="30" title="exercise progress">
-                        <circle
-                            id="progress-circle"
-                            class="progress-ring__circle"
-                            stroke="black"
-                            stroke-width="2.5"
-                            fill="transparent"
-                            r="14"
-                            cx="15"
-                            cy="15"/>
-                        <circle
-                            stroke="lightgray"
-                            stroke-width="0.5"
-                            fill="transparent"
-                            r="14"
-                            cx="15"
-                            cy="15"/>
-                </svg>
-                <span class="progress-text" id="progress-text"> 0/0 </span>
+                <a class="page-link" href="/lia/part5/index/">Part 5</a>
+
                 <span class="kernel-status">
                     <button class="kernel-status-button" onclick="kernel_status_clicked()" title="kernel status"></button>
                     <span id="kernel-messages" class="kernel-messages"></span>
                 </span>
+
                 <div id="connection_options" class="options sidebar" style="text-align: left; line-height: normal; max-width: 800px; padding: 10px; border-radius: 15px;">
                     <!-- display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: space-between; -->
                     <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
@@ -164,6 +148,40 @@
                         <input type="text" placeholder="binderUrl" id="binderUrl" name="binderUrl" value="https://mybinder.org">
                     </div>
                 </div>
+
+                <span class="control-container" id="control-container">
+                    <svg class="progress-ring" id="progress-ring" width="30" height="30" title="exercise progress" onclick="kernel_status_clicked()">
+                        <circle
+                            id="progress-circle"
+                            class="progress-ring__circle"
+                            stroke="black"
+                            stroke-width="2.5"
+                            fill="transparent"
+                            r="14"
+                            cx="15"
+                            cy="15"/>
+                        <circle
+                            stroke="lightgray"
+                            stroke-width="0.5"
+                            fill="transparent"
+                            r="14"
+                            cx="15"
+                            cy="15"/>
+                    </svg>
+                    <div id="connection_options" class="options sidebar" style="text-align: left; line-height: normal; max-width: 800px; padding: 10px; border-radius: 15px;"></div>
+                    <span class="progress-text" id="progress-text" onclick="kernel_status_clicked()"> 0/0 </span>
+
+                    <span id="controls" class="controls">
+                        <svg version="1.1" id="run-all" class="run-all" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                            width="15" height="15" viewBox="0 0 163.861 163.861" style="enable-background:new 0 0 163.861 163.861;"
+                            xml:space="preserve">
+                            <g>
+                                <path d="M34.857,3.613C20.084-4.861,8.107,2.081,8.107,19.106v125.637c0,17.042,11.977,23.975,26.75,15.509L144.67,97.275
+                                    c14.778-8.477,14.778-22.211,0-30.686L34.857,3.613z"/>
+                            </g>
+                        </svg>
+                    </span>
+                </span>
             </div>
 
             <style>
@@ -263,8 +281,23 @@
                     margin-left: 20px;
                 }
 
-                .progress-ring {
+                .progress-ring, .run-all {
                     vertical-align: middle;
+                }
+
+                .control-container {
+                    transition: all .2s ease-in-out;
+                }
+
+                .controls {
+                    display: none;
+                    opacity: 0;
+                    margin-right: 10px;
+                    transition: all .5s ease-in-out;
+                }
+
+                .run-all:hover {
+                    filter: brightness(135%);
                 }
 
                 .progress-ring__circle {
@@ -281,6 +314,10 @@
                     font-size: 8px;
                     vertical-align: middle;
                     align-self: center;
+                }
+
+                .progress-text:hover, .progress-ring:hover, .progress-ring__circle:hover, .run-all {
+                    cursor: pointer;
                 }
             </style>
 
@@ -366,7 +403,7 @@
                 
                         console.info("Clicked kernel status");
 
-                        document.getElementById("kernel-messages").style.display="none";
+                        document.getElementById("kernel-messages").style.display = "none";
 
                         document.getElementById("connection_options").style.width = "750px";
                         document.getElementById("connection_options").style.display = "block";
@@ -376,7 +413,7 @@
 
                     function closeNav() {
 
-                        document.getElementById("kernel-messages").style.display="inline";
+                        document.getElementById("kernel-messages").style.display = "inline";
 
                         document.getElementById("connection_options").style.width = "0";
                         document.getElementById("connection_options").style.display = "none";
@@ -400,6 +437,23 @@
                         prevScrollpos = currentScrollPos;
                     }
                 }
+
+            let control_container = document.getElementById("control-container");
+            let controls = document.getElementById("controls");
+
+            control_container.addEventListener("mouseenter", function(event) {
+                controls.style.display = "inline";
+//                controls.style.visibility = "visible";
+                controls.style.opacity = 1;
+                console.info("mouseenter");
+            }, false);
+
+            control_container.addEventListener("mouseleave", function(event) {
+                // controls.style.visibility = "hidden";
+                // controls.style.display = "none";
+                controls.style.opacity = 0;
+                console.info("mouseleave");
+            }, false);
 
             </script>
             
@@ -434,7 +488,7 @@
   
     <div class="post-content">
         <h2>Contents</h2>    
-        <ul class="section-nav">
+        <ul id="toc" class="section-nav">
 <li class="toc-entry toc-h2"><a href="#booleans">Booleans</a></li>
 <li class="toc-entry toc-h2"><a href="#finite-subsets-of-ℕ">Finite subsets of ℕ</a></li>
 <li class="toc-entry toc-h2"><a href="#enumerable-functions">Enumerable functions</a></li>
@@ -712,7 +766,7 @@ extensionality).</p>
     </p>
 </header>
 
-    <p class="p-name"> Last-modified: Dec 31 11:53:28 2020 </p>
+    <p class="p-name"> Last-modified: Jan  4 10:36:16 2021 </p>
   </article>
       </div>
     </main><footer class="site-footer h-card">
