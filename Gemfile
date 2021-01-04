@@ -23,3 +23,5 @@ group :epub do
   gem 'safe_yaml'
   gem 'liquid'
 end
+
+gem "nokogiri", ">= 1.11.0.rc4"
