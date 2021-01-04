@@ -311,7 +311,28 @@ invariance : ∀ φ →
 
 !exercise(#exercise:invariance)(`invariance`)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Prove invariance of the semantics.
+Prove invariance of the semantics[^split-bug].
+
+[^split-bug]:
+    Currently there is a [bug](https://github.com/agda/agda/issues/3209) in Agda when case-splitting (Ctr-c+Ctrl-c) on an argument (such as `Formula`) which is defined in a parametric module (such as `part1.Semantics`).
+    For instance, if we case-split on `φ` in 
+
+        fun : Formula → Formula
+        fun φ = {! φ !}
+
+    we get
+
+        fun part1.Semantics.Formula.⊥ = ?
+        fun part1.Semantics.Formula.⊤ = ?
+        fun (part1.Semantics.Formula.` p) = ?
+        ...
+
+    instead of the expected
+    
+        fun ⊥ = ?
+        fun ⊤ = ?
+        fun (` p) = ?
+        ...
 
 !codemirror(invariance)
 
