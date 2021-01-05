@@ -456,6 +456,57 @@ data _,_⇒_ : AExp → Env → ℕ → Set where
     Let x e f , ρ ⇒ n
 ```
 
+Example derivation:
+
+```
+x0 = 0
+e0 = Let x0 ($ 2 + $ 3) (` x0 · $ 2) 
+
+_ : e0 , ρ0 ⇒ 10
+_ = BEGIN
+    have $ 2 , ρ0 ⇒ 2                               by ⇒-Num
+    have $ 3 , ρ0 ⇒ 3                               by ⇒-Num
+    have $ 2 + $ 3 , ρ0 ⇒ 5                         apply ⇒-Add at back 1 , here
+
+    have ` x0 , ρ0 [ x0 ↦ 5 ] ⇒ 5                   by ⇒-Var
+    have $ 2 , ρ0 [ x0 ↦ 5 ] ⇒ 2                    by ⇒-Num
+    have (` x0 · $ 2) , ρ0 [ x0 ↦ 5 ] ⇒ 10          apply ⇒-Mul at back 1 , here
+
+    have Let x0 ($ 2 + $ 3) (` x0 · $ 2) , ρ0 ⇒ 10  apply ⇒-Let at back 3 , here
+    END
+```
+
+## Evaluator (interpreter)
+
+Luckily we can automatically produce the derivations as in the previous example.
+
+```
+eval : ∀ e ρ → ∃[ n ] e , ρ ⇒ n
+
+eval ($ n) ρ = n , ⇒-Num
+
+eval (` x) ρ = ρ x , ⇒-Var
+
+eval (e + f) ρ
+  with eval e ρ | eval f ρ
+... | m , δ | n , σ = m +ℕ n , ⇒-Add δ σ
+
+eval (e · f) ρ
+  with eval e ρ | eval f ρ
+... | m , δ | n , σ = m ·ℕ n , ⇒-Mul δ σ
+
+eval (Let x e f) ρ
+  with eval e ρ
+... | m , δ 
+  with eval f (ρ [ x ↦ m ])
+... | n , σ = n , ⇒-Let δ σ
+```
+
+```
+_ : e0 , ρ0 ⇒ 10
+_ = dsnd (eval e0 ρ0)
+```
+
 ## Evaluation is deterministic
 
 ```
