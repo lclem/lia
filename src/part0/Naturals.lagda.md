@@ -20,7 +20,7 @@ open import Agda.Builtin.Nat using (Nat; zero; suc) public
 
 private
   variable
-    k m n : ℕ
+    k l m n : ℕ
 
 suc-inj : ∀ {m n : ℕ} → suc m ≡ suc n → m ≡ n
 suc-inj refl = refl
@@ -335,6 +335,14 @@ A⟦ e *E f ⟧ = A⟦ e ⟧ * A⟦ f ⟧
 ## Arithmetic contexts
 
 ```
+<-+-left : l < m → l + n < m + n
+<-+-left = {!   !}
+
+<-+-right : l < m → n + l < n + m
+<-+-right = {!   !}
+```
+
+```
 infixl 20 _+C_
 infixl 25 _*C_
 
@@ -355,7 +363,6 @@ aCtxApply (ctx1 *C ctx2) e = aCtxApply ctx1 e *E aCtxApply ctx2 e
 
 -- this is actually false: 0 * □
 -- postulate cong-< : ∀ {a b} → (ctx : ACtx) → a < b → A⟦ aCtxApply ctx (Num a) ⟧ < A⟦ aCtxApply ctx (Num b) ⟧
-
 
 postulate cong-≤ : ∀ {a b} → (ctx : ACtx) → a ≤ b → A⟦ aCtxApply ctx (Num a) ⟧ ≤ A⟦ aCtxApply ctx (Num b) ⟧
 

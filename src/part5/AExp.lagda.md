@@ -64,6 +64,11 @@ infixr 30 _·_
 infixl 25 _+_
 ```
 
+```
+add-one′ : AExp
+add-one′ = ` 10 + $ 1
+```
+
 ## Environments
 
 In order to represent the value of free variables,
@@ -404,51 +409,78 @@ size-down :
 size-down ↝-Var = s≤s 0≤n
 
 size-down ↝-Add-stop = s≤s 0≤n
-size-down (↝-Add-left de) = {!   !} -- s≤s (≤-+-cong-1 (size-down de))
-size-down {ρ} {e + f} {e + f′} (↝-Add-right de)
-  with size-down de -- | suc-lemma (size e) (size f′)
-... | e>f = {!   !} -- s≤s (subst (_≤ size e + size f) (sym p) {! ≤-+-cong-2 e>f !})
+size-down (↝-Add-left δ) = s≤s (<-+-left (size-down δ))
+size-down {e = e + _} (↝-Add-right δ) = s≤s (<-+-right {n = size e} (size-down δ))
 
 size-down ↝-Mul-stop = s≤s 0≤n
-size-down (↝-Mul-left δ) = {!   !} -- s≤s (≤-+-cong-1 (size-down de))
-size-down {ρ} {e · f} {e · f′} (↝-Mul-right δ)
-  with size-down δ 
-... | e>f = {!   !}
+size-down (↝-Mul-left δ) = s≤s (<-+-left (size-down δ))
+size-down {e = e · _} (↝-Mul-right δ) = s≤s (<-+-right {n = size e} (size-down δ))
 
 size-down ↝-Let-stop = s≤s 0≤n
-size-down (↝-Let-1 de) = s≤s (size-down de)
-size-down (↝-Let-2 de) = s≤s {!   !} -- (≤-+-cong-1 (size-down de))
+size-down (↝-Let-1 δ) = s≤s (size-down δ)
+size-down (↝-Let-2 δ) = s≤s (<-+-left (size-down δ))
 ```
+
+In the two "right" cases we need to give some extra hint for one implicit parameter.
 
 # Big-steps operational semantics
 
 ```
 infix 4 _,_⇒_
 data _,_⇒_ : AExp → Env → ℕ → Set where
-  ⇒-Num : ∀ {n ρ} → Num n , ρ ⇒ n
-  ⇒-Var : ∀ {x ρ} → Var x , ρ ⇒ ρ x
-  ⇒-Add : ∀ {e f m n ρ} → e , ρ ⇒ m → f , ρ ⇒ n → Add e f , ρ ⇒ m +ℕ n
-  ⇒-let : ∀ {x e f m n ρ} → e , ρ ⇒ m → f , ρ [ x ↦ m ] ⇒ n
-         → Let x e f , ρ ⇒ n
+
+  ⇒-Num :
+    -------------
+    Num n , ρ ⇒ n
+
+  ⇒-Var :
+    ---------------
+    Var x , ρ ⇒ ρ x
+
+  ⇒-Add :
+    e , ρ ⇒ m →
+    f , ρ ⇒ n →
+    ------------------
+    e + f , ρ ⇒ m +ℕ n
+
+  ⇒-Mul :
+    e , ρ ⇒ m →
+    f , ρ ⇒ n →
+    ------------------
+    e · f , ρ ⇒ m ·ℕ n
+
+  ⇒-Let :
+    e , ρ ⇒ m →
+    f , ρ [ x ↦ m ] ⇒ n →
+    ---------------------
+    Let x e f , ρ ⇒ n
 ```
 
 ## Evaluation is deterministic
 
 ```
-⇒-det : ∀ {e ρ m n} → e , ρ ⇒ m → e , ρ ⇒ n → m ≡ n
+⇒-det :
+  e , ρ ⇒ m →
+  e , ρ ⇒ n →
+  -----------
+  m ≡ n
+
 ⇒-det ⇒-Num ⇒-Num = refl
 ⇒-det ⇒-Var ⇒-Var = refl
 ⇒-det (⇒-Add x x₁) (⇒-Add y y₁)
     with ⇒-det x y | ⇒-det x₁ y₁
 ... | refl | refl = refl
-⇒-det (⇒-let ⇒₁-e ⇒₁-f) (⇒-let ⇒₂-e ⇒₂-f)
+⇒-det (⇒-Mul x x₁) (⇒-Mul y y₁)
+    with ⇒-det x y | ⇒-det x₁ y₁
+... | refl | refl = refl
+⇒-det (⇒-Let ⇒₁-e ⇒₁-f) (⇒-Let ⇒₂-e ⇒₂-f)
     with ⇒-det ⇒₁-e ⇒₂-e
 ... | refl
     with ⇒-det ⇒₁-f ⇒₂-f
 ... | refl = refl
 ```
 
-Note that in the `⇒-let` case we cannot perform the two with-abstractions in parallel because in order to apply the second one `⇒-det ⇒₁-f ⇒₂-f`
+Note that in the `⇒-Let` case we cannot perform the two with-abstractions in parallel because in order to apply the second one `⇒-det ⇒₁-f ⇒₂-f`
 we need the result of the first one.
 
 ## Agreement of the semantics
@@ -456,10 +488,10 @@ we need the result of the first one.
 The following lemma shows that the big-steps operational semantics agrees with the denotational semantics.
 
 ```
-⇒-agree-⟦⟧ : ∀ {e ρ} → e , ρ ⇒ ⟦ e ⟧ ρ
+⇒-agree-⟦⟧ : e , ρ ⇒ ⟦ e ⟧ ρ
 ⇒-agree-⟦⟧ {Num x} = ⇒-Num
 ⇒-agree-⟦⟧ {Var x} = ⇒-Var
 ⇒-agree-⟦⟧ {Add e e₁} = ⇒-Add ⇒-agree-⟦⟧ ⇒-agree-⟦⟧ 
-⇒-agree-⟦⟧ {Mul e e₁} = {!   !} -- ⇒-Add ⇒-agree-⟦⟧ ⇒-agree-⟦⟧ 
-⇒-agree-⟦⟧ {Let x e f} = ⇒-let ⇒-agree-⟦⟧ ⇒-agree-⟦⟧
+⇒-agree-⟦⟧ {Mul e e₁} = ⇒-Mul ⇒-agree-⟦⟧ ⇒-agree-⟦⟧ 
+⇒-agree-⟦⟧ {Let x e f} = ⇒-Let ⇒-agree-⟦⟧ ⇒-agree-⟦⟧
 ```
