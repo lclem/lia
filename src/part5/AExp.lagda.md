@@ -546,3 +546,269 @@ The following lemma shows that the big-steps operational semantics agrees with t
 ⇒-agree-⟦⟧ {Mul e e₁} = ⇒-Mul ⇒-agree-⟦⟧ ⇒-agree-⟦⟧ 
 ⇒-agree-⟦⟧ {Let x e f} = ⇒-Let ⇒-agree-⟦⟧ ⇒-agree-⟦⟧
 ```
+
+# Binary expressions
+
+## Syntax
+
+```
+infix 30 _𝟬 _𝟭
+
+data Bin : Set where
+  $ : Bin
+  _𝟬 : Bin → Bin
+  _𝟭 : Bin → Bin
+  Add : Bin → Bin → Bin
+
+pattern _+_ x y = Add x y
+
+private
+  variable
+    a a′ b b′ : Bin
+```
+
+## Denotational semantics
+
+```
+⟦_⟧ : Bin → ℕ
+⟦ $ ⟧ = 0
+⟦ a 𝟬 ⟧ = 2 ·ℕ ⟦ a ⟧
+⟦ a 𝟭 ⟧ = 1 +ℕ 2 ·ℕ ⟦ a ⟧
+⟦ a + b ⟧ = ⟦ a ⟧ +ℕ ⟦ b ⟧
+```
+
+## Small-steps operational semantics
+
+```
+infix 4 _↝_
+data _↝_ : Bin → Bin → Set where
+
+  ↝𝟬 : a ↝ a′ →
+       ----------
+       a 𝟬 ↝ a′ 𝟬
+
+  ↝𝟭 : a ↝ a′ →
+       ----------
+       a 𝟭 ↝ a′ 𝟭
+
+  ↝$L : ---------
+        $ + a ↝ a
+
+  ↝$R : ---------
+        a + $ ↝ a
+
+  ↝+L : a ↝ a′ →
+        --------------
+        a + b ↝ a′ + b
+
+  ↝+R : b ↝ b′ →
+        --------------
+        a + b ↝ a + b′
+        
+  ↝+𝟬𝟬 : ---------------------
+         a 𝟬 + b 𝟬 ↝ (a + b) 𝟬
+
+  ↝+𝟬𝟭 : ---------------------
+         a 𝟬 + b 𝟭 ↝ (a + b) 𝟭
+
+  ↝+𝟭𝟬 : ---------------------
+         a 𝟭 + b 𝟬 ↝ (a + b) 𝟭
+
+  ↝+𝟭𝟭 : ----------------------------
+         a 𝟭 + b 𝟭 ↝ (a + b + $ 𝟭) 𝟬
+```
+
+## Agreement 
+
+```
+agree : a ↝ a′ →
+        --------------
+        ⟦ a ⟧ ≡ ⟦ a′ ⟧
+
+agree (↝𝟬 e↝e') rewrite agree e↝e' = refl
+agree (↝𝟭 e↝e') rewrite agree e↝e' = refl
+agree ↝$L = refl
+agree ↝$R = n+0≡n _
+agree (↝+L e↝e') rewrite agree e↝e' = refl
+agree (↝+R e↝e') rewrite agree e↝e' = refl
+agree (↝+𝟬𝟬 {a} {b}) = magic ⟦ a ⟧ ⟦ b ⟧ where
+
+  magic : ∀ a b → a +ℕ (a +ℕ zero) +ℕ (b +ℕ (b +ℕ 0)) ≡ a +ℕ b +ℕ (a +ℕ b +ℕ 0)
+  magic = solve-∀
+
+agree (↝+𝟬𝟭 {a} {b}) = magic ⟦ a ⟧ ⟦ b ⟧ where
+    
+    magic : ∀ a b → a +ℕ (a +ℕ 0) +ℕ suc (b +ℕ (b +ℕ 0)) ≡ suc (a +ℕ b +ℕ (a +ℕ b +ℕ 0))
+    magic = solve-∀
+
+agree (↝+𝟭𝟬 {a} {b}) = magic ⟦ a ⟧ ⟦ b ⟧ where
+    
+    magic : ∀ a b → suc (a +ℕ (a +ℕ 0) +ℕ (b +ℕ (b +ℕ 0))) ≡ suc (a +ℕ b +ℕ (a +ℕ b +ℕ 0))
+    magic = solve-∀
+    
+agree (↝+𝟭𝟭 {a} {b}) = magic ⟦ a ⟧ ⟦ b ⟧ where
+
+  magic : ∀ a b → suc (a +ℕ (a +ℕ 0) +ℕ suc (b +ℕ (b +ℕ 0))) ≡ a +ℕ b +ℕ 1 +ℕ (a +ℕ b +ℕ 1 +ℕ 0)
+  magic = solve-∀
+```
+
+## Strong normalisation (first proof)
+
+```
+binSize : Bin → ℕ
+binSize $ = 0
+binSize (a 𝟬) = 1 +ℕ binSize a
+binSize (a 𝟭) = 1 +ℕ binSize a
+binSize (a + b) = 1 +ℕ binSize a +ℕ binSize b
+
+-- transitive closure
+infix 4 _↝*_
+data _↝*_ : Bin → Bin → Set where
+    stop : ∀ {a} → a ↝* a
+    step : ∀ {a b g} → a ↝ b → b ↝* g → a ↝* g
+
+-- strong normalisation
+-- we define a measure that is strictly decreasing on each computation step
+
+μ : Bin → ℕ
+μ $ = 0
+μ (a 𝟬) = 2 +ℕ μ a
+μ (a 𝟭) = 4 +ℕ μ a
+μ (a + b) = 1 +ℕ μ a +ℕ μ b
+
+μ-wf : a ↝ b →
+       ---------
+       μ b < μ a
+
+μ-wf (↝𝟬 e↝f) with μ-wf e↝f
+... | μf<μe = s≤s (s≤s μf<μe)
+
+μ-wf (↝𝟭 e↝f) with μ-wf e↝f
+... | μf<μe = s≤s (s≤s (s≤s (s≤s μf<μe)))
+
+μ-wf ↝$L = refl-≤
+
+μ-wf .{a + $} {a} ↝$R rewrite n+0≡n (μ a) = refl-≤
+
+μ-wf (↝+L e↝e') with μ-wf e↝e'
+... | μe'<μe = s≤s (<-+-left μe'<μe)
+
+μ-wf (↝+R f↝f') with μ-wf f↝f'
+... | μf'<μf = s≤s (<-+-right μf'<μf)
+
+μ-wf {a} {b} ↝+𝟬𝟬 = s≤s (s≤s (s≤s (<-+-right n<suc2n)))
+
+μ-wf a@{Add (a₁ 𝟬) (b₁ 𝟭)} {b} ↝+𝟬𝟭
+  rewrite
+    n+0≡n (μ a) |
+    n+0≡n (μ b) |
+    suc-lemma {μ a₁} {suc (suc (suc (μ b₁)))} |
+    suc-lemma {μ a₁} {suc (suc (μ b₁))} |
+    suc-lemma {μ a₁} {suc (μ b₁)} |
+    suc-lemma {μ a₁} {μ b₁}
+  = s≤s (s≤s (s≤s (s≤s (s≤s (s≤s n≤sucn)))))
+
+μ-wf a@{Add (a₁ 𝟭) (b₁ 𝟬)} {b} ↝+𝟭𝟬
+  rewrite
+    n+0≡n (μ a) |
+    n+0≡n (μ b) |
+    suc-lemma {μ a₁} {suc (μ b₁)} |
+    suc-lemma {μ a₁} {μ b₁}
+  = s≤s (s≤s (s≤s (s≤s (s≤s (s≤s n≤sucn)))))
+
+μ-wf a@{Add (a₁ 𝟭) (b₁ 𝟭)} {b} ↝+𝟭𝟭 = goal where
+
+  magic : ∀ a b →
+      suc (suc (suc (suc (suc (a +ℕ b +ℕ 4))))) ≡
+      suc (suc (suc (suc (suc (a +ℕ suc (suc (suc (suc b))))))))
+  magic = solve-∀
+
+  goal : suc (suc (suc (suc (suc (μ a₁ +ℕ μ b₁ +ℕ 4))))) ≤
+         suc (suc (suc (suc (suc (μ a₁ +ℕ suc (suc (suc (suc (μ b₁)))))))))
+  goal rewrite magic (μ a₁) (μ b₁) = refl-≤
+```
+
+## Strong normalisation (second proof)
+
+We prove strong normalisation by well-founded induction on a lexicograpic order.
+
+```
+zeroes ones dollars : Bin → ℕ
+
+zeroes $ = 0
+zeroes (a 𝟬) = 1 +ℕ zeroes a
+zeroes (a 𝟭) = zeroes a
+zeroes (a + b) = zeroes a +ℕ zeroes b
+
+ones $ = 0
+ones (a 𝟬) = ones a
+ones (a 𝟭) = 1 +ℕ ones a
+ones (a + b) = ones a +ℕ ones b
+
+dollars $ = 1
+dollars (a 𝟬) = dollars a
+dollars (a 𝟭) = dollars a
+dollars (a + b) = dollars a +ℕ dollars b
+
+Triple = ℕ × ℕ × ℕ
+
+triple : Bin → Triple
+triple a = (ones a , zeroes a , dollars a)
+
+_≺_ : Triple → Triple → Set
+_≺_ = _<_ ×ₗₑₓ _<_ ×ₗₑₓ _<_
+
+wf-≺ : WellFounded _≺_
+wf-≺ = lex-wf <-wf (lex-wf <-wf <-wf)
+
+triple-mon : a ↝ b →
+             -------------------
+             triple b ≺ triple a
+             
+triple-mon (↝𝟬 δ) with triple-mon δ
+... | left 1s = left 1s
+... | right (1s , left 0s) = right (1s , left (s≤s 0s))
+... | right (1s , right (0s , $s)) = right (1s , right (cong suc 0s , $s))
+
+triple-mon (↝𝟭 δ) with triple-mon δ
+... | left 1s = left (s≤s 1s)
+... | right (1s , left 0s) = right (cong suc 1s , left 0s)
+... | right (1s , right (0s , $s)) = right (cong suc 1s , right (0s , $s))
+
+triple-mon {$ + b} ↝$L = right (refl , right (refl , n<sucn))
+
+triple-mon {b + $} ↝$R
+  rewrite
+    n+0≡n (ones b) |
+    n+0≡n (zeroes b) |
+    suc-lemma {dollars b} {0} |
+    n+0≡n (dollars b) = right (refl , right (refl , refl-≤))
+
+triple-mon (↝+L δ) with triple-mon δ
+... | left 1s = left (<-+-left 1s)
+... | right (1s , left 0s) rewrite 1s = right (refl , left (<-+-left 0s))
+... | right (1s , right (0s , $s)) rewrite 1s | 0s = right (refl , right (refl , <-+-left $s))
+
+triple-mon (↝+R δ) with triple-mon δ
+... | left 1s = left (<-+-right 1s)
+... | right (1s , left 0s) rewrite 1s | 1s = right (refl , left (<-+-right 0s))
+... | right (1s , right (0s , $s)) rewrite 1s | 1s | 0s = right (refl , right (refl , <-+-right $s))
+
+-- number of zeroes goes down
+triple-mon {a 𝟬 + b 𝟬} ↝+𝟬𝟬 rewrite suc-lemma {zeroes a} {zeroes b} = right ( refl , left refl-≤)
+
+-- number of zeroes goes down
+triple-mon {a 𝟬 + b 𝟭} ↝+𝟬𝟭 rewrite suc-lemma {ones a} {ones b} = right ( refl , left refl-≤)
+
+-- number of zeroes goes down
+triple-mon {a 𝟭 + b 𝟬} ↝+𝟭𝟬 rewrite suc-lemma {zeroes a} {zeroes b} = right ( refl , left refl-≤)
+
+-- number of ones goes down
+triple-mon {a 𝟭 + b 𝟭} ↝+𝟭𝟭 = left goal where
+
+  have : ∀ a b → suc (a +ℕ b +ℕ 1) ≡ suc (a +ℕ suc b)
+  have = solve-∀
+
+  goal : suc (ones a +ℕ ones b +ℕ 1) ≤ suc (ones a +ℕ suc (ones b))
+  goal rewrite have (ones a) (ones b) = refl-≤
+```

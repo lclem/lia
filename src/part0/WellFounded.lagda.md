@@ -50,6 +50,7 @@ mon-wf R S f wf-S R⊆S a = acc {!!}
 ## Lexicographic product
 
 ```
+infixr 20 _×ₗₑₓ_
 _×ₗₑₓ_ : {A : Set} {B : Set} →
   (A → A → Set) →
   (B → B → Set) →
@@ -64,8 +65,6 @@ lex-wf : {A : Set} {B : Set}
   WellFounded (_≺A_ ×ₗₑₓ _≺B_) 
 lex-wf = {!!}
 ```
-
-
 
 ## List inclusion is well-founded
 

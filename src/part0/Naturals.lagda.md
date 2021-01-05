@@ -8,7 +8,7 @@ title: Natural numbers🚧
 
 module part0.Naturals where
 open import part0.Equality public
-open import Agda.Builtin.Nat using (Nat; zero; suc) public
+open import Agda.Builtin.Nat using (Nat; zero; suc) renaming (_+_ to infixl 11 _+_; _*_ to infixl 12 _*_) public
 
 ℕ = Nat
 
@@ -157,7 +157,7 @@ inst-max-≤-right {{arg}} = max-≤-right arg
 _ : max m n ≤ m
 _ = {!   !}
 
-n<suc2n : ∀ {n} → n < suc (suc n)
+n<suc2n : n < suc (suc n)
 n<suc2n {n} = trans-< (n<sucn {n}) (n<sucn {suc n})
 
 <→≢ : ∀ {m n} → m < n → m ≢ n
@@ -229,11 +229,11 @@ test x0 x y z p0 p q =
 ~n<n {suc n} q with ~n<n {n}
 ... | p = p (suc-≤ q)
 
-infixl 11 _+_
+-- infixl 11 _+_
 
-_+_ : ℕ → ℕ → ℕ
-zero + m = m
-suc n + m = suc (n + m)
+-- _+_ : ℕ → ℕ → ℕ
+-- zero + m = m
+-- suc n + m = suc (n + m)
 
 -- check that the definition above is equivalent to the built-in one
 -- {-# BUILTIN NATPLUS _+_ #-}
@@ -248,17 +248,19 @@ n+0≡n (suc n) rewrite n+0≡n n = refl
 {-# REWRITE n+0≡n #-}
 
 postulate sucm+n≡m+sucn : {m n : ℕ} → suc m + n ≡ m + suc n
-postulate suc-lemma : {m n : ℕ} → m + suc n ≡ suc m + n -- the commuting variant of the above
+
+suc-lemma : m + suc n ≡ suc m + n -- the commuting variant of the above
+suc-lemma = {!   !}
 
 ≤+ : ∀ {m n} → m ≤ m + n
 ≤+ {zero} {n} = 0≤n
 ≤+ {suc m} {n} = s≤s (≤+ {m} {n})
 
-infixl 12 _*_
+-- infixl 12 _*_
 
-_*_ : ℕ → ℕ → ℕ
-zero * m = zero
-suc n * m = m + n * m
+-- _*_ : ℕ → ℕ → ℕ
+-- zero * m = zero
+-- suc n * m = m + n * m
 
 -- {-# BUILTIN NATTIMES _*_ #-}
 ```
@@ -370,4 +372,18 @@ longAnd : ∀ {ℓ} → Set ℓ → ℕ → Set ℓ
 longAnd _ zero = T
 longAnd A (suc zero) = A
 longAnd A (suc (suc n)) = A × longAnd A (suc n)
+```
+
+```
+open import Relation.Binary.PropositionalEquality
+open ≡-Reasoning
+open import Data.Nat.Solver using (module +-*-Solver)
+open +-*-Solver
+
+ex₅ : ∀ m n → m * (n + zero) ≡ n * m
+ex₅ = solve 2 (λ m n → m :* (n :+ con 0) :=  n :* m) refl
+
+open import Data.Nat.Tactic.RingSolver public
+_ : ∀ m n → m * (n + 0) ≡ n * m
+_ = solve-∀
 ```
