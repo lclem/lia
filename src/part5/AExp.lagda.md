@@ -22,6 +22,9 @@ Any countable domain with decidable equality (such as strings) would work here
 ```
 VarName = ℕ
 
+x₀ : VarName
+x₀ = 0
+
 private variable x y z : VarName
 ```
 
@@ -77,37 +80,36 @@ we use environments.
 ```
 Env = VarName → ℕ
 
-private variable ρ : Env
+private variable ϱ : Env
 ```
 
 The following environment assigns value `200` to the variable named `10`,
 and value `40` to every other variable.
 
 ```
-ρ0 : Env
-ρ0 10 = 200
-ρ0 _ = 40
+ϱ0 : Env
+ϱ0 10 = 200
+ϱ0 _ = 40
 ```
 
 # Denotational semantics
 
 ```
 infix 15 ⟦_⟧_ A⟦_⟧_
-private ⟦_⟧_ sem : AExp → Env → ℕ
-⟦ $ n ⟧ ρ = n
-⟦ ` x ⟧ ρ = ρ x
-⟦ e + f ⟧ ρ = ⟦ e ⟧ ρ +ℕ ⟦ f ⟧ ρ
-⟦ e · f ⟧ ρ = ⟦ e ⟧ ρ ·ℕ ⟦ f ⟧ ρ
-⟦ Let x e f ⟧ ρ = ⟦ f ⟧ ρ [ x ↦ ⟦ e ⟧ ρ ]
+private ⟦_⟧_ : AExp → Env → ℕ
+⟦ $ n ⟧ ϱ = n
+⟦ ` x ⟧ ϱ = ϱ x
+⟦ e + f ⟧ ϱ = ⟦ e ⟧ ϱ +ℕ ⟦ f ⟧ ϱ
+⟦ e · f ⟧ ϱ = ⟦ e ⟧ ϱ ·ℕ ⟦ f ⟧ ϱ
+⟦ Let x e f ⟧ ϱ = ⟦ f ⟧ ϱ [ x ↦ ⟦ e ⟧ ϱ ]
 
 A⟦_⟧_ = ⟦_⟧_
-sem = ⟦_⟧_
 ```
 
 With our denotational semantics for expressions we can check (by computation) the value of concrete expressions.
 
 ```
-_ : ⟦ add-one ⟧ ρ0 ≡ 201
+_ : ⟦ add-one ⟧ ϱ0 ≡ 201
 _ = refl
 ```
 
@@ -119,55 +121,55 @@ We use global environments and eager semantics.
 infix 4 _⊢_↝_
 data _⊢_↝_ : Env → AExp → AExp → Set where
 
-  ↝-Var : ρ ⊢ ` x ↝ $ ρ x
+  ↝-Var : ϱ ⊢ ` x ↝ $ ϱ x
 
   ↝-Add-stop :
-    ρ ⊢ $ m + $ n ↝ $ (m +ℕ n)
+    ϱ ⊢ $ m + $ n ↝ $ (m +ℕ n)
 
   ↝-Add-left :
-    ρ ⊢ e ↝ e′ →
+    ϱ ⊢ e ↝ e′ →
     ------------------
-    ρ ⊢ e + f ↝ e′ + f
+    ϱ ⊢ e + f ↝ e′ + f
 
   ↝-Add-right :
-    ρ ⊢ f ↝ f′ →
+    ϱ ⊢ f ↝ f′ →
     ------------------
-    ρ ⊢ e + f ↝ e + f′
+    ϱ ⊢ e + f ↝ e + f′
 
   ↝-Mul-stop :
-    ρ ⊢ $ m · $ n ↝ $ (m ·ℕ n)
+    ϱ ⊢ $ m · $ n ↝ $ (m ·ℕ n)
 
   ↝-Mul-left :
-    ρ ⊢ e ↝ e′ →
+    ϱ ⊢ e ↝ e′ →
     ------------------
-    ρ ⊢ e · f ↝ e′ · f
+    ϱ ⊢ e · f ↝ e′ · f
 
   ↝-Mul-right :
-    ρ ⊢ f ↝ f′ →
+    ϱ ⊢ f ↝ f′ →
     ------------------
-    ρ ⊢ e · f ↝ e · f′
+    ϱ ⊢ e · f ↝ e · f′
 
   ↝-Let-stop :
-    ρ ⊢ Let x ($ m) ($ n) ↝ $ n
+    ϱ ⊢ Let x ($ m) ($ n) ↝ $ n
 
   ↝-Let-1 :
-    ρ [ x ↦ m ] ⊢ f ↝ f′ →
+    ϱ [ x ↦ m ] ⊢ f ↝ f′ →
     ----------------------------------
-    ρ ⊢ Let x ($ m) f ↝ Let x ($ m) f′
+    ϱ ⊢ Let x ($ m) f ↝ Let x ($ m) f′
 
   ↝-Let-2 :
-    ρ ⊢ e ↝ e′ →
+    ϱ ⊢ e ↝ e′ →
     --------------------------
-    ρ ⊢ Let x e f ↝ Let x e′ f
+    ϱ ⊢ Let x e f ↝ Let x e′ f
 ```
 
 ## Preservation
 
 ```
 preservation :
-  ρ ⊢ e ↝ f →
+  ϱ ⊢ e ↝ f →
   -----------------
-  ⟦ e ⟧ ρ ≡ ⟦ f ⟧ ρ
+  ⟦ e ⟧ ϱ ≡ ⟦ f ⟧ ϱ
 
 preservation ↝-Var = refl
 
@@ -191,22 +193,22 @@ We define the transitive closure of the small-step operational semantics.
 ```
 data _⊢_↝*_ : Env → AExp → AExp → Set where
 
-    stop : ρ ⊢ e ↝* e
+    stop : ϱ ⊢ e ↝* e
 
-    one : ρ ⊢ e ↝ f →
-          ρ ⊢ f ↝* g →
+    one : ϱ ⊢ e ↝ f →
+          ϱ ⊢ f ↝* g →
           ----------
-          ρ ⊢ e ↝* g
+          ϱ ⊢ e ↝* g
 ```
 
 We can indeed show that `_⊢_↝*_` is transitive with a standard induction.
 
 ```
 ↝*-trans :
-  ρ ⊢ e ↝* f →
-  ρ ⊢ f ↝* g →
+  ϱ ⊢ e ↝* f →
+  ϱ ⊢ f ↝* g →
   ----------
-  ρ ⊢ e ↝* g
+  ϱ ⊢ e ↝* g
 
 ↝*-trans stop δ = δ
 ↝*-trans (one step δ₁) δ₂ = one step (↝*-trans δ₁ δ₂)
@@ -216,16 +218,16 @@ An easy induction based on !ref(preservation) shows that the denotational semant
 
 ```
 preservation* :
-  ρ ⊢ e ↝* f →
+  ϱ ⊢ e ↝* f →
   -----------------
-  ⟦ e ⟧ ρ ≡ ⟦ f ⟧ ρ
+  ⟦ e ⟧ ϱ ≡ ⟦ f ⟧ ϱ
 
-preservation* {ρ} {e} {.e} stop = refl
-preservation* {ρ} {e} {g} (one {f = f} step der) =
+preservation* {ϱ} {e} {.e} stop = refl
+preservation* {ϱ} {e} {g} (one {f = f} step der) =
     begin
-        ⟦ e ⟧ ρ ≡⟨ preservation {ρ} {e} {f} step ⟩
-        ⟦ f ⟧ ρ ≡⟨ preservation* {ρ} {f} {g} der ⟩
-        ⟦ g ⟧ ρ
+        ⟦ e ⟧ ϱ ≡⟨ preservation {ϱ} {e} {f} step ⟩
+        ⟦ f ⟧ ϱ ≡⟨ preservation* {ϱ} {f} {g} der ⟩
+        ⟦ g ⟧ ϱ
     ∎
 ```
 
@@ -234,9 +236,9 @@ then this is the right result.
 
 ```
 ↝*-agree-⟦⟧ :
-  ρ ⊢ e ↝* $ m →
+  ϱ ⊢ e ↝* $ m →
   --------------
-  m ≡ ⟦ e ⟧ ρ
+  m ≡ ⟦ e ⟧ ϱ
 
 ↝*-agree-⟦⟧ der = sym (preservation* der)
 ```
@@ -253,8 +255,8 @@ then they necessarily are the same number.
 
 ```
 ↝*-det :
-  ρ ⊢ e ↝* Num m →
-  ρ ⊢ e ↝* Num n →
+  ϱ ⊢ e ↝* Num m →
+  ϱ ⊢ e ↝* Num n →
   -----------------
   m ≡ n
 
@@ -267,49 +269,49 @@ We show that the transitive closure `_⊢_↝*_` respects subexpressions.
 
 ```
 add-cong-1 :
-  ρ ⊢ e ↝* e′ →
+  ϱ ⊢ e ↝* e′ →
   -------------------
-  ρ ⊢ e + f ↝* e′ + f
+  ϱ ⊢ e + f ↝* e′ + f
 
 add-cong-1 stop = stop
 add-cong-1 (one x d) = one (↝-Add-left x) (add-cong-1 d)
 
 add-cong-2 :
-  ρ ⊢ f ↝* f′ →
+  ϱ ⊢ f ↝* f′ →
   -------------------
-  ρ ⊢ e + f ↝* e + f′
+  ϱ ⊢ e + f ↝* e + f′
 
 add-cong-2 stop = stop
 add-cong-2 (one x d) = one (↝-Add-right x) (add-cong-2 d)
 
 mul-cong-1 :
-  ρ ⊢ e ↝* e′ →
+  ϱ ⊢ e ↝* e′ →
   -------------------
-  ρ ⊢ e · f ↝* e′ · f
+  ϱ ⊢ e · f ↝* e′ · f
 
 mul-cong-1 stop = stop
 mul-cong-1 (one x d) = one (↝-Mul-left x) (mul-cong-1 d)
 
 mul-cong-2 :
-  ρ ⊢ f ↝* f′ →
+  ϱ ⊢ f ↝* f′ →
   -------------------
-  ρ ⊢ e · f ↝* e · f′
+  ϱ ⊢ e · f ↝* e · f′
 
 mul-cong-2 stop = stop
 mul-cong-2 (one x d) = one (↝-Mul-right x) (mul-cong-2 d)
 
 let-cong-1 :
-  ρ ⊢ e ↝* e′ →
+  ϱ ⊢ e ↝* e′ →
   ----------------------------
-  ρ ⊢ Let x e f ↝* Let x e′ f
+  ϱ ⊢ Let x e f ↝* Let x e′ f
 
 let-cong-1 stop = stop
 let-cong-1 (one x d) = one (↝-Let-2 x) (let-cong-1 d)
 
 let-cong-2 :
-  ρ [ x ↦ m ] ⊢ f ↝* f′ →
+  ϱ [ x ↦ m ] ⊢ f ↝* f′ →
   -----------------------------------
-  ρ ⊢ Let x ($ m) f ↝* Let x ($ m) f′
+  ϱ ⊢ Let x ($ m) f ↝* Let x ($ m) f′
 
 let-cong-2 stop = stop
 let-cong-2 (one x d) = one (↝-Let-1 x) (let-cong-2 d)
@@ -323,16 +325,16 @@ We introduce some syntactic sugaring to conveniently write chains of small steps
 infixr 2 _↝*⟨⟩_ _↝*⟨_⟩_ _↝⟨_⟩_ 
 infix  3 _↝*∎
 
-_↝*⟨⟩_ : ∀ {ρ} e {f} → ρ ⊢ e ↝* f → ρ ⊢ e ↝* f
+_↝*⟨⟩_ : ∀ {ϱ} e {f} → ϱ ⊢ e ↝* f → ϱ ⊢ e ↝* f
 e ↝*⟨⟩ e↝*f = e↝*f
 
-_↝*⟨_⟩_ : ∀ {ρ} e {f g} → ρ ⊢ e ↝* f → ρ ⊢ f ↝* g → ρ ⊢ e ↝* g
+_↝*⟨_⟩_ : ∀ {ϱ} e {f g} → ϱ ⊢ e ↝* f → ϱ ⊢ f ↝* g → ϱ ⊢ e ↝* g
 e ↝*⟨ e↝*f ⟩ f↝*g = ↝*-trans e↝*f f↝*g
 
-_↝⟨_⟩_ : ∀ {ρ} e {f g} → ρ ⊢ e ↝ f → ρ ⊢ f ↝* g → ρ ⊢ e ↝* g
+_↝⟨_⟩_ : ∀ {ϱ} e {f g} → ϱ ⊢ e ↝ f → ϱ ⊢ f ↝* g → ϱ ⊢ e ↝* g
 e ↝⟨ e↝f ⟩ f↝*g = e ↝*⟨ one e↝f stop ⟩ f↝*g 
 
-_↝*∎ : ∀ e → ρ ⊢ e ↝* e
+_↝*∎ : ∀ e → ϱ ⊢ e ↝* e
 e ↝*∎ = stop
 ```
 
@@ -347,38 +349,38 @@ We prove that the small step operational semantics can always reache some numeri
 In other word, we prove below that the rewrite is *weakly normalising*.
 
 ```
-weak-normalisation : ∀ e → ρ ⊢ e ↝* $ (⟦ e ⟧ ρ)
+weak-normalisation : ∀ e → ϱ ⊢ e ↝* $ (⟦ e ⟧ ϱ)
 
 weak-normalisation ($ n) = stop
 
 weak-normalisation (` x) = one ↝-Var stop
 
-weak-normalisation {ρ} (e + f)
+weak-normalisation {ϱ} (e + f)
   with weak-normalisation e | weak-normalisation f
 ... | de | df = 
   e + f ↝*⟨ add-cong-1 de ⟩
-  ($ (⟦ e ⟧ ρ)) + f ↝*⟨ add-cong-2 df ⟩
-  ($ (⟦ e ⟧ ρ)) + ($ (⟦ f ⟧ ρ)) ↝⟨ ↝-Add-stop ⟩
-  $ (⟦ e ⟧ ρ +ℕ ⟦ f ⟧ ρ)
+  ($ (⟦ e ⟧ ϱ)) + f ↝*⟨ add-cong-2 df ⟩
+  ($ (⟦ e ⟧ ϱ)) + ($ (⟦ f ⟧ ϱ)) ↝⟨ ↝-Add-stop ⟩
+  $ (⟦ e ⟧ ϱ +ℕ ⟦ f ⟧ ϱ)
   ↝*∎
 
-weak-normalisation {ρ} (e · f)
+weak-normalisation {ϱ} (e · f)
   with weak-normalisation e | weak-normalisation f
 ... | de | df = 
   e · f ↝*⟨ mul-cong-1 de ⟩
-  ($ (⟦ e ⟧ ρ)) · f ↝*⟨ mul-cong-2 df ⟩
-  ($ (⟦ e ⟧ ρ)) · ($ (⟦ f ⟧ ρ)) ↝⟨ ↝-Mul-stop ⟩
-  $ (⟦ e ⟧ ρ ·ℕ ⟦ f ⟧ ρ)
+  ($ (⟦ e ⟧ ϱ)) · f ↝*⟨ mul-cong-2 df ⟩
+  ($ (⟦ e ⟧ ϱ)) · ($ (⟦ f ⟧ ϱ)) ↝⟨ ↝-Mul-stop ⟩
+  $ (⟦ e ⟧ ϱ ·ℕ ⟦ f ⟧ ϱ)
   ↝*∎
 
-weak-normalisation {ρ} (Let x e f)
+weak-normalisation {ϱ} (Let x e f)
   with weak-normalisation e | weak-normalisation f
 ... | de | df =
     Let x e f ↝*⟨ let-cong-1 de ⟩
-    Let x ($ (⟦ e ⟧ ρ)) f ↝*⟨ let-cong-2 df ⟩
-    Let x ($ (⟦ e ⟧ ρ)) ($ (⟦ f ⟧ (ρ [ x ↦ ⟦ e ⟧ ρ ])))
+    Let x ($ (⟦ e ⟧ ϱ)) f ↝*⟨ let-cong-2 df ⟩
+    Let x ($ (⟦ e ⟧ ϱ)) ($ (⟦ f ⟧ (ϱ [ x ↦ ⟦ e ⟧ ϱ ])))
         ↝⟨ ↝-Let-stop ⟩
-    $ (⟦ f ⟧ (ρ [ x ↦ ⟦ e ⟧ ρ ]))
+    $ (⟦ f ⟧ (ϱ [ x ↦ ⟦ e ⟧ ϱ ]))
     ↝*∎
 ```
 
@@ -405,7 +407,7 @@ In the lemma below we show that the size of an expression strictly decreases at 
 
 ```
 size-down :
-  ρ ⊢ e ↝ f →
+  ϱ ⊢ e ↝ f →
   ---------------
   size e > size f
   
@@ -434,29 +436,29 @@ data _,_⇒_ : AExp → Env → ℕ → Set where
 
   ⇒-Num :
     -------------
-    Num n , ρ ⇒ n
+    Num n , ϱ ⇒ n
 
   ⇒-Var :
     ---------------
-    Var x , ρ ⇒ ρ x
+    Var x , ϱ ⇒ ϱ x
 
   ⇒-Add :
-    e , ρ ⇒ m →
-    f , ρ ⇒ n →
+    e , ϱ ⇒ m →
+    f , ϱ ⇒ n →
     ------------------
-    e + f , ρ ⇒ m +ℕ n
+    e + f , ϱ ⇒ m +ℕ n
 
   ⇒-Mul :
-    e , ρ ⇒ m →
-    f , ρ ⇒ n →
+    e , ϱ ⇒ m →
+    f , ϱ ⇒ n →
     ------------------
-    e · f , ρ ⇒ m ·ℕ n
+    e · f , ϱ ⇒ m ·ℕ n
 
   ⇒-Let :
-    e , ρ ⇒ m →
-    f , ρ [ x ↦ m ] ⇒ n →
+    e , ϱ ⇒ m →
+    f , ϱ [ x ↦ m ] ⇒ n →
     ---------------------
-    Let x e f , ρ ⇒ n
+    Let x e f , ϱ ⇒ n
 ```
 
 Example derivation:
@@ -465,17 +467,17 @@ Example derivation:
 x0 = 0
 e0 = Let x0 ($ 2 + $ 3) (` x0 · $ 2) 
 
-_ : e0 , ρ0 ⇒ 10
+_ : e0 , ϱ0 ⇒ 10
 _ = BEGIN
-    have $ 2 , ρ0 ⇒ 2                               by ⇒-Num
-    have $ 3 , ρ0 ⇒ 3                               by ⇒-Num
-    have $ 2 + $ 3 , ρ0 ⇒ 5                         apply ⇒-Add at back 1 , here
+    have $ 2 , ϱ0 ⇒ 2                               by ⇒-Num
+    have $ 3 , ϱ0 ⇒ 3                               by ⇒-Num
+    have $ 2 + $ 3 , ϱ0 ⇒ 5                         apply ⇒-Add at back 1 , here
 
-    have ` x0 , ρ0 [ x0 ↦ 5 ] ⇒ 5                   by ⇒-Var
-    have $ 2 , ρ0 [ x0 ↦ 5 ] ⇒ 2                    by ⇒-Num
-    have (` x0 · $ 2) , ρ0 [ x0 ↦ 5 ] ⇒ 10          apply ⇒-Mul at back 1 , here
+    have ` x0 , ϱ0 [ x0 ↦ 5 ] ⇒ 5                   by ⇒-Var
+    have $ 2 , ϱ0 [ x0 ↦ 5 ] ⇒ 2                    by ⇒-Num
+    have (` x0 · $ 2) , ϱ0 [ x0 ↦ 5 ] ⇒ 10          apply ⇒-Mul at back 1 , here
 
-    have Let x0 ($ 2 + $ 3) (` x0 · $ 2) , ρ0 ⇒ 10  apply ⇒-Let at back 3 , here
+    have Let x0 ($ 2 + $ 3) (` x0 · $ 2) , ϱ0 ⇒ 10  apply ⇒-Let at back 3 , here
     END
 ```
 
@@ -484,38 +486,38 @@ _ = BEGIN
 Luckily we can automatically produce the derivations as in the previous example.
 
 ```
-eval : ∀ e ρ → ∃[ n ] e , ρ ⇒ n
+eval : ∀ e ϱ → ∃[ n ] e , ϱ ⇒ n
 
-eval ($ n) ρ = n , ⇒-Num
+eval ($ n) ϱ = n , ⇒-Num
 
-eval (` x) ρ = ρ x , ⇒-Var
+eval (` x) ϱ = ϱ x , ⇒-Var
 
-eval (e + f) ρ
-  with eval e ρ | eval f ρ
+eval (e + f) ϱ
+  with eval e ϱ | eval f ϱ
 ... | m , δ | n , σ = m +ℕ n , ⇒-Add δ σ
 
-eval (e · f) ρ
-  with eval e ρ | eval f ρ
+eval (e · f) ϱ
+  with eval e ϱ | eval f ϱ
 ... | m , δ | n , σ = m ·ℕ n , ⇒-Mul δ σ
 
-eval (Let x e f) ρ
-  with eval e ρ
+eval (Let x e f) ϱ
+  with eval e ϱ
 ... | m , δ 
-  with eval f (ρ [ x ↦ m ])
+  with eval f (ϱ [ x ↦ m ])
 ... | n , σ = n , ⇒-Let δ σ
 ```
 
 ```
-_ : e0 , ρ0 ⇒ 10
-_ = dsnd (eval e0 ρ0)
+_ : e0 , ϱ0 ⇒ 10
+_ = dsnd (eval e0 ϱ0)
 ```
 
 ## Evaluation is deterministic
 
 ```
 ⇒-det :
-  e , ρ ⇒ m →
-  e , ρ ⇒ n →
+  e , ϱ ⇒ m →
+  e , ϱ ⇒ n →
   -----------
   m ≡ n
 
@@ -542,7 +544,7 @@ we need the result of the first one.
 The following lemma shows that the big-steps operational semantics agrees with the denotational semantics.
 
 ```
-⇒-agree-⟦⟧ : e , ρ ⇒ ⟦ e ⟧ ρ
+⇒-agree-⟦⟧ : e , ϱ ⇒ ⟦ e ⟧ ϱ
 ⇒-agree-⟦⟧ {Num x} = ⇒-Num
 ⇒-agree-⟦⟧ {Var x} = ⇒-Var
 ⇒-agree-⟦⟧ {Add e e₁} = ⇒-Add ⇒-agree-⟦⟧ ⇒-agree-⟦⟧ 
@@ -565,7 +567,7 @@ fv (Let x e f) = fv e ++ remove x (fv f)
 closed : AExp → Set
 closed e = fv e ≡ ε
 
-fv-lemma : ∀ ρ₀ ρ₁ e → Agree ρ₀ ρ₁ (fv e) → ⟦ e ⟧ ρ₀ ≡ ⟦ e ⟧ ρ₁
+fv-lemma : ∀ ϱ₀ ϱ₁ e → Agree ϱ₀ ϱ₁ (fv e) → ⟦ e ⟧ ϱ₀ ≡ ⟦ e ⟧ ϱ₁
 fv-lemma = {!   !}
 
 -- all named variables occurring in the expression
@@ -673,10 +675,10 @@ data _AdmissibleFor_In_ (g : AExp) (x : VarName) : AExp → Set where
           --------------------------------
           g AdmissibleFor x In (Let y e f)
 
-subst-lemma : ∀ g x ρ →
+subst-lemma : ∀ g x ϱ →
   g AdmissibleFor x In e →
   --------------------------------------------
-  ⟦ e A[ x ↦ g ] ⟧ ρ ≡ ⟦ e ⟧ ρ [ x ↦ ⟦ g ⟧ ρ ]
+  ⟦ e A[ x ↦ g ] ⟧ ϱ ≡ ⟦ e ⟧ ϱ [ x ↦ ⟦ g ⟧ ϱ ]
 
 subst-lemma _ _ _ (Num n) = refl
 
@@ -685,36 +687,36 @@ subst-lemma _ x _ (Var y)
 ... | yes refl = refl
 ... | no _ = refl
 
-subst-lemma g x ρ (Add e f adm-e adm-f)
-  rewrite subst-lemma g x ρ adm-e |
-          subst-lemma g x ρ adm-f
+subst-lemma g x ϱ (Add e f adm-e adm-f)
+  rewrite subst-lemma g x ϱ adm-e |
+          subst-lemma g x ϱ adm-f
   = refl
 
-subst-lemma g x ρ (Mul e f adm-e adm-f)
-  rewrite subst-lemma g x ρ adm-e |
-          subst-lemma g x ρ adm-f
+subst-lemma g x ϱ (Mul e f adm-e adm-f)
+  rewrite subst-lemma g x ϱ adm-e |
+          subst-lemma g x ϱ adm-f
   = refl
 
-subst-lemma g x ρ (Let-1 e f adm-e)
-  with subst-lemma g x ρ adm-e
+subst-lemma g x ϱ (Let-1 e f adm-e)
+  with subst-lemma g x ϱ adm-e
 ... | ind =
   begin
-    ⟦ Let x e f A[ x ↦ g ] ⟧ ρ
-      ≡⟨ cong (λ C → ⟦ C ⟧ ρ) (subs-Let-1 x e) ⟩
-    ⟦ Let x (e A[ x ↦ g ]) f ⟧ ρ
+    ⟦ Let x e f A[ x ↦ g ] ⟧ ϱ
+      ≡⟨ cong (λ C → ⟦ C ⟧ ϱ) (subs-Let-1 x e) ⟩
+    ⟦ Let x (e A[ x ↦ g ]) f ⟧ ϱ
       ≡⟨⟩
-    ⟦ f ⟧ ρ [ x ↦ ⟦ e A[ x ↦ g ] ⟧ ρ ]
-      ≡⟨ cong (λ C → ⟦ f ⟧ ρ [ x ↦ C ]) ind ⟩
-    ⟦ f ⟧ ρ [ x ↦ ⟦ e ⟧ ρ [ x ↦ ⟦ g ⟧ ρ ] ]
+    ⟦ f ⟧ ϱ [ x ↦ ⟦ e A[ x ↦ g ] ⟧ ϱ ]
+      ≡⟨ cong (λ C → ⟦ f ⟧ ϱ [ x ↦ C ]) ind ⟩
+    ⟦ f ⟧ ϱ [ x ↦ ⟦ e ⟧ ϱ [ x ↦ ⟦ g ⟧ ϱ ] ]
       ≡⟨ cong (λ C → ⟦ f ⟧ C) (sym (doubleupdate x)) ⟩
-    ⟦ f ⟧ ρ [ x ↦ ⟦ g ⟧ ρ ] [ x ↦ ⟦ e ⟧ ρ [ x ↦ ⟦ g ⟧ ρ ] ]
+    ⟦ f ⟧ ϱ [ x ↦ ⟦ g ⟧ ϱ ] [ x ↦ ⟦ e ⟧ ϱ [ x ↦ ⟦ g ⟧ ϱ ] ]
       ≡⟨⟩
-    ⟦ Let x e f ⟧ ρ [ x ↦ ⟦ g ⟧ ρ ]
+    ⟦ Let x e f ⟧ ϱ [ x ↦ ⟦ g ⟧ ϱ ]
   ∎
 
-subst-lemma g x ρ (Let-2 e f x≢y xNFf adm-e) = {!   !}
+subst-lemma g x ϱ (Let-2 e f x≢y xNFf adm-e) = {!   !}
 
-subst-lemma g x ρ (Let-3 e f x≢y yNFg adm-e adm-f) = {!   !}
+subst-lemma g x ϱ (Let-3 e f x≢y yNFg adm-e adm-f) = {!   !}
 
 -- subst-lemma ($ n) = refl
 
@@ -723,63 +725,102 @@ subst-lemma g x ρ (Let-3 e f x≢y yNFg adm-e adm-f) = {!   !}
 -- ... | yes refl = refl
 -- ... | no _ = refl
 
--- subst-lemma {x} {g} {ρ} (e + f)
---   rewrite subst-lemma {x} {g} {ρ} e |
---           subst-lemma {x} {g} {ρ} f = refl
+-- subst-lemma {x} {g} {ϱ} (e + f)
+--   rewrite subst-lemma {x} {g} {ϱ} e |
+--           subst-lemma {x} {g} {ϱ} f = refl
 
--- subst-lemma {x} {g} {ρ} (e · f)
---   rewrite subst-lemma {x} {g} {ρ} e |
---           subst-lemma {x} {g} {ρ} f = refl
+-- subst-lemma {x} {g} {ϱ} (e · f)
+--   rewrite subst-lemma {x} {g} {ϱ} e |
+--           subst-lemma {x} {g} {ϱ} f = refl
 
--- subst-lemma {x} {g} {ρ} (Let y e f)
+-- subst-lemma {x} {g} {ϱ} (Let y e f)
 --   with x ≡? y
 -- ... | yes refl = 
 --   begin
---   ⟦ Let x (e A[ x ↦ g ]) f ⟧ ρ
+--   ⟦ Let x (e A[ x ↦ g ]) f ⟧ ϱ
 --     ≡⟨⟩
---   ⟦ f ⟧ ρ [ x ↦ ⟦ e A[ x ↦ g ] ⟧ ρ ]
---     ≡⟨ cong (λ C → ⟦ f ⟧ ρ [ x ↦ C ]) (subst-lemma {x} {g} {ρ} e) ⟩
---   ⟦ f ⟧ ρ [ x ↦ ⟦ e ⟧ ρ′ ]
+--   ⟦ f ⟧ ϱ [ x ↦ ⟦ e A[ x ↦ g ] ⟧ ϱ ]
+--     ≡⟨ cong (λ C → ⟦ f ⟧ ϱ [ x ↦ C ]) (subst-lemma {x} {g} {ϱ} e) ⟩
+--   ⟦ f ⟧ ϱ [ x ↦ ⟦ e ⟧ ϱ′ ]
 --     ≡⟨ cong (λ C → ⟦ f ⟧ C) (sym (doubleupdate x)) ⟩
---   ⟦ f ⟧ ρ′ [ x ↦ ⟦ e ⟧ ρ′ ]
+--   ⟦ f ⟧ ϱ′ [ x ↦ ⟦ e ⟧ ϱ′ ]
 --     ≡⟨⟩
---   ⟦ Let x e f ⟧ ρ′
---   ∎ where ρ′ = ρ [ x ↦ ⟦ g ⟧ ρ ]
+--   ⟦ Let x e f ⟧ ϱ′
+--   ∎ where ϱ′ = ϱ [ x ↦ ⟦ g ⟧ ϱ ]
 
 -- ... | no x≢y
 --   with y ∈? fv g
 -- ... | no ¬y∈g =
 --   begin
---   ⟦ Let y (e A[ x ↦ g ]) (f A[ x ↦ g ]) ⟧ ρ
+--   ⟦ Let y (e A[ x ↦ g ]) (f A[ x ↦ g ]) ⟧ ϱ
 --     ≡⟨⟩
---   ⟦ f A[ x ↦ g ] ⟧ ρ [ y ↦ ⟦ e A[ x ↦ g ] ⟧ ρ ]
---     ≡⟨ cong (λ C → ⟦ f A[ x ↦ g ] ⟧ ρ [ y ↦ C ]) (subst-lemma e) ⟩
---   ⟦ f A[ x ↦ g ] ⟧ ρ′′
+--   ⟦ f A[ x ↦ g ] ⟧ ϱ [ y ↦ ⟦ e A[ x ↦ g ] ⟧ ϱ ]
+--     ≡⟨ cong (λ C → ⟦ f A[ x ↦ g ] ⟧ ϱ [ y ↦ C ]) (subst-lemma e) ⟩
+--   ⟦ f A[ x ↦ g ] ⟧ ϱ′′
 --     ≡⟨ subst-lemma f ⟩
---   ⟦ f ⟧ ρ′′ [ x ↦ ⟦ g ⟧ ρ′′ ]
+--   ⟦ f ⟧ ϱ′′ [ x ↦ ⟦ g ⟧ ϱ′′ ]
 --     ≡⟨⟩
---   ⟦ f ⟧ ρ [ y ↦ ⟦ e ⟧ ρ′ ] [ x ↦ ⟦ g ⟧ ρ′′ ]
+--   ⟦ f ⟧ ϱ [ y ↦ ⟦ e ⟧ ϱ′ ] [ x ↦ ⟦ g ⟧ ϱ′′ ]
 --     ≡⟨ sym (cong (λ C → ⟦ f ⟧ C) (update-comm _ _ _ _ _  x≢y))⟩
---   ⟦ f ⟧ ρ [ x ↦ ⟦ g ⟧ ρ′′ ] [ y ↦ ⟦ e ⟧ ρ′ ] 
---     ≡⟨ cong (λ C → ⟦ f ⟧ ρ [ x ↦ C ] [ y ↦ ⟦ e ⟧ ρ′ ]) eq ⟩
---   ⟦ f ⟧ ρ [ x ↦ ⟦ g ⟧ ρ ] [ y ↦ ⟦ e ⟧ ρ′ ]
+--   ⟦ f ⟧ ϱ [ x ↦ ⟦ g ⟧ ϱ′′ ] [ y ↦ ⟦ e ⟧ ϱ′ ] 
+--     ≡⟨ cong (λ C → ⟦ f ⟧ ϱ [ x ↦ C ] [ y ↦ ⟦ e ⟧ ϱ′ ]) eq ⟩
+--   ⟦ f ⟧ ϱ [ x ↦ ⟦ g ⟧ ϱ ] [ y ↦ ⟦ e ⟧ ϱ′ ]
 --     ≡⟨⟩
---   ⟦ f ⟧ ρ′ [ y ↦ ⟦ e ⟧ ρ′ ]
+--   ⟦ f ⟧ ϱ′ [ y ↦ ⟦ e ⟧ ϱ′ ]
 --     ≡⟨⟩
---   ⟦ Let y e f ⟧ ρ′
---   ∎ where ρ′ = ρ [ x ↦ ⟦ g ⟧ ρ ]
---           ρ′′ = ρ [ y ↦ ⟦ e ⟧ ρ′ ]
+--   ⟦ Let y e f ⟧ ϱ′
+--   ∎ where ϱ′ = ϱ [ x ↦ ⟦ g ⟧ ϱ ]
+--           ϱ′′ = ϱ [ y ↦ ⟦ e ⟧ ϱ′ ]
 
---           ag : Agree ρ ρ′′ (fv g)
+--           ag : Agree ϱ ϱ′′ (fv g)
 --           ag = Agree-update-~∈ ¬y∈g
 
---           eq : ⟦ g ⟧ ρ′′ ≡ ⟦ g ⟧ ρ
---           eq = fv-lemma ρ′′ ρ g (sym-Agree ag)
+--           eq : ⟦ g ⟧ ϱ′′ ≡ ⟦ g ⟧ ϱ
+--           eq = fv-lemma ϱ′′ ϱ g (sym-Agree ag)
 
 -- ... | yes y∈g = {!   !}
+```
 
--- _≈_ : ∀ e f → Set
--- e ≈ f = ∀ g → {!   !}
+```
+_≈_ : ∀ e f → Set
+e ≈ f = ∀ c x ϱ → ⟦ c A[ x ↦ e ] ⟧ ϱ ≡ ⟦ c A[ x ↦ f ] ⟧ ϱ
+```
+
+## Full abstraction
+
+There is nothing else beside the numerical value an expression has.
+
+```
+full-abstraction-1 : e ≈ f → ∀[ ϱ ] ⟦ e ⟧ ϱ ≡ ⟦ f ⟧ ϱ
+full-abstraction-1 e≈f ϱ = e≈f (` x₀) x₀ ϱ
+
+full-abstraction-2 : ∀[ ϱ ] ⟦ e ⟧ ϱ ≡ ⟦ f ⟧ ϱ → e ≈ f
+
+full-abstraction-2 ⟦e⟧≡⟦f⟧ ($ n) x ϱ = refl
+
+full-abstraction-2 ⟦e⟧≡⟦f⟧ (` y) x ϱ
+  with x ≡? y
+... | yes refl = ⟦e⟧≡⟦f⟧ ϱ
+... | no _ = refl
+
+full-abstraction-2 {e} {f} ⟦e⟧≡⟦f⟧ (c + d) x ϱ
+  rewrite full-abstraction-2 {e} {f} ⟦e⟧≡⟦f⟧ c x ϱ |
+          full-abstraction-2 {e} {f} ⟦e⟧≡⟦f⟧ d x ϱ = refl
+
+full-abstraction-2 {e} {f} ⟦e⟧≡⟦f⟧ (c · d) x ϱ
+  rewrite full-abstraction-2 {e} {f} ⟦e⟧≡⟦f⟧ c x ϱ |
+          full-abstraction-2 {e} {f} ⟦e⟧≡⟦f⟧ d x ϱ = refl
+
+full-abstraction-2 {e} {f} ⟦e⟧≡⟦f⟧ (Let y c d) x ϱ
+  with x ≡? y
+... | yes refl
+  rewrite full-abstraction-2 {e} {f} ⟦e⟧≡⟦f⟧ c y ϱ = refl
+... | no _
+  rewrite full-abstraction-2 {e} {f} ⟦e⟧≡⟦f⟧ c x ϱ |
+          full-abstraction-2 {e} {f} ⟦e⟧≡⟦f⟧ d x (ϱ [ y ↦ ⟦ c A[ x ↦ f ] ⟧ ϱ ]) = refl
+
+full-abstraction : e ≈ f ↔ ∀[ ϱ ] ⟦ e ⟧ ϱ ≡ A⟦ f ⟧ ϱ
+full-abstraction = full-abstraction-1 , full-abstraction-2
 ```
 
 # Binary expressions
