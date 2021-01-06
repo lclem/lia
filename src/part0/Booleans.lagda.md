@@ -39,8 +39,11 @@ tt≢ff ()
 ff≢tt : ff ≢ tt
 ff≢tt ()
 
-ff≢tt-elim : ff ≡ tt → whatever
-ff≢tt-elim ff≡tt = F-elim (ff≢tt ff≡tt)
+ff≡tt-elim : ff ≡ tt → whatever
+ff≡tt-elim ff≡tt = F-elim (ff≢tt ff≡tt)
+
+tt≡ff-elim : tt ≡ ff → whatever
+tt≡ff-elim tt≡ff = F-elim (tt≢ff tt≡ff)
 
 a≡ff→a≡tt-elim : ∀ {a} → a ≡ ff → a ≡ tt → whatever
 a≡ff→a≡tt-elim refl ()

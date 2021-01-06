@@ -5,7 +5,8 @@ title: "Imperative programs 🚧"
 ```
 {-# OPTIONS --allow-unsolved-metas #-}
 module part5.Programs where
-open import part5.BExp hiding (_,_⇒_; ⇒-det; ↝*-trans; _↝*⟨⟩_; _↝⟨_⟩_; _↝*⟨_⟩_) public
+open import part5.AExp hiding (_↝_; _,_⇒_; ⇒-det; ↝*-trans; _↝*⟨⟩_; _↝⟨_⟩_; _↝*⟨_⟩_)
+open import part5.BExp --  public
 ```
 
 ```
@@ -46,7 +47,7 @@ On the other hand, imperative programs, such as `loop` above, may not terminate.
 
 Therefore, we resort to an operational semantics.
 
-## Big-steps operational semantics
+# Big-steps operational semantics (Natural semantics)
 
 We begin with the notion of state,
 which is the same as environments as of now,
@@ -54,6 +55,15 @@ but needs not be.
 
 ```
 State = VarName → ℕ
+
+private
+  variable
+    m n : ℕ
+    s s′ s′′ : State
+    x : VarName
+    e : AExp
+    b : BExp
+    c d : Cmd
 ```
 
 The definition of the operational semantics of imperative programs
@@ -69,7 +79,8 @@ data _,_⇒_ : Cmd → State → State → Set where
 The `skip` command terminates immediately without changing the state.
 
 ```
-  ⇒-skip : ∀ {s} →
+  ⇒-skip :
+    ------------
     skip , s ⇒ s
 ```
 
@@ -79,8 +90,9 @@ The assignment command modifies the state
 by updating the value of `x` to the value of `e` in the current state.
 
 ```
-  ⇒-assign : ∀ {s x e} →
-    x ≔ e , s ⇒ s [ x ↦ ⟦ e ⟧ s ]
+  ⇒-assign :
+    -----------------------------
+    x ≔ e , s ⇒ s [ x ↦ A⟦ e ⟧ s ]
 ```
 
 ### `c ⨟ d`
@@ -88,10 +100,11 @@ by updating the value of `x` to the value of `e` in the current state.
 Sequencing two commands amounts to thread the state change.
 
 ```
-  ⇒-seq : ∀ {c d s s' s''} →
-    c , s ⇒ s' →
-    d , s' ⇒ s'' →
-    c ⨟ d , s ⇒ s''
+  ⇒-seq :
+    c , s ⇒ s′ →
+    d , s′ ⇒ s′′ →
+    ---------------
+    c ⨟ d , s ⇒ s′′
 ```
 
 ### `if b then c else d`
@@ -100,15 +113,17 @@ For conditionals, there are two cases to consider,
 depending on whether the condition evaluates to true or to false.
 
 ```
-  ⇒-if-tt : ∀ {b s c s' d} →
-    ⟦ b ⟧B s ≡ tt →
-    c , s ⇒ s' →
-    if b then c else d , s ⇒ s'
+  ⇒-if-tt :
+    B⟦ b ⟧ s ≡ tt →
+    c , s ⇒ s′ →
+    ---------------------------
+    if b then c else d , s ⇒ s′
     
-  ⇒-if-ff : ∀ {b s c s' d} →
-    ⟦ b ⟧B s ≡ ff →
-    d , s ⇒ s' →
-    if b then c else d , s ⇒ s'
+  ⇒-if-ff :
+    B⟦ b ⟧ s ≡ ff →
+    d , s ⇒ s′ →
+    ---------------------------
+    if b then c else d , s ⇒ s′
 ```
 
 ### `while b do: c`
@@ -116,22 +131,24 @@ depending on whether the condition evaluates to true or to false.
 Similarly, for while loops there are two cases to consider.
 
 ```
-  ⇒-while-tt : ∀ {b s c s' s''} →
-    ⟦ b ⟧B s ≡ tt →
-    c , s ⇒ s' →
-    while b do: c , s' ⇒ s'' →
-    while b do: c , s ⇒ s''
+  ⇒-while-tt :
+    B⟦ b ⟧ s ≡ tt →
+    c , s ⇒ s′ →
+    while b do: c , s′ ⇒ s′′ →
+    --------------------------
+    while b do: c , s ⇒ s′′
   
-  ⇒-while-ff : ∀ {b s c} →
-    ⟦ b ⟧B s ≡ ff →
+  ⇒-while-ff :
+    B⟦ b ⟧ s ≡ ff →
+    ---------------------
     while b do: c , s ⇒ s
 ```
 
-This concludes the definition of the operational semantics ` c , s ⇒ s'`.
+This concludes the definition of the operational semantics `c , s ⇒ s′`.
 
 ## **Exercise**: `do: c while b`
 
-Extend the syntax and semantics of imperative programs
+Extend the syntax and semantics of programs
 by adding a new construct
 
 ```
@@ -157,22 +174,22 @@ that evaluation of programs is deterministic.
 Show that evaluation of imperative programs is deterministic.
 
 ```
--- convenient to rule out some impossible cases.
-false≡true : {A : Set} → tt ≡ ff → A
-false≡true ()
+⇒-det : c , s ⇒ s′ →
+        c , s ⇒ s′′ →
+        -------------
+        s′ ≡ s′′
 
-⇒-det : ∀ {c s s' s''} → c , s ⇒ s' → c , s ⇒ s'' → s' ≡ s''
-⇒-det ⇒-skip ⇒-skip = {!   !}
-⇒-det ⇒-assign ⇒-assign = {!   !}
-⇒-det (⇒-seq der1 der2) (⇒-seq der3 der4) = {! ⇒-det der1 der2 !}
-⇒-det (⇒-if-tt _ der1) (⇒-if-tt _ der2) = {!   !}
-⇒-det (⇒-if-tt x _) (⇒-if-ff y _) = {!   !}
-⇒-det (⇒-if-ff x _) (⇒-if-tt y _) = {!   !}
-⇒-det (⇒-if-ff _ der1) (⇒-if-ff _ der2) = {!   !}
-⇒-det (⇒-while-tt x der1 der2) (⇒-while-tt y der3 der4) = {!   !}
-⇒-det (⇒-while-tt x _ _) (⇒-while-ff y) = {!   !}
-⇒-det (⇒-while-ff x) (⇒-while-tt y _ _) = {!   !}
-⇒-det (⇒-while-ff _) (⇒-while-ff _) = {!   !}
+⇒-det ⇒-skip ⇒-skip = refl
+⇒-det ⇒-assign ⇒-assign = refl
+⇒-det (⇒-seq δ₁ δ₂) (⇒-seq δ₃ δ₄) rewrite ⇒-det δ₁ δ₃ | ⇒-det δ₂ δ₄ = refl
+⇒-det (⇒-if-tt _ δ1) (⇒-if-tt _ δ2) rewrite ⇒-det δ1 δ2 = refl
+⇒-det (⇒-if-tt ⟦b⟧s≡tt _) (⇒-if-ff ⟦b⟧s≡ff _) = a≡ff→a≡tt-elim ⟦b⟧s≡ff ⟦b⟧s≡tt
+⇒-det (⇒-if-ff ⟦b⟧s≡ff _) (⇒-if-tt ⟦b⟧s≡tt _) = a≡ff→a≡tt-elim ⟦b⟧s≡ff ⟦b⟧s≡tt
+⇒-det (⇒-if-ff _ δ₁) (⇒-if-ff _ δ₂) rewrite ⇒-det δ₁ δ₂ = refl
+⇒-det (⇒-while-tt _ δ₁ δ₂) (⇒-while-tt _ δ₃ δ₄) rewrite ⇒-det δ₁ δ₃ | ⇒-det δ₂ δ₄ = refl
+⇒-det (⇒-while-tt ⟦b⟧s≡tt _ _) (⇒-while-ff ⟦b⟧s≡ff) = a≡ff→a≡tt-elim ⟦b⟧s≡ff ⟦b⟧s≡tt
+⇒-det (⇒-while-ff ⟦b⟧s≡ff) (⇒-while-tt ⟦b⟧s≡tt _ _) = a≡ff→a≡tt-elim ⟦b⟧s≡ff ⟦b⟧s≡tt
+⇒-det (⇒-while-ff _) (⇒-while-ff _) = refl
 ```
 
 ## **Exercise**: `loop`
@@ -180,8 +197,9 @@ false≡true ()
 Show that the program `loop` introduced above never stops.
 
 ```
-loop-⊥ : ∀ {s s'} → ~ (loop , s ⇒ s')
-loop-⊥ = {!   !}
+loop-⊥ : ~ (loop , s ⇒ s′)
+loop-⊥ (⇒-while-tt _ ⇒-skip δ) = loop-⊥ δ
+loop-⊥ (⇒-while-ff ⟦tt⟧s≡ff) = tt≡ff-elim ⟦tt⟧s≡ff
 ```
 
 # Small-steps operational semantics
@@ -215,7 +233,7 @@ A similar remark applies to boolean expressions below.)
 
 ```
   ↝-assign : ∀ {x e s} →
-    x ≔ e , s ↝ skip , s [ x ↦ ⟦ e ⟧ s ]
+    x ≔ e , s ↝ skip , s [ x ↦ A⟦ e ⟧ s ]
 ```
 
 ### `c ⨟ d`
@@ -227,9 +245,9 @@ In the case `↝-seq-left`, we evaluate one step of `c`.
 In the case `↝-seq-right`, `c` has finished and we continue with `d`.
 
 ```
-  ↝-seq-left : ∀ {c s c' s' d} →
-    c , s ↝ c' , s' →
-    c ⨟ d , s ↝ c' ⨟ d , s'
+  ↝-seq-left : ∀ {c s c′ s′ d} →
+    c , s ↝ c′ , s′ →
+    c ⨟ d , s ↝ c′ ⨟ d , s′
     
   ↝-seq-right : ∀ {d s} →
     skip ⨟ d , s ↝ d , s
@@ -242,11 +260,11 @@ depending on whether the condition evaluates to `true` or `false`.
 
 ```
   ↝-if-tt : ∀ {b s c d} →
-    ⟦ b ⟧B s ≡ tt →
+    B⟦ b ⟧ s ≡ tt →
     if b then c else d , s ↝ c , s
     
   ↝-if-ff : ∀ {b s c d} →
-    ⟦ b ⟧B s ≡ ff →
+    B⟦ b ⟧ s ≡ ff →
     if b then c else d , s ↝ d , s
 ```
 
@@ -259,11 +277,11 @@ Otherwise, it terminates rewriting to `skip`.
 
 ```
   ↝-while-tt : ∀ {b c s} →
-    ⟦ b ⟧B s ≡ tt →
+    B⟦ b ⟧ s ≡ tt →
     while b do: c , s ↝ c ⨟ while b do: c , s
     
   ↝-while-ff : ∀ {b c s} →
-    ⟦ b ⟧B s ≡ ff →
+    B⟦ b ⟧ s ≡ ff →
     while b do: c , s ↝ skip , s
 ```
 
@@ -285,7 +303,8 @@ Show that the relation `↝*` on configurations is indeed transitive.
 
 ```
 ↝*-trans : ∀ {x y z} → x ↝* y → y ↝* z → x ↝* z
-↝*-trans der1 der2 = {!   !}
+↝*-trans stop δ₂ = δ₂
+↝*-trans (one step δ₁) δ₂ = one step (↝*-trans δ₁ δ₂)
 ```
 
 ### Notation for transitive closure
@@ -324,12 +343,18 @@ we need to prove a lemma
 connecting sequencing `⨟` and `↝*`.
 
 ```
-⨟-lemma-1 : ∀ {c d s s' s''} →
-  c , s ↝* skip , s'' →
-  d , s'' ↝* skip , s' →
-  c ⨟ d , s ↝* skip , s'
-⨟-lemma-1 stop der2 = {!   !}
-⨟-lemma-1 {c} {d} {s} {s'} {s''} (one {y = c' , s'''} step der1) der2 = {!   !}
+⨟-lemma-1 : ∀ {c d s s′ s′′} →
+  c , s ↝* skip , s′′ →
+  d , s′′ ↝* skip , s′ →
+  c ⨟ d , s ↝* skip , s′
+⨟-lemma-1 stop der2 = one ↝-seq-right der2
+⨟-lemma-1 {c} {d} {s} {s′} {s′′} (one {y = c′ , s′′′} der0 der1) der2
+    with ⨟-lemma-1 der1 der2
+... | der = start
+              c ⨟ d , s ↝⟨ ↝-seq-left der0 ⟩
+              c′ ⨟ d , s′′′ ↝*⟨ der ⟩
+              skip , s′ 
+            end
 ```
 
 ## **Exercise**: `big→small`
@@ -344,8 +369,79 @@ We begin in this section with the easier direction `big→small`:
 the big step semantics implies the small step one.
 
 ```
-big→small : ∀ c s s' → c , s ⇒ s' → c , s ↝* skip , s'
-big→small = {!   !}
+big→small : ∀ c s s′ → c , s ⇒ s′ → c , s ↝* skip , s′
+```
+
+### `skip`, `x ≔ e`
+
+The proofs for the skip and assignment constructs are immediate.
+
+```
+big→small skip s .s ⇒-skip = stop
+big→small (x ≔ e) s .(s [ x ↦ A⟦ e ⟧ s ]) ⇒-assign = one ↝-assign stop
+```
+
+### `c ⨟ d`
+
+In the case of sequencing `c ⨟ d`
+we call the inductive assumption twice and we collect the results.
+
+```
+big→small (c ⨟ d) s s′ (⇒-seq {s′ = s′′} ⇒-der1 ⇒-der2)
+    with big→small c s s′′ ⇒-der1 | big→small d s′′ s′ ⇒-der2
+... | ↝*-der1 | ↝*-der2 =
+  start
+    c ⨟ d , s ↝*⟨ ⨟-lemma-1 ↝*-der1 ↝*-der2 ⟩
+    skip , s′
+  end
+```
+
+### `if b then c else d`
+
+The conditional construct has two cases,
+depending on whether the condition holds or not.
+
+```
+big→small (if b then c else d) s s′ (⇒-if-tt b≡true ⇒-der)
+    with big→small c s s′ ⇒-der
+... | ↝*-der =
+  start
+    if b then c else d , s ↝⟨ ↝-if-tt b≡true ⟩
+    c , s ↝*⟨ ↝*-der ⟩
+    skip , s′
+  end
+
+big→small (if b then c else d) s s′ (⇒-if-ff b≡false ⇒-der)
+    with big→small d s s′ ⇒-der
+... | ↝*-der =
+  start
+    if b then c else d , s ↝⟨ ↝-if-ff b≡false ⟩
+    d , s ↝*⟨ ↝*-der ⟩
+    skip , s′
+  end
+```
+
+### `while b do: c`
+
+Finally, also for while loops there are two cases,
+depending on whether the guard `b` holds or not.
+In the `true` case we apply the inductive assumption twice.
+
+```
+big→small (while b do: c) s s′ (⇒-while-tt {s′ = s′′} b≡true ⇒-der1 ⇒-der2)
+    with big→small c s s′′ ⇒-der1 | big→small (while b do: c) s′′ s′ ⇒-der2
+... | ↝*-der1 | ↝*-der2 =
+  start
+    while b do: c , s ↝⟨ ↝-while-tt b≡true ⟩
+    c ⨟ while b do: c , s  ↝*⟨ ⨟-lemma-1 ↝*-der1 ↝*-der2 ⟩
+    skip , s′
+  end  
+
+big→small (while b do: c) s .s (⇒-while-ff b≡false) =
+  start
+    while b do: c , s ↝⟨ ↝-while-ff b≡false ⟩
+    skip , s
+  end
 ```
 
 ## From small to big steps: first attempt
@@ -354,13 +450,13 @@ We turn now our attention to the other direction of the equivalence between smal
 namely
 
 ```
--- small→big : ∀ c s s' → c , s ↝* skip , s' → c , s ⇒ s'
+-- small→big : ∀ c s s′ → c , s ↝* skip , s′ → c , s ⇒ s′
 ```
 
 A natural starting point is the converse of `⨟-lemma-1` above.
 
 ```
--- ⨟-lemma-2 : ∀ {c d s s'} → c ⨟ d , s ↝* skip , s' → ∃[ s'' ] c , s ↝* skip , s'' × d , s'' ↝* skip , s'
+-- ⨟-lemma-2 : ∀ {c d s s′} → c ⨟ d , s ↝* skip , s′ → ∃[ s′′ ] c , s ↝* skip , s′′ × d , s′′ ↝* skip , s′
 ```
 
 However, it turns out that the statement `small→big` above
@@ -368,11 +464,11 @@ creates problems for the termination checker in first `while` case
 (all the other cases go through):
 
 ```
--- small→big (while b do: c) s s' (one (↝-while-tt b≡true) ↝*-der)
+-- small→big (while b do: c) s s′ (one (↝-while-tt b≡true) ↝*-der)
 --     with ⨟-lemma-2 ↝*-der
--- ... | s'' , ↝*-der1 , ↝*-der2
---     with small→big c s s'' ↝*-der1 |
---          ? {- small→big (while b do: c) s'' s' ↝*-der2 -}
+-- ... | s′′ , ↝*-der1 , ↝*-der2
+--     with small→big c s s′′ ↝*-der1 |
+--          ? {- small→big (while b do: c) s′′ s′ ↝*-der2 -}
 -- ... | ⇒-der1 | ⇒-der2 = ⇒-while-tt b≡true ⇒-der1 ⇒-der2
 -- small→big _ _ _ _ = ?
 ```
@@ -381,7 +477,7 @@ The issue with the commented code above
 is that no argument of the call
 
 ```
--- small→big (while b do: c) s'' s' ↝*-der2
+-- small→big (while b do: c) s′′ s′ ↝*-der2
 ```
 
 is structurally smaller than the original call.
@@ -413,18 +509,22 @@ We can now prove the converse of `⨟-lemma-1` above
 in the richer setting offered by `_↝*_#_`.
 
 (Also `⨟-lemma-1` can be generalised to `_↝*_#_`,
-but we won't need it here.)
+but we won′t need it here.)
 
 
 ```
-⨟-lemma-2 : ∀ {c d s s' m} →
-  c ⨟ d , s ↝* skip , s' # m →
-  ∃[ s'' ] ∃[ m1 ] ∃[ m2 ]
-      c , s ↝* skip , s'' # m1 ×
-      d , s'' ↝* skip , s' # m2 ×
+⨟-lemma-2 : ∀ {c d s s′ m} →
+  c ⨟ d , s ↝* skip , s′ # m →
+  ∃[ s′′ ] ∃[ m1 ] ∃[ m2 ]
+      c , s ↝* skip , s′′ # m1 ×
+      d , s′′ ↝* skip , s′ # m2 ×
       suc (m1 +ℕ m2) ≡ m
-⨟-lemma-2 (one (↝-seq-left step) ↝-der) = {!   !}
-⨟-lemma-2 {s = s} (one {n = n} ↝-seq-right ↝-der) = {!   !}
+⨟-lemma-2 (one (↝-seq-left step) ↝-der)
+    with ⨟-lemma-2 ↝-der
+... | s′′ , m1 , m2 , der1 , der2 , m1+m2≡n =
+    s′′ , suc m1 , m2 , one step der1 , der2 , cong suc m1+m2≡n
+⨟-lemma-2 {s = s} (one {n = n} ↝-seq-right ↝-der) =
+    s , 0 , n , stop , ↝-der , refl
 ```
 
 ### **Exercise**: `skip` and `↝*`
@@ -434,8 +534,10 @@ Show that executing the `skip` command necessarily terminates in `0` steps.
 *Hint*: Convince Agda that only the case `stop` needs to be considered.
 
 ```
-↝*-skip : ∀ {s c s' m} → skip , s ↝* c , s' # m → c ≡ skip × s ≡ s' × m ≡ 0
-↝*-skip der = {!   !}
+↝*-skip : skip , s ↝* c , s′ # m →
+          -------------------------
+          c ≡ skip × s ≡ s′ × m ≡ 0
+↝*-skip stop = refl , refl , refl
 ```
 
 ## **Exercise**: `small→big`
@@ -443,11 +545,117 @@ Show that executing the `skip` command necessarily terminates in `0` steps.
 We are now ready to prove that the small step semantics implies the big step one.
 
 ```
-small→big : ∀ c s s' n → c , s ↝* skip , s' # n → c , s ⇒ s'
-small→big c s s' n ↝*-der = {!   !}
+small→big : ∀ c s s′ n → c , s ↝* skip , s′ # n → c , s ⇒ s′
+small→big c s s′ n ↝*-der = go c s s′ n ↝*-der (<-wf n) where
 
-    -- go c s s' n ↝*-der (<-wf n) where
+ go : ∀ c s s′ n → c , s ↝* skip , s′ # n → Acc _<_ n → c , s ⇒ s′
+```
 
-    -- go : ∀ c s s' n →  c , s ↝* skip , s' # n → Acc n → c , s ⇒ s'
-    -- go = ?
- ```
+We employ a helper function `go`
+which has an additional parameter `Acc n`
+allowing us to do well-founded induction in the crucial `while` case below.
+
+### `skip`
+
+The `skip` case is immediate.
+
+```
+ go skip s .s 0 stop _ = ⇒-skip
+```
+
+### `x ≔ e`
+
+In the assignment case we call `↝*-skip ↝*-der`
+to enure that `s′ ≡ s [ x ↦ ⟦ e ⟧A s ]`
+as required by `⇒-assign`.
+
+```
+ go (x ≔ e) s s′ (suc m) (one ↝-assign ↝*-der) _
+     with ↝*-skip ↝*-der
+ ... | refl , refl , refl = ⇒-assign
+```
+
+### `c ⨟ d`
+
+In the sequencing case
+we first call `⨟-lemma-2 ↝*-der` to discover that
+
+1. `↝*-der1 : c , s ↝* skip , s′′ # _`, and
+2. `↝*-der2 : d , s′′ ↝* skip , s′ # _`.
+
+With this information in hand,
+we recursively call `small→big` on the subcomputations
+`↝*-der1`, `↝*-der2` and we assemble the results back with `⇒-seq`.
+
+```
+ go (c ⨟ d) s s′ (suc m) ↝*-der (acc a)
+     with ⨟-lemma-2 ↝*-der
+ ... | s′′ , m1 , m2 , ↝*-der1 , ↝*-der2 , _
+     with go c s s′′ m1 ↝*-der1 (a m1 {!   !}) | go d s′′ s′ m2 ↝*-der2 {!   !}
+ ... | ⇒-der1 | ⇒-der2 = ⇒-seq ⇒-der1 ⇒-der2
+```
+
+Note how we do not need to reason about the lengths `m1`, `m2` of the two subcomputations `↝*-der1`, `↝*-der2`
+because the recursive calls `small→big c ...` and `small→big d`
+are done on structurally smaller programs `c`, resp., `d`.
+
+### `if b then c else d`
+
+The case for conditional is straightforward.
+
+```
+ go (if b then c else d) s s′ (suc m) (one (↝-if-tt b≡true) ↝*-der) _
+     with go c s s′ m ↝*-der {!   !}
+ ... | ⇒-der = ⇒-if-tt b≡true ⇒-der
+
+ go (if b then c else d) s s′ (suc m) (one (↝-if-ff b≡false) ↝*-der) _
+     with go d s s′ m ↝*-der {!   !}
+ ... | ⇒-der = ⇒-if-ff b≡false ⇒-der
+```
+
+### `while b do: c`, case one
+
+We now tackle the hardest case,
+the while loop when the guard evaluates to true.
+
+By calling `⨟-lemma-2 ↝*-der`
+we obtain `m1` as the length of
+the derivation `↝*-der1` showing `c , s ↝* skip , s′′ # m1`
+and `m2` as the length of
+`↝*-der2` showing `while b do: c , s′′ ↝* skip , s′ # m2`
+and a proof `sm1+m2≡m` that `suc (m1 + m2) ≡ m`.
+
+We can then show that `m1 < m` and `m2 < m`,
+which allows us to use well-founded induction when calling `go` again
+on `↝*-der1`, resp., `↝*-der2`.
+
+The latter inductive calls to `go`
+provide us with `⇒-der1 : c , s ⇒ s′′`
+and `⇒-der2 : while b do: c , s′′ ⇒ s′`,
+from which we can immediately conclude by applying the constructor `⇒-while-tt`
+
+```
+ go (while b do: c) s s′ m (one (↝-while-tt b≡true) ↝*-der) (acc a)
+     with ⨟-lemma-2 ↝*-der
+ ... | s′′ , m1 , m2 , ↝*-der1 , ↝*-der2 , sm1+m2≡m
+     with go c s s′′ m1 ↝*-der1 (a m1 m1<m) |
+          go (while b do: c) s′′ s′ m2 ↝*-der2 (a m2 m2<m)
+          where
+           m1<m : m1 < m
+           m1<m = {!   !} -- s≤s (≤-suc2 (subst (λ x → suc m1 ≤ x) sm1+m2≡m (≤-+-left {suc m1} {m2})))
+           m2<m : m2 < m
+           m2<m = {!   !} -- s≤s (subst (m2 ≤_) sm1+m2≡m (≤-+-right {suc m1} {m2}))
+ ... | ⇒-der1 | ⇒-der2 = ⇒-while-tt b≡true ⇒-der1 ⇒-der2
+```
+
+This is the only place where we use well-founded induction.
+
+### `while b do: c`, case two
+
+This case is straightforward.
+
+```
+ go (while b do: c) s s′ m (one (↝-while-ff b≡false) ↝*-der) _
+     with ↝*-skip ↝*-der
+ ... | refl , refl , refl = ⇒-while-ff b≡false
+```

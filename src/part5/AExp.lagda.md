@@ -5,7 +5,7 @@ title: "Arithmetic expressions 🚧"
 ```
 {-# OPTIONS --allow-unsolved-metas #-}
 module part5.AExp where
-open import part0.index hiding (AExp) renaming (_+_ to _+ℕ_; _*_ to _·ℕ_) public
+open import part0.index hiding (AExp; A⟦_⟧) renaming (_+_ to _+ℕ_; _*_ to _·ℕ_) public
 ```
 
 # Arithmetic expressions
@@ -92,13 +92,15 @@ and value `40` to every other variable.
 # Denotational semantics
 
 ```
-infix 15 ⟦_⟧_
-⟦_⟧_ : AExp → Env → ℕ
+infix 15 ⟦_⟧_ A⟦_⟧_
+private ⟦_⟧_ : AExp → Env → ℕ
 ⟦ $ n ⟧ ρ = n
 ⟦ ` x ⟧ ρ = ρ x
 ⟦ e + f ⟧ ρ = ⟦ e ⟧ ρ +ℕ ⟦ f ⟧ ρ
 ⟦ e · f ⟧ ρ = ⟦ e ⟧ ρ ·ℕ ⟦ f ⟧ ρ
 ⟦ Let x e f ⟧ ρ = ⟦ f ⟧ ρ [ x ↦ ⟦ e ⟧ ρ ]
+
+A⟦_⟧_ = ⟦_⟧_
 ```
 
 With our denotational semantics for expressions we can check (by computation) the value of concrete expressions.
@@ -570,7 +572,7 @@ private
 ## Denotational semantics
 
 ```
-⟦_⟧ : Bin → ℕ
+private ⟦_⟧ : Bin → ℕ
 ⟦ $ ⟧ = 0
 ⟦ a 𝟬 ⟧ = 2 ·ℕ ⟦ a ⟧
 ⟦ a 𝟭 ⟧ = 1 +ℕ 2 ·ℕ ⟦ a ⟧
@@ -662,10 +664,10 @@ binSize (a 𝟭) = 1 +ℕ binSize a
 binSize (a + b) = 1 +ℕ binSize a +ℕ binSize b
 
 -- transitive closure
-infix 4 _↝*_
-data _↝*_ : Bin → Bin → Set where
-    stop : ∀ {a} → a ↝* a
-    step : ∀ {a b g} → a ↝ b → b ↝* g → a ↝* g
+-- infix 4 _↝*_
+-- data _↝*_ : Bin → Bin → Set where
+--     stop : ∀ {a} → a ↝* a
+--     one : ∀ {a b g} → a ↝ b → b ↝* g → a ↝* g
 
 -- strong normalisation
 -- we define a measure that is strictly decreasing on each computation step

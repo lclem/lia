@@ -37,7 +37,7 @@ instance
   eqℕ : Eq ℕ
   _≡?_ {{eqℕ}} = _≟ℕ_
 
-infix 5 _≤_ _<_ _≥_ _>_
+infix 5 _≤_ _<_ _≥_ _>_ _≤?_
 
 data _≤_ : ℕ → ℕ → Set where
   instance 0≤n : ∀ {n : ℕ} → zero ≤ n
@@ -57,7 +57,6 @@ refl-≤ {suc n} = s≤s refl-≤
 suc-≤ : ∀ {m n : ℕ} → suc m ≤ suc n → m ≤ n
 suc-≤ (s≤s p) = p
 
--- TODO
 _≤?_ : ∀ m n → Dec (m ≤ n)
 zero ≤? n = yes 0≤n
 suc m ≤? zero = no λ ()
@@ -320,7 +319,6 @@ m∸n≤m (suc m) n
 ## Arithmetic expressions
 
 ```
-
 data AExp : Set where
   Num : ℕ → AExp
   Suc : AExp → AExp
