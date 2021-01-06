@@ -5,7 +5,7 @@ title: "Arithmetic expressions 🚧"
 ```
 {-# OPTIONS --allow-unsolved-metas #-}
 module part5.AExp where
-open import part0.index hiding (AExp; A⟦_⟧) renaming (_+_ to _+ℕ_; _*_ to _·ℕ_) public
+open import part0.index hiding (AExp; A⟦_⟧; _≈_) renaming (_+_ to _+ℕ_; _*_ to _·ℕ_) public
 ```
 
 # Arithmetic expressions
@@ -93,7 +93,7 @@ and value `40` to every other variable.
 
 ```
 infix 15 ⟦_⟧_ A⟦_⟧_
-private ⟦_⟧_ : AExp → Env → ℕ
+private ⟦_⟧_ sem : AExp → Env → ℕ
 ⟦ $ n ⟧ ρ = n
 ⟦ ` x ⟧ ρ = ρ x
 ⟦ e + f ⟧ ρ = ⟦ e ⟧ ρ +ℕ ⟦ f ⟧ ρ
@@ -101,6 +101,7 @@ private ⟦_⟧_ : AExp → Env → ℕ
 ⟦ Let x e f ⟧ ρ = ⟦ f ⟧ ρ [ x ↦ ⟦ e ⟧ ρ ]
 
 A⟦_⟧_ = ⟦_⟧_
+sem = ⟦_⟧_
 ```
 
 With our denotational semantics for expressions we can check (by computation) the value of concrete expressions.
@@ -549,6 +550,238 @@ The following lemma shows that the big-steps operational semantics agrees with t
 ⇒-agree-⟦⟧ {Let x e f} = ⇒-Let ⇒-agree-⟦⟧ ⇒-agree-⟦⟧
 ```
 
+## Contextual equivalence
+
+We say that two arithmetic expression are *contextually equivalent* if they provide the same result whenever they are plugged in the same context.
+
+```
+fv : AExp → VarName *
+fv ($ n) = ε
+fv (` x) = [ x ]
+fv (e + f) = fv e ++ fv f
+fv (e · f) = fv e ++ fv f
+fv (Let x e f) = fv e ++ remove x (fv f)
+
+closed : AExp → Set
+closed e = fv e ≡ ε
+
+fv-lemma : ∀ ρ₀ ρ₁ e → Agree ρ₀ ρ₁ (fv e) → ⟦ e ⟧ ρ₀ ≡ ⟦ e ⟧ ρ₁
+fv-lemma = {!   !}
+
+-- all named variables occurring in the expression
+vars : AExp → VarName *
+vars ($ n) = ε
+vars (` x) = [ x ]
+vars (e + f) = fv e ++ fv f
+vars (e · f) = fv e ++ fv f
+vars (Let x e f) = [ x ] ++ fv e ++ fv f
+
+-- fresh : AExp → VarName
+-- fresh = {!   !}
+
+-- fresh2 : AExp → AExp → VarName
+-- fresh2 = {!   !}
+
+-- fresh-lemma : ∀ e → fresh e ~∈ vars e
+-- fresh-lemma = {!   !}
+
+-- fresh2-lemma : ∀ e f → fresh2 e f ~∈ vars e × fresh2 e f ~∈ vars f
+-- fresh2-lemma = {!   !}
+
+-- rename : AExp → VarName → VarName → AExp
+-- rename e x y = {!   !}
+
+-- refresh : AExp → AExp → AExp
+-- refresh e g = {!   !}
+
+-- refresh-lemma : let e′ = refresh e g in sem e ≡ sem e′ × vars e′ ∩ vars g ≡ ε
+-- refresh-lemma = {!   !}
+
+infix 101 _A[_↦_]
+_A[_↦_] : AExp → VarName → AExp → AExp
+
+($ n) A[ x ↦ g ] = $ n
+
+(` y) A[ x ↦ g ]
+  with x ≡? y
+... | yes _ = g
+... | no _ = ` y
+
+(e + f) A[ x ↦ g ] = e A[ x ↦ g ] + f A[ x ↦ g ]
+(e · f) A[ x ↦ g ] = e A[ x ↦ g ] · f A[ x ↦ g ]
+
+Let y e f A[ x ↦ g ]
+  with e A[ x ↦ g ]
+... | e′
+  with x ≡? y
+... | yes _ = Let y e′ f
+... | no _ = Let y e′ (f A[ x ↦ g ]) -- in general this is incorrect since free variables in g may get captured
+```
+
+## Substitution facts
+
+```
+subs-Let-1 : ∀ x e → Let x e f A[ x ↦ g ] ≡ Let x (e A[ x ↦ g ]) f
+subs-Let-1 x e = {!   !}
+```
+
+## Substitution lemma
+
+This is correct only if no free occurrence of `x` in `e` falls under a let binding a variable `y` which is free in `g`.
+This is captured by `g AdmissibleFor x In e`.
+
+```
+_NotFreeIn_ : VarName → AExp → Set
+x NotFreeIn e = x ~∈ fv e
+
+infix 20 _AdmissibleFor_In_
+data _AdmissibleFor_In_ (g : AExp) (x : VarName) : AExp → Set where
+
+  Num : (n : ℕ) → g AdmissibleFor x In $ n
+
+  Var : (y : VarName) → g AdmissibleFor x In ` y
+
+  Add : ∀ e f →
+        g AdmissibleFor x In e → 
+        g AdmissibleFor x In f → 
+        ----------------------------
+        g AdmissibleFor x In (e + f)
+
+  Mul : ∀ e f →
+        g AdmissibleFor x In e → 
+        g AdmissibleFor x In f → 
+        ----------------------------
+        g AdmissibleFor x In (e · f)
+
+  Let-1 : ∀ e f →
+          g AdmissibleFor x In e → 
+          --------------------------------
+          g AdmissibleFor x In (Let x e f)
+
+  Let-2 : ∀ e f →
+          x ≢ y →
+          x NotFreeIn f →
+          g AdmissibleFor x In e →
+          --------------------------------
+          g AdmissibleFor x In (Let y e f)
+
+  Let-3 : ∀ e f →
+          x ≢ y →
+          y NotFreeIn g →
+          g AdmissibleFor x In e →
+          g AdmissibleFor x In f →
+          --------------------------------
+          g AdmissibleFor x In (Let y e f)
+
+subst-lemma : ∀ g x ρ →
+  g AdmissibleFor x In e →
+  --------------------------------------------
+  ⟦ e A[ x ↦ g ] ⟧ ρ ≡ ⟦ e ⟧ ρ [ x ↦ ⟦ g ⟧ ρ ]
+
+subst-lemma _ _ _ (Num n) = refl
+
+subst-lemma _ x _ (Var y)
+  with x ≡? y
+... | yes refl = refl
+... | no _ = refl
+
+subst-lemma g x ρ (Add e f adm-e adm-f)
+  rewrite subst-lemma g x ρ adm-e |
+          subst-lemma g x ρ adm-f
+  = refl
+
+subst-lemma g x ρ (Mul e f adm-e adm-f)
+  rewrite subst-lemma g x ρ adm-e |
+          subst-lemma g x ρ adm-f
+  = refl
+
+subst-lemma g x ρ (Let-1 e f adm-e)
+  with subst-lemma g x ρ adm-e
+... | ind =
+  begin
+    ⟦ Let x e f A[ x ↦ g ] ⟧ ρ
+      ≡⟨ cong (λ C → ⟦ C ⟧ ρ) (subs-Let-1 x e) ⟩
+    ⟦ Let x (e A[ x ↦ g ]) f ⟧ ρ
+      ≡⟨⟩
+    ⟦ f ⟧ ρ [ x ↦ ⟦ e A[ x ↦ g ] ⟧ ρ ]
+      ≡⟨ cong (λ C → ⟦ f ⟧ ρ [ x ↦ C ]) ind ⟩
+    ⟦ f ⟧ ρ [ x ↦ ⟦ e ⟧ ρ [ x ↦ ⟦ g ⟧ ρ ] ]
+      ≡⟨ cong (λ C → ⟦ f ⟧ C) (sym (doubleupdate x)) ⟩
+    ⟦ f ⟧ ρ [ x ↦ ⟦ g ⟧ ρ ] [ x ↦ ⟦ e ⟧ ρ [ x ↦ ⟦ g ⟧ ρ ] ]
+      ≡⟨⟩
+    ⟦ Let x e f ⟧ ρ [ x ↦ ⟦ g ⟧ ρ ]
+  ∎
+
+subst-lemma g x ρ (Let-2 e f x≢y xNFf adm-e) = {!   !}
+
+subst-lemma g x ρ (Let-3 e f x≢y yNFg adm-e adm-f) = {!   !}
+
+-- subst-lemma ($ n) = refl
+
+-- subst-lemma {x} (` y)
+--   with x ≡? y
+-- ... | yes refl = refl
+-- ... | no _ = refl
+
+-- subst-lemma {x} {g} {ρ} (e + f)
+--   rewrite subst-lemma {x} {g} {ρ} e |
+--           subst-lemma {x} {g} {ρ} f = refl
+
+-- subst-lemma {x} {g} {ρ} (e · f)
+--   rewrite subst-lemma {x} {g} {ρ} e |
+--           subst-lemma {x} {g} {ρ} f = refl
+
+-- subst-lemma {x} {g} {ρ} (Let y e f)
+--   with x ≡? y
+-- ... | yes refl = 
+--   begin
+--   ⟦ Let x (e A[ x ↦ g ]) f ⟧ ρ
+--     ≡⟨⟩
+--   ⟦ f ⟧ ρ [ x ↦ ⟦ e A[ x ↦ g ] ⟧ ρ ]
+--     ≡⟨ cong (λ C → ⟦ f ⟧ ρ [ x ↦ C ]) (subst-lemma {x} {g} {ρ} e) ⟩
+--   ⟦ f ⟧ ρ [ x ↦ ⟦ e ⟧ ρ′ ]
+--     ≡⟨ cong (λ C → ⟦ f ⟧ C) (sym (doubleupdate x)) ⟩
+--   ⟦ f ⟧ ρ′ [ x ↦ ⟦ e ⟧ ρ′ ]
+--     ≡⟨⟩
+--   ⟦ Let x e f ⟧ ρ′
+--   ∎ where ρ′ = ρ [ x ↦ ⟦ g ⟧ ρ ]
+
+-- ... | no x≢y
+--   with y ∈? fv g
+-- ... | no ¬y∈g =
+--   begin
+--   ⟦ Let y (e A[ x ↦ g ]) (f A[ x ↦ g ]) ⟧ ρ
+--     ≡⟨⟩
+--   ⟦ f A[ x ↦ g ] ⟧ ρ [ y ↦ ⟦ e A[ x ↦ g ] ⟧ ρ ]
+--     ≡⟨ cong (λ C → ⟦ f A[ x ↦ g ] ⟧ ρ [ y ↦ C ]) (subst-lemma e) ⟩
+--   ⟦ f A[ x ↦ g ] ⟧ ρ′′
+--     ≡⟨ subst-lemma f ⟩
+--   ⟦ f ⟧ ρ′′ [ x ↦ ⟦ g ⟧ ρ′′ ]
+--     ≡⟨⟩
+--   ⟦ f ⟧ ρ [ y ↦ ⟦ e ⟧ ρ′ ] [ x ↦ ⟦ g ⟧ ρ′′ ]
+--     ≡⟨ sym (cong (λ C → ⟦ f ⟧ C) (update-comm _ _ _ _ _  x≢y))⟩
+--   ⟦ f ⟧ ρ [ x ↦ ⟦ g ⟧ ρ′′ ] [ y ↦ ⟦ e ⟧ ρ′ ] 
+--     ≡⟨ cong (λ C → ⟦ f ⟧ ρ [ x ↦ C ] [ y ↦ ⟦ e ⟧ ρ′ ]) eq ⟩
+--   ⟦ f ⟧ ρ [ x ↦ ⟦ g ⟧ ρ ] [ y ↦ ⟦ e ⟧ ρ′ ]
+--     ≡⟨⟩
+--   ⟦ f ⟧ ρ′ [ y ↦ ⟦ e ⟧ ρ′ ]
+--     ≡⟨⟩
+--   ⟦ Let y e f ⟧ ρ′
+--   ∎ where ρ′ = ρ [ x ↦ ⟦ g ⟧ ρ ]
+--           ρ′′ = ρ [ y ↦ ⟦ e ⟧ ρ′ ]
+
+--           ag : Agree ρ ρ′′ (fv g)
+--           ag = Agree-update-~∈ ¬y∈g
+
+--           eq : ⟦ g ⟧ ρ′′ ≡ ⟦ g ⟧ ρ
+--           eq = fv-lemma ρ′′ ρ g (sym-Agree ag)
+
+-- ... | yes y∈g = {!   !}
+
+-- _≈_ : ∀ e f → Set
+-- e ≈ f = ∀ g → {!   !}
+```
+
 # Binary expressions
 
 ## Syntax
@@ -723,7 +956,7 @@ binSize (a + b) = 1 +ℕ binSize a +ℕ binSize b
   magic : ∀ a b →
       suc (suc (suc (suc (suc (a +ℕ b +ℕ 4))))) ≡
       suc (suc (suc (suc (suc (a +ℕ suc (suc (suc (suc b))))))))
-  magic = solve-∀
+  magic = {! solve-∀ !}
 
   goal : suc (suc (suc (suc (suc (μ a₁ +ℕ μ b₁ +ℕ 4))))) ≤
          suc (suc (suc (suc (suc (μ a₁ +ℕ suc (suc (suc (suc (μ b₁)))))))))
@@ -809,7 +1042,7 @@ triple-mon {a 𝟭 + b 𝟬} ↝+𝟭𝟬 rewrite suc-lemma {zeroes a} {zeroes b
 triple-mon {a 𝟭 + b 𝟭} ↝+𝟭𝟭 = left goal where
 
   have : ∀ a b → suc (a +ℕ b +ℕ 1) ≡ suc (a +ℕ suc b)
-  have = solve-∀
+  have = {! solve-∀ !}
 
   goal : suc (ones a +ℕ ones b +ℕ 1) ≤ suc (ones a +ℕ suc (ones b))
   goal rewrite have (ones a) (ones b) = refl-≤
