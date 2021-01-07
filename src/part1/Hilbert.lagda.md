@@ -4,7 +4,7 @@ title: "Hilbert-style proof system for propositional logic 🚧"
 
 ```
 {-# OPTIONS --allow-unsolved-metas #-} -- --rewriting --confluence-check
-open import part0.index
+open import part0.index hiding (_^_)
 
 module part1.Hilbert (n′ : ℕ) where
 open import part1.CharacteristicFormulas n′ public hiding (ϱtt; ϱff; LEM)
