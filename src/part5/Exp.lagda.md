@@ -22,8 +22,9 @@ Any countable domain with decidable equality (such as strings) would work here
 ```
 VarName = ℕ
 
-x₀ : VarName
+x₀ x₁ : VarName
 x₀ = 0
+x₁ = 1
 
 private variable x y z : VarName
 ```
@@ -61,10 +62,12 @@ pattern $_ n = Num n
 pattern `_ x = Var x
 pattern _+_ x y = Add x y
 pattern _·_ x y = Mul x y
+pattern Let_≔_In_ x e f = Let x e f
 
 infix 50 $_ `_
 infixr 30 _·_
 infixl 25 _+_
+infixr 20 Let_≔_In_
 ```
 
 ```
@@ -87,9 +90,9 @@ The following environment assigns value `200` to the variable named `10`,
 and value `40` to every other variable.
 
 ```
-ϱ0 : Env
-ϱ0 10 = 200
-ϱ0 _ = 40
+ϱ₀ : Env
+ϱ₀ 10 = 200
+ϱ₀ _ = 40
 ```
 
 # Boolean expressions
@@ -131,7 +134,7 @@ A⟦_⟧_ = ⟦_⟧_
 With our denotational semantics for expressions we can check (by computation) the value of concrete expressions.
 
 ```
-_ : ⟦ add-one ⟧ ϱ0 ≡ 201
+_ : ⟦ add-one ⟧ ϱ₀ ≡ 201
 _ = refl
 ```
 
@@ -170,13 +173,108 @@ B⟦ e ≤ f ⟧ ρ
 
 # Lazy semantics
 
+## Dynamic binding
+
 ```
 Envˡ = VarName → AExp
 
-infix 15 ⟦_⟧ˡ_
-private ⟦_⟧ˡ_ : AExp → Envˡ → ℕ
-⟦ e ⟧ˡ ϱ = ?
+ϱ₁ : Envˡ
+ϱ₁ _ = $ 0
 
+infix 15 ⟦_⟧ˡ_
+
+{-# TERMINATING #-}
+⟦_⟧ˡ_ : AExp → Envˡ → ℕ
+⟦ $ n ⟧ˡ ϱ = n
+⟦ ` x ⟧ˡ ϱ = ⟦ ϱ x ⟧ˡ ϱ -- termination issue here
+⟦ e + f ⟧ˡ ϱ = ⟦ e ⟧ˡ ϱ +ℕ ⟦ f ⟧ˡ ϱ
+⟦ e · f ⟧ˡ ϱ = ⟦ e ⟧ˡ ϱ ·ℕ ⟦ f ⟧ˡ ϱ
+⟦ Let x e f ⟧ˡ ϱ = ⟦ f ⟧ˡ ϱ [ x ↦ e ]
+```
+
+Example:
+
+```
+_ : ⟦ Let x₀ ($ 2 + $ 3) ($ 3 · ` x₀) ⟧ˡ ϱ₁ ≡ 15
+_  = refl
+```
+
+Notice how the meaning of free variables dynamically depends on the environment active when they are *used*:
+
+```
+_ : ⟦ Let x₁ ≔ $ 1 In Let x₀ ≔ ` x₁ In Let x₁ ≔ $ 2 In ` x₀ ⟧ˡ ϱ₁ ≡ 2
+_  = refl
+```
+
+## Static binding
+
+We need coinductively-defined environments.
+
+```
+-- Envˡˢ = VarName → AExp × Envˡˢ
+```
+
+```
+record Envˡˢ : Set where
+  coinductive
+  field
+    env : VarName → AExp × Envˡˢ
+
+open Envˡˢ
+
+_[[_↦_,_]] : Envˡˢ → VarName → AExp → Envˡˢ → Envˡˢ
+env (ϱ [[ x ↦ e , ϱ′ ]]) = env ϱ [ x ↦ e , ϱ′ ]
+```
+
+```
+ϱ₂ : Envˡˢ
+env ϱ₂ _ = $ 0 , ϱ₂
+
+infix 15 ⟦_⟧ˡˢ_
+
+{-# TERMINATING #-}
+⟦_⟧ˡˢ_ : AExp → Envˡˢ → ℕ
+⟦ $ n ⟧ˡˢ ϱ = n
+⟦ ` x ⟧ˡˢ ϱ = let e , ϱ′ = env ϱ x in ⟦ e ⟧ˡˢ ϱ′ -- termination issue
+⟦ e + f ⟧ˡˢ ϱ = ⟦ e ⟧ˡˢ ϱ +ℕ ⟦ f ⟧ˡˢ ϱ
+⟦ e · f ⟧ˡˢ ϱ = ⟦ e ⟧ˡˢ ϱ ·ℕ ⟦ f ⟧ˡˢ ϱ
+⟦ Let x e f ⟧ˡˢ ϱ = ⟦ f ⟧ˡˢ ϱ [[ x ↦ e , ϱ ]]
+```
+
+Notice how the meaning of free variables statically depends on the environment active when they are *defined*:
+
+```
+_ : ⟦ Let x₁ ≔ $ 1 In Let x₀ ≔ ` x₁ In Let x₁ ≔ $ 2 In ` x₀ ⟧ˡˢ ϱ₂ ≡ 1
+_  = refl
+```
+
+We show that the lazy semantics with static binding agrees with the eager semantics.
+Note that in general the lazy semantics may be "more defined" than the eager one, i.e., in the presence of errors or exceptions.
+
+```
+env-agree : Envˡˢ → Env → Set
+env-agree ϱ τ = ∀[ x ] ⟦ ` x ⟧ˡˢ ϱ ≡ τ x
+
+env-agree-update : ∀ ϱ τ x e → env-agree ϱ τ → env-agree (ϱ [[ x ↦ e , ϱ ]]) (τ [ x ↦ ⟦ e ⟧ˡˢ ϱ ])
+env-agree-update ϱ τ x e ag y
+  with x ≡? y
+... | yes refl = refl
+... | no _ = ag y
+
+eager-lazy-agree : ∀ ϱ τ → env-agree ϱ τ → ∀[ e ] ⟦ e ⟧ˡˢ ϱ ≡ ⟦ e ⟧ τ
+eager-lazy-agree _ _ ag ($ n) = refl
+eager-lazy-agree _ _ ag (` x) = ag x
+eager-lazy-agree ϱ τ ag (e + f)
+  rewrite eager-lazy-agree ϱ τ ag e |
+          eager-lazy-agree ϱ τ ag f = refl
+eager-lazy-agree ϱ τ ag (e · f)
+  rewrite eager-lazy-agree ϱ τ ag e |
+          eager-lazy-agree ϱ τ ag f = refl
+eager-lazy-agree ϱ τ ag (Let x ≔ e In f)
+  with env-agree-update ϱ τ x e ag
+... | ag′
+  rewrite sym (eager-lazy-agree ϱ τ ag e) |
+          eager-lazy-agree (ϱ [[ x ↦ e , ϱ ]]) (τ [ x ↦ ⟦ e ⟧ˡˢ ϱ ]) ag′ f = refl
 ```
 
 # Free variables
@@ -828,17 +926,17 @@ Example derivation:
 x0 = 0
 e0 = Let x0 ($ 2 + $ 3) (` x0 · $ 2) 
 
-_ : e0 , ϱ0 ⇒ 10
+_ : e0 , ϱ₀ ⇒ 10
 _ = BEGIN
-    have $ 2 , ϱ0 ⇒ 2                               by ⇒-Num
-    have $ 3 , ϱ0 ⇒ 3                               by ⇒-Num
-    have $ 2 + $ 3 , ϱ0 ⇒ 5                         apply ⇒-Add at back 1 , here
+    have $ 2 , ϱ₀ ⇒ 2                               by ⇒-Num
+    have $ 3 , ϱ₀ ⇒ 3                               by ⇒-Num
+    have $ 2 + $ 3 , ϱ₀ ⇒ 5                         apply ⇒-Add at back 1 , here
 
-    have ` x0 , ϱ0 [ x0 ↦ 5 ] ⇒ 5                   by ⇒-Var
-    have $ 2 , ϱ0 [ x0 ↦ 5 ] ⇒ 2                    by ⇒-Num
-    have (` x0 · $ 2) , ϱ0 [ x0 ↦ 5 ] ⇒ 10          apply ⇒-Mul at back 1 , here
+    have ` x0 , ϱ₀ [ x0 ↦ 5 ] ⇒ 5                   by ⇒-Var
+    have $ 2 , ϱ₀ [ x0 ↦ 5 ] ⇒ 2                    by ⇒-Num
+    have (` x0 · $ 2) , ϱ₀ [ x0 ↦ 5 ] ⇒ 10          apply ⇒-Mul at back 1 , here
 
-    have Let x0 ($ 2 + $ 3) (` x0 · $ 2) , ϱ0 ⇒ 10  apply ⇒-Let at back 3 , here
+    have Let x0 ($ 2 + $ 3) (` x0 · $ 2) , ϱ₀ ⇒ 10  apply ⇒-Let at back 3 , here
     END
 ```
 
@@ -869,8 +967,8 @@ eval (Let x e f) ϱ
 ```
 
 ```
-_ : e0 , ϱ0 ⇒ 10
-_ = dsnd (eval e0 ϱ0)
+_ : e0 , ϱ₀ ⇒ 10
+_ = dsnd (eval e0 ϱ₀)
 ```
 
 ## Evaluation is deterministic
