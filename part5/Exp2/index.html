@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Arithmetic expressions with division 🚧 | Logic in Agda</title><!-- Begin Jekyll SEO tag v2.6.1 -->
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Arithmetic expressions with division 🚧" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Propositional and fist-order logic developed with the proof assistant Agda." />
+<meta property="og:description" content="Propositional and fist-order logic developed with the proof assistant Agda." />
+<link rel="canonical" href="/lia/part5/Exp2/" />
+<meta property="og:url" content="/lia/part5/Exp2/" />
+<meta property="og:site_name" content="Logic in Agda" />
+<script type="application/ld+json">
+{"url":"/lia/part5/Exp2/","@type":"WebPage","description":"Propositional and fist-order logic developed with the proof assistant Agda.","headline":"Arithmetic expressions with division 🚧","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/lia/assets/main.css">
+
+  <!-- <link rel="stylesheet" href="/lia/assets/custom.css"> --><!-- Mathjax Support -->
+  <script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+  <!-- Load KaTeX -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1.1/katex.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1.1/katex.min.js"></script>
+
+<script type="text/x-thebe-config">
+  {
+    bootstrap: true,
+    requestKernel: true,
+    runAllCells: false,
+    selector: "[data-executable]",
+    predefinedOutput: false,
+    codeMirrorConfig: {
+        //theme: "idea",
+        language: "agda",
+        readOnly: false,
+        lineNumbers: true,
+        keyMap: "default",
+//        gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
+    },
+    kernelOptions: {
+        name: "agda",
+        kernelName: "agda",
+        path: "src/",
+        loadFromStore: true,
+        persistent: false,
+        // notebook server configuration; not needed with binder
+        serverSettings: {
+              baseUrl: "http://127.0.0.1:8888",
+              token: "test-secret",
+            },
+    },
+    binderOptions: {
+      repo: "lclem/lia", // need to put here the actual github repo (if it is a fork)
+      ref: "main",
+      binderUrl: "https://mybinder.org",
+      repoProvider: "github",
+      savedSession: {
+        enabled: true,
+        maxAge: 86400, // the max age in seconds to consider re-using a session
+        storagePrefix: "thebe-binder-lia-"
+      },
+    },
+  }
+</script>
+
+<!-- <script type="text/javascript" src="https://unpkg.com/thebelab@latest"></script> -->
+
+<!-- our own version of the thebe library: -->
+<script type="text/javascript" src="/lia/thebe/lib/index.js"></script>
+
+<!-- highlighting for Agda -->
+<script src="/lia/codemirror-agda/lib/index.js"></script>
+
+</head>
+<body><header class="site-header" id="site-header">
+
+    <div class="wrapper">
+
+        <a class="site-title" href="/lia/">Logic in Agda</a>
+
+        <nav class="site-nav">
+            <!-- <span class="menu-icon">
+                <svg viewBox="0 0 18 15" width="18px" height="15px">
+                    <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+                    <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+                    <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+                </svg>
+            </span> -->
+
+            <div class="trigger">
+                <a class="page-link" href="/lia/part0/index/">Part 0</a>
+                <a class="page-link" href="/lia/part1/index/">Part 1</a>
+                <a class="page-link" href="/lia/part2/index/">Part 2</a>
+                <a class="page-link" href="/lia/part3/index/">Part 3</a>
+                <a class="page-link" href="/lia/part4/index/">Part 4</a>
+                <a class="page-link" href="/lia/part5/index/">Part 5</a>
+
+                <span class="kernel-status">
+                    <button class="kernel-status-button" onclick="kernel_status_clicked()" title="kernel status"></button>
+                    <span id="kernel-messages" class="kernel-messages"></span>
+                </span>
+
+                <div id="connection_options" class="options sidebar" style="text-align: left; line-height: normal; max-width: 800px; padding: 10px; border-radius: 15px;">
+                    <!-- display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: space-between; -->
+                    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+                    <div>
+                        <label for="username" style="color: white;">User:</label>
+                        <input type="text" placeholder="github username" id="username" name="username">
+                        <label for="password" style="color: white;">Password:</label>
+                        <input type="password" placeholder="password" id="password" name="password">
+                    </div>
+                    <div>
+                        <label for="loadFromStore" style="color: white;">Load code from browser store:</label>
+                        <label class="switch" style="vertical-align: middle; margin: 10px;">
+                            <input type="checkbox" id="loadFromStore" name="loadFromStore">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div>
+                        <label for="baseUrl" style="color: white;">Base URL:</label>
+                        <input type="text" placeholder="baseUrl" id="baseUrl" name="baseUrl" value="http://127.0.0.1:8888">
+                        <label for="token" style="color: white;">Token:</label>
+                        <input type="text" placeholder="token" id="token" name="token" value="test-secret">
+                    </div>
+                    <div>
+                        <label for="useBinder" style="color: white;">Use binder:</label>
+                        <label class="switch" style="vertical-align: middle; margin: 10px;">
+                            <input type="checkbox" id="useBinder" name="useBinder">
+                            <span class="slider round"></span>
+                        </label>
+                        <label for="savedSession" style="color: white;">Reuse session:</label>
+                        <label class="switch" style="vertical-align: middle; margin: 10px;">
+                            <input type="checkbox" id="savedSession" name="savedSession">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div>
+                        <label for="repository" style="color: white;">Github repo:</label>
+                        <input type="text" placeholder="repository" id="repository" name="repository" value="">
+
+                        <label for="ref" style="color: white;">Branch:</label>
+                        <input type="text" placeholder="ref" id="ref" name="ref" value="main">
+
+                        <label for="binderUrl" style="color: white;">Binder URL:</label>                        
+                        <input type="text" placeholder="binderUrl" id="binderUrl" name="binderUrl" value="https://mybinder.org">
+                    </div>
+                </div>
+
+                <span class="control-container" id="control-container">
+                    <svg class="progress-ring" id="progress-ring" width="30" height="30" title="exercise progress" onclick="kernel_status_clicked()">
+                        <circle
+                            id="progress-circle"
+                            class="progress-ring__circle"
+                            stroke="black"
+                            stroke-width="2.5"
+                            fill="transparent"
+                            r="14"
+                            cx="15"
+                            cy="15"/>
+                        <circle
+                            stroke="lightgray"
+                            stroke-width="0.5"
+                            fill="transparent"
+                            r="14"
+                            cx="15"
+                            cy="15"/>
+                    </svg>
+                    <div id="connection_options" class="options sidebar" style="text-align: left; line-height: normal; max-width: 800px; padding: 10px; border-radius: 15px;"></div>
+                    <span class="progress-text" id="progress-text" onclick="kernel_status_clicked()"> 0/0 </span>
+
+                    <span id="controls" class="controls">
+                        <svg version="1.1" id="run-all" class="run-all" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                            width="15" height="15" viewBox="0 0 163.861 163.861" style="enable-background:new 0 0 163.861 163.861;"
+                            xml:space="preserve">
+                            <g>
+                                <path d="M34.857,3.613C20.084-4.861,8.107,2.081,8.107,19.106v125.637c0,17.042,11.977,23.975,26.75,15.509L144.67,97.275
+                                    c14.778-8.477,14.778-22.211,0-30.686L34.857,3.613z"/>
+                            </g>
+                        </svg>
+                    </span>
+                </span>
+            </div>
+
+            <style>
+                .switch {
+                    position: relative;
+                    display: inline-block;
+                    width: 40px;
+                    height: 20px;
+                }
+
+                /* Hide default HTML checkbox */
+                .switch input {
+                    opacity: 0;
+                    width: 0;
+                    height: 0;
+                }
+
+                /* The slider */
+                .slider {
+                    position: absolute;
+                    cursor: pointer;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background-color: #ccc;
+                    -webkit-transition: .4s;
+                    transition: .4s;
+                }
+
+                .slider:before {
+                    position: absolute;
+                    content: "";
+                    height: 16px;
+                    width: 16px;
+                    left: 2px;
+                    /* right: 4px; */
+                    bottom: 2px;
+                    top: 2px;
+                    background-color: white;
+                    -webkit-transition: .4s;
+                    transition: .4s;
+                }
+
+                input:checked + .slider {
+                    background-color: #2196F3;
+                }
+
+                input:focus + .slider {
+                    box-shadow: 0 0 1px #2196F3;
+                }
+
+                input:checked + .slider:before {
+                    -webkit-transform: translateX(18px);
+                    -ms-transform: translateX(18px);
+                    transform: translateX(18px);
+                }
+
+                /* Rounded sliders */
+                .slider.round {
+                    border-radius: 30px;
+                }
+
+                .slider.round:before {
+                border-radius: 50%;
+                }
+
+                .sidebar input[type=text] {
+                    padding: 6px;
+                    margin-top: 8px;
+                    /* font-size: 17px; */
+                    border: none;
+                    /* width: 150px; */
+                }
+
+                .sidebar {
+                    /* height: 100%; */
+                    width: 0;
+                    position: fixed;
+                    z-index: 1000;
+                    top: 0;
+                    right: 20px;
+                    background-color: rgba(17, 17, 17, 0.637);
+                    /* overflow-x: hidden; */
+                    transition: 0.5s;
+                    padding-top: 60px;
+                    display: none;
+                    margin-top: 60px;
+                }
+
+                .sidebar .closebtn {
+                    position: absolute;
+                    color: white;
+                    top: 0;
+                    right: 10px;
+                    font-size: 24px;
+                    margin-left: 20px;
+                }
+
+                .progress-ring, .run-all {
+                    vertical-align: middle;
+                }
+
+                .control-container {
+                    transition: all .2s ease-in-out;
+                }
+
+                .controls {
+                    display: none;
+                    opacity: 0;
+                    margin-right: 10px;
+                    transition: all .5s ease-in-out;
+                }
+
+                .run-all:hover {
+                    filter: brightness(135%);
+                }
+
+                .progress-ring__circle {
+                    transition: 0.35s stroke-dashoffset;
+                    transform: rotate(-90deg);
+                    transform-origin: 50% 50%;
+                    visibility: hidden;
+                }
+
+                .progress-text {
+                    position: relative;
+                    top: 0;
+                    left: -25px;
+                    font-size: 8px;
+                    vertical-align: middle;
+                    align-self: center;
+                }
+
+                .progress-text:hover, .progress-ring:hover, .progress-ring__circle:hover, .run-all {
+                    cursor: pointer;
+                }
+            </style>
+
+            <script>
+
+                //  var storedUsername = localStorage.getItem("username");
+                //  localStorage.setItem("username", storedUsername.value);
+            
+                function doStore(input, key) {
+
+                    if(input.type == "checkbox") {
+                        var checked = localStorage.getItem(key);
+
+                        if (checked == "yes") {
+                            localStorage.setItem(key, "no");
+                        }
+                        else {
+                            localStorage.setItem(key, "yes");
+                        }
+
+                        console.info("checked: ", localStorage.getItem(key));
+                    }
+                    else {
+                        console.info("value: ", input.value);
+                        localStorage.setItem(key, input.value);
+                    }
+                }
+
+                function persistInput(input) {
+                    var key = "input-" + input.id;
+                    var storedValue = localStorage.getItem(key);
+                
+                    console.info("Persisting input: ", input);
+                
+                    // if there is a stored value, use it
+                    if (storedValue) {
+
+                        if(input.type != "password") {
+                            console.info("restoring value ", storedValue, " for ", input);
+                        }
+
+                        if(input.type == "checkbox") {
+                            if(storedValue=="yes") {
+                                input.setAttribute("checked", "");
+                            }
+                            else {
+                                input.removeAttribute("checked");
+                            }
+                        }
+                        else {
+                            input.value = storedValue;
+                        }
+                    }
+                    // if there is no stored value, store the current value
+                    else {
+                        doStore(input, key);
+                    }
+
+                    input.addEventListener('input', function () {
+                        console.info("input changed: key = ", key, "; value = ", input);
+                        doStore(input, key);
+                    });
+                    }
+                
+                    persistInput(document.getElementById("username"));
+                    persistInput(document.getElementById("password"));
+
+                    persistInput(document.getElementById("loadFromStore"));
+
+                    persistInput(document.getElementById("baseUrl"));
+                    persistInput(document.getElementById("token"));
+
+                    persistInput(document.getElementById("useBinder"));
+                    persistInput(document.getElementById("savedSession"));
+                    persistInput(document.getElementById("repository"));
+                    persistInput(document.getElementById("ref"));
+                    persistInput(document.getElementById("binderUrl"));
+
+                    // init
+                    document.getElementById("connection_options").style.display = "none";
+
+                    function kernel_status_clicked() {
+                
+                        console.info("Clicked kernel status");
+
+                        document.getElementById("kernel-messages").style.display = "none";
+
+                        document.getElementById("connection_options").style.width = "750px";
+                        document.getElementById("connection_options").style.display = "block";
+                        //document.getElementById("header").style.marginLeft = "250px";
+
+                    }
+
+                    function closeNav() {
+
+                        document.getElementById("kernel-messages").style.display = "inline";
+
+                        document.getElementById("connection_options").style.width = "0";
+                        document.getElementById("connection_options").style.display = "none";
+                        //document.getElementById("header").style.marginLeft= "0";
+                    }
+
+                var prevScrollpos = window.pageYOffset;
+                var header = document.getElementById("site-header");
+                var boxShadow = header.style.boxShadow;
+
+                window.onscroll = function() {
+                    var currentScrollPos = window.pageYOffset;
+                    // detect scroll down
+                    if (prevScrollpos > currentScrollPos) {
+                        header.style.top = "0";
+                        header.style.boxShadow = boxShadow;
+                        prevScrollpos = currentScrollPos;
+                    } else if (prevScrollpos <= currentScrollPos) {
+                        header.style.top = "-55px";
+                        header.style.boxShadow = "none"
+                        prevScrollpos = currentScrollPos;
+                    }
+                }
+
+            let control_container = document.getElementById("control-container");
+            let controls = document.getElementById("controls");
+
+            control_container.addEventListener("mouseenter", function(event) {
+                controls.style.display = "inline";
+//                controls.style.visibility = "visible";
+                controls.style.opacity = 1;
+                console.info("mouseenter");
+            }, false);
+
+            control_container.addEventListener("mouseleave", function(event) {
+                // controls.style.visibility = "hidden";
+                // controls.style.display = "none";
+                controls.style.opacity = 0;
+                console.info("mouseleave");
+            }, false);
+
+            </script>
+            
+        </nav>
+
+    </div>
+
+</header><main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post">
+
+    <header class="post-header">
+        <h1 class="post-title">Arithmetic expressions with division 🚧</h1>
+    </header>
+  
+    <header class="nav-header">
+    <p style="text-align:center;">
+        
+        
+        
+        <a alt="Part" href="/lia/part5/index/">Part</a>
+        &bullet;
+        
+        
+        <a alt="Source code" href="https://github.com/lclem/lia/blob/main/src/part5/Exp2.lagda.md">Source</a>
+        
+        
+        
+    </p>
+</header>
+
+  
+    <div class="post-content">
+        <h2>Contents</h2>    
+        <ul id="toc" class="section-nav">
+<li class="toc-entry toc-h1"><a href="#arithmetic-expressions-with-division">Arithmetic expressions with division</a></li>
+<li class="toc-entry toc-h1"><a href="#eager-semantics">Eager semantics</a></li>
+<li class="toc-entry toc-h1"><a href="#lazy-semantics">Lazy semantics</a></li>
+<li class="toc-entry toc-h1"><a href="#references">References</a></li>
+</ul><pre class="Agda"><a id="62" class="Symbol">{-#</a> <a id="66" class="Keyword">OPTIONS</a> <a id="74" class="Pragma">--allow-unsolved-metas</a> <a id="97" class="Symbol">#-}</a>
+<a id="101" class="Keyword">module</a> <a id="108" href="/lia/part5/Exp2/" class="Module">part5.Exp2</a> <a id="119" class="Keyword">where</a>
+<a id="125" class="Keyword">open</a> <a id="130" class="Keyword">import</a> <a id="137" href="/lia/part0/index/" class="Module">part0.index</a> <a id="149" class="Keyword">hiding</a> <a id="156" class="Symbol">(</a><a id="157" href="/lia/part0/Naturals/#6982" class="Datatype">AExp</a><a id="161" class="Symbol">;</a> <a id="163" href="/lia/part0/Naturals/#7093" class="Function Operator">A⟦_⟧</a><a id="167" class="Symbol">;</a> <a id="169" href="/lia/part0/List/#23605" class="Function Operator">_≈_</a><a id="172" class="Symbol">;</a> <a id="174" href="/lia/part0/List/#31344" class="Datatype Operator">_⊑_</a><a id="177" class="Symbol">)</a> <a id="179" class="Keyword">renaming</a> <a id="188" class="Symbol">(</a><a id="189" href="/lia/part0/Naturals/#266" class="Primitive Operator">_+_</a> <a id="193" class="Symbol">to</a> <a id="Nat._+_"></a><a id="196" href="/lia/part5/Exp2/#196" class="Primitive Operator">_+ℕ_</a><a id="200" class="Symbol">;</a> <a id="202" href="/lia/part0/Naturals/#288" class="Primitive Operator">_*_</a> <a id="206" class="Symbol">to</a> <a id="Nat._*_"></a><a id="209" href="/lia/part5/Exp2/#209" class="Primitive Operator">_·ℕ_</a><a id="213" class="Symbol">;</a> <a id="215" href="/lia/part0/Naturals/#798" class="Datatype Operator">_≤_</a> <a id="219" class="Symbol">to</a> <a id="_≤_"></a><a id="222" href="/lia/part5/Exp2/#222" class="Datatype Operator">_≤ℕ_</a><a id="226" class="Symbol">)</a> <a id="228" class="Keyword">public</a>
+<a id="235" class="Keyword">open</a> <a id="240" class="Keyword">import</a> <a id="247" href="Data.Nat.DivMod.html" class="Module">Data.Nat.DivMod</a> <a id="263" class="Keyword">renaming</a> <a id="272" class="Symbol">(</a><a id="273" href="Data.Nat.DivMod.html#1308" class="Function Operator">_/_</a> <a id="277" class="Symbol">to</a> <a id="DivMod._/_"></a><a id="280" href="/lia/part5/Exp2/#280" class="Function Operator">_/ℕ_</a><a id="284" class="Symbol">)</a></pre>
+
+<h1 id="arithmetic-expressions-with-division">
+<a class="anchor" href="#arithmetic-expressions-with-division" aria-hidden="true"><span class="octicon octicon-link"></span></a>Arithmetic expressions with division</h1>
+
+<pre class="Agda"><a id="VarName"></a><a id="335" href="/lia/part5/Exp2/#335" class="Function">VarName</a> <a id="343" class="Symbol">=</a> <a id="345" href="/lia/part0/Naturals/#301" class="Function">ℕ</a>
+
+<a id="x₀"></a><a id="348" href="/lia/part5/Exp2/#348" class="Function">x₀</a> <a id="x₁"></a><a id="351" href="/lia/part5/Exp2/#351" class="Function">x₁</a> <a id="354" class="Symbol">:</a> <a id="356" href="/lia/part5/Exp2/#335" class="Function">VarName</a>
+<a id="364" href="/lia/part5/Exp2/#348" class="Function">x₀</a> <a id="367" class="Symbol">=</a> <a id="369" class="Number">0</a>
+<a id="371" href="/lia/part5/Exp2/#351" class="Function">x₁</a> <a id="374" class="Symbol">=</a> <a id="376" class="Number">1</a>
+
+<a id="379" class="Keyword">data</a> <a id="AExp"></a><a id="384" href="/lia/part5/Exp2/#384" class="Datatype">AExp</a> <a id="389" class="Symbol">:</a> <a id="391" class="PrimitiveType">Set</a> <a id="395" class="Keyword">where</a>
+  <a id="AExp.Num"></a><a id="403" href="/lia/part5/Exp2/#403" class="InductiveConstructor">Num</a> <a id="407" class="Symbol">:</a> <a id="409" class="Symbol">(</a><a id="410" href="/lia/part5/Exp2/#410" class="Bound">n</a> <a id="412" class="Symbol">:</a> <a id="414" href="/lia/part0/Naturals/#301" class="Function">ℕ</a><a id="415" class="Symbol">)</a> <a id="417" class="Symbol">→</a> <a id="419" href="/lia/part5/Exp2/#384" class="Datatype">AExp</a>
+  <a id="AExp.Var"></a><a id="426" href="/lia/part5/Exp2/#426" class="InductiveConstructor">Var</a> <a id="430" class="Symbol">:</a> <a id="432" class="Symbol">(</a><a id="433" href="/lia/part5/Exp2/#433" class="Bound">x</a> <a id="435" class="Symbol">:</a> <a id="437" href="/lia/part5/Exp2/#335" class="Function">VarName</a><a id="444" class="Symbol">)</a> <a id="446" class="Symbol">→</a> <a id="448" href="/lia/part5/Exp2/#384" class="Datatype">AExp</a>
+  <a id="AExp.Add"></a><a id="455" href="/lia/part5/Exp2/#455" class="InductiveConstructor">Add</a> <a id="459" class="Symbol">:</a> <a id="461" class="Symbol">(</a><a id="462" href="/lia/part5/Exp2/#462" class="Bound">e</a> <a id="464" href="/lia/part5/Exp2/#464" class="Bound">f</a> <a id="466" class="Symbol">:</a> <a id="468" href="/lia/part5/Exp2/#384" class="Datatype">AExp</a><a id="472" class="Symbol">)</a> <a id="474" class="Symbol">→</a> <a id="476" href="/lia/part5/Exp2/#384" class="Datatype">AExp</a>
+  <a id="AExp.Mul"></a><a id="483" href="/lia/part5/Exp2/#483" class="InductiveConstructor">Mul</a> <a id="487" class="Symbol">:</a> <a id="489" class="Symbol">(</a><a id="490" href="/lia/part5/Exp2/#490" class="Bound">e</a> <a id="492" href="/lia/part5/Exp2/#492" class="Bound">f</a> <a id="494" class="Symbol">:</a> <a id="496" href="/lia/part5/Exp2/#384" class="Datatype">AExp</a><a id="500" class="Symbol">)</a> <a id="502" class="Symbol">→</a> <a id="504" href="/lia/part5/Exp2/#384" class="Datatype">AExp</a>
+  <a id="AExp.Div"></a><a id="511" href="/lia/part5/Exp2/#511" class="InductiveConstructor">Div</a> <a id="515" class="Symbol">:</a> <a id="517" class="Symbol">(</a><a id="518" href="/lia/part5/Exp2/#518" class="Bound">e</a> <a id="520" href="/lia/part5/Exp2/#520" class="Bound">f</a> <a id="522" class="Symbol">:</a> <a id="524" href="/lia/part5/Exp2/#384" class="Datatype">AExp</a><a id="528" class="Symbol">)</a> <a id="530" class="Symbol">→</a> <a id="532" href="/lia/part5/Exp2/#384" class="Datatype">AExp</a>
+  <a id="AExp.Let"></a><a id="539" href="/lia/part5/Exp2/#539" class="InductiveConstructor">Let</a> <a id="543" class="Symbol">:</a> <a id="545" class="Symbol">(</a><a id="546" href="/lia/part5/Exp2/#546" class="Bound">x</a> <a id="548" class="Symbol">:</a> <a id="550" href="/lia/part5/Exp2/#335" class="Function">VarName</a><a id="557" class="Symbol">)</a> <a id="559" class="Symbol">(</a><a id="560" href="/lia/part5/Exp2/#560" class="Bound">e</a> <a id="562" href="/lia/part5/Exp2/#562" class="Bound">f</a> <a id="564" class="Symbol">:</a> <a id="566" href="/lia/part5/Exp2/#384" class="Datatype">AExp</a><a id="570" class="Symbol">)</a> <a id="572" class="Symbol">→</a> <a id="574" href="/lia/part5/Exp2/#384" class="Datatype">AExp</a>
+
+<a id="580" class="Keyword">private</a>
+  <a id="590" class="Keyword">variable</a>
+    <a id="603" href="/lia/part5/Exp2/#603" class="Generalizable">e</a> <a id="605" href="/lia/part5/Exp2/#605" class="Generalizable">e′</a> <a id="608" href="/lia/part5/Exp2/#608" class="Generalizable">f</a> <a id="610" href="/lia/part5/Exp2/#610" class="Generalizable">f′</a> <a id="613" href="/lia/part5/Exp2/#613" class="Generalizable">g</a> <a id="615" class="Symbol">:</a> <a id="617" href="/lia/part5/Exp2/#384" class="Datatype">AExp</a>
+    <a id="626" href="/lia/part5/Exp2/#626" class="Generalizable">m</a> <a id="628" href="/lia/part5/Exp2/#628" class="Generalizable">n</a> <a id="630" class="Symbol">:</a> <a id="632" href="/lia/part0/Naturals/#301" class="Function">ℕ</a></pre>
+<pre class="Agda"><a id="643" class="Keyword">pattern</a> <a id="$_"></a><a id="651" href="/lia/part5/Exp2/#651" class="InductiveConstructor Operator">$_</a> <a id="654" href="/lia/part5/Exp2/#662" class="Bound">n</a> <a id="656" class="Symbol">=</a> <a id="658" class="InductiveConstructor">Num</a> <a id="662" href="/lia/part5/Exp2/#662" class="Bound">n</a>
+<a id="664" class="Keyword">pattern</a> <a id="`_"></a><a id="672" href="/lia/part5/Exp2/#672" class="InductiveConstructor Operator">`_</a> <a id="675" href="/lia/part5/Exp2/#683" class="Bound">x</a> <a id="677" class="Symbol">=</a> <a id="679" href="/lia/part5/Exp2/#426" class="InductiveConstructor">Var</a> <a id="683" href="/lia/part5/Exp2/#683" class="Bound">x</a>
+<a id="685" class="Keyword">pattern</a> <a id="_+_"></a><a id="693" href="/lia/part5/Exp2/#693" class="InductiveConstructor Operator">_+_</a> <a id="697" href="/lia/part5/Exp2/#707" class="Bound">x</a> <a id="699" href="/lia/part5/Exp2/#709" class="Bound">y</a> <a id="701" class="Symbol">=</a> <a id="703" href="/lia/part5/Exp2/#455" class="InductiveConstructor">Add</a> <a id="707" href="/lia/part5/Exp2/#707" class="Bound">x</a> <a id="709" href="/lia/part5/Exp2/#709" class="Bound">y</a>
+<a id="711" class="Keyword">pattern</a> <a id="_·_"></a><a id="719" href="/lia/part5/Exp2/#719" class="InductiveConstructor Operator">_·_</a> <a id="723" href="/lia/part5/Exp2/#733" class="Bound">x</a> <a id="725" href="/lia/part5/Exp2/#735" class="Bound">y</a> <a id="727" class="Symbol">=</a> <a id="729" href="/lia/part5/Exp2/#483" class="InductiveConstructor">Mul</a> <a id="733" href="/lia/part5/Exp2/#733" class="Bound">x</a> <a id="735" href="/lia/part5/Exp2/#735" class="Bound">y</a>
+<a id="737" class="Keyword">pattern</a> <a id="_/_"></a><a id="745" href="/lia/part5/Exp2/#745" class="InductiveConstructor Operator">_/_</a> <a id="749" href="/lia/part5/Exp2/#759" class="Bound">x</a> <a id="751" href="/lia/part5/Exp2/#761" class="Bound">y</a> <a id="753" class="Symbol">=</a> <a id="755" href="/lia/part5/Exp2/#511" class="InductiveConstructor">Div</a> <a id="759" href="/lia/part5/Exp2/#759" class="Bound">x</a> <a id="761" href="/lia/part5/Exp2/#761" class="Bound">y</a>
+<a id="763" class="Keyword">pattern</a> <a id="Let_≔_In_"></a><a id="771" href="/lia/part5/Exp2/#771" class="InductiveConstructor Operator">Let_≔_In_</a> <a id="781" href="/lia/part5/Exp2/#793" class="Bound">x</a> <a id="783" href="/lia/part5/Exp2/#795" class="Bound">e</a> <a id="785" href="/lia/part5/Exp2/#797" class="Bound">f</a> <a id="787" class="Symbol">=</a> <a id="789" href="/lia/part5/Exp2/#539" class="InductiveConstructor">Let</a> <a id="793" href="/lia/part5/Exp2/#793" class="Bound">x</a> <a id="795" href="/lia/part5/Exp2/#795" class="Bound">e</a> <a id="797" href="/lia/part5/Exp2/#797" class="Bound">f</a>
+
+<a id="800" class="Keyword">infix</a> <a id="806" class="Number">50</a> <a id="809" href="/lia/part5/Exp2/#651" class="InductiveConstructor Operator">$_</a> <a id="812" href="/lia/part5/Exp2/#672" class="InductiveConstructor Operator">`_</a>
+<a id="815" class="Keyword">infixl</a> <a id="822" class="Number">30</a> <a id="825" href="/lia/part5/Exp2/#719" class="InductiveConstructor Operator">_·_</a> <a id="829" href="/lia/part5/Exp2/#745" class="InductiveConstructor Operator">_/_</a>
+<a id="833" class="Keyword">infixl</a> <a id="840" class="Number">25</a> <a id="843" href="/lia/part5/Exp2/#693" class="InductiveConstructor Operator">_+_</a>
+<a id="847" class="Keyword">infixr</a> <a id="854" class="Number">20</a> <a id="857" href="/lia/part5/Exp2/#771" class="InductiveConstructor Operator">Let_≔_In_</a></pre>
+
+<h1 id="eager-semantics">
+<a class="anchor" href="#eager-semantics" aria-hidden="true"><span class="octicon octicon-link"></span></a>Eager semantics</h1>
+
+<p>Since division by zero can occur, not every expression has a value. To
+model this, we construct a new domain by adding <code class="language-plaintext highlighter-rouge">⊥</code>. (An alternative way
+would be by modelling evaluation as a partial function, but this is not
+possible in Agda since its functions are total.)</p>
+
+<pre class="Agda"><a id="1161" class="Keyword">data</a> <a id="ℕ⊥"></a><a id="1166" href="/lia/part5/Exp2/#1166" class="Datatype">ℕ⊥</a> <a id="1169" class="Symbol">:</a> <a id="1171" class="PrimitiveType">Set</a> <a id="1175" class="Keyword">where</a>
+  <a id="ℕ⊥.⊥"></a><a id="1183" href="/lia/part5/Exp2/#1183" class="InductiveConstructor">⊥</a> <a id="1185" class="Symbol">:</a> <a id="1187" href="/lia/part5/Exp2/#1166" class="Datatype">ℕ⊥</a>
+  <a id="ℕ⊥.Just"></a><a id="1192" href="/lia/part5/Exp2/#1192" class="InductiveConstructor">Just</a> <a id="1197" class="Symbol">:</a> <a id="1199" href="/lia/part0/Naturals/#301" class="Function">ℕ</a> <a id="1201" class="Symbol">→</a> <a id="1203" href="/lia/part5/Exp2/#1166" class="Datatype">ℕ⊥</a>
+
+<a id="1207" class="Keyword">private</a> <a id="1215" class="Keyword">variable</a> <a id="1224" href="/lia/part5/Exp2/#1224" class="Generalizable">m⊥</a> <a id="1227" href="/lia/part5/Exp2/#1227" class="Generalizable">n⊥</a> <a id="1230" class="Symbol">:</a> <a id="1232" href="/lia/part5/Exp2/#1166" class="Datatype">ℕ⊥</a>
+
+<a id="lift"></a><a id="1236" href="/lia/part5/Exp2/#1236" class="Function">lift</a> <a id="1241" class="Symbol">:</a> <a id="1243" class="Symbol">(</a><a id="1244" href="/lia/part0/Naturals/#301" class="Function">ℕ</a> <a id="1246" class="Symbol">→</a> <a id="1248" href="/lia/part0/Naturals/#301" class="Function">ℕ</a><a id="1249" class="Symbol">)</a> <a id="1251" class="Symbol">→</a> <a id="1253" href="/lia/part5/Exp2/#1166" class="Datatype">ℕ⊥</a> <a id="1256" class="Symbol">→</a> <a id="1258" href="/lia/part5/Exp2/#1166" class="Datatype">ℕ⊥</a>
+<a id="1261" href="/lia/part5/Exp2/#1236" class="Function">lift</a> <a id="1266" href="/lia/part5/Exp2/#1266" class="Bound">f</a> <a id="1268" href="/lia/part5/Exp2/#1183" class="InductiveConstructor">⊥</a> <a id="1270" class="Symbol">=</a> <a id="1272" href="/lia/part5/Exp2/#1183" class="InductiveConstructor">⊥</a>
+<a id="1274" href="/lia/part5/Exp2/#1236" class="Function">lift</a> <a id="1279" href="/lia/part5/Exp2/#1279" class="Bound">f</a> <a id="1281" class="Symbol">(</a><a id="1282" href="/lia/part5/Exp2/#1192" class="InductiveConstructor">Just</a> <a id="1287" href="/lia/part5/Exp2/#1287" class="Bound">x</a><a id="1288" class="Symbol">)</a> <a id="1290" class="Symbol">=</a> <a id="1292" href="/lia/part5/Exp2/#1192" class="InductiveConstructor">Just</a> <a id="1297" class="Symbol">(</a><a id="1298" href="/lia/part5/Exp2/#1279" class="Bound">f</a> <a id="1300" href="/lia/part5/Exp2/#1287" class="Bound">x</a><a id="1301" class="Symbol">)</a>
+
+<a id="lift2"></a><a id="1304" href="/lia/part5/Exp2/#1304" class="Function">lift2</a> <a id="1310" class="Symbol">:</a> <a id="1312" class="Symbol">(</a><a id="1313" href="/lia/part0/Naturals/#301" class="Function">ℕ</a> <a id="1315" class="Symbol">→</a> <a id="1317" href="/lia/part0/Naturals/#301" class="Function">ℕ</a> <a id="1319" class="Symbol">→</a> <a id="1321" href="/lia/part0/Naturals/#301" class="Function">ℕ</a><a id="1322" class="Symbol">)</a> <a id="1324" class="Symbol">→</a> <a id="1326" href="/lia/part5/Exp2/#1166" class="Datatype">ℕ⊥</a> <a id="1329" class="Symbol">→</a> <a id="1331" href="/lia/part5/Exp2/#1166" class="Datatype">ℕ⊥</a> <a id="1334" class="Symbol">→</a> <a id="1336" href="/lia/part5/Exp2/#1166" class="Datatype">ℕ⊥</a>
+<a id="1339" href="/lia/part5/Exp2/#1304" class="Function">lift2</a> <a id="1345" href="/lia/part5/Exp2/#1345" class="Bound">f</a> <a id="1347" href="/lia/part5/Exp2/#1183" class="InductiveConstructor">⊥</a> <a id="1349" class="Symbol">_</a> <a id="1351" class="Symbol">=</a> <a id="1353" href="/lia/part5/Exp2/#1183" class="InductiveConstructor">⊥</a>
+<a id="1355" href="/lia/part5/Exp2/#1304" class="CatchallClause Function">lift2</a><a id="1360" class="CatchallClause"> </a><a id="1361" href="/lia/part5/Exp2/#1361" class="CatchallClause Bound">f</a><a id="1362" class="CatchallClause"> </a><a id="1363" class="CatchallClause Symbol">_</a><a id="1364" class="CatchallClause"> </a><a id="1365" href="/lia/part5/Exp2/#1183" class="CatchallClause InductiveConstructor">⊥</a> <a id="1367" class="Symbol">=</a> <a id="1369" href="/lia/part5/Exp2/#1183" class="InductiveConstructor">⊥</a>
+<a id="1371" href="/lia/part5/Exp2/#1304" class="Function">lift2</a> <a id="1377" href="/lia/part5/Exp2/#1377" class="Bound">f</a> <a id="1379" class="Symbol">(</a><a id="1380" href="/lia/part5/Exp2/#1192" class="InductiveConstructor">Just</a> <a id="1385" href="/lia/part5/Exp2/#1385" class="Bound">m</a><a id="1386" class="Symbol">)</a> <a id="1388" class="Symbol">(</a><a id="1389" href="/lia/part5/Exp2/#1192" class="InductiveConstructor">Just</a> <a id="1394" href="/lia/part5/Exp2/#1394" class="Bound">n</a><a id="1395" class="Symbol">)</a> <a id="1397" class="Symbol">=</a> <a id="1399" href="/lia/part5/Exp2/#1192" class="InductiveConstructor">Just</a> <a id="1404" class="Symbol">(</a><a id="1405" href="/lia/part5/Exp2/#1377" class="Bound">f</a> <a id="1407" href="/lia/part5/Exp2/#1385" class="Bound">m</a> <a id="1409" href="/lia/part5/Exp2/#1394" class="Bound">n</a><a id="1410" class="Symbol">)</a>
+
+<a id="Envᵉ"></a><a id="1413" href="/lia/part5/Exp2/#1413" class="Function">Envᵉ</a> <a id="1418" class="Symbol">=</a> <a id="1420" href="/lia/part5/Exp2/#335" class="Function">VarName</a> <a id="1428" class="Symbol">→</a> <a id="1430" href="/lia/part0/Naturals/#301" class="Function">ℕ</a>
+
+<a id="ϱ₀"></a><a id="1433" href="/lia/part5/Exp2/#1433" class="Function">ϱ₀</a> <a id="1436" class="Symbol">:</a> <a id="1438" href="/lia/part5/Exp2/#1413" class="Function">Envᵉ</a>
+<a id="1443" href="/lia/part5/Exp2/#1433" class="Function">ϱ₀</a> <a id="1446" class="Symbol">_</a> <a id="1448" class="Symbol">=</a> <a id="1450" class="Number">0</a></pre>
+<pre class="Agda"><a id="1461" class="Keyword">infixl</a> <a id="1468" class="Number">13</a> <a id="1471" href="/lia/part5/Exp2/#1492" class="Function Operator">_+⊥_</a>
+<a id="1476" class="Keyword">infixl</a> <a id="1483" class="Number">14</a> <a id="1486" href="/lia/part5/Exp2/#1497" class="Function Operator">_·⊥_</a>
+
+<a id="_+⊥_"></a><a id="1492" href="/lia/part5/Exp2/#1492" class="Function Operator">_+⊥_</a> <a id="_·⊥_"></a><a id="1497" href="/lia/part5/Exp2/#1497" class="Function Operator">_·⊥_</a> <a id="1502" class="Symbol">:</a> <a id="1504" href="/lia/part5/Exp2/#1166" class="Datatype">ℕ⊥</a> <a id="1507" class="Symbol">→</a> <a id="1509" href="/lia/part5/Exp2/#1166" class="Datatype">ℕ⊥</a> <a id="1512" class="Symbol">→</a> <a id="1514" href="/lia/part5/Exp2/#1166" class="Datatype">ℕ⊥</a>
+<a id="1517" href="/lia/part5/Exp2/#1492" class="Function Operator">_+⊥_</a> <a id="1522" class="Symbol">=</a> <a id="1524" href="/lia/part5/Exp2/#1304" class="Function">lift2</a> <a id="1530" href="/lia/part5/Exp2/#196" class="Primitive Operator">_+ℕ_</a>
+<a id="1535" href="/lia/part5/Exp2/#1497" class="Function Operator">_·⊥_</a> <a id="1540" class="Symbol">=</a> <a id="1542" href="/lia/part5/Exp2/#1304" class="Function">lift2</a> <a id="1548" href="/lia/part5/Exp2/#209" class="Primitive Operator">_·ℕ_</a></pre>
+<pre class="Agda"><a id="1562" class="Keyword">infix</a> <a id="1568" class="Number">15</a> <a id="1571" href="/lia/part5/Exp2/#1577" class="Function Operator">⟦_⟧ᵉ_</a>
+<a id="⟦_⟧ᵉ_"></a><a id="1577" href="/lia/part5/Exp2/#1577" class="Function Operator">⟦_⟧ᵉ_</a> <a id="1583" class="Symbol">:</a> <a id="1585" href="/lia/part5/Exp2/#384" class="Datatype">AExp</a> <a id="1590" class="Symbol">→</a> <a id="1592" href="/lia/part5/Exp2/#1413" class="Function">Envᵉ</a> <a id="1597" class="Symbol">→</a> <a id="1599" href="/lia/part5/Exp2/#1166" class="Datatype">ℕ⊥</a>
+
+<a id="1603" href="/lia/part5/Exp2/#1577" class="Function Operator">⟦</a> <a id="1605" href="/lia/part5/Exp2/#651" class="InductiveConstructor Operator">$</a> <a id="1607" href="/lia/part5/Exp2/#1607" class="Bound">n</a> <a id="1609" href="/lia/part5/Exp2/#1577" class="Function Operator">⟧ᵉ</a> <a id="1612" href="/lia/part5/Exp2/#1612" class="Bound">ϱ</a> <a id="1614" class="Symbol">=</a> <a id="1616" href="/lia/part5/Exp2/#1192" class="InductiveConstructor">Just</a> <a id="1621" href="/lia/part5/Exp2/#1607" class="Bound">n</a>
+<a id="1623" href="/lia/part5/Exp2/#1577" class="Function Operator">⟦</a> <a id="1625" href="/lia/part5/Exp2/#672" class="InductiveConstructor Operator">`</a> <a id="1627" href="/lia/part5/Exp2/#1627" class="Bound">x</a> <a id="1629" href="/lia/part5/Exp2/#1577" class="Function Operator">⟧ᵉ</a> <a id="1632" href="/lia/part5/Exp2/#1632" class="Bound">ϱ</a> <a id="1634" class="Symbol">=</a> <a id="1636" href="/lia/part5/Exp2/#1192" class="InductiveConstructor">Just</a> <a id="1641" class="Symbol">(</a><a id="1642" href="/lia/part5/Exp2/#1632" class="Bound">ϱ</a> <a id="1644" href="/lia/part5/Exp2/#1627" class="Bound">x</a><a id="1645" class="Symbol">)</a>
+<a id="1647" href="/lia/part5/Exp2/#1577" class="Function Operator">⟦</a> <a id="1649" href="/lia/part5/Exp2/#1649" class="Bound">e</a> <a id="1651" href="/lia/part5/Exp2/#693" class="InductiveConstructor Operator">+</a> <a id="1653" href="/lia/part5/Exp2/#1653" class="Bound">f</a> <a id="1655" href="/lia/part5/Exp2/#1577" class="Function Operator">⟧ᵉ</a> <a id="1658" href="/lia/part5/Exp2/#1658" class="Bound">ϱ</a> <a id="1660" class="Symbol">=</a> <a id="1662" href="/lia/part5/Exp2/#1577" class="Function Operator">⟦</a> <a id="1664" href="/lia/part5/Exp2/#1649" class="Bound">e</a> <a id="1666" href="/lia/part5/Exp2/#1577" class="Function Operator">⟧ᵉ</a> <a id="1669" href="/lia/part5/Exp2/#1658" class="Bound">ϱ</a> <a id="1671" href="/lia/part5/Exp2/#1492" class="Function Operator">+⊥</a> <a id="1674" href="/lia/part5/Exp2/#1577" class="Function Operator">⟦</a> <a id="1676" href="/lia/part5/Exp2/#1653" class="Bound">f</a> <a id="1678" href="/lia/part5/Exp2/#1577" class="Function Operator">⟧ᵉ</a> <a id="1681" href="/lia/part5/Exp2/#1658" class="Bound">ϱ</a>
+<a id="1683" href="/lia/part5/Exp2/#1577" class="Function Operator">⟦</a> <a id="1685" href="/lia/part5/Exp2/#1685" class="Bound">e</a> <a id="1687" href="/lia/part5/Exp2/#719" class="InductiveConstructor Operator">·</a> <a id="1689" href="/lia/part5/Exp2/#1689" class="Bound">f</a> <a id="1691" href="/lia/part5/Exp2/#1577" class="Function Operator">⟧ᵉ</a> <a id="1694" href="/lia/part5/Exp2/#1694" class="Bound">ϱ</a> <a id="1696" class="Symbol">=</a> <a id="1698" href="/lia/part5/Exp2/#1577" class="Function Operator">⟦</a> <a id="1700" href="/lia/part5/Exp2/#1685" class="Bound">e</a> <a id="1702" href="/lia/part5/Exp2/#1577" class="Function Operator">⟧ᵉ</a> <a id="1705" href="/lia/part5/Exp2/#1694" class="Bound">ϱ</a> <a id="1707" href="/lia/part5/Exp2/#1497" class="Function Operator">·⊥</a> <a id="1710" href="/lia/part5/Exp2/#1577" class="Function Operator">⟦</a> <a id="1712" href="/lia/part5/Exp2/#1689" class="Bound">f</a> <a id="1714" href="/lia/part5/Exp2/#1577" class="Function Operator">⟧ᵉ</a> <a id="1717" href="/lia/part5/Exp2/#1694" class="Bound">ϱ</a>
+
+<a id="1720" href="/lia/part5/Exp2/#1577" class="Function Operator">⟦</a> <a id="1722" href="/lia/part5/Exp2/#1722" class="Bound">e</a> <a id="1724" href="/lia/part5/Exp2/#745" class="InductiveConstructor Operator">/</a> <a id="1726" href="/lia/part5/Exp2/#1726" class="Bound">f</a> <a id="1728" href="/lia/part5/Exp2/#1577" class="Function Operator">⟧ᵉ</a> <a id="1731" href="/lia/part5/Exp2/#1731" class="Bound">ϱ</a>
+  <a id="1735" class="Keyword">with</a> <a id="1740" href="/lia/part5/Exp2/#1577" class="Function Operator">⟦</a> <a id="1742" href="/lia/part5/Exp2/#1722" class="Bound">e</a> <a id="1744" href="/lia/part5/Exp2/#1577" class="Function Operator">⟧ᵉ</a> <a id="1747" href="/lia/part5/Exp2/#1731" class="Bound">ϱ</a>
+<a id="1749" class="Symbol">...</a> <a id="1753" class="Symbol">|</a> <a id="1755" href="/lia/part5/Exp2/#1183" class="InductiveConstructor">⊥</a> <a id="1757" class="Symbol">=</a> <a id="1759" href="/lia/part5/Exp2/#1183" class="InductiveConstructor">⊥</a>
+<a id="1761" class="Symbol">...</a> <a id="1765" class="Symbol">|</a> <a id="1767" href="/lia/part5/Exp2/#1192" class="InductiveConstructor">Just</a> <a id="1772" href="/lia/part5/Exp2/#1772" class="Bound">m</a>
+  <a id="1776" class="Keyword">with</a> <a id="1781" href="/lia/part5/Exp2/#1577" class="Function Operator">⟦</a> <a id="1783" class="Bound">f</a> <a id="1785" href="/lia/part5/Exp2/#1577" class="Function Operator">⟧ᵉ</a> <a id="1788" class="Bound">ϱ</a>
+<a id="1790" class="Symbol">...</a> <a id="1794" class="Symbol">|</a> <a id="1796" href="/lia/part5/Exp2/#1183" class="InductiveConstructor">⊥</a> <a id="1798" class="Symbol">=</a> <a id="1800" href="/lia/part5/Exp2/#1183" class="InductiveConstructor">⊥</a>
+<a id="1802" class="Symbol">...</a> <a id="1806" class="Symbol">|</a> <a id="1808" href="/lia/part5/Exp2/#1192" class="InductiveConstructor">Just</a> <a id="1813" class="Number">0</a> <a id="1815" class="Symbol">=</a> <a id="1817" href="/lia/part5/Exp2/#1183" class="InductiveConstructor">⊥</a>
+<a id="1819" class="Symbol">...</a> <a id="1823" class="Symbol">|</a> <a id="1825" href="/lia/part5/Exp2/#1192" class="InductiveConstructor">Just</a> <a id="1830" class="Symbol">(</a><a id="1831" href="Agda.Builtin.Nat.html#223" class="InductiveConstructor">suc</a> <a id="1835" href="/lia/part5/Exp2/#1835" class="Bound">n</a><a id="1836" class="Symbol">)</a> <a id="1838" class="Symbol">=</a> <a id="1840" href="/lia/part5/Exp2/#1192" class="InductiveConstructor">Just</a> <a id="1845" class="Symbol">(</a><a id="1846" class="Bound">m</a> <a id="1848" href="/lia/part5/Exp2/#280" class="Function Operator">/ℕ</a> <a id="1851" href="Agda.Builtin.Nat.html#223" class="InductiveConstructor">suc</a> <a id="1855" href="/lia/part5/Exp2/#1835" class="Bound">n</a><a id="1856" class="Symbol">)</a>
+
+<a id="1859" href="/lia/part5/Exp2/#1577" class="Function Operator">⟦</a> <a id="1861" href="/lia/part5/Exp2/#771" class="InductiveConstructor Operator">Let</a> <a id="1865" href="/lia/part5/Exp2/#1865" class="Bound">x</a> <a id="1867" href="/lia/part5/Exp2/#771" class="InductiveConstructor Operator">≔</a> <a id="1869" href="/lia/part5/Exp2/#1869" class="Bound">e</a> <a id="1871" href="/lia/part5/Exp2/#771" class="InductiveConstructor Operator">In</a> <a id="1874" href="/lia/part5/Exp2/#1874" class="Bound">f</a> <a id="1876" href="/lia/part5/Exp2/#1577" class="Function Operator">⟧ᵉ</a> <a id="1879" href="/lia/part5/Exp2/#1879" class="Bound">ϱ</a>
+  <a id="1883" class="Keyword">with</a> <a id="1888" href="/lia/part5/Exp2/#1577" class="Function Operator">⟦</a> <a id="1890" href="/lia/part5/Exp2/#1869" class="Bound">e</a> <a id="1892" href="/lia/part5/Exp2/#1577" class="Function Operator">⟧ᵉ</a> <a id="1895" href="/lia/part5/Exp2/#1879" class="Bound">ϱ</a>
+<a id="1897" class="Symbol">...</a> <a id="1901" class="Symbol">|</a> <a id="1903" href="/lia/part5/Exp2/#1183" class="InductiveConstructor">⊥</a> <a id="1905" class="Symbol">=</a> <a id="1907" href="/lia/part5/Exp2/#1183" class="InductiveConstructor">⊥</a> 
+<a id="1910" class="Symbol">...</a> <a id="1914" class="Symbol">|</a> <a id="1916" href="/lia/part5/Exp2/#1192" class="InductiveConstructor">Just</a> <a id="1921" href="/lia/part5/Exp2/#1921" class="Bound">m</a> <a id="1923" class="Symbol">=</a> <a id="1925" href="/lia/part5/Exp2/#1577" class="Function Operator">⟦</a> <a id="1927" class="Bound">f</a> <a id="1929" href="/lia/part5/Exp2/#1577" class="Function Operator">⟧ᵉ</a> <a id="1932" class="Bound">ϱ</a> <a id="1934" href="/lia/part0/Functions/#570" class="Function Operator">[</a> <a id="1936" class="Bound">x</a> <a id="1938" href="/lia/part0/Functions/#570" class="Function Operator">↦</a> <a id="1940" href="/lia/part5/Exp2/#1921" class="Bound">m</a> <a id="1942" href="/lia/part0/Functions/#570" class="Function Operator">]</a></pre>
+
+<p>Examples:</p>
+
+<pre class="Agda"><a id="1964" href="/lia/part5/Exp2/#1964" class="Function">_</a> <a id="1966" class="Symbol">:</a> <a id="1968" href="/lia/part5/Exp2/#1577" class="Function Operator">⟦</a> <a id="1970" href="/lia/part5/Exp2/#771" class="InductiveConstructor Operator">Let</a> <a id="1974" href="/lia/part5/Exp2/#348" class="Function">x₀</a> <a id="1977" href="/lia/part5/Exp2/#771" class="InductiveConstructor Operator">≔</a> <a id="1979" href="/lia/part5/Exp2/#651" class="InductiveConstructor Operator">$</a> <a id="1981" class="Number">3</a> <a id="1983" href="/lia/part5/Exp2/#771" class="InductiveConstructor Operator">In</a> <a id="1986" href="/lia/part5/Exp2/#651" class="InductiveConstructor Operator">$</a> <a id="1988" class="Number">18</a> <a id="1991" href="/lia/part5/Exp2/#745" class="InductiveConstructor Operator">/</a> <a id="1993" href="/lia/part5/Exp2/#672" class="InductiveConstructor Operator">`</a> <a id="1995" href="/lia/part5/Exp2/#348" class="Function">x₀</a> <a id="1998" href="/lia/part5/Exp2/#1577" class="Function Operator">⟧ᵉ</a> <a id="2001" href="/lia/part5/Exp2/#1433" class="Function">ϱ₀</a> <a id="2004" href="Agda.Builtin.Equality.html#151" class="Datatype Operator">≡</a> <a id="2006" href="/lia/part5/Exp2/#1192" class="InductiveConstructor">Just</a> <a id="2011" class="Number">6</a>
+<a id="2013" class="Symbol">_</a> <a id="2015" class="Symbol">=</a> <a id="2017" href="Agda.Builtin.Equality.html#208" class="InductiveConstructor">refl</a>
+
+<a id="2023" href="/lia/part5/Exp2/#2023" class="Function">_</a> <a id="2025" class="Symbol">:</a> <a id="2027" href="/lia/part5/Exp2/#1577" class="Function Operator">⟦</a> <a id="2029" href="/lia/part5/Exp2/#771" class="InductiveConstructor Operator">Let</a> <a id="2033" href="/lia/part5/Exp2/#348" class="Function">x₀</a> <a id="2036" href="/lia/part5/Exp2/#771" class="InductiveConstructor Operator">≔</a> <a id="2038" href="/lia/part5/Exp2/#651" class="InductiveConstructor Operator">$</a> <a id="2040" class="Number">0</a> <a id="2042" href="/lia/part5/Exp2/#771" class="InductiveConstructor Operator">In</a> <a id="2045" href="/lia/part5/Exp2/#651" class="InductiveConstructor Operator">$</a> <a id="2047" class="Number">18</a> <a id="2050" href="/lia/part5/Exp2/#745" class="InductiveConstructor Operator">/</a> <a id="2052" href="/lia/part5/Exp2/#672" class="InductiveConstructor Operator">`</a> <a id="2054" href="/lia/part5/Exp2/#348" class="Function">x₀</a> <a id="2057" href="/lia/part5/Exp2/#1577" class="Function Operator">⟧ᵉ</a> <a id="2060" href="/lia/part5/Exp2/#1433" class="Function">ϱ₀</a> <a id="2063" href="Agda.Builtin.Equality.html#151" class="Datatype Operator">≡</a> <a id="2065" href="/lia/part5/Exp2/#1183" class="InductiveConstructor">⊥</a>
+<a id="2067" class="Symbol">_</a> <a id="2069" class="Symbol">=</a> <a id="2071" href="Agda.Builtin.Equality.html#208" class="InductiveConstructor">refl</a></pre>
+
+<h1 id="lazy-semantics">
+<a class="anchor" href="#lazy-semantics" aria-hidden="true"><span class="octicon octicon-link"></span></a>Lazy semantics</h1>
+
+<pre class="Agda"><a id="Envˡ"></a><a id="2103" href="/lia/part5/Exp2/#2103" class="Function">Envˡ</a> <a id="2108" class="Symbol">=</a> <a id="2110" href="/lia/part5/Exp2/#335" class="Function">VarName</a> <a id="2118" class="Symbol">→</a> <a id="2120" href="/lia/part5/Exp2/#1166" class="Datatype">ℕ⊥</a>
+
+<a id="2124" class="Keyword">infix</a> <a id="2130" class="Number">15</a> <a id="2133" href="/lia/part5/Exp2/#2139" class="Function Operator">⟦_⟧ˡ_</a>
+<a id="⟦_⟧ˡ_"></a><a id="2139" href="/lia/part5/Exp2/#2139" class="Function Operator">⟦_⟧ˡ_</a> <a id="2145" class="Symbol">:</a> <a id="2147" href="/lia/part5/Exp2/#384" class="Datatype">AExp</a> <a id="2152" class="Symbol">→</a> <a id="2154" href="/lia/part5/Exp2/#2103" class="Function">Envˡ</a> <a id="2159" class="Symbol">→</a> <a id="2161" href="/lia/part5/Exp2/#1166" class="Datatype">ℕ⊥</a>
+
+<a id="2165" href="/lia/part5/Exp2/#2139" class="Function Operator">⟦</a> <a id="2167" href="/lia/part5/Exp2/#651" class="InductiveConstructor Operator">$</a> <a id="2169" href="/lia/part5/Exp2/#2169" class="Bound">n</a> <a id="2171" href="/lia/part5/Exp2/#2139" class="Function Operator">⟧ˡ</a> <a id="2174" href="/lia/part5/Exp2/#2174" class="Bound">ϱ</a> <a id="2176" class="Symbol">=</a> <a id="2178" href="/lia/part5/Exp2/#1192" class="InductiveConstructor">Just</a> <a id="2183" href="/lia/part5/Exp2/#2169" class="Bound">n</a>
+<a id="2185" href="/lia/part5/Exp2/#2139" class="Function Operator">⟦</a> <a id="2187" href="/lia/part5/Exp2/#672" class="InductiveConstructor Operator">`</a> <a id="2189" href="/lia/part5/Exp2/#2189" class="Bound">x</a> <a id="2191" href="/lia/part5/Exp2/#2139" class="Function Operator">⟧ˡ</a> <a id="2194" href="/lia/part5/Exp2/#2194" class="Bound">ϱ</a> <a id="2196" class="Symbol">=</a> <a id="2198" href="/lia/part5/Exp2/#2194" class="Bound">ϱ</a> <a id="2200" href="/lia/part5/Exp2/#2189" class="Bound">x</a>
+<a id="2202" href="/lia/part5/Exp2/#2139" class="Function Operator">⟦</a> <a id="2204" href="/lia/part5/Exp2/#2204" class="Bound">e</a> <a id="2206" href="/lia/part5/Exp2/#693" class="InductiveConstructor Operator">+</a> <a id="2208" href="/lia/part5/Exp2/#2208" class="Bound">f</a> <a id="2210" href="/lia/part5/Exp2/#2139" class="Function Operator">⟧ˡ</a> <a id="2213" href="/lia/part5/Exp2/#2213" class="Bound">ϱ</a> <a id="2215" class="Symbol">=</a> <a id="2217" href="/lia/part5/Exp2/#2139" class="Function Operator">⟦</a> <a id="2219" href="/lia/part5/Exp2/#2204" class="Bound">e</a> <a id="2221" href="/lia/part5/Exp2/#2139" class="Function Operator">⟧ˡ</a> <a id="2224" href="/lia/part5/Exp2/#2213" class="Bound">ϱ</a> <a id="2226" href="/lia/part5/Exp2/#1492" class="Function Operator">+⊥</a> <a id="2229" href="/lia/part5/Exp2/#2139" class="Function Operator">⟦</a> <a id="2231" href="/lia/part5/Exp2/#2208" class="Bound">f</a> <a id="2233" href="/lia/part5/Exp2/#2139" class="Function Operator">⟧ˡ</a> <a id="2236" href="/lia/part5/Exp2/#2213" class="Bound">ϱ</a>
+<a id="2238" href="/lia/part5/Exp2/#2139" class="Function Operator">⟦</a> <a id="2240" href="/lia/part5/Exp2/#2240" class="Bound">e</a> <a id="2242" href="/lia/part5/Exp2/#719" class="InductiveConstructor Operator">·</a> <a id="2244" href="/lia/part5/Exp2/#2244" class="Bound">f</a> <a id="2246" href="/lia/part5/Exp2/#2139" class="Function Operator">⟧ˡ</a> <a id="2249" href="/lia/part5/Exp2/#2249" class="Bound">ϱ</a> <a id="2251" class="Symbol">=</a> <a id="2253" href="/lia/part5/Exp2/#2139" class="Function Operator">⟦</a> <a id="2255" href="/lia/part5/Exp2/#2240" class="Bound">e</a> <a id="2257" href="/lia/part5/Exp2/#2139" class="Function Operator">⟧ˡ</a> <a id="2260" href="/lia/part5/Exp2/#2249" class="Bound">ϱ</a> <a id="2262" href="/lia/part5/Exp2/#1497" class="Function Operator">·⊥</a> <a id="2265" href="/lia/part5/Exp2/#2139" class="Function Operator">⟦</a> <a id="2267" href="/lia/part5/Exp2/#2244" class="Bound">f</a> <a id="2269" href="/lia/part5/Exp2/#2139" class="Function Operator">⟧ˡ</a> <a id="2272" href="/lia/part5/Exp2/#2249" class="Bound">ϱ</a>
+
+<a id="2275" href="/lia/part5/Exp2/#2139" class="Function Operator">⟦</a> <a id="2277" href="/lia/part5/Exp2/#2277" class="Bound">e</a> <a id="2279" href="/lia/part5/Exp2/#745" class="InductiveConstructor Operator">/</a> <a id="2281" href="/lia/part5/Exp2/#2281" class="Bound">f</a> <a id="2283" href="/lia/part5/Exp2/#2139" class="Function Operator">⟧ˡ</a> <a id="2286" href="/lia/part5/Exp2/#2286" class="Bound">ϱ</a>
+  <a id="2290" class="Keyword">with</a> <a id="2295" href="/lia/part5/Exp2/#2139" class="Function Operator">⟦</a> <a id="2297" href="/lia/part5/Exp2/#2277" class="Bound">e</a> <a id="2299" href="/lia/part5/Exp2/#2139" class="Function Operator">⟧ˡ</a> <a id="2302" href="/lia/part5/Exp2/#2286" class="Bound">ϱ</a>
+<a id="2304" class="Symbol">...</a> <a id="2308" class="Symbol">|</a> <a id="2310" href="/lia/part5/Exp2/#1183" class="InductiveConstructor">⊥</a> <a id="2312" class="Symbol">=</a> <a id="2314" href="/lia/part5/Exp2/#1183" class="InductiveConstructor">⊥</a>
+<a id="2316" class="Symbol">...</a> <a id="2320" class="Symbol">|</a> <a id="2322" href="/lia/part5/Exp2/#1192" class="InductiveConstructor">Just</a> <a id="2327" href="/lia/part5/Exp2/#2327" class="Bound">m</a>
+  <a id="2331" class="Keyword">with</a> <a id="2336" href="/lia/part5/Exp2/#2139" class="Function Operator">⟦</a> <a id="2338" class="Bound">f</a> <a id="2340" href="/lia/part5/Exp2/#2139" class="Function Operator">⟧ˡ</a> <a id="2343" class="Bound">ϱ</a>
+<a id="2345" class="Symbol">...</a> <a id="2349" class="Symbol">|</a> <a id="2351" href="/lia/part5/Exp2/#1183" class="InductiveConstructor">⊥</a> <a id="2353" class="Symbol">=</a> <a id="2355" href="/lia/part5/Exp2/#1183" class="InductiveConstructor">⊥</a>
+<a id="2357" class="Symbol">...</a> <a id="2361" class="Symbol">|</a> <a id="2363" href="/lia/part5/Exp2/#1192" class="InductiveConstructor">Just</a> <a id="2368" class="Number">0</a> <a id="2370" class="Symbol">=</a> <a id="2372" href="/lia/part5/Exp2/#1183" class="InductiveConstructor">⊥</a>
+<a id="2374" class="Symbol">...</a> <a id="2378" class="Symbol">|</a> <a id="2380" href="/lia/part5/Exp2/#1192" class="InductiveConstructor">Just</a> <a id="2385" class="Symbol">(</a><a id="2386" href="Agda.Builtin.Nat.html#223" class="InductiveConstructor">suc</a> <a id="2390" href="/lia/part5/Exp2/#2390" class="Bound">n</a><a id="2391" class="Symbol">)</a> <a id="2393" class="Symbol">=</a> <a id="2395" href="/lia/part5/Exp2/#1192" class="InductiveConstructor">Just</a> <a id="2400" class="Symbol">(</a><a id="2401" class="Bound">m</a> <a id="2403" href="/lia/part5/Exp2/#280" class="Function Operator">/ℕ</a> <a id="2406" href="Agda.Builtin.Nat.html#223" class="InductiveConstructor">suc</a> <a id="2410" href="/lia/part5/Exp2/#2390" class="Bound">n</a><a id="2411" class="Symbol">)</a>
+
+<a id="2414" href="/lia/part5/Exp2/#2139" class="Function Operator">⟦</a> <a id="2416" href="/lia/part5/Exp2/#771" class="InductiveConstructor Operator">Let</a> <a id="2420" href="/lia/part5/Exp2/#2420" class="Bound">x</a> <a id="2422" href="/lia/part5/Exp2/#771" class="InductiveConstructor Operator">≔</a> <a id="2424" href="/lia/part5/Exp2/#2424" class="Bound">e</a> <a id="2426" href="/lia/part5/Exp2/#771" class="InductiveConstructor Operator">In</a> <a id="2429" href="/lia/part5/Exp2/#2429" class="Bound">f</a> <a id="2431" href="/lia/part5/Exp2/#2139" class="Function Operator">⟧ˡ</a> <a id="2434" href="/lia/part5/Exp2/#2434" class="Bound">ϱ</a> <a id="2436" class="Symbol">=</a> <a id="2438" href="/lia/part5/Exp2/#2139" class="Function Operator">⟦</a> <a id="2440" href="/lia/part5/Exp2/#2429" class="Bound">f</a> <a id="2442" href="/lia/part5/Exp2/#2139" class="Function Operator">⟧ˡ</a> <a id="2445" href="/lia/part5/Exp2/#2434" class="Bound">ϱ</a> <a id="2447" href="/lia/part0/Functions/#570" class="Function Operator">[</a> <a id="2449" href="/lia/part5/Exp2/#2420" class="Bound">x</a> <a id="2451" href="/lia/part0/Functions/#570" class="Function Operator">↦</a> <a id="2453" href="/lia/part5/Exp2/#2139" class="Function Operator">⟦</a> <a id="2455" href="/lia/part5/Exp2/#2424" class="Bound">e</a> <a id="2457" href="/lia/part5/Exp2/#2139" class="Function Operator">⟧ˡ</a> <a id="2460" href="/lia/part5/Exp2/#2434" class="Bound">ϱ</a> <a id="2462" href="/lia/part0/Functions/#570" class="Function Operator">]</a></pre>
+
+<p>The lazy semantics can return a value while the eager semantics is
+undefined:</p>
+
+<pre class="Agda"><a id="2552" class="Comment">-- TODO</a></pre>
+
+<p>We show that the lazy semantics is at least as defined as the eager one,
+and they agree when they are both defined.</p>
+
+<pre class="Agda"><a id="2686" class="Keyword">infix</a> <a id="2692" class="Number">5</a> <a id="2694" href="/lia/part5/Exp2/#2703" class="Datatype Operator">_⊑_</a>
+<a id="2698" class="Keyword">data</a> <a id="_⊑_"></a><a id="2703" href="/lia/part5/Exp2/#2703" class="Datatype Operator">_⊑_</a> <a id="2707" class="Symbol">:</a> <a id="2709" href="/lia/part5/Exp2/#1166" class="Datatype">ℕ⊥</a> <a id="2712" class="Symbol">→</a> <a id="2714" href="/lia/part5/Exp2/#1166" class="Datatype">ℕ⊥</a> <a id="2717" class="Symbol">→</a> <a id="2719" class="PrimitiveType">Set</a> <a id="2723" class="Keyword">where</a>
+  <a id="_⊑_.⊥"></a><a id="2731" href="/lia/part5/Exp2/#2731" class="InductiveConstructor">⊥</a> <a id="2733" class="Symbol">:</a> <a id="2735" href="/lia/part5/Exp2/#1183" class="InductiveConstructor">⊥</a> <a id="2737" href="/lia/part5/Exp2/#2703" class="Datatype Operator">⊑</a> <a id="2739" href="/lia/part5/Exp2/#1224" class="Generalizable">m⊥</a>
+  <a id="_⊑_.Just"></a><a id="2744" href="/lia/part5/Exp2/#2744" class="InductiveConstructor">Just</a> <a id="2749" class="Symbol">:</a> <a id="2751" href="/lia/part5/Exp2/#1192" class="InductiveConstructor">Just</a> <a id="2756" href="/lia/part5/Exp2/#626" class="Generalizable">m</a> <a id="2758" href="/lia/part5/Exp2/#2703" class="Datatype Operator">⊑</a> <a id="2760" href="/lia/part5/Exp2/#1192" class="InductiveConstructor">Just</a> <a id="2765" href="/lia/part5/Exp2/#626" class="Generalizable">m</a>
+
+<a id="⊑-Just"></a><a id="2768" href="/lia/part5/Exp2/#2768" class="Function">⊑-Just</a> <a id="2775" class="Symbol">:</a> <a id="2777" href="/lia/part5/Exp2/#1192" class="InductiveConstructor">Just</a> <a id="2782" href="/lia/part5/Exp2/#626" class="Generalizable">m</a> <a id="2784" href="/lia/part5/Exp2/#2703" class="Datatype Operator">⊑</a> <a id="2786" href="/lia/part5/Exp2/#1227" class="Generalizable">n⊥</a> <a id="2789" class="Symbol">→</a> <a id="2791" href="/lia/part5/Exp2/#1227" class="Generalizable">n⊥</a> <a id="2794" href="Agda.Builtin.Equality.html#151" class="Datatype Operator">≡</a> <a id="2796" href="/lia/part5/Exp2/#1192" class="InductiveConstructor">Just</a> <a id="2801" href="/lia/part5/Exp2/#626" class="Generalizable">m</a>
+<a id="2803" href="/lia/part5/Exp2/#2768" class="Function">⊑-Just</a> <a id="2810" href="/lia/part5/Exp2/#2744" class="InductiveConstructor">Just</a> <a id="2815" class="Symbol">=</a> <a id="2817" href="Agda.Builtin.Equality.html#208" class="InductiveConstructor">refl</a>
+
+<a id="update-Just"></a><a id="2823" href="/lia/part5/Exp2/#2823" class="Function">update-Just</a> <a id="2835" class="Symbol">:</a> <a id="2837" class="Symbol">∀</a> <a id="2839" class="Symbol">(</a><a id="2840" href="/lia/part5/Exp2/#2840" class="Bound">ϱ</a> <a id="2842" class="Symbol">:</a> <a id="2844" href="/lia/part5/Exp2/#1413" class="Function">Envᵉ</a><a id="2848" class="Symbol">)</a> <a id="2850" class="Symbol">(</a><a id="2851" href="/lia/part5/Exp2/#2851" class="Bound">x</a> <a id="2853" class="Symbol">:</a> <a id="2855" href="/lia/part5/Exp2/#335" class="Function">VarName</a><a id="2862" class="Symbol">)</a> <a id="2864" class="Symbol">(</a><a id="2865" href="/lia/part5/Exp2/#2865" class="Bound">m</a> <a id="2867" class="Symbol">:</a> <a id="2869" href="/lia/part0/Naturals/#301" class="Function">ℕ</a><a id="2870" class="Symbol">)</a> <a id="2872" class="Symbol">→</a> <a id="2874" href="/lia/part0/Functions/#450" class="Function">update</a> <a id="2881" class="Symbol">{</a><a id="2882" class="Argument">B</a> <a id="2884" class="Symbol">=</a> <a id="2886" href="/lia/part0/Utils/#244" class="Function">const</a> <a id="2892" href="/lia/part5/Exp2/#1166" class="Datatype">ℕ⊥</a><a id="2894" class="Symbol">}</a> <a id="2896" class="Symbol">(</a><a id="2897" href="/lia/part5/Exp2/#1192" class="InductiveConstructor">Just</a> <a id="2902" href="/lia/part0/Utils/#705" class="Function Operator">∘</a> <a id="2904" href="/lia/part5/Exp2/#2840" class="Bound">ϱ</a><a id="2905" class="Symbol">)</a> <a id="2907" href="/lia/part5/Exp2/#2851" class="Bound">x</a> <a id="2909" class="Symbol">(</a><a id="2910" href="/lia/part5/Exp2/#1192" class="InductiveConstructor">Just</a> <a id="2915" href="/lia/part5/Exp2/#2865" class="Bound">m</a><a id="2916" class="Symbol">)</a> <a id="2918" href="Agda.Builtin.Equality.html#151" class="Datatype Operator">≡</a> <a id="2920" href="/lia/part5/Exp2/#1192" class="InductiveConstructor">Just</a> <a id="2925" href="/lia/part0/Utils/#705" class="Function Operator">∘</a> <a id="2927" href="/lia/part0/Functions/#450" class="Function">update</a> <a id="2934" href="/lia/part5/Exp2/#2840" class="Bound">ϱ</a> <a id="2936" href="/lia/part5/Exp2/#2851" class="Bound">x</a> <a id="2938" href="/lia/part5/Exp2/#2865" class="Bound">m</a>
+<a id="2940" href="/lia/part5/Exp2/#2823" class="Function">update-Just</a> <a id="2952" href="/lia/part5/Exp2/#2952" class="Bound">ϱ</a> <a id="2954" href="/lia/part5/Exp2/#2954" class="Bound">x</a> <a id="2956" href="/lia/part5/Exp2/#2956" class="Bound">m</a> <a id="2958" class="Symbol">=</a> <a id="2960" href="/lia/part0/Equality/#458" class="Function">sym</a> <a id="2964" class="Symbol">(</a><a id="2965" href="/lia/part0/Functions/#3638" class="Function">update-∘</a> <a id="2974" href="/lia/part5/Exp2/#2952" class="Bound">ϱ</a> <a id="2976" href="/lia/part5/Exp2/#1192" class="InductiveConstructor">Just</a> <a id="2981" href="/lia/part5/Exp2/#2954" class="Bound">x</a> <a id="2983" href="/lia/part5/Exp2/#2956" class="Bound">m</a><a id="2984" class="Symbol">)</a>
+
+<a id="mon-lift2"></a><a id="2987" href="/lia/part5/Exp2/#2987" class="Function">mon-lift2</a> <a id="2997" class="Symbol">:</a> <a id="2999" class="Symbol">∀</a> <a id="3001" class="Symbol">{</a><a id="3002" href="/lia/part5/Exp2/#3002" class="Bound">m₀</a> <a id="3005" href="/lia/part5/Exp2/#3005" class="Bound">n₀</a> <a id="3008" href="/lia/part5/Exp2/#3008" class="Bound">m₁</a> <a id="3011" href="/lia/part5/Exp2/#3011" class="Bound">n₁</a><a id="3013" class="Symbol">}</a> <a id="3015" class="Symbol">(</a><a id="3016" href="/lia/part5/Exp2/#3016" class="Bound">f</a> <a id="3018" class="Symbol">:</a> <a id="3020" href="/lia/part0/Naturals/#301" class="Function">ℕ</a> <a id="3022" class="Symbol">→</a> <a id="3024" href="/lia/part0/Naturals/#301" class="Function">ℕ</a> <a id="3026" class="Symbol">→</a> <a id="3028" href="/lia/part0/Naturals/#301" class="Function">ℕ</a><a id="3029" class="Symbol">)</a> <a id="3031" class="Symbol">→</a>
+  <a id="3035" href="/lia/part5/Exp2/#3002" class="Bound">m₀</a> <a id="3038" href="/lia/part5/Exp2/#2703" class="Datatype Operator">⊑</a> <a id="3040" href="/lia/part5/Exp2/#3008" class="Bound">m₁</a> <a id="3043" class="Symbol">→</a>
+  <a id="3047" href="/lia/part5/Exp2/#3005" class="Bound">n₀</a> <a id="3050" href="/lia/part5/Exp2/#2703" class="Datatype Operator">⊑</a> <a id="3052" href="/lia/part5/Exp2/#3011" class="Bound">n₁</a> <a id="3055" class="Symbol">→</a>
+  <a id="3059" class="Comment">-----------------------------</a>
+  <a id="3091" href="/lia/part5/Exp2/#1304" class="Function">lift2</a> <a id="3097" href="/lia/part5/Exp2/#3016" class="Bound">f</a> <a id="3099" href="/lia/part5/Exp2/#3002" class="Bound">m₀</a> <a id="3102" href="/lia/part5/Exp2/#3005" class="Bound">n₀</a> <a id="3105" href="/lia/part5/Exp2/#2703" class="Datatype Operator">⊑</a> <a id="3107" href="/lia/part5/Exp2/#1304" class="Function">lift2</a> <a id="3113" href="/lia/part5/Exp2/#3016" class="Bound">f</a> <a id="3115" href="/lia/part5/Exp2/#3008" class="Bound">m₁</a> <a id="3118" href="/lia/part5/Exp2/#3011" class="Bound">n₁</a>
+  
+<a id="3124" href="/lia/part5/Exp2/#2987" class="Function">mon-lift2</a> <a id="3134" href="/lia/part5/Exp2/#3134" class="Bound">f</a> <a id="3136" href="/lia/part5/Exp2/#2731" class="InductiveConstructor">⊥</a> <a id="3138" href="/lia/part5/Exp2/#2731" class="InductiveConstructor">⊥</a> <a id="3140" class="Symbol">=</a> <a id="3142" href="/lia/part5/Exp2/#2731" class="InductiveConstructor">⊥</a>
+<a id="3144" href="/lia/part5/Exp2/#2987" class="Function">mon-lift2</a> <a id="3154" href="/lia/part5/Exp2/#3154" class="Bound">f</a> <a id="3156" href="/lia/part5/Exp2/#2731" class="InductiveConstructor">⊥</a> <a id="3158" href="/lia/part5/Exp2/#2744" class="InductiveConstructor">Just</a> <a id="3163" class="Symbol">=</a> <a id="3165" href="/lia/part5/Exp2/#2731" class="InductiveConstructor">⊥</a>
+<a id="3167" href="/lia/part5/Exp2/#2987" class="Function">mon-lift2</a> <a id="3177" href="/lia/part5/Exp2/#3177" class="Bound">f</a> <a id="3179" href="/lia/part5/Exp2/#2744" class="InductiveConstructor">Just</a> <a id="3184" href="/lia/part5/Exp2/#2731" class="InductiveConstructor">⊥</a> <a id="3186" class="Symbol">=</a> <a id="3188" href="/lia/part5/Exp2/#2731" class="InductiveConstructor">⊥</a>
+<a id="3190" href="/lia/part5/Exp2/#2987" class="Function">mon-lift2</a> <a id="3200" href="/lia/part5/Exp2/#3200" class="Bound">f</a> <a id="3202" href="/lia/part5/Exp2/#2744" class="InductiveConstructor">Just</a> <a id="3207" href="/lia/part5/Exp2/#2744" class="InductiveConstructor">Just</a> <a id="3212" class="Symbol">=</a> <a id="3214" href="/lia/part5/Exp2/#2744" class="InductiveConstructor">Just</a></pre>
+<pre class="Agda"><a id="approx"></a><a id="3228" href="/lia/part5/Exp2/#3228" class="Function">approx</a> <a id="3235" class="Symbol">:</a> <a id="3237" class="Symbol">∀</a> <a id="3239" href="/lia/part5/Exp2/#3239" class="Bound">ϱ</a> <a id="3241" href="/lia/part5/Exp2/#3241" class="Bound">e</a> <a id="3243" class="Symbol">→</a> <a id="3245" href="/lia/part5/Exp2/#1577" class="Function Operator">⟦</a> <a id="3247" href="/lia/part5/Exp2/#3241" class="Bound">e</a> <a id="3249" href="/lia/part5/Exp2/#1577" class="Function Operator">⟧ᵉ</a> <a id="3252" href="/lia/part5/Exp2/#3239" class="Bound">ϱ</a> <a id="3254" href="/lia/part5/Exp2/#2703" class="Datatype Operator">⊑</a> <a id="3256" href="/lia/part5/Exp2/#2139" class="Function Operator">⟦</a> <a id="3258" href="/lia/part5/Exp2/#3241" class="Bound">e</a> <a id="3260" href="/lia/part5/Exp2/#2139" class="Function Operator">⟧ˡ</a> <a id="3263" class="Symbol">(</a><a id="3264" href="/lia/part5/Exp2/#1192" class="InductiveConstructor">Just</a> <a id="3269" href="/lia/part0/Utils/#705" class="Function Operator">∘</a> <a id="3271" href="/lia/part5/Exp2/#3239" class="Bound">ϱ</a><a id="3272" class="Symbol">)</a>
+
+<a id="3275" href="/lia/part5/Exp2/#3228" class="Function">approx</a> <a id="3282" href="/lia/part5/Exp2/#3282" class="Bound">ϱ</a> <a id="3284" class="Symbol">(</a><a id="3285" href="/lia/part5/Exp2/#651" class="InductiveConstructor Operator">$</a> <a id="3287" href="/lia/part5/Exp2/#3287" class="Bound">n</a><a id="3288" class="Symbol">)</a> <a id="3290" class="Symbol">=</a> <a id="3292" href="/lia/part5/Exp2/#2744" class="InductiveConstructor">Just</a>
+
+<a id="3298" href="/lia/part5/Exp2/#3228" class="Function">approx</a> <a id="3305" href="/lia/part5/Exp2/#3305" class="Bound">ϱ</a> <a id="3307" class="Symbol">(</a><a id="3308" href="/lia/part5/Exp2/#672" class="InductiveConstructor Operator">`</a> <a id="3310" href="/lia/part5/Exp2/#3310" class="Bound">x</a><a id="3311" class="Symbol">)</a> <a id="3313" class="Symbol">=</a> <a id="3315" href="/lia/part5/Exp2/#2744" class="InductiveConstructor">Just</a>
+
+<a id="3321" href="/lia/part5/Exp2/#3228" class="Function">approx</a> <a id="3328" href="/lia/part5/Exp2/#3328" class="Bound">ϱ</a> <a id="3330" class="Symbol">(</a><a id="3331" href="/lia/part5/Exp2/#3331" class="Bound">e</a> <a id="3333" href="/lia/part5/Exp2/#693" class="InductiveConstructor Operator">+</a> <a id="3335" href="/lia/part5/Exp2/#3335" class="Bound">f</a><a id="3336" class="Symbol">)</a> <a id="3338" class="Keyword">with</a> <a id="3343" href="/lia/part5/Exp2/#3228" class="Function">approx</a> <a id="3350" href="/lia/part5/Exp2/#3328" class="Bound">ϱ</a> <a id="3352" href="/lia/part5/Exp2/#3331" class="Bound">e</a> <a id="3354" class="Symbol">|</a> <a id="3356" href="/lia/part5/Exp2/#3228" class="Function">approx</a> <a id="3363" href="/lia/part5/Exp2/#3328" class="Bound">ϱ</a> <a id="3365" href="/lia/part5/Exp2/#3335" class="Bound">f</a>
+<a id="3367" class="Symbol">...</a> <a id="3371" class="Symbol">|</a> <a id="3373" href="/lia/part5/Exp2/#3373" class="Bound">ind-e</a> <a id="3379" class="Symbol">|</a> <a id="3381" href="/lia/part5/Exp2/#3381" class="Bound">ind-f</a> <a id="3387" class="Symbol">=</a> <a id="3389" href="/lia/part5/Exp2/#2987" class="Function">mon-lift2</a> <a id="3399" class="Symbol">_</a> <a id="3401" href="/lia/part5/Exp2/#3373" class="Bound">ind-e</a> <a id="3407" href="/lia/part5/Exp2/#3381" class="Bound">ind-f</a>
+
+<a id="3414" href="/lia/part5/Exp2/#3228" class="Function">approx</a> <a id="3421" href="/lia/part5/Exp2/#3421" class="Bound">ϱ</a> <a id="3423" class="Symbol">(</a><a id="3424" href="/lia/part5/Exp2/#3424" class="Bound">e</a> <a id="3426" href="/lia/part5/Exp2/#719" class="InductiveConstructor Operator">·</a> <a id="3428" href="/lia/part5/Exp2/#3428" class="Bound">f</a><a id="3429" class="Symbol">)</a> <a id="3431" class="Keyword">with</a> <a id="3436" href="/lia/part5/Exp2/#3228" class="Function">approx</a> <a id="3443" href="/lia/part5/Exp2/#3421" class="Bound">ϱ</a> <a id="3445" href="/lia/part5/Exp2/#3424" class="Bound">e</a> <a id="3447" class="Symbol">|</a> <a id="3449" href="/lia/part5/Exp2/#3228" class="Function">approx</a> <a id="3456" href="/lia/part5/Exp2/#3421" class="Bound">ϱ</a> <a id="3458" href="/lia/part5/Exp2/#3428" class="Bound">f</a>
+<a id="3460" class="Symbol">...</a> <a id="3464" class="Symbol">|</a> <a id="3466" href="/lia/part5/Exp2/#3466" class="Bound">ind-e</a> <a id="3472" class="Symbol">|</a> <a id="3474" href="/lia/part5/Exp2/#3474" class="Bound">ind-f</a> <a id="3480" class="Symbol">=</a> <a id="3482" href="/lia/part5/Exp2/#2987" class="Function">mon-lift2</a> <a id="3492" class="Symbol">_</a> <a id="3494" href="/lia/part5/Exp2/#3466" class="Bound">ind-e</a> <a id="3500" href="/lia/part5/Exp2/#3474" class="Bound">ind-f</a>
+
+<a id="3507" href="/lia/part5/Exp2/#3228" class="Function">approx</a> <a id="3514" href="/lia/part5/Exp2/#3514" class="Bound">ϱ</a> <a id="3516" class="Symbol">(</a><a id="3517" href="/lia/part5/Exp2/#3517" class="Bound">e</a> <a id="3519" href="/lia/part5/Exp2/#745" class="InductiveConstructor Operator">/</a> <a id="3521" href="/lia/part5/Exp2/#3521" class="Bound">f</a><a id="3522" class="Symbol">)</a>
+  <a id="3526" class="Keyword">with</a> <a id="3531" href="/lia/part0/Equality/#4517" class="Function">inspect</a> <a id="3539" class="Symbol">(</a><a id="3540" href="/lia/part5/Exp2/#1577" class="Function Operator">⟦</a> <a id="3542" href="/lia/part5/Exp2/#3517" class="Bound">e</a> <a id="3544" href="/lia/part5/Exp2/#1577" class="Function Operator">⟧ᵉ</a> <a id="3547" href="/lia/part5/Exp2/#3514" class="Bound">ϱ</a><a id="3548" class="Symbol">)</a>
+<a id="3550" class="Symbol">...</a> <a id="3554" class="Symbol">|</a> <a id="3556" href="/lia/part0/Equality/#4483" class="InductiveConstructor">it</a> <a id="3559" href="/lia/part5/Exp2/#1183" class="InductiveConstructor">⊥</a> <a id="3561" href="/lia/part5/Exp2/#3561" class="Bound">eq-e</a> <a id="3566" class="Keyword">rewrite</a> <a id="3574" href="/lia/part5/Exp2/#3561" class="Bound">eq-e</a> <a id="3579" class="Symbol">=</a> <a id="3581" href="/lia/part5/Exp2/#2731" class="InductiveConstructor">⊥</a>
+<a id="3583" class="Symbol">...</a> <a id="3587" class="Symbol">|</a> <a id="3589" href="/lia/part0/Equality/#4483" class="InductiveConstructor">it</a> <a id="3592" class="Symbol">(</a><a id="3593" href="/lia/part5/Exp2/#1192" class="InductiveConstructor">Just</a> <a id="3598" href="/lia/part5/Exp2/#3598" class="Bound">m</a><a id="3599" class="Symbol">)</a> <a id="3601" href="/lia/part5/Exp2/#3601" class="Bound">eq-e</a> <a id="3606" class="Keyword">rewrite</a> <a id="3614" href="/lia/part5/Exp2/#3601" class="Bound">eq-e</a>
+  <a id="3621" class="Keyword">with</a> <a id="3626" href="/lia/part0/Equality/#4517" class="Function">inspect</a> <a id="3634" class="Symbol">(</a><a id="3635" href="/lia/part5/Exp2/#1577" class="Function Operator">⟦</a> <a id="3637" class="Bound">f</a> <a id="3639" href="/lia/part5/Exp2/#1577" class="Function Operator">⟧ᵉ</a> <a id="3642" class="Bound">ϱ</a><a id="3643" class="Symbol">)</a>
+<a id="3645" class="Symbol">...</a> <a id="3649" class="Symbol">|</a> <a id="3651" href="/lia/part0/Equality/#4483" class="InductiveConstructor">it</a> <a id="3654" href="/lia/part5/Exp2/#1183" class="InductiveConstructor">⊥</a> <a id="3656" href="/lia/part5/Exp2/#3656" class="Bound">eq-f</a> <a id="3661" class="Keyword">rewrite</a> <a id="3669" href="/lia/part5/Exp2/#3656" class="Bound">eq-f</a> <a id="3674" class="Symbol">=</a> <a id="3676" href="/lia/part5/Exp2/#2731" class="InductiveConstructor">⊥</a>
+<a id="3678" class="Symbol">...</a> <a id="3682" class="Symbol">|</a> <a id="3684" href="/lia/part0/Equality/#4483" class="InductiveConstructor">it</a> <a id="3687" class="Symbol">(</a><a id="3688" href="/lia/part5/Exp2/#1192" class="InductiveConstructor">Just</a> <a id="3693" class="Number">0</a><a id="3694" class="Symbol">)</a> <a id="3696" href="/lia/part5/Exp2/#3696" class="Bound">eq-f</a> <a id="3701" class="Keyword">rewrite</a> <a id="3709" href="/lia/part5/Exp2/#3696" class="Bound">eq-f</a> <a id="3714" class="Symbol">=</a> <a id="3716" href="/lia/part5/Exp2/#2731" class="InductiveConstructor">⊥</a>
+<a id="3718" class="Symbol">...</a> <a id="3722" class="Symbol">|</a> <a id="3724" href="/lia/part0/Equality/#4483" class="InductiveConstructor">it</a> <a id="3727" class="Symbol">(</a><a id="3728" href="/lia/part5/Exp2/#1192" class="InductiveConstructor">Just</a> <a id="3733" class="Symbol">(</a><a id="3734" href="Agda.Builtin.Nat.html#223" class="InductiveConstructor">suc</a> <a id="3738" href="/lia/part5/Exp2/#3738" class="Bound">n</a><a id="3739" class="Symbol">))</a> <a id="3742" href="/lia/part5/Exp2/#3742" class="Bound">eq-f</a>
+  <a id="3749" class="Keyword">with</a> <a id="3754" href="/lia/part5/Exp2/#3228" class="Function">approx</a> <a id="3761" class="Bound">ϱ</a> <a id="3763" class="Bound">e</a> <a id="3765" class="Symbol">|</a> <a id="3767" href="/lia/part5/Exp2/#3228" class="Function">approx</a> <a id="3774" class="Bound">ϱ</a> <a id="3776" class="Bound">f</a>
+<a id="3778" class="Symbol">...</a> <a id="3782" class="Symbol">|</a> <a id="3784" href="/lia/part5/Exp2/#3784" class="Bound">ind-e</a> <a id="3790" class="Symbol">|</a> <a id="3792" href="/lia/part5/Exp2/#3792" class="Bound">ind-f</a>
+  <a id="3800" class="Keyword">rewrite</a> <a id="3808" class="Bound">eq-e</a> <a id="3813" class="Symbol">|</a> <a id="3815" class="Bound">eq-f</a> <a id="3820" class="Symbol">|</a> <a id="3822" href="/lia/part5/Exp2/#2768" class="Function">⊑-Just</a> <a id="3829" href="/lia/part5/Exp2/#3784" class="Bound">ind-e</a> <a id="3835" class="Symbol">|</a> <a id="3837" href="/lia/part5/Exp2/#2768" class="Function">⊑-Just</a> <a id="3844" href="/lia/part5/Exp2/#3792" class="Bound">ind-f</a> <a id="3850" class="Symbol">=</a> <a id="3852" href="/lia/part5/Exp2/#2744" class="InductiveConstructor">Just</a>
+
+<a id="3858" href="/lia/part5/Exp2/#3228" class="Function">approx</a> <a id="3865" href="/lia/part5/Exp2/#3865" class="Bound">ϱ</a> <a id="3867" class="Symbol">(</a><a id="3868" href="/lia/part5/Exp2/#771" class="InductiveConstructor Operator">Let</a> <a id="3872" href="/lia/part5/Exp2/#3872" class="Bound">x</a> <a id="3874" href="/lia/part5/Exp2/#771" class="InductiveConstructor Operator">≔</a> <a id="3876" href="/lia/part5/Exp2/#3876" class="Bound">e</a> <a id="3878" href="/lia/part5/Exp2/#771" class="InductiveConstructor Operator">In</a> <a id="3881" href="/lia/part5/Exp2/#3881" class="Bound">f</a><a id="3882" class="Symbol">)</a>
+  <a id="3886" class="Keyword">with</a> <a id="3891" href="/lia/part0/Equality/#4517" class="Function">inspect</a> <a id="3899" class="Symbol">(</a><a id="3900" href="/lia/part5/Exp2/#1577" class="Function Operator">⟦</a> <a id="3902" href="/lia/part5/Exp2/#3876" class="Bound">e</a> <a id="3904" href="/lia/part5/Exp2/#1577" class="Function Operator">⟧ᵉ</a> <a id="3907" href="/lia/part5/Exp2/#3865" class="Bound">ϱ</a><a id="3908" class="Symbol">)</a>
+<a id="3910" class="Symbol">...</a> <a id="3914" class="Symbol">|</a> <a id="3916" href="/lia/part0/Equality/#4483" class="InductiveConstructor">it</a> <a id="3919" href="/lia/part5/Exp2/#1183" class="InductiveConstructor">⊥</a> <a id="3921" href="/lia/part5/Exp2/#3921" class="Bound">eq-e</a> <a id="3926" class="Keyword">rewrite</a> <a id="3934" href="/lia/part5/Exp2/#3921" class="Bound">eq-e</a> <a id="3939" class="Symbol">=</a> <a id="3941" href="/lia/part5/Exp2/#2731" class="InductiveConstructor">⊥</a>
+<a id="3943" class="Symbol">...</a> <a id="3947" class="Symbol">|</a> <a id="3949" href="/lia/part0/Equality/#4483" class="InductiveConstructor">it</a> <a id="3952" class="Symbol">(</a><a id="3953" href="/lia/part5/Exp2/#1192" class="InductiveConstructor">Just</a> <a id="3958" href="/lia/part5/Exp2/#3958" class="Bound">m</a><a id="3959" class="Symbol">)</a> <a id="3961" href="/lia/part5/Exp2/#3961" class="Bound">eq-e</a>
+  <a id="3968" class="Keyword">with</a> <a id="3973" href="/lia/part5/Exp2/#3228" class="Function">approx</a> <a id="3980" class="Bound">ϱ</a> <a id="3982" class="Bound">e</a>
+<a id="3984" class="Symbol">...</a> <a id="3988" class="Symbol">|</a> <a id="3990" href="/lia/part5/Exp2/#3990" class="Bound">ind-e</a>
+  <a id="3998" class="Keyword">rewrite</a> <a id="4006" class="Bound">eq-e</a>
+  <a id="4013" class="Keyword">with</a> <a id="4018" href="/lia/part5/Exp2/#2768" class="Function">⊑-Just</a> <a id="4025" href="/lia/part5/Exp2/#3990" class="Bound">ind-e</a>
+<a id="4031" class="Symbol">...</a> <a id="4035" class="Symbol">|</a> <a id="4037" href="/lia/part5/Exp2/#4037" class="Bound">eq-e-l</a> <a id="4044" class="Keyword">rewrite</a> <a id="4052" href="/lia/part5/Exp2/#4037" class="Bound">eq-e-l</a>
+  <a id="4061" class="Keyword">with</a> <a id="4066" href="/lia/part0/Equality/#4517" class="Function">inspect</a> <a id="4074" class="Symbol">(</a><a id="4075" href="/lia/part5/Exp2/#1577" class="Function Operator">⟦</a> <a id="4077" class="Bound">f</a> <a id="4079" href="/lia/part5/Exp2/#1577" class="Function Operator">⟧ᵉ</a> <a id="4082" class="Bound">ϱ</a> <a id="4084" href="/lia/part0/Functions/#570" class="Function Operator">[</a> <a id="4086" class="Bound">x</a> <a id="4088" href="/lia/part0/Functions/#570" class="Function Operator">↦</a> <a id="4090" class="Bound">m</a> <a id="4092" href="/lia/part0/Functions/#570" class="Function Operator">]</a><a id="4093" class="Symbol">)</a>
+<a id="4095" class="Symbol">...</a> <a id="4099" class="Symbol">|</a> <a id="4101" href="/lia/part0/Equality/#4483" class="InductiveConstructor">it</a> <a id="4104" href="/lia/part5/Exp2/#1183" class="InductiveConstructor">⊥</a> <a id="4106" href="/lia/part5/Exp2/#4106" class="Bound">eq-f</a> <a id="4111" class="Keyword">rewrite</a> <a id="4119" href="/lia/part5/Exp2/#4106" class="Bound">eq-f</a> <a id="4124" class="Symbol">=</a> <a id="4126" href="/lia/part5/Exp2/#2731" class="InductiveConstructor">⊥</a>
+<a id="4128" class="Symbol">...</a> <a id="4132" class="Symbol">|</a> <a id="4134" href="/lia/part0/Equality/#4483" class="InductiveConstructor">it</a> <a id="4137" class="Symbol">(</a><a id="4138" href="/lia/part5/Exp2/#1192" class="InductiveConstructor">Just</a> <a id="4143" href="/lia/part5/Exp2/#4143" class="Bound">n</a><a id="4144" class="Symbol">)</a> <a id="4146" href="/lia/part5/Exp2/#4146" class="Bound">eq-f</a>
+  <a id="4153" class="Keyword">with</a> <a id="4158" href="/lia/part5/Exp2/#3228" class="Function">approx</a> <a id="4165" class="Symbol">(</a><a id="4166" class="Bound">ϱ</a> <a id="4168" href="/lia/part0/Functions/#570" class="Function Operator">[</a> <a id="4170" class="Bound">x</a> <a id="4172" href="/lia/part0/Functions/#570" class="Function Operator">↦</a> <a id="4174" class="Bound">m</a> <a id="4176" href="/lia/part0/Functions/#570" class="Function Operator">]</a><a id="4177" class="Symbol">)</a> <a id="4179" class="Bound">f</a>
+<a id="4181" class="Symbol">...</a> <a id="4185" class="Symbol">|</a> <a id="4187" href="/lia/part5/Exp2/#4187" class="Bound">ind-f</a>
+  <a id="4195" class="Keyword">rewrite</a> <a id="4203" class="Bound">eq-f</a>
+  <a id="4210" class="Keyword">with</a> <a id="4215" href="/lia/part5/Exp2/#2768" class="Function">⊑-Just</a> <a id="4222" href="/lia/part5/Exp2/#4187" class="Bound">ind-f</a>
+<a id="4228" class="Symbol">...</a> <a id="4232" class="Symbol">|</a> <a id="4234" href="/lia/part5/Exp2/#4234" class="Bound">eq-f-l</a>
+  <a id="4243" class="Keyword">rewrite</a> <a id="4251" href="/lia/part5/Exp2/#2823" class="Function">update-Just</a> <a id="4263" class="Bound">ϱ</a> <a id="4265" class="Bound">x</a> <a id="4267" class="Bound">m</a> <a id="4269" class="Symbol">|</a> <a id="4271" href="/lia/part5/Exp2/#4234" class="Bound">eq-f-l</a> <a id="4278" class="Symbol">=</a> <a id="4280" href="/lia/part5/Exp2/#2744" class="InductiveConstructor">Just</a></pre>
+
+<div id="refs">
+
+  <h1 id="references">
+<a class="anchor" href="#references" aria-hidden="true"><span class="octicon octicon-link"></span></a>References</h1>
+
+</div>
+
+    </div>
+  
+    <header class="nav-header">
+    <p style="text-align:center;">
+        
+        
+        
+        <a alt="Part" href="/lia/part5/index/">Part</a>
+        &bullet;
+        
+        
+        <a alt="Source code" href="https://github.com/lclem/lia/blob/main/src/part5/Exp2.lagda.md">Source</a>
+        
+        
+        
+    </p>
+</header>
+
+    <p class="p-name"> Last-modified: Jan  7 22:36:10 2021 </p>
+  </article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/lia/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Logic in Agda</h2><div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Lorenzo Clemente</li>
+          <li><a class="u-email" href="mailto:clementelorenzo@gmail.com">clementelorenzo@gmail.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/lclem"><svg class="svg-icon"><use xlink:href="/lia/assets/minima-social-icons.svg#github"></use></svg> <span class="username">lclem</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3"></div>
+    </div>This work is licensed under a <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>
+  </div>
+</footer>
+
+<!-- Parse the Latex divs with Katex
+<script type="text/javascript">
+  $("script[type='math/tex']").replaceWith(
+    function(){
+      var tex = $(this).text();
+      return katex.renderToString(tex, {displayMode: false});
+  });
+  
+  $("script[type='math/tex; mode=display']").replaceWith(
+    function(){
+      var tex = $(this).text();
+      return katex.renderToString(tex.replace(/%.*/g, ''), {displayMode: true});
+  });
+</script>
+-->
+
+<script type="text/javascript" src="/lia/assets/hidebox.js"></script>
+</body>
+
+</html>
