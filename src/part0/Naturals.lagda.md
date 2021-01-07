@@ -214,7 +214,7 @@ _end< _∎< : (x : ℕ) → x ≤ x
 _ end< = refl-≤
 _ ∎< = refl-≤
 
-test : (x0 x y z : ℕ) → x0 ≤ x → x ≤ y → y < z → x0 < z
+private test : (x0 x y z : ℕ) → x0 ≤ x → x ≤ y → y < z → x0 < z
 test x0 x y z p0 p q =
   begin<
     x0 ≤<⟨ p0 ⟩
