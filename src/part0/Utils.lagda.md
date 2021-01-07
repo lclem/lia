@@ -23,6 +23,7 @@ const b _ = b
 id : ∀ {ℓ} {A : Set ℓ} → A → A
 id x = x
 
+-- dependent apply
 apply : ∀ {ℓ m} {A : Set ℓ} {B : A → Set m} → (f : ((a : A) → B a)) → (a : A) → B a
 apply f a = f a
 

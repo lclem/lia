@@ -5,8 +5,7 @@ title: "Imperative programs 🚧"
 ```
 {-# OPTIONS --allow-unsolved-metas #-}
 module part5.Programs where
-open import part5.AExp hiding (_↝_; _,_⇒_; ⇒-det; ↝*-trans; _↝*⟨⟩_; _↝⟨_⟩_; _↝*⟨_⟩_)
-open import part5.BExp --  public
+open import part5.Exp hiding (_↝_; _,_⇒_; ⇒-det; ↝*-trans; _↝*⟨⟩_; _↝⟨_⟩_; _↝*⟨_⟩_; _,_↝_,_)
 ```
 
 ```
@@ -63,7 +62,7 @@ private
     x : VarName
     e : AExp
     b : BExp
-    c d : Cmd
+    c d c′ d′ : Cmd
 ```
 
 The definition of the operational semantics of imperative programs
@@ -659,3 +658,162 @@ This case is straightforward.
      with ↝*-skip ↝*-der
  ... | refl , refl , refl = ⇒-while-ff b≡false
 ```
+
+# Contexual equivalence
+
+We first need to introduce the notion of  *program contexts*,
+which are programs with a single distinguished hole.
+
+```
+data Context : Set where
+  □ : Context
+  _⨟-left_ : (C : Context) → (c : Cmd) → Context
+  _⨟-right_ : (c : Cmd) → (C : Context) → Context
+  if-left_then_else_ : (b : BExp) → (C : Context) → (c : Cmd) → Context
+  if-right_then_else_ : (b : BExp) → (c : Cmd) → (C : Context) → Context
+  while_do:_ : (b : BExp) → (C : Context) → Context
+
+private
+  variable
+    C : Context
+```
+
+We can fill the hole in a context with a given program.
+
+```
+contextApply : Context → Cmd → Cmd
+contextApply □ d = d
+contextApply (C ⨟-left c) d = contextApply C d ⨟ c
+contextApply (c ⨟-right C) d = c ⨟ contextApply C d
+contextApply (if-left b then C else c) d = if b then (contextApply C d) else c
+contextApply (if-right b then c else C) d = if b then c else (contextApply C d)
+contextApply (while b do: C) d = while b do: contextApply C d
+```
+
+Contexual equivalence:
+
+```
+_∼_ : (c d : Cmd) → Set
+c ∼ d = ∀[ s ] ∀[ s′ ] c , s ⇒ s′ ↔ d , s ⇒ s′
+
+sym-∼ : c ∼ d → d ∼ c
+sym-∼ c∼d s s′ with c∼d s s′
+... | have0 , have1 = have1 , have0
+
+_≈_ : (c d : Cmd) → Set
+c ≈ d = ∀ C → contextApply C c ∼ contextApply C d
+```
+
+## Full abstraction
+
+Preliminary facts:
+
+```
+fa-⨟-left : ∀ C →
+           contextApply C c ∼ contextApply C d →
+           contextApply C c ⨟ c′ , s ⇒ s′ →
+           -------------------------------------
+           contextApply C d ⨟ c′ , s ⇒ s′
+
+fa-⨟-left {s = s} _ Cc∼Cd (⇒-seq {s′ = s′′} δ₀ δ₁)
+    with Cc∼Cd s s′′
+... | have , _ = ⇒-seq (have δ₀) δ₁
+
+fa-⨟-right : ∀ C →
+            contextApply C c ∼ contextApply C d →
+            c′ ⨟ contextApply C c , s ⇒ s′ →
+            -------------------------------------
+            c′ ⨟ contextApply C d , s ⇒ s′
+
+fa-⨟-right {s′ = s′} _ Cc∼Cd (⇒-seq {s′ = s′′} δ₀ δ₁)
+    with Cc∼Cd s′′ s′
+... | have , _ = ⇒-seq δ₀ (have δ₁)
+
+fa-while : ∀ C →
+           contextApply C c ∼ contextApply C d →
+           while b do: contextApply C c , s ⇒ s′ →
+           ---------------------------------------
+           while b do: contextApply C d , s ⇒ s′
+           
+fa-while _ Cc∼Cd (⇒-while-ff ⟦b⟧s≡ff) = ⇒-while-ff ⟦b⟧s≡ff
+
+fa-while C Cc∼Cd (⇒-while-tt {s′′ = s′′} ⟦b⟧s≡tt δ₀ δ₁)
+  with fst (Cc∼Cd _ _) δ₀ |
+       fa-while C Cc∼Cd δ₁
+... | δ₀′ | δ₁′ = ⇒-while-tt ⟦b⟧s≡tt δ₀′ δ₁′
+
+fa-ite-right : ∀ C →
+               contextApply C c ∼ contextApply C d →
+               if b then contextApply C c else c′ , s ⇒ s′ →
+               --------------------------------------------
+               if b then contextApply C d else c′ , s ⇒ s′
+
+fa-ite-right C Cc∼Cd (⇒-if-tt ⟦b⟧s≡tt δ)
+  with fst (Cc∼Cd _ _) δ
+... | δ′ = ⇒-if-tt ⟦b⟧s≡tt δ′
+
+fa-ite-right C Cc∼Cd (⇒-if-ff ⟦b⟧s≡ff δ) = ⇒-if-ff ⟦b⟧s≡ff δ
+
+fa-ite-left : ∀ C →
+              contextApply C c ∼ contextApply C d →
+              if b then c′ else contextApply C c , s ⇒ s′ →
+              --------------------------------------------
+              if b then c′ else contextApply C d , s ⇒ s′
+
+fa-ite-left C Cc∼Cd (⇒-if-tt ⟦b⟧s≡tt δ) = ⇒-if-tt ⟦b⟧s≡tt δ
+fa-ite-left C Cc∼Cd (⇒-if-ff ⟦b⟧s≡ff δ)
+  with fst (Cc∼Cd _ _) δ
+... | δ′ = ⇒-if-ff ⟦b⟧s≡ff δ′
+```
+
+The natural semantics is fully abstract:
+
+```
+fullAbstraction-1 : c ≈ d → c ∼ d
+fullAbstraction-1 c≈d = c≈d □
+
+fullAbstraction-2 : c ∼ d → c ≈ d
+
+fullAbstraction-2 c∼d □ s s′ = c∼d s s′
+
+fullAbstraction-2 {c} {d} c∼d (C ⨟-left c′) s s′
+    with fullAbstraction-2 c∼d C
+... | ind = goal0 , goal1 where
+
+  goal0 : contextApply C c ⨟ c′ , s ⇒ s′ → contextApply C d ⨟ c′ , s ⇒ s′
+  goal0 = fa-⨟-left C ind
+
+  goal1 : contextApply C d ⨟ c′ , s ⇒ s′ → contextApply C c ⨟ c′ , s ⇒ s′
+  goal1 = fa-⨟-left C (sym-∼ ind)
+
+fullAbstraction-2 c∼d (c ⨟-right C) s s′
+  with fullAbstraction-2 c∼d C
+... | ind = fa-⨟-right C ind , fa-⨟-right C (sym-∼ ind)
+
+fullAbstraction-2 {c} {d} c∼d (if-left b then C else c′) s s′
+    with fullAbstraction-2 c∼d C
+... | ind = fa-ite-right C ind , fa-ite-right C (sym-∼ ind)
+
+fullAbstraction-2 {c} {d} c∼d (if-right b then c′ else C) s s′
+    with fullAbstraction-2 c∼d C
+... | ind = fa-ite-left C ind , fa-ite-left C (sym-∼ ind)
+
+fullAbstraction-2 {c} {d} c∼d (while b do: C) s s′
+  with fullAbstraction-2 c∼d C
+... | ind = goal0 , goal1 where
+
+  goal0 : (while b do: contextApply C c) , s ⇒ s′ →
+          (while b do: contextApply C d) , s ⇒ s′
+  goal0 = fa-while C ind
+
+  goal1 : (while b do: contextApply C d) , s ⇒ s′ →
+          (while b do: contextApply C c) , s ⇒ s′
+  goal1 = fa-while C (sym-∼ ind)
+  
+fullAbstraction : c ≈ d ↔ c ∼ d
+fullAbstraction = fullAbstraction-1 , fullAbstraction-2
+```
+
+# Axiomatic semantics
+
+TODO.

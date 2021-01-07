@@ -1,11 +1,11 @@
 ---
-title: "Arithmetic expressions 🚧"
+title: "Arithmetic and Boolean expressions 🚧"
 ---
 
 ```
 {-# OPTIONS --allow-unsolved-metas #-}
-module part5.AExp where
-open import part0.index hiding (AExp; A⟦_⟧; _≈_) renaming (_+_ to _+ℕ_; _*_ to _·ℕ_) public
+module part5.Exp where
+open import part0.index hiding (AExp; A⟦_⟧; _≈_) renaming (_+_ to _+ℕ_; _*_ to _·ℕ_; _≤_ to _≤ℕ_) public
 ```
 
 # Arithmetic expressions
@@ -80,7 +80,7 @@ we use environments.
 ```
 Env = VarName → ℕ
 
-private variable ϱ : Env
+private variable ϱ ϱ′ : Env
 ```
 
 The following environment assigns value `200` to the variable named `10`,
@@ -90,6 +90,28 @@ and value `40` to every other variable.
 ϱ0 : Env
 ϱ0 10 = 200
 ϱ0 _ = 40
+```
+
+# Boolean expressions
+
+On top of arithmetic expressions we can build a simple language of Boolean expressions.
+An element in `BExp` is a boolean combination
+of atomic expressions of the form `Leq e f`,
+where `e` and `f` are arithmetic expressions.
+
+```
+data BExp : Set where
+  tt : BExp
+  ff : BExp
+  Not : BExp → BExp
+  Or : BExp → BExp → BExp
+  And : BExp → BExp → BExp
+  Leq : AExp → AExp → BExp
+
+pattern _∨_ b₀ b₁ = Or b₀ b₁
+pattern _∧_ b₀ b₁ = And b₀ b₁
+pattern ¬_ b = Not b
+pattern _≤_ e f = Leq e f
 ```
 
 # Denotational semantics
@@ -113,448 +135,40 @@ _ : ⟦ add-one ⟧ ϱ0 ≡ 201
 _ = refl
 ```
 
-# Small-steps operational semantics
+!exercise(#exercise-BExp-semantics)
+~~~~~~~~~~~~~~~~
 
-We use global environments and eager semantics.
-
-```
-infix 4 _⊢_↝_
-data _⊢_↝_ : Env → AExp → AExp → Set where
-
-  ↝-Var : ϱ ⊢ ` x ↝ $ ϱ x
-
-  ↝-Add-stop :
-    ϱ ⊢ $ m + $ n ↝ $ (m +ℕ n)
-
-  ↝-Add-left :
-    ϱ ⊢ e ↝ e′ →
-    ------------------
-    ϱ ⊢ e + f ↝ e′ + f
-
-  ↝-Add-right :
-    ϱ ⊢ f ↝ f′ →
-    ------------------
-    ϱ ⊢ e + f ↝ e + f′
-
-  ↝-Mul-stop :
-    ϱ ⊢ $ m · $ n ↝ $ (m ·ℕ n)
-
-  ↝-Mul-left :
-    ϱ ⊢ e ↝ e′ →
-    ------------------
-    ϱ ⊢ e · f ↝ e′ · f
-
-  ↝-Mul-right :
-    ϱ ⊢ f ↝ f′ →
-    ------------------
-    ϱ ⊢ e · f ↝ e · f′
-
-  ↝-Let-stop :
-    ϱ ⊢ Let x ($ m) ($ n) ↝ $ n
-
-  ↝-Let-1 :
-    ϱ [ x ↦ m ] ⊢ f ↝ f′ →
-    ----------------------------------
-    ϱ ⊢ Let x ($ m) f ↝ Let x ($ m) f′
-
-  ↝-Let-2 :
-    ϱ ⊢ e ↝ e′ →
-    --------------------------
-    ϱ ⊢ Let x e f ↝ Let x e′ f
-```
-
-## Preservation
+Write the denotational semantics of Boolean expressions.
 
 ```
-preservation :
-  ϱ ⊢ e ↝ f →
-  -----------------
-  ⟦ e ⟧ ϱ ≡ ⟦ f ⟧ ϱ
-
-preservation ↝-Var = refl
-
-preservation ↝-Add-stop = refl
-preservation (↝-Add-left step) rewrite preservation step = refl
-preservation (↝-Add-right step) rewrite preservation step = refl
-
-preservation ↝-Mul-stop = refl
-preservation (↝-Mul-left step) rewrite preservation step = refl
-preservation (↝-Mul-right step) rewrite preservation step = refl
-
-preservation ↝-Let-stop = refl
-preservation (↝-Let-1 step) rewrite preservation step = refl
-preservation (↝-Let-2 step) rewrite preservation step = refl
+infix 101 B⟦_⟧_
+B⟦_⟧_ : BExp → Env → 𝔹
 ```
 
-## Transitive closure
+!codemirror(BExp-semantics)(B⟦_⟧_)
 
-We define the transitive closure of the small-step operational semantics.
+*Hint:* In the `Leq` case you will need `_≤?_`.
 
-```
-data _⊢_↝*_ : Env → AExp → AExp → Set where
+~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~
 
-    stop : ϱ ⊢ e ↝* e
-
-    one : ϱ ⊢ e ↝ f →
-          ϱ ⊢ f ↝* g →
-          ----------
-          ϱ ⊢ e ↝* g
-```
-
-We can indeed show that `_⊢_↝*_` is transitive with a standard induction.
+We proceed by structural induction on Boolan expressions.
 
 ```
-↝*-trans :
-  ϱ ⊢ e ↝* f →
-  ϱ ⊢ f ↝* g →
-  ----------
-  ϱ ⊢ e ↝* g
-
-↝*-trans stop δ = δ
-↝*-trans (one step δ₁) δ₂ = one step (↝*-trans δ₁ δ₂)
+B⟦ tt ⟧ ρ = tt
+B⟦ ff ⟧ ρ = ff
+B⟦ ¬ b ⟧ ρ = ¬𝔹 B⟦ b ⟧ ρ
+B⟦ b ∨ c ⟧ ρ = B⟦ b ⟧ ρ ∨𝔹 B⟦ c ⟧ ρ
+B⟦ b ∧ c ⟧ ρ = B⟦ b ⟧ ρ ∧𝔹 B⟦ c ⟧ ρ
+B⟦ e ≤ f ⟧ ρ
+  with A⟦ e ⟧ ρ ≤? A⟦ f ⟧ ρ
+... | yes _ = tt
+... | no _ = ff
 ```
 
-An easy induction based on !ref(preservation) shows that the denotational semantics is preserved by the transitive closure of the small-step operational semantics.
+~~~~~~~~~~~~~~~~
 
-```
-preservation* :
-  ϱ ⊢ e ↝* f →
-  -----------------
-  ⟦ e ⟧ ϱ ≡ ⟦ f ⟧ ϱ
-
-preservation* {ϱ} {e} {.e} stop = refl
-preservation* {ϱ} {e} {g} (one {f = f} step der) =
-    begin
-        ⟦ e ⟧ ϱ ≡⟨ preservation {ϱ} {e} {f} step ⟩
-        ⟦ f ⟧ ϱ ≡⟨ preservation* {ϱ} {f} {g} der ⟩
-        ⟦ g ⟧ ϱ
-    ∎
-```
-
-This immediately implies that whenever the small-step semantics terminates producing a number `m`,
-then this is the right result.
-
-```
-↝*-agree-⟦⟧ :
-  ϱ ⊢ e ↝* $ m →
-  --------------
-  m ≡ ⟦ e ⟧ ϱ
-
-↝*-agree-⟦⟧ der = sym (preservation* der)
-```
-
-## Deterministic values
-
-Notice that small-step semantics is a non-deterministic relation:
-In general there may be several ways to reduce an expression
-(as witnessed by the rules `↝-Add-left` and `↝-Add-right` for instance).
-
-However, as an immediate consequence of preservation
-we have that if two numerical values are eventually produced,
-then they necessarily are the same number.
-
-```
-↝*-det :
-  ϱ ⊢ e ↝* Num m →
-  ϱ ⊢ e ↝* Num n →
-  -----------------
-  m ≡ n
-
-↝*-det der1 der2 rewrite sym (preservation* der1) | preservation* der2 = refl
-```
-
-## Congruence
-
-We show that the transitive closure `_⊢_↝*_` respects subexpressions.
-
-```
-add-cong-1 :
-  ϱ ⊢ e ↝* e′ →
-  -------------------
-  ϱ ⊢ e + f ↝* e′ + f
-
-add-cong-1 stop = stop
-add-cong-1 (one x d) = one (↝-Add-left x) (add-cong-1 d)
-
-add-cong-2 :
-  ϱ ⊢ f ↝* f′ →
-  -------------------
-  ϱ ⊢ e + f ↝* e + f′
-
-add-cong-2 stop = stop
-add-cong-2 (one x d) = one (↝-Add-right x) (add-cong-2 d)
-
-mul-cong-1 :
-  ϱ ⊢ e ↝* e′ →
-  -------------------
-  ϱ ⊢ e · f ↝* e′ · f
-
-mul-cong-1 stop = stop
-mul-cong-1 (one x d) = one (↝-Mul-left x) (mul-cong-1 d)
-
-mul-cong-2 :
-  ϱ ⊢ f ↝* f′ →
-  -------------------
-  ϱ ⊢ e · f ↝* e · f′
-
-mul-cong-2 stop = stop
-mul-cong-2 (one x d) = one (↝-Mul-right x) (mul-cong-2 d)
-
-let-cong-1 :
-  ϱ ⊢ e ↝* e′ →
-  ----------------------------
-  ϱ ⊢ Let x e f ↝* Let x e′ f
-
-let-cong-1 stop = stop
-let-cong-1 (one x d) = one (↝-Let-2 x) (let-cong-1 d)
-
-let-cong-2 :
-  ϱ [ x ↦ m ] ⊢ f ↝* f′ →
-  -----------------------------------
-  ϱ ⊢ Let x ($ m) f ↝* Let x ($ m) f′
-
-let-cong-2 stop = stop
-let-cong-2 (one x d) = one (↝-Let-1 x) (let-cong-2 d)
-```
-
-## Relational reasoning
-
-We introduce some syntactic sugaring to conveniently write chains of small steps.
-
-```
-infixr 2 _↝*⟨⟩_ _↝*⟨_⟩_ _↝⟨_⟩_ 
-infix  3 _↝*∎
-
-_↝*⟨⟩_ : ∀ {ϱ} e {f} → ϱ ⊢ e ↝* f → ϱ ⊢ e ↝* f
-e ↝*⟨⟩ e↝*f = e↝*f
-
-_↝*⟨_⟩_ : ∀ {ϱ} e {f g} → ϱ ⊢ e ↝* f → ϱ ⊢ f ↝* g → ϱ ⊢ e ↝* g
-e ↝*⟨ e↝*f ⟩ f↝*g = ↝*-trans e↝*f f↝*g
-
-_↝⟨_⟩_ : ∀ {ϱ} e {f g} → ϱ ⊢ e ↝ f → ϱ ⊢ f ↝* g → ϱ ⊢ e ↝* g
-e ↝⟨ e↝f ⟩ f↝*g = e ↝*⟨ one e↝f stop ⟩ f↝*g 
-
-_↝*∎ : ∀ e → ϱ ⊢ e ↝* e
-e ↝*∎ = stop
-```
-
-## **Exercise**: Termination (Weak normalisation)
-
-So far we have shown that the small-step semantics produces the right result,
-*if it produces any result at all*.
-In fact, an operational semantics that never reaches a Numerical value
-trivially satisfies this condition.
-
-We prove that the small step operational semantics can always reache some numerical value after a finite number of steps.
-In other word, we prove below that the rewrite is *weakly normalising*.
-
-```
-weak-normalisation : ∀ e → ϱ ⊢ e ↝* $ (⟦ e ⟧ ϱ)
-
-weak-normalisation ($ n) = stop
-
-weak-normalisation (` x) = one ↝-Var stop
-
-weak-normalisation {ϱ} (e + f)
-  with weak-normalisation e | weak-normalisation f
-... | de | df = 
-  e + f ↝*⟨ add-cong-1 de ⟩
-  ($ (⟦ e ⟧ ϱ)) + f ↝*⟨ add-cong-2 df ⟩
-  ($ (⟦ e ⟧ ϱ)) + ($ (⟦ f ⟧ ϱ)) ↝⟨ ↝-Add-stop ⟩
-  $ (⟦ e ⟧ ϱ +ℕ ⟦ f ⟧ ϱ)
-  ↝*∎
-
-weak-normalisation {ϱ} (e · f)
-  with weak-normalisation e | weak-normalisation f
-... | de | df = 
-  e · f ↝*⟨ mul-cong-1 de ⟩
-  ($ (⟦ e ⟧ ϱ)) · f ↝*⟨ mul-cong-2 df ⟩
-  ($ (⟦ e ⟧ ϱ)) · ($ (⟦ f ⟧ ϱ)) ↝⟨ ↝-Mul-stop ⟩
-  $ (⟦ e ⟧ ϱ ·ℕ ⟦ f ⟧ ϱ)
-  ↝*∎
-
-weak-normalisation {ϱ} (Let x e f)
-  with weak-normalisation e | weak-normalisation f
-... | de | df =
-    Let x e f ↝*⟨ let-cong-1 de ⟩
-    Let x ($ (⟦ e ⟧ ϱ)) f ↝*⟨ let-cong-2 df ⟩
-    Let x ($ (⟦ e ⟧ ϱ)) ($ (⟦ f ⟧ (ϱ [ x ↦ ⟦ e ⟧ ϱ ])))
-        ↝⟨ ↝-Let-stop ⟩
-    $ (⟦ f ⟧ (ϱ [ x ↦ ⟦ e ⟧ ϱ ]))
-    ↝*∎
-```
-
-## **Exercise**: Strong normalisation
-
-The termination property above is also called *weak normalisation*,
-which means that there exists a finite reduction sequence `e ↝* f`
-reaching a normal form (i.e. a value) `f ≡ Num m`.
-We show below even *strong normalisation*, namely,
-*every* reduction sequence starting from `e` is finite.
-
-To this end, we introduce a notion of *size* of arithmetic expressions.
-
-```
-size : AExp → ℕ
-size (Num x) = 0
-size (Var x) = 1
-size (Add e f) = 1 +ℕ size e +ℕ size f
-size (Mul e f) = 1 +ℕ size e +ℕ size f
-size (Let x e f) = 1 +ℕ size e +ℕ size f
-```
-
-In the lemma below we show that the size of an expression strictly decreases at each step, which implies strong normalisation.
-
-```
-size-down :
-  ϱ ⊢ e ↝ f →
-  ---------------
-  size e > size f
-  
-size-down ↝-Var = s≤s 0≤n
-
-size-down ↝-Add-stop = s≤s 0≤n
-size-down (↝-Add-left δ) = s≤s (<-+-left (size-down δ))
-size-down {e = e + _} (↝-Add-right δ) = s≤s (<-+-right {n = size e} (size-down δ))
-
-size-down ↝-Mul-stop = s≤s 0≤n
-size-down (↝-Mul-left δ) = s≤s (<-+-left (size-down δ))
-size-down {e = e · _} (↝-Mul-right δ) = s≤s (<-+-right {n = size e} (size-down δ))
-
-size-down ↝-Let-stop = s≤s 0≤n
-size-down (↝-Let-1 δ) = s≤s (size-down δ)
-size-down (↝-Let-2 δ) = s≤s (<-+-left (size-down δ))
-```
-
-In the two "right" cases we need to give some extra hint for one implicit parameter.
-
-# Big-steps operational semantics
-
-```
-infix 4 _,_⇒_
-data _,_⇒_ : AExp → Env → ℕ → Set where
-
-  ⇒-Num :
-    -------------
-    Num n , ϱ ⇒ n
-
-  ⇒-Var :
-    ---------------
-    Var x , ϱ ⇒ ϱ x
-
-  ⇒-Add :
-    e , ϱ ⇒ m →
-    f , ϱ ⇒ n →
-    ------------------
-    e + f , ϱ ⇒ m +ℕ n
-
-  ⇒-Mul :
-    e , ϱ ⇒ m →
-    f , ϱ ⇒ n →
-    ------------------
-    e · f , ϱ ⇒ m ·ℕ n
-
-  ⇒-Let :
-    e , ϱ ⇒ m →
-    f , ϱ [ x ↦ m ] ⇒ n →
-    ---------------------
-    Let x e f , ϱ ⇒ n
-```
-
-Example derivation:
-
-```
-x0 = 0
-e0 = Let x0 ($ 2 + $ 3) (` x0 · $ 2) 
-
-_ : e0 , ϱ0 ⇒ 10
-_ = BEGIN
-    have $ 2 , ϱ0 ⇒ 2                               by ⇒-Num
-    have $ 3 , ϱ0 ⇒ 3                               by ⇒-Num
-    have $ 2 + $ 3 , ϱ0 ⇒ 5                         apply ⇒-Add at back 1 , here
-
-    have ` x0 , ϱ0 [ x0 ↦ 5 ] ⇒ 5                   by ⇒-Var
-    have $ 2 , ϱ0 [ x0 ↦ 5 ] ⇒ 2                    by ⇒-Num
-    have (` x0 · $ 2) , ϱ0 [ x0 ↦ 5 ] ⇒ 10          apply ⇒-Mul at back 1 , here
-
-    have Let x0 ($ 2 + $ 3) (` x0 · $ 2) , ϱ0 ⇒ 10  apply ⇒-Let at back 3 , here
-    END
-```
-
-## Evaluator (interpreter)
-
-Luckily we can automatically produce the derivations as in the previous example.
-
-```
-eval : ∀ e ϱ → ∃[ n ] e , ϱ ⇒ n
-
-eval ($ n) ϱ = n , ⇒-Num
-
-eval (` x) ϱ = ϱ x , ⇒-Var
-
-eval (e + f) ϱ
-  with eval e ϱ | eval f ϱ
-... | m , δ | n , σ = m +ℕ n , ⇒-Add δ σ
-
-eval (e · f) ϱ
-  with eval e ϱ | eval f ϱ
-... | m , δ | n , σ = m ·ℕ n , ⇒-Mul δ σ
-
-eval (Let x e f) ϱ
-  with eval e ϱ
-... | m , δ 
-  with eval f (ϱ [ x ↦ m ])
-... | n , σ = n , ⇒-Let δ σ
-```
-
-```
-_ : e0 , ϱ0 ⇒ 10
-_ = dsnd (eval e0 ϱ0)
-```
-
-## Evaluation is deterministic
-
-```
-⇒-det :
-  e , ϱ ⇒ m →
-  e , ϱ ⇒ n →
-  -----------
-  m ≡ n
-
-⇒-det ⇒-Num ⇒-Num = refl
-⇒-det ⇒-Var ⇒-Var = refl
-⇒-det (⇒-Add x x₁) (⇒-Add y y₁)
-    with ⇒-det x y | ⇒-det x₁ y₁
-... | refl | refl = refl
-⇒-det (⇒-Mul x x₁) (⇒-Mul y y₁)
-    with ⇒-det x y | ⇒-det x₁ y₁
-... | refl | refl = refl
-⇒-det (⇒-Let ⇒₁-e ⇒₁-f) (⇒-Let ⇒₂-e ⇒₂-f)
-    with ⇒-det ⇒₁-e ⇒₂-e
-... | refl
-    with ⇒-det ⇒₁-f ⇒₂-f
-... | refl = refl
-```
-
-Note that in the `⇒-Let` case we cannot perform the two with-abstractions in parallel because in order to apply the second one `⇒-det ⇒₁-f ⇒₂-f`
-we need the result of the first one.
-
-## Agreement of the semantics
-
-The following lemma shows that the big-steps operational semantics agrees with the denotational semantics.
-
-```
-⇒-agree-⟦⟧ : e , ϱ ⇒ ⟦ e ⟧ ϱ
-⇒-agree-⟦⟧ {Num x} = ⇒-Num
-⇒-agree-⟦⟧ {Var x} = ⇒-Var
-⇒-agree-⟦⟧ {Add e e₁} = ⇒-Add ⇒-agree-⟦⟧ ⇒-agree-⟦⟧ 
-⇒-agree-⟦⟧ {Mul e e₁} = ⇒-Mul ⇒-agree-⟦⟧ ⇒-agree-⟦⟧ 
-⇒-agree-⟦⟧ {Let x e f} = ⇒-Let ⇒-agree-⟦⟧ ⇒-agree-⟦⟧
-```
-
-## Contextual equivalence
-
-We say that two arithmetic expression are *contextually equivalent* if they provide the same result whenever they are plugged in the same context.
+# Free variables
 
 ```
 fv : AExp → VarName *
@@ -577,28 +191,13 @@ vars (` x) = [ x ]
 vars (e + f) = fv e ++ fv f
 vars (e · f) = fv e ++ fv f
 vars (Let x e f) = [ x ] ++ fv e ++ fv f
+```
 
--- fresh : AExp → VarName
--- fresh = {!   !}
+# Substitution
 
--- fresh2 : AExp → AExp → VarName
--- fresh2 = {!   !}
+We say that two arithmetic expression are *contextually equivalent* if they provide the same result whenever they are plugged in the same context.
 
--- fresh-lemma : ∀ e → fresh e ~∈ vars e
--- fresh-lemma = {!   !}
-
--- fresh2-lemma : ∀ e f → fresh2 e f ~∈ vars e × fresh2 e f ~∈ vars f
--- fresh2-lemma = {!   !}
-
--- rename : AExp → VarName → VarName → AExp
--- rename e x y = {!   !}
-
--- refresh : AExp → AExp → AExp
--- refresh e g = {!   !}
-
--- refresh-lemma : let e′ = refresh e g in sem e ≡ sem e′ × vars e′ ∩ vars g ≡ ε
--- refresh-lemma = {!   !}
-
+```
 infix 101 _A[_↦_]
 _A[_↦_] : AExp → VarName → AExp → AExp
 
@@ -620,14 +219,12 @@ Let y e f A[ x ↦ g ]
 ... | no _ = Let y e′ (f A[ x ↦ g ]) -- in general this is incorrect since free variables in g may get captured
 ```
 
-## Substitution facts
+Substitution facts:
 
 ```
 subs-Let-1 : ∀ x e → Let x e f A[ x ↦ g ] ≡ Let x (e A[ x ↦ g ]) f
 subs-Let-1 x e = {!   !}
 ```
-
-## Substitution lemma
 
 This is correct only if no free occurrence of `x` in `e` falls under a let binding a variable `y` which is free in `g`.
 This is captured by `g AdmissibleFor x In e`.
@@ -781,12 +378,12 @@ subst-lemma g x ϱ (Let-3 e f x≢y yNFg adm-e adm-f) = {!   !}
 -- ... | yes y∈g = {!   !}
 ```
 
+# Contextual equivalence and full abstraction
+
 ```
-_≈_ : ∀ e f → Set
+private _≈_ : ∀ e f → Set
 e ≈ f = ∀ c x ϱ → ⟦ c A[ x ↦ e ] ⟧ ϱ ≡ ⟦ c A[ x ↦ f ] ⟧ ϱ
 ```
-
-## Full abstraction
 
 There is nothing else beside the numerical value an expression has.
 
@@ -821,6 +418,608 @@ full-abstraction-2 {e} {f} ⟦e⟧≡⟦f⟧ (Let y c d) x ϱ
 
 full-abstraction : e ≈ f ↔ ∀[ ϱ ] ⟦ e ⟧ ϱ ≡ A⟦ f ⟧ ϱ
 full-abstraction = full-abstraction-1 , full-abstraction-2
+```
+
+# Small-steps operational semantics
+
+## Global environment
+
+We use global environments and eager semantics.
+
+```
+infix 4 _⊢_↝_
+data _⊢_↝_ : Env → AExp → AExp → Set where
+
+  ↝-Var : ϱ ⊢ ` x ↝ $ ϱ x
+
+  ↝-Add-stop :
+    ϱ ⊢ $ m + $ n ↝ $ (m +ℕ n)
+
+  ↝-Add-left :
+    ϱ ⊢ e ↝ e′ →
+    ------------------
+    ϱ ⊢ e + f ↝ e′ + f
+
+  ↝-Add-right :
+    ϱ ⊢ f ↝ f′ →
+    ------------------
+    ϱ ⊢ e + f ↝ e + f′
+
+  ↝-Mul-stop :
+    ϱ ⊢ $ m · $ n ↝ $ (m ·ℕ n)
+
+  ↝-Mul-left :
+    ϱ ⊢ e ↝ e′ →
+    ------------------
+    ϱ ⊢ e · f ↝ e′ · f
+
+  ↝-Mul-right :
+    ϱ ⊢ f ↝ f′ →
+    ------------------
+    ϱ ⊢ e · f ↝ e · f′
+
+  ↝-Let-stop :
+    ϱ ⊢ Let x ($ m) ($ n) ↝ $ n
+
+  ↝-Let-1 :
+    ϱ [ x ↦ m ] ⊢ f ↝ f′ →
+    ----------------------------------
+    ϱ ⊢ Let x ($ m) f ↝ Let x ($ m) f′
+
+  ↝-Let-2 :
+    ϱ ⊢ e ↝ e′ →
+    --------------------------
+    ϱ ⊢ Let x e f ↝ Let x e′ f
+```
+
+### Preservation
+
+```
+preservation :
+  ϱ ⊢ e ↝ f →
+  -----------------
+  ⟦ e ⟧ ϱ ≡ ⟦ f ⟧ ϱ
+
+preservation ↝-Var = refl
+
+preservation ↝-Add-stop = refl
+preservation (↝-Add-left step) rewrite preservation step = refl
+preservation (↝-Add-right step) rewrite preservation step = refl
+
+preservation ↝-Mul-stop = refl
+preservation (↝-Mul-left step) rewrite preservation step = refl
+preservation (↝-Mul-right step) rewrite preservation step = refl
+
+preservation ↝-Let-stop = refl
+preservation (↝-Let-1 step) rewrite preservation step = refl
+preservation (↝-Let-2 step) rewrite preservation step = refl
+```
+
+### Transitive closure
+
+We define the transitive closure of the small-step operational semantics.
+
+```
+data _⊢_↝*_ : Env → AExp → AExp → Set where
+
+    stop : ϱ ⊢ e ↝* e
+
+    one : ϱ ⊢ e ↝ f →
+          ϱ ⊢ f ↝* g →
+          ----------
+          ϱ ⊢ e ↝* g
+```
+
+We can indeed show that `_⊢_↝*_` is transitive with a standard induction.
+
+```
+↝*-trans :
+  ϱ ⊢ e ↝* f →
+  ϱ ⊢ f ↝* g →
+  ----------
+  ϱ ⊢ e ↝* g
+
+↝*-trans stop δ = δ
+↝*-trans (one step δ₁) δ₂ = one step (↝*-trans δ₁ δ₂)
+```
+
+An easy induction based on !ref(preservation) shows that the denotational semantics is preserved by the transitive closure of the small-step operational semantics.
+
+```
+preservation* :
+  ϱ ⊢ e ↝* f →
+  -----------------
+  ⟦ e ⟧ ϱ ≡ ⟦ f ⟧ ϱ
+
+preservation* {ϱ} {e} {.e} stop = refl
+preservation* {ϱ} {e} {g} (one {f = f} step der) =
+    begin
+        ⟦ e ⟧ ϱ ≡⟨ preservation {ϱ} {e} {f} step ⟩
+        ⟦ f ⟧ ϱ ≡⟨ preservation* {ϱ} {f} {g} der ⟩
+        ⟦ g ⟧ ϱ
+    ∎
+```
+
+This immediately implies that whenever the small-step semantics terminates producing a number `m`,
+then this is the right result.
+
+```
+↝*-agree-⟦⟧ :
+  ϱ ⊢ e ↝* $ m →
+  --------------
+  m ≡ ⟦ e ⟧ ϱ
+
+↝*-agree-⟦⟧ der = sym (preservation* der)
+```
+
+### Deterministic values
+
+Notice that small-step semantics is a non-deterministic relation:
+In general there may be several ways to reduce an expression
+(as witnessed by the rules `↝-Add-left` and `↝-Add-right` for instance).
+
+However, as an immediate consequence of preservation
+we have that if two numerical values are eventually produced,
+then they necessarily are the same number.
+
+```
+↝*-det :
+  ϱ ⊢ e ↝* Num m →
+  ϱ ⊢ e ↝* Num n →
+  -----------------
+  m ≡ n
+
+↝*-det der1 der2 rewrite sym (preservation* der1) | preservation* der2 = refl
+```
+
+### Congruence
+
+We show that the transitive closure `_⊢_↝*_` respects subexpressions.
+
+```
+add-cong-1 :
+  ϱ ⊢ e ↝* e′ →
+  -------------------
+  ϱ ⊢ e + f ↝* e′ + f
+
+add-cong-1 stop = stop
+add-cong-1 (one x d) = one (↝-Add-left x) (add-cong-1 d)
+
+add-cong-2 :
+  ϱ ⊢ f ↝* f′ →
+  -------------------
+  ϱ ⊢ e + f ↝* e + f′
+
+add-cong-2 stop = stop
+add-cong-2 (one x d) = one (↝-Add-right x) (add-cong-2 d)
+
+mul-cong-1 :
+  ϱ ⊢ e ↝* e′ →
+  -------------------
+  ϱ ⊢ e · f ↝* e′ · f
+
+mul-cong-1 stop = stop
+mul-cong-1 (one x d) = one (↝-Mul-left x) (mul-cong-1 d)
+
+mul-cong-2 :
+  ϱ ⊢ f ↝* f′ →
+  -------------------
+  ϱ ⊢ e · f ↝* e · f′
+
+mul-cong-2 stop = stop
+mul-cong-2 (one x d) = one (↝-Mul-right x) (mul-cong-2 d)
+
+let-cong-1 :
+  ϱ ⊢ e ↝* e′ →
+  ----------------------------
+  ϱ ⊢ Let x e f ↝* Let x e′ f
+
+let-cong-1 stop = stop
+let-cong-1 (one x d) = one (↝-Let-2 x) (let-cong-1 d)
+
+let-cong-2 :
+  ϱ [ x ↦ m ] ⊢ f ↝* f′ →
+  -----------------------------------
+  ϱ ⊢ Let x ($ m) f ↝* Let x ($ m) f′
+
+let-cong-2 stop = stop
+let-cong-2 (one x d) = one (↝-Let-1 x) (let-cong-2 d)
+```
+
+### Relational reasoning
+
+We introduce some syntactic sugaring to conveniently write chains of small steps.
+
+```
+infixr 2 _↝*⟨⟩_ _↝*⟨_⟩_ _↝⟨_⟩_ 
+infix  3 _↝*∎
+
+_↝*⟨⟩_ : ∀ {ϱ} e {f} → ϱ ⊢ e ↝* f → ϱ ⊢ e ↝* f
+e ↝*⟨⟩ e↝*f = e↝*f
+
+_↝*⟨_⟩_ : ∀ {ϱ} e {f g} → ϱ ⊢ e ↝* f → ϱ ⊢ f ↝* g → ϱ ⊢ e ↝* g
+e ↝*⟨ e↝*f ⟩ f↝*g = ↝*-trans e↝*f f↝*g
+
+_↝⟨_⟩_ : ∀ {ϱ} e {f g} → ϱ ⊢ e ↝ f → ϱ ⊢ f ↝* g → ϱ ⊢ e ↝* g
+e ↝⟨ e↝f ⟩ f↝*g = e ↝*⟨ one e↝f stop ⟩ f↝*g 
+
+_↝*∎ : ∀ e → ϱ ⊢ e ↝* e
+e ↝*∎ = stop
+```
+
+### **Exercise**: Termination (Weak normalisation)
+
+So far we have shown that the small-step semantics produces the right result,
+*if it produces any result at all*.
+In fact, an operational semantics that never reaches a Numerical value
+trivially satisfies this condition.
+
+We prove that the small step operational semantics can always reache some numerical value after a finite number of steps.
+In other word, we prove below that the rewrite is *weakly normalising*.
+
+```
+weak-normalisation : ∀ e → ϱ ⊢ e ↝* $ (⟦ e ⟧ ϱ)
+
+weak-normalisation ($ n) = stop
+
+weak-normalisation (` x) = one ↝-Var stop
+
+weak-normalisation {ϱ} (e + f)
+  with weak-normalisation e | weak-normalisation f
+... | de | df = 
+  e + f ↝*⟨ add-cong-1 de ⟩
+  ($ (⟦ e ⟧ ϱ)) + f ↝*⟨ add-cong-2 df ⟩
+  ($ (⟦ e ⟧ ϱ)) + ($ (⟦ f ⟧ ϱ)) ↝⟨ ↝-Add-stop ⟩
+  $ (⟦ e ⟧ ϱ +ℕ ⟦ f ⟧ ϱ)
+  ↝*∎
+
+weak-normalisation {ϱ} (e · f)
+  with weak-normalisation e | weak-normalisation f
+... | de | df = 
+  e · f ↝*⟨ mul-cong-1 de ⟩
+  ($ (⟦ e ⟧ ϱ)) · f ↝*⟨ mul-cong-2 df ⟩
+  ($ (⟦ e ⟧ ϱ)) · ($ (⟦ f ⟧ ϱ)) ↝⟨ ↝-Mul-stop ⟩
+  $ (⟦ e ⟧ ϱ ·ℕ ⟦ f ⟧ ϱ)
+  ↝*∎
+
+weak-normalisation {ϱ} (Let x e f)
+  with weak-normalisation e | weak-normalisation f
+... | de | df =
+    Let x e f ↝*⟨ let-cong-1 de ⟩
+    Let x ($ (⟦ e ⟧ ϱ)) f ↝*⟨ let-cong-2 df ⟩
+    Let x ($ (⟦ e ⟧ ϱ)) ($ (⟦ f ⟧ (ϱ [ x ↦ ⟦ e ⟧ ϱ ])))
+        ↝⟨ ↝-Let-stop ⟩
+    $ (⟦ f ⟧ (ϱ [ x ↦ ⟦ e ⟧ ϱ ]))
+    ↝*∎
+```
+
+### **Exercise**: Strong normalisation
+
+The termination property above is also called *weak normalisation*,
+which means that there exists a finite reduction sequence `e ↝* f`
+reaching a normal form (i.e. a value) `f ≡ Num m`.
+We show below even *strong normalisation*, namely,
+*every* reduction sequence starting from `e` is finite.
+
+To this end, we introduce a notion of *size* of arithmetic expressions.
+
+```
+size : AExp → ℕ
+size (Num x) = 0
+size (Var x) = 1
+size (Add e f) = 1 +ℕ size e +ℕ size f
+size (Mul e f) = 1 +ℕ size e +ℕ size f
+size (Let x e f) = 1 +ℕ size e +ℕ size f
+```
+
+In the lemma below we show that the size of an expression strictly decreases at each step, which implies strong normalisation.
+
+```
+size-down :
+  ϱ ⊢ e ↝ f →
+  ---------------
+  size e > size f
+  
+size-down ↝-Var = s≤s 0≤n
+
+size-down ↝-Add-stop = s≤s 0≤n
+size-down (↝-Add-left δ) = s≤s (<-+-left (size-down δ))
+size-down {e = e + _} (↝-Add-right δ) = s≤s (<-+-right {n = size e} (size-down δ))
+
+size-down ↝-Mul-stop = s≤s 0≤n
+size-down (↝-Mul-left δ) = s≤s (<-+-left (size-down δ))
+size-down {e = e · _} (↝-Mul-right δ) = s≤s (<-+-right {n = size e} (size-down δ))
+
+size-down ↝-Let-stop = s≤s 0≤n
+size-down (↝-Let-1 δ) = s≤s (size-down δ)
+size-down (↝-Let-2 δ) = s≤s (<-+-left (size-down δ))
+```
+
+In the two "right" cases we need to give some extra hint for one implicit parameter.
+
+## Local environments
+
+An alternative way to deal with the environment is to use it in a local way.
+However this causes troubles.
+The naive way to write the derivation rules is incorrect:
+
+```
+infix 4 _,_↝_,_
+data _,_↝_,_ : AExp → Env → AExp → Env → Set where
+
+  ↝-Var : ` x , ϱ ↝ $ ϱ x , ϱ
+
+  ↝-Add-stop :
+    $ m + $ n , ϱ ↝ $ (m +ℕ n) , ϱ
+
+  ↝-Add-left :
+    e , ϱ ↝ e′ , ϱ′ →
+    -----------------------
+    e + f , ϱ ↝ e′ + f , ϱ′
+
+  ↝-Add-right :
+    f , ϱ ↝ f′ , ϱ′ →
+    ------------------
+    e + f , ϱ ↝ e + f′ , ϱ′
+
+  ↝-Let-stop :
+    Let x ($ m) ($ n) , ϱ ↝ $ n , ϱ
+
+  ↝-Let-1 :
+    f , ϱ [ x ↦ m ] ↝ f′ , ϱ′ →
+    ---------------------------------------
+    Let x ($ m) f , ϱ ↝ Let x ($ m) f′ , ϱ′
+
+  ↝-Let-2 :
+    e , ϱ ↝ e′ , ϱ′ →
+    ------------------------------
+    Let x e f , ϱ ↝ Let x e′ f , ϱ′
+```
+
+One option would be to add a new construct in the language `e then x is n` to save and restore the previous value of `x`.
+
+# Big-steps operational semantics
+
+```
+infix 4 _,_⇒_
+data _,_⇒_ : AExp → Env → ℕ → Set where
+
+  ⇒-Num :
+    -------------
+    Num n , ϱ ⇒ n
+
+  ⇒-Var :
+    ---------------
+    Var x , ϱ ⇒ ϱ x
+
+  ⇒-Add :
+    e , ϱ ⇒ m →
+    f , ϱ ⇒ n →
+    ------------------
+    e + f , ϱ ⇒ m +ℕ n
+
+  ⇒-Mul :
+    e , ϱ ⇒ m →
+    f , ϱ ⇒ n →
+    ------------------
+    e · f , ϱ ⇒ m ·ℕ n
+
+  ⇒-Let :
+    e , ϱ ⇒ m →
+    f , ϱ [ x ↦ m ] ⇒ n →
+    ---------------------
+    Let x e f , ϱ ⇒ n
+```
+
+Example derivation:
+
+```
+x0 = 0
+e0 = Let x0 ($ 2 + $ 3) (` x0 · $ 2) 
+
+_ : e0 , ϱ0 ⇒ 10
+_ = BEGIN
+    have $ 2 , ϱ0 ⇒ 2                               by ⇒-Num
+    have $ 3 , ϱ0 ⇒ 3                               by ⇒-Num
+    have $ 2 + $ 3 , ϱ0 ⇒ 5                         apply ⇒-Add at back 1 , here
+
+    have ` x0 , ϱ0 [ x0 ↦ 5 ] ⇒ 5                   by ⇒-Var
+    have $ 2 , ϱ0 [ x0 ↦ 5 ] ⇒ 2                    by ⇒-Num
+    have (` x0 · $ 2) , ϱ0 [ x0 ↦ 5 ] ⇒ 10          apply ⇒-Mul at back 1 , here
+
+    have Let x0 ($ 2 + $ 3) (` x0 · $ 2) , ϱ0 ⇒ 10  apply ⇒-Let at back 3 , here
+    END
+```
+
+## Evaluator (interpreter)
+
+Luckily we can automatically produce the derivations as in the previous example.
+
+```
+eval : ∀ e ϱ → ∃[ n ] e , ϱ ⇒ n
+
+eval ($ n) ϱ = n , ⇒-Num
+
+eval (` x) ϱ = ϱ x , ⇒-Var
+
+eval (e + f) ϱ
+  with eval e ϱ | eval f ϱ
+... | m , δ | n , σ = m +ℕ n , ⇒-Add δ σ
+
+eval (e · f) ϱ
+  with eval e ϱ | eval f ϱ
+... | m , δ | n , σ = m ·ℕ n , ⇒-Mul δ σ
+
+eval (Let x e f) ϱ
+  with eval e ϱ
+... | m , δ 
+  with eval f (ϱ [ x ↦ m ])
+... | n , σ = n , ⇒-Let δ σ
+```
+
+```
+_ : e0 , ϱ0 ⇒ 10
+_ = dsnd (eval e0 ϱ0)
+```
+
+## Evaluation is deterministic
+
+```
+⇒-det :
+  e , ϱ ⇒ m →
+  e , ϱ ⇒ n →
+  -----------
+  m ≡ n
+
+⇒-det ⇒-Num ⇒-Num = refl
+⇒-det ⇒-Var ⇒-Var = refl
+⇒-det (⇒-Add x x₁) (⇒-Add y y₁)
+    with ⇒-det x y | ⇒-det x₁ y₁
+... | refl | refl = refl
+⇒-det (⇒-Mul x x₁) (⇒-Mul y y₁)
+    with ⇒-det x y | ⇒-det x₁ y₁
+... | refl | refl = refl
+⇒-det (⇒-Let ⇒₁-e ⇒₁-f) (⇒-Let ⇒₂-e ⇒₂-f)
+    with ⇒-det ⇒₁-e ⇒₂-e
+... | refl
+    with ⇒-det ⇒₁-f ⇒₂-f
+... | refl = refl
+```
+
+Note that in the `⇒-Let` case we cannot perform the two with-abstractions in parallel because in order to apply the second one `⇒-det ⇒₁-f ⇒₂-f`
+we need the result of the first one.
+
+## Agreement of the semantics
+
+The following lemma shows that the big-steps operational semantics agrees with the denotational semantics.
+
+```
+⇒-agree-⟦⟧ : e , ϱ ⇒ ⟦ e ⟧ ϱ
+⇒-agree-⟦⟧ {Num x} = ⇒-Num
+⇒-agree-⟦⟧ {Var x} = ⇒-Var
+⇒-agree-⟦⟧ {Add e e₁} = ⇒-Add ⇒-agree-⟦⟧ ⇒-agree-⟦⟧ 
+⇒-agree-⟦⟧ {Mul e e₁} = ⇒-Mul ⇒-agree-⟦⟧ ⇒-agree-⟦⟧ 
+⇒-agree-⟦⟧ {Let x e f} = ⇒-Let ⇒-agree-⟦⟧ ⇒-agree-⟦⟧
+```
+
+# Binary numbers
+
+## LSD
+
+```
+data LSD : Set where
+  $ : LSD
+  _𝟬 : LSD → LSD
+  _𝟭 : LSD → LSD
+```
+
+Semantics according to least significant digit (LSD)
+
+```
+LSD⟦_⟧ : LSD → ℕ
+LSD⟦ $ ⟧ = 0
+LSD⟦ x 𝟬 ⟧ = 2 ·ℕ LSD⟦ x ⟧
+LSD⟦ x 𝟭 ⟧ = suc (2 ·ℕ LSD⟦ x ⟧)
+```
+
+Example:
+
+```
+_ : LSD⟦ $ 𝟬 𝟭 𝟭 𝟬 ⟧ ≡ 6
+_ = refl
+```
+
+## MSD
+
+```
+data MSD : Set where
+  $ : MSD
+  𝟬_ : MSD → MSD
+  𝟭_ : MSD → MSD
+```
+
+Semantics according to most significant digit (MSD).
+This won't work:
+
+```
+-- MSD⟦_⟧ : MSD → ℕ
+-- MSD⟦ x ⟧ = {!   !}
+```
+
+A possible solution: Additionally remember the number of digits (second component).
+
+```
+MSD⟦_⟧ : MSD → ℕ × ℕ
+MSD⟦ $ ⟧ = 0 , 0
+MSD⟦ 𝟬 x ⟧
+  with MSD⟦ x ⟧
+... | n , k = n , suc k
+
+MSD⟦ 𝟭 x ⟧
+  with MSD⟦ x ⟧
+... | n , k = n +ℕ 2 ^ k , suc k
+```
+
+Example:
+
+```
+_ : MSD⟦ 𝟬 𝟭 𝟭 𝟬 $ ⟧ ≡ 6 , 4 
+_ = refl
+```
+
+## Agreement of LSD and MSD
+
+```
+push-𝟬 push-𝟭 : MSD → MSD
+push-𝟬 $ = 𝟬 $
+push-𝟬 (𝟬 x) = 𝟬 (push-𝟬 x)
+push-𝟬 (𝟭 x) = 𝟭 (push-𝟬 x)
+
+push-𝟭 $ = 𝟭 $
+push-𝟭 (𝟬 x) = 𝟬 (push-𝟭 x)
+push-𝟭 (𝟭 x) = 𝟭 (push-𝟭 x)
+
+-- this type was copied-pasted and abstracted from the goal in push-𝟬-lemma  before the last rewrite
+aux-𝟬 : ∀ m n → m +ℕ (m +ℕ 0) +ℕ (n +ℕ (n +ℕ zero)) ≡ m +ℕ n +ℕ (m +ℕ n +ℕ 0)
+aux-𝟬 = solve-∀
+
+push-𝟬-lemma : ∀ x → let n , k = MSD⟦ x ⟧ in MSD⟦ push-𝟬 x ⟧ ≡ 2 ·ℕ n , suc k
+push-𝟬-lemma $ = refl
+push-𝟬-lemma (𝟬 x) rewrite push-𝟬-lemma x = refl
+push-𝟬-lemma (𝟭 x)
+  rewrite push-𝟬-lemma x |
+          aux-𝟬 (fst MSD⟦ x ⟧) (2 ^ snd MSD⟦ x ⟧) = refl
+
+aux-𝟭 : ∀ m n → suc (m +ℕ (m +ℕ 0) +ℕ (n +ℕ (n +ℕ zero))) ≡ suc (m +ℕ n +ℕ (m +ℕ n +ℕ 0))
+aux-𝟭 = solve-∀
+
+push-𝟭-lemma : ∀ x → let n , k = MSD⟦ x ⟧ in MSD⟦ push-𝟭 x ⟧ ≡ suc (2 ·ℕ n) , suc k
+push-𝟭-lemma $ = refl
+push-𝟭-lemma (𝟬 x) rewrite push-𝟭-lemma x = refl
+push-𝟭-lemma (𝟭 x)
+  rewrite push-𝟭-lemma x |
+          aux-𝟭 (fst MSD⟦ x ⟧) (2 ^ snd MSD⟦ x ⟧) = refl
+
+LSD2MSD : LSD → MSD
+LSD2MSD $ = $
+LSD2MSD (x 𝟬) = push-𝟬 (LSD2MSD x)
+LSD2MSD (x 𝟭) = push-𝟭 (LSD2MSD x) 
+
+LSD-MSD-agree : ∀ x → LSD⟦ x ⟧ ≡ fst MSD⟦ LSD2MSD x ⟧
+
+LSD-MSD-agree $ = refl
+
+LSD-MSD-agree (x 𝟬)
+  with LSD-MSD-agree x
+... | ind
+  rewrite push-𝟬-lemma (LSD2MSD x) |
+          sym ind = refl
+
+LSD-MSD-agree (x 𝟭)
+  with LSD-MSD-agree x
+... | ind
+  rewrite push-𝟭-lemma (LSD2MSD x) |
+          sym ind = refl
 ```
 
 # Binary expressions
@@ -999,7 +1198,7 @@ binSize (a + b) = 1 +ℕ binSize a +ℕ binSize b
       suc (suc (suc (suc (suc (a +ℕ suc (suc (suc (suc b))))))))
   magic = {! solve-∀ !}
 
-  goal : suc (suc (suc (suc (suc (μ a₁ +ℕ μ b₁ +ℕ 4))))) ≤
+  goal : suc (suc (suc (suc (suc (μ a₁ +ℕ μ b₁ +ℕ 4))))) ≤ℕ
          suc (suc (suc (suc (suc (μ a₁ +ℕ suc (suc (suc (suc (μ b₁)))))))))
   goal rewrite magic (μ a₁) (μ b₁) = refl-≤
 ```
@@ -1085,6 +1284,6 @@ triple-mon {a 𝟭 + b 𝟭} ↝+𝟭𝟭 = left goal where
   have : ∀ a b → suc (a +ℕ b +ℕ 1) ≡ suc (a +ℕ suc b)
   have = {! solve-∀ !}
 
-  goal : suc (ones a +ℕ ones b +ℕ 1) ≤ suc (ones a +ℕ suc (ones b))
+  goal : suc (ones a +ℕ ones b +ℕ 1) ≤ℕ suc (ones a +ℕ suc (ones b))
   goal rewrite have (ones a) (ones b) = refl-≤
 ```

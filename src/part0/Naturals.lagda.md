@@ -227,7 +227,11 @@ test x0 x y z p0 p q =
 ~n<n {zero} = λ ()
 ~n<n {suc n} q with ~n<n {n}
 ... | p = p (suc-≤ q)
+```
 
+# Addition
+
+```
 -- infixl 11 _+_
 
 -- _+_ : ℕ → ℕ → ℕ
@@ -384,4 +388,17 @@ ex₅ = solve 2 (λ m n → m :* (n :+ con 0) :=  n :* m) refl
 open import Data.Nat.Tactic.RingSolver public
 _ : ∀ m n → m * (n + 0) ≡ n * m
 _ = solve-∀
+```
+
+# Exponentiation
+
+```
+infixl 100 _^_
+_^_ : ℕ → ℕ → ℕ
+0 ^ 0 = 0
+(suc _) ^ 0 = 1
+m ^ suc n = m * m ^ n
+
+_ : 2 ^ 5 ≡ 32
+_ = refl
 ```
