@@ -201,8 +201,34 @@ loop-⊥ (⇒-while-tt _ ⇒-skip δ) = loop-⊥ δ
 loop-⊥ (⇒-while-ff ⟦tt⟧s≡ff) = tt≡ff-elim ⟦tt⟧s≡ff
 ```
 
-# Small-steps operational semantics
+## Behavioural equivalence
 
+Two programs `c`, `d` are *behaviourally equivalent*, written `c ∼ d`, if they relate the same set of initial and final states:
+
+```
+infix 10 _∼_
+_∼_ : (c d : Cmd) → Set
+c ∼ d = ∀[ s ] ∀[ s′ ] c , s ⇒ s′ ↔ d , s ⇒ s′
+
+sym-∼ : c ∼ d → d ∼ c
+sym-∼ c∼d s s′ with c∼d s s′
+... | have0 , have1 = have1 , have0
+```
+
+Examples:
+
+```
+skip-⨟-id-left : ∀ c → skip ⨟ c ∼ c
+skip-⨟-id-left c s s′ = (λ{ (⇒-seq ⇒-skip δ) → δ}) , λ δ → ⇒-seq ⇒-skip δ
+
+skip-⨟-id-right : ∀ c → c ⨟ skip ∼ c
+skip-⨟-id-right c s s′ = (λ{ (⇒-seq δ ⇒-skip) → δ}) , λ δ → ⇒-seq δ ⇒-skip
+
+assoc-⨟ : ∀ c d e → (c ⨟ d) ⨟ e ∼ c ⨟ (d ⨟ e)
+assoc-⨟ c d e s s′ = {!   !} , {!   !}
+```
+
+# Small-steps operational semantics
 
 We provide an alternative small-steps semantics for imperative programs.
 
@@ -693,18 +719,9 @@ contextApply (while b do: C) d = while b do: contextApply C d
 Contexual equivalence:
 
 ```
-_∼_ : (c d : Cmd) → Set
-c ∼ d = ∀[ s ] ∀[ s′ ] c , s ⇒ s′ ↔ d , s ⇒ s′
-
-sym-∼ : c ∼ d → d ∼ c
-sym-∼ c∼d s s′ with c∼d s s′
-... | have0 , have1 = have1 , have0
-
 _≈_ : (c d : Cmd) → Set
 c ≈ d = ∀ C → contextApply C c ∼ contextApply C d
 ```
-
-## Full abstraction
 
 Preliminary facts:
 
@@ -769,15 +786,15 @@ fa-ite-left C Cc∼Cd (⇒-if-ff ⟦b⟧s≡ff δ)
 The natural semantics is fully abstract:
 
 ```
-fullAbstraction-1 : c ≈ d → c ∼ d
-fullAbstraction-1 c≈d = c≈d □
+congruence-1 : c ≈ d → c ∼ d
+congruence-1 c≈d = c≈d □
 
-fullAbstraction-2 : c ∼ d → c ≈ d
+congruence-2 : c ∼ d → c ≈ d
 
-fullAbstraction-2 c∼d □ s s′ = c∼d s s′
+congruence-2 c∼d □ s s′ = c∼d s s′
 
-fullAbstraction-2 {c} {d} c∼d (C ⨟-left c′) s s′
-    with fullAbstraction-2 c∼d C
+congruence-2 {c} {d} c∼d (C ⨟-left c′) s s′
+    with congruence-2 c∼d C
 ... | ind = goal0 , goal1 where
 
   goal0 : contextApply C c ⨟ c′ , s ⇒ s′ → contextApply C d ⨟ c′ , s ⇒ s′
@@ -786,20 +803,20 @@ fullAbstraction-2 {c} {d} c∼d (C ⨟-left c′) s s′
   goal1 : contextApply C d ⨟ c′ , s ⇒ s′ → contextApply C c ⨟ c′ , s ⇒ s′
   goal1 = fa-⨟-left C (sym-∼ ind)
 
-fullAbstraction-2 c∼d (c ⨟-right C) s s′
-  with fullAbstraction-2 c∼d C
+congruence-2 c∼d (c ⨟-right C) s s′
+  with congruence-2 c∼d C
 ... | ind = fa-⨟-right C ind , fa-⨟-right C (sym-∼ ind)
 
-fullAbstraction-2 {c} {d} c∼d (if-left b then C else c′) s s′
-    with fullAbstraction-2 c∼d C
+congruence-2 {c} {d} c∼d (if-left b then C else c′) s s′
+    with congruence-2 c∼d C
 ... | ind = fa-ite-right C ind , fa-ite-right C (sym-∼ ind)
 
-fullAbstraction-2 {c} {d} c∼d (if-right b then c′ else C) s s′
-    with fullAbstraction-2 c∼d C
+congruence-2 {c} {d} c∼d (if-right b then c′ else C) s s′
+    with congruence-2 c∼d C
 ... | ind = fa-ite-left C ind , fa-ite-left C (sym-∼ ind)
 
-fullAbstraction-2 {c} {d} c∼d (while b do: C) s s′
-  with fullAbstraction-2 c∼d C
+congruence-2 {c} {d} c∼d (while b do: C) s s′
+  with congruence-2 c∼d C
 ... | ind = goal0 , goal1 where
 
   goal0 : (while b do: contextApply C c) , s ⇒ s′ →
@@ -810,8 +827,8 @@ fullAbstraction-2 {c} {d} c∼d (while b do: C) s s′
           (while b do: contextApply C c) , s ⇒ s′
   goal1 = fa-while C (sym-∼ ind)
   
-fullAbstraction : c ≈ d ↔ c ∼ d
-fullAbstraction = fullAbstraction-1 , fullAbstraction-2
+congruence : c ≈ d ↔ c ∼ d
+congruence = congruence-1 , congruence-2
 ```
 
 # Axiomatic semantics
