@@ -32,17 +32,24 @@
 ~~~~~~~~~~~~~~~~~
 module !part().!chapter().!1 where
 open import TypeOf
-open !part().!chapter() as !chapter()
+open import !part().!chapter() renaming (!2 to !2-orig)
+~~~~~~~~~~~~~~~~~
+
+!define(standardPreamble2)
+~~~~~~~~~~~~~~~~~
+module !part().!chapter().!1 where
+open import TypeOf
+open import !part().!chapter() renaming (!2 to !2-orig; !3 to !3-orig;)
 ~~~~~~~~~~~~~~~~~
 
 !define(preamble)
 ~~~~~~~~~~~~~~~~~
-!standardPreamble(!1)
+!standardPreamble(!1)(!2)
 ~~~~~~~~~~~~~~~~~
 
 !define(preamble2)
 ~~~~~~~~~~~~~~~~~
-!standardPreamble(!1)
+!standardPreamble2(!1)(!2)(!3)
 ~~~~~~~~~~~~~~~~~
 
 // the extra newlines below are significant

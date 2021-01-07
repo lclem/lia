@@ -168,6 +168,17 @@ B⟦ e ≤ f ⟧ ρ
 
 ~~~~~~~~~~~~~~~~
 
+# Lazy semantics
+
+```
+Envˡ = VarName → AExp
+
+infix 15 ⟦_⟧ˡ_
+private ⟦_⟧ˡ_ : AExp → Envˡ → ℕ
+⟦ e ⟧ˡ ϱ = ?
+
+```
+
 # Free variables
 
 ```
