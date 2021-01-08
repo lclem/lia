@@ -13,7 +13,7 @@ infixr 20 _⨟_
 infix 25 _≔_
 ```
 
-# Syntax of programs 
+# Syntax of programs
 
 We define a simple imperative language,
 leveraging on arithmetic and boolean expressions defined above.
@@ -536,18 +536,20 @@ in the richer setting offered by `_↝*_#_`.
 (Also `⨟-lemma-1` can be generalised to `_↝*_#_`,
 but we won′t need it here.)
 
-
 ```
 ⨟-lemma-2 : ∀ {c d s s′ m} →
+  -----------------------------
   c ⨟ d , s ↝* skip , s′ # m →
   ∃[ s′′ ] ∃[ m1 ] ∃[ m2 ]
       c , s ↝* skip , s′′ # m1 ×
       d , s′′ ↝* skip , s′ # m2 ×
       suc (m1 +ℕ m2) ≡ m
+
 ⨟-lemma-2 (one (↝-seq-left step) ↝-der)
     with ⨟-lemma-2 ↝-der
 ... | s′′ , m1 , m2 , der1 , der2 , m1+m2≡n =
     s′′ , suc m1 , m2 , one step der1 , der2 , cong suc m1+m2≡n
+    
 ⨟-lemma-2 {s = s} (one {n = n} ↝-seq-right ↝-der) =
     s , 0 , n , stop , ↝-der , refl
 ```
@@ -615,8 +617,8 @@ we recursively call `small→big` on the subcomputations
 ```
  go (c ⨟ d) s s′ (suc m) ↝*-der (acc a)
      with ⨟-lemma-2 ↝*-der
- ... | s′′ , m1 , m2 , ↝*-der1 , ↝*-der2 , _
-     with go c s s′′ m1 ↝*-der1 (a m1 {!   !}) | go d s′′ s′ m2 ↝*-der2 {!   !}
+ ... | s′′ , m1 , m2 , ↝*-der1 , ↝*-der2 , eq rewrite sym eq
+     with go c s s′′ m1 ↝*-der1 (a m1 (s≤s mon-≤-left)) | go d s′′ s′ m2 ↝*-der2 (a m2 (s≤s mon-≤-right))
  ... | ⇒-der1 | ⇒-der2 = ⇒-seq ⇒-der1 ⇒-der2
 ```
 

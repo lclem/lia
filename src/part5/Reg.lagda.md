@@ -6,8 +6,8 @@ title: "Regular programs 🚧"
 {-# OPTIONS --allow-unsolved-metas #-}
 module part5.Reg where
 open import part0.index hiding (AExp; A⟦_⟧; _*)
-open import part5.Exp using (VarName; AExp; BExp; ¬_; B⟦_⟧_; A⟦_⟧_)
-open import part5.Imp hiding (⇒-det; ↝*-trans; _↝*⟨⟩_; _↝⟨_⟩_; _↝*⟨_⟩_)
+open import part5.Exp using (VarName; AExp; BExp; ¬_; B⟦_⟧_; A⟦_⟧_; _+ℕ_)
+open import part5.Imp hiding (⇒-det; ↝*-trans; _↝*⟨⟩_; _↝⟨_⟩_; _↝*⟨_⟩_; ⨟-lemma-2; ⨟-lemma-1)
 ```
 
 ```
@@ -30,6 +30,7 @@ Small-steps operational semantics:
 ```
 private
   variable
+    m n k : ℕ
     x : VarName
     e : AExp
     b : BExp
@@ -166,20 +167,143 @@ imp2reg-lemma-1 (⇒-while-ff {b = b} {s = s} ⟦b⟧s≡ff) = seq-0 star-stop ,
   ¬𝔹⟦b⟧s≡tt : ¬𝔹 B⟦ b ⟧ s ≡ tt
   ¬𝔹⟦b⟧s≡tt rewrite ⟦b⟧s≡ff = refl
 
--- imp2reg-lemma-2′ : ∀ {c} →
---   imp2reg c , s ⇝  s′ →
---   ---------------------
---   c , s ↝  s′
+-- infix 3 _,_⇝**_,_
+-- data _,_⇝**_,_ : Reg → State → Reg → State → Set where
 
-imp2reg-lemma-2 : ∀ {c} →
-  imp2reg c , s ⇝* s′ →
-  ---------------------
+--   stop : c , s ⇝ right s′ →
+--          ------------------
+--          c , s ⇝** c , s′
+
+--   step : c , s ⇝ left (c′ , s′) →
+--          c′ , s′ ⇝** c″ , s″ →
+--          ------------------------
+--          c , s ⇝** c″ , s″
+
+-- imp2reg-lemma-2′ : ∀ {c c′} →
+--   imp2reg c , s ⇝** imp2reg c′ , s′ →
+--   -----------------------------------
+--   c , s ↝ c′ , s′
+
+-- imp2reg-lemma-2′ = {!   !}
+
+infix 3 _,_⇝*_#_
+data _,_⇝*_#_ : Reg → State → State → ℕ → Set where
+
+  stop : c , s ⇝ right s′ →
+         ------------------
+         c , s ⇝* s′ # 0
+
+  step : c , s ⇝ left (c′ , s′) →
+         c′ , s′ ⇝* s″ # n →
+         ------------------------
+         c , s ⇝* s″ # suc n
+
+pattern _# δ = stop δ
+pattern _,,_ δ₀ δ₁ = step δ₀ δ₁
+
+remove-gas : c , s ⇝* s′ # n → c , s ⇝* s′
+remove-gas δ = {!   !}
+
+add-gas : c , s ⇝* s′ → ∃[ n ] c , s ⇝* s′ # n
+add-gas δ = {!   !}
+```
+
+The following lemma is analogous to !remoteRef(part5)(Imp)(⨟-lemma-2)
+
+```
+⨟-lemma-2 :
+  c ⨟ d , s ⇝* s′ # m →
+  -------------------------
+  ∃[ s″ ] ∃[ m1 ] ∃[ m2 ]
+      c , s ⇝* s″ # m1 ×
+      d , s″ ⇝* s′ # m2 ×
+      suc (m1 +ℕ m2) ≡ m
+
+⨟-lemma-2 (seq-0 δ₀ ,, δ) = _ , 0 , _ , δ₀ # , δ , refl
+
+⨟-lemma-2 (seq-1 δ₀ ,, δ)
+  with ⨟-lemma-2 δ
+... | s″ , m₁ , m₂ , δ₁ , δ₂ , m1+m2≡n =
+      s″ , suc m₁ , m₂ , (δ₀ ,, δ₁) , δ₂ , cong suc m1+m2≡n
+```
+
+Quantitative transitivity:
+
+```
+⨟-lemma-1 :
+  c , s ⇝* s″ # m →
+  d , s″ ⇝* s′ # n →
+  -----------------------------
+  c ⨟ d , s ⇝* s′ # suc (m + n)
+
+⨟-lemma-1 (δ₀ #) δ₁ = seq-0 δ₀ ,, δ₁
+⨟-lemma-1 (δ ,, δ₀) δ₁
+  with ⨟-lemma-1 δ₀ δ₁
+... | δ₂ = seq-1 δ ,, δ₂
+
+-- ⨟-lemma-1 stop der2 = one ↝-seq-right der2
+-- ⨟-lemma-1 {c} {d} {s} {s′} {s′′} (one {y = c′ , s′′′} der0 der1) der2
+--     with ⨟-lemma-1 der1 der2
+-- ... | der = start
+--               c ⨟ d , s ↝⟨ ↝-seq-left der0 ⟩
+--               c′ ⨟ d , s′′′ ↝*⟨ der ⟩
+--               skip , s′ 
+--             end
+```
+
+```
+imp2reg-lemma-2 : ∀ c →
+  imp2reg c , s ⇝* s′ # n →
+  -------------------------
   c , s ⇒ s′
 
-imp2reg-lemma-2 δ = {!   !}
+-- imp2reg-lemma-2 skip (ε #) = ⇒-skip
+-- imp2reg-lemma-2 (x ≔ e) (assign #) = ⇒-assign
+-- imp2reg-lemma-2 (c ⨟ d) δ = {!   !}
+-- imp2reg-lemma-2 (if x then c else c₁) δ = {!   !}
+-- imp2reg-lemma-2 (while x do: c) δ = {!   !}
+
+imp2reg-lemma-2 {n = n} c δ = go c δ (<-wf n) where
+
+  go : ∀ c {n} →
+    imp2reg c , s ⇝* s′ # n →
+    Acc _<_ n →
+    -------------------------
+    c , s ⇒ s′
+
+  go skip (ε #) (acc a) = ⇒-skip
+
+  go (x ≔ e) (assign #) (acc a) = ⇒-assign
+
+  go (c ⨟ d) δ (acc a)
+    with ⨟-lemma-2 δ
+  ... | s‶ , m₁ , m₂ , δ₁ , δ₂ , eq rewrite sym eq
+    with go c δ₁ (a m₁ (s≤s mon-≤-left)) |
+         go d δ₂ (a m₂ (s≤s mon-≤-right))
+  ... | ⇒-der1 | ⇒-der2 = ⇒-seq ⇒-der1 ⇒-der2
+
+  go (if b then c else _) (or-left ,, seq-0 (test ⟦b⟧s≡tt) ,, δ) (acc a)
+    with go c δ (a _ n<suc2n)
+  ... | ⇒-der = ⇒-if-tt ⟦b⟧s≡tt ⇒-der
+
+  go (if b then _ else d) (or-right ,, seq-0 (test ⟦¬b⟧s≡tt) ,, δ) (acc a)
+    with go d δ (a _ n<suc2n)
+  ... | ⇒-der = ⇒-if-ff (¬𝔹-tt-ff ⟦¬b⟧s≡tt) ⇒-der where
+
+  go (while b do: c) (seq-0 star-stop ,, test ⟦¬b⟧s≡tt #) (acc a) = ⇒-while-ff (¬𝔹-tt-ff ⟦¬b⟧s≡tt)
+  
+  go (while b do: c) (seq-1 star-step ,, seq-1 (seq-1 (seq-0 (test ⟦b⟧s≡tt))) ,, δ) (acc a)
+    with ⨟-lemma-2 δ 
+  ... | s‶ , m₁ , m₂ , δ₁ , δ₂ , eq -- rewrite sym eq
+    with ⨟-lemma-2 δ₁
+  ... | s‷  , m₃ , m₄ , δ₃ , δ₄ , eq′
+    rewrite sym eq | sym eq′
+    with go c δ₃ (a _ (s≤s {!   !})) |
+         go _ (⨟-lemma-1 δ₄ δ₂) (a _ (s≤s (s≤s {!   !})))
+  ... | ⇒-der1 | ⇒-der2 = ⇒-while-tt ⟦b⟧s≡tt ⇒-der1 ⇒-der2
 
 imp2reg-lemma : ∀ {c} → c , s ⇒ s′ ↔ imp2reg c , s ⇝* s′
-imp2reg-lemma = imp2reg-lemma-1 , imp2reg-lemma-2
+imp2reg-lemma = imp2reg-lemma-1 , λ δ → let _ , δ′ = add-gas δ in imp2reg-lemma-2 _ δ′
 ```
 
 Notice that neither direction of the simulation is sufficient alone.

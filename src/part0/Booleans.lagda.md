@@ -21,6 +21,10 @@ In this section we introduce *Boolean values*.
 data 𝔹 : Set where
   ff : 𝔹
   tt : 𝔹
+
+private
+  variable
+    a b : 𝔹
 ```
 
 Erasure:
@@ -211,6 +215,12 @@ push¬⇔𝔹 ff ff = refl
 ```
 
 ## Basic properties
+
+```
+¬𝔹-tt-ff : ¬𝔹 a ≡ tt → a ≡ ff
+¬𝔹-tt-ff {ff} _ = refl
+¬𝔹-tt-ff {tt} ()
+```
 
 ### Idempotence
 

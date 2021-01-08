@@ -255,9 +255,14 @@ postulate sucm+n≡m+sucn : {m n : ℕ} → suc m + n ≡ m + suc n
 suc-lemma : m + suc n ≡ suc m + n -- the commuting variant of the above
 suc-lemma = {!   !}
 
-≤+ : ∀ {m n} → m ≤ m + n
+≤+ mon-≤-left : ∀ {m n} → m ≤ m + n
 ≤+ {zero} {n} = 0≤n
 ≤+ {suc m} {n} = s≤s (≤+ {m} {n})
+
+mon-≤-left = ≤+
+
+mon-≤-right : ∀ {m n} → m ≤ n + m
+mon-≤-right = {!   !}
 
 -- infixl 12 _*_
 
