@@ -8,7 +8,6 @@ module part5.Reg where
 open import part5.Exp hiding (_↝_; _,_⇒_; ⇒-det; ↝*-trans; _↝*⟨⟩_; _↝⟨_⟩_; _↝*⟨_⟩_; _,_↝_,_; _*)
 ```
 
-
 ```
 data Reg : Set where
   ε : Reg
