@@ -12,6 +12,7 @@ open import part5.Imp hiding (⇒-det; ↝*-trans; _↝*⟨⟩_; _↝⟨_⟩_; _
 
 ```
 data Reg : Set where
+  𝕠 : Reg
   ε : Reg
   _≔_ : VarName → AExp → Reg
   _?? : BExp → Reg
@@ -37,6 +38,8 @@ private
 
 infix 10 _,_⇝_
 data _,_⇝_ : Reg → State → Reg × State ⊎ State → Set where
+
+  -- notice there is no rule for 𝕠!
 
   ε : ---------------
       ε , s ⇝ right s
@@ -178,3 +181,9 @@ imp2reg-lemma-2 δ = {!   !}
 imp2reg-lemma : ∀ {c} → c , s ⇒ s′ ↔ imp2reg c , s ⇝* s′
 imp2reg-lemma = imp2reg-lemma-1 , imp2reg-lemma-2
 ```
+
+Notice that neither direction of the simulation is sufficient alone.
+For instance, if we only required the "only if" direction,
+then we could define `imp2reg c` to be any regular program that nondeterministically can reach an arbitrary state.
+And if we only required the "if" direction,
+then we could define `imp2reg c` to be a regular program that does not reach any state at all (such as !ref(Reg)(𝕠) or `ff ??`).
