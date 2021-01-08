@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Continuations 🚧 | Logic in Agda</title><!-- Begin Jekyll SEO tag v2.6.1 -->
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Continuations 🚧" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Propositional and fist-order logic developed with the proof assistant Agda." />
+<meta property="og:description" content="Propositional and fist-order logic developed with the proof assistant Agda." />
+<link rel="canonical" href="/lia/part5/Continuations/" />
+<meta property="og:url" content="/lia/part5/Continuations/" />
+<meta property="og:site_name" content="Logic in Agda" />
+<script type="application/ld+json">
+{"url":"/lia/part5/Continuations/","@type":"WebPage","description":"Propositional and fist-order logic developed with the proof assistant Agda.","headline":"Continuations 🚧","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/lia/assets/main.css">
+
+  <!-- <link rel="stylesheet" href="/lia/assets/custom.css"> --><!-- Mathjax Support -->
+  <script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+  <!-- Load KaTeX -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1.1/katex.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1.1/katex.min.js"></script>
+
+<script type="text/x-thebe-config">
+  {
+    bootstrap: true,
+    requestKernel: true,
+    runAllCells: false,
+    selector: "[data-executable]",
+    predefinedOutput: false,
+    codeMirrorConfig: {
+        //theme: "idea",
+        language: "agda",
+        readOnly: false,
+        lineNumbers: true,
+        keyMap: "default",
+//        gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
+    },
+    kernelOptions: {
+        name: "agda",
+        kernelName: "agda",
+        path: "src/",
+        loadFromStore: true,
+        persistent: false,
+        // notebook server configuration; not needed with binder
+        serverSettings: {
+              baseUrl: "http://127.0.0.1:8888",
+              token: "test-secret",
+            },
+    },
+    binderOptions: {
+      repo: "lclem/lia", // need to put here the actual github repo (if it is a fork)
+      ref: "main",
+      binderUrl: "https://mybinder.org",
+      repoProvider: "github",
+      savedSession: {
+        enabled: true,
+        maxAge: 86400, // the max age in seconds to consider re-using a session
+        storagePrefix: "thebe-binder-lia-"
+      },
+    },
+  }
+</script>
+
+<!-- <script type="text/javascript" src="https://unpkg.com/thebelab@latest"></script> -->
+
+<!-- our own version of the thebe library: -->
+<script type="text/javascript" src="/lia/thebe/lib/index.js"></script>
+
+<!-- highlighting for Agda -->
+<script src="/lia/codemirror-agda/lib/index.js"></script>
+
+</head>
+<body><header class="site-header" id="site-header">
+
+    <div class="wrapper">
+
+        <a class="site-title" href="/lia/">Logic in Agda</a>
+
+        <nav class="site-nav">
+            <!-- <span class="menu-icon">
+                <svg viewBox="0 0 18 15" width="18px" height="15px">
+                    <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+                    <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+                    <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+                </svg>
+            </span> -->
+
+            <div class="trigger">
+                <a class="page-link" href="/lia/part0/index/">Part 0</a>
+                <a class="page-link" href="/lia/part1/index/">Part 1</a>
+                <a class="page-link" href="/lia/part2/index/">Part 2</a>
+                <a class="page-link" href="/lia/part3/index/">Part 3</a>
+                <a class="page-link" href="/lia/part4/index/">Part 4</a>
+                <a class="page-link" href="/lia/part5/index/">Part 5</a>
+
+                <span class="kernel-status">
+                    <button class="kernel-status-button" onclick="kernel_status_clicked()" title="kernel status"></button>
+                    <span id="kernel-messages" class="kernel-messages"></span>
+                </span>
+
+                <div id="connection_options" class="options sidebar" style="text-align: left; line-height: normal; max-width: 800px; padding: 10px; border-radius: 15px;">
+                    <!-- display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: space-between; -->
+                    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+                    <div>
+                        <label for="username" style="color: white;">User:</label>
+                        <input type="text" placeholder="github username" id="username" name="username">
+                        <label for="password" style="color: white;">Password:</label>
+                        <input type="password" placeholder="password" id="password" name="password">
+                    </div>
+                    <div>
+                        <label for="loadFromStore" style="color: white;">Load code from browser store:</label>
+                        <label class="switch" style="vertical-align: middle; margin: 10px;">
+                            <input type="checkbox" id="loadFromStore" name="loadFromStore">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div>
+                        <label for="baseUrl" style="color: white;">Base URL:</label>
+                        <input type="text" placeholder="baseUrl" id="baseUrl" name="baseUrl" value="http://127.0.0.1:8888">
+                        <label for="token" style="color: white;">Token:</label>
+                        <input type="text" placeholder="token" id="token" name="token" value="test-secret">
+                    </div>
+                    <div>
+                        <label for="useBinder" style="color: white;">Use binder:</label>
+                        <label class="switch" style="vertical-align: middle; margin: 10px;">
+                            <input type="checkbox" id="useBinder" name="useBinder">
+                            <span class="slider round"></span>
+                        </label>
+                        <label for="savedSession" style="color: white;">Reuse session:</label>
+                        <label class="switch" style="vertical-align: middle; margin: 10px;">
+                            <input type="checkbox" id="savedSession" name="savedSession">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div>
+                        <label for="repository" style="color: white;">Github repo:</label>
+                        <input type="text" placeholder="repository" id="repository" name="repository" value="">
+
+                        <label for="ref" style="color: white;">Branch:</label>
+                        <input type="text" placeholder="ref" id="ref" name="ref" value="main">
+
+                        <label for="binderUrl" style="color: white;">Binder URL:</label>                        
+                        <input type="text" placeholder="binderUrl" id="binderUrl" name="binderUrl" value="https://mybinder.org">
+                    </div>
+                </div>
+
+                <span class="control-container" id="control-container">
+                    <svg class="progress-ring" id="progress-ring" width="30" height="30" title="exercise progress" onclick="kernel_status_clicked()">
+                        <circle
+                            id="progress-circle"
+                            class="progress-ring__circle"
+                            stroke="black"
+                            stroke-width="2.5"
+                            fill="transparent"
+                            r="14"
+                            cx="15"
+                            cy="15"/>
+                        <circle
+                            stroke="lightgray"
+                            stroke-width="0.5"
+                            fill="transparent"
+                            r="14"
+                            cx="15"
+                            cy="15"/>
+                    </svg>
+                    <div id="connection_options" class="options sidebar" style="text-align: left; line-height: normal; max-width: 800px; padding: 10px; border-radius: 15px;"></div>
+                    <span class="progress-text" id="progress-text" onclick="kernel_status_clicked()"> 0/0 </span>
+
+                    <span id="controls" class="controls">
+                        <svg version="1.1" id="run-all" class="run-all" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                            width="15" height="15" viewBox="0 0 163.861 163.861" style="enable-background:new 0 0 163.861 163.861;"
+                            xml:space="preserve">
+                            <g>
+                                <path d="M34.857,3.613C20.084-4.861,8.107,2.081,8.107,19.106v125.637c0,17.042,11.977,23.975,26.75,15.509L144.67,97.275
+                                    c14.778-8.477,14.778-22.211,0-30.686L34.857,3.613z"/>
+                            </g>
+                        </svg>
+                    </span>
+                </span>
+            </div>
+
+            <style>
+                .switch {
+                    position: relative;
+                    display: inline-block;
+                    width: 40px;
+                    height: 20px;
+                }
+
+                /* Hide default HTML checkbox */
+                .switch input {
+                    opacity: 0;
+                    width: 0;
+                    height: 0;
+                }
+
+                /* The slider */
+                .slider {
+                    position: absolute;
+                    cursor: pointer;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background-color: #ccc;
+                    -webkit-transition: .4s;
+                    transition: .4s;
+                }
+
+                .slider:before {
+                    position: absolute;
+                    content: "";
+                    height: 16px;
+                    width: 16px;
+                    left: 2px;
+                    /* right: 4px; */
+                    bottom: 2px;
+                    top: 2px;
+                    background-color: white;
+                    -webkit-transition: .4s;
+                    transition: .4s;
+                }
+
+                input:checked + .slider {
+                    background-color: #2196F3;
+                }
+
+                input:focus + .slider {
+                    box-shadow: 0 0 1px #2196F3;
+                }
+
+                input:checked + .slider:before {
+                    -webkit-transform: translateX(18px);
+                    -ms-transform: translateX(18px);
+                    transform: translateX(18px);
+                }
+
+                /* Rounded sliders */
+                .slider.round {
+                    border-radius: 30px;
+                }
+
+                .slider.round:before {
+                border-radius: 50%;
+                }
+
+                .sidebar input[type=text] {
+                    padding: 6px;
+                    margin-top: 8px;
+                    /* font-size: 17px; */
+                    border: none;
+                    /* width: 150px; */
+                }
+
+                .sidebar {
+                    /* height: 100%; */
+                    width: 0;
+                    position: fixed;
+                    z-index: 1000;
+                    top: 0;
+                    right: 20px;
+                    background-color: rgba(17, 17, 17, 0.637);
+                    /* overflow-x: hidden; */
+                    transition: 0.5s;
+                    padding-top: 60px;
+                    display: none;
+                    margin-top: 60px;
+                }
+
+                .sidebar .closebtn {
+                    position: absolute;
+                    color: white;
+                    top: 0;
+                    right: 10px;
+                    font-size: 24px;
+                    margin-left: 20px;
+                }
+
+                .progress-ring, .run-all {
+                    vertical-align: middle;
+                }
+
+                .control-container {
+                    transition: all .2s ease-in-out;
+                }
+
+                .controls {
+                    display: none;
+                    opacity: 0;
+                    margin-right: 10px;
+                    transition: all .5s ease-in-out;
+                }
+
+                .run-all:hover {
+                    filter: brightness(135%);
+                }
+
+                .progress-ring__circle {
+                    transition: 0.35s stroke-dashoffset;
+                    transform: rotate(-90deg);
+                    transform-origin: 50% 50%;
+                    visibility: hidden;
+                }
+
+                .progress-text {
+                    position: relative;
+                    top: 0;
+                    left: -25px;
+                    font-size: 8px;
+                    vertical-align: middle;
+                    align-self: center;
+                }
+
+                .progress-text:hover, .progress-ring:hover, .progress-ring__circle:hover, .run-all {
+                    cursor: pointer;
+                }
+            </style>
+
+            <script>
+
+                //  var storedUsername = localStorage.getItem("username");
+                //  localStorage.setItem("username", storedUsername.value);
+            
+                function doStore(input, key) {
+
+                    if(input.type == "checkbox") {
+                        var checked = localStorage.getItem(key);
+
+                        if (checked == "yes") {
+                            localStorage.setItem(key, "no");
+                        }
+                        else {
+                            localStorage.setItem(key, "yes");
+                        }
+
+                        console.info("checked: ", localStorage.getItem(key));
+                    }
+                    else {
+                        console.info("value: ", input.value);
+                        localStorage.setItem(key, input.value);
+                    }
+                }
+
+                function persistInput(input) {
+                    var key = "input-" + input.id;
+                    var storedValue = localStorage.getItem(key);
+                
+                    console.info("Persisting input: ", input);
+                
+                    // if there is a stored value, use it
+                    if (storedValue) {
+
+                        if(input.type != "password") {
+                            console.info("restoring value ", storedValue, " for ", input);
+                        }
+
+                        if(input.type == "checkbox") {
+                            if(storedValue=="yes") {
+                                input.setAttribute("checked", "");
+                            }
+                            else {
+                                input.removeAttribute("checked");
+                            }
+                        }
+                        else {
+                            input.value = storedValue;
+                        }
+                    }
+                    // if there is no stored value, store the current value
+                    else {
+                        doStore(input, key);
+                    }
+
+                    input.addEventListener('input', function () {
+                        console.info("input changed: key = ", key, "; value = ", input);
+                        doStore(input, key);
+                    });
+                    }
+                
+                    persistInput(document.getElementById("username"));
+                    persistInput(document.getElementById("password"));
+
+                    persistInput(document.getElementById("loadFromStore"));
+
+                    persistInput(document.getElementById("baseUrl"));
+                    persistInput(document.getElementById("token"));
+
+                    persistInput(document.getElementById("useBinder"));
+                    persistInput(document.getElementById("savedSession"));
+                    persistInput(document.getElementById("repository"));
+                    persistInput(document.getElementById("ref"));
+                    persistInput(document.getElementById("binderUrl"));
+
+                    // init
+                    document.getElementById("connection_options").style.display = "none";
+
+                    function kernel_status_clicked() {
+                
+                        console.info("Clicked kernel status");
+
+                        document.getElementById("kernel-messages").style.display = "none";
+
+                        document.getElementById("connection_options").style.width = "750px";
+                        document.getElementById("connection_options").style.display = "block";
+                        //document.getElementById("header").style.marginLeft = "250px";
+
+                    }
+
+                    function closeNav() {
+
+                        document.getElementById("kernel-messages").style.display = "inline";
+
+                        document.getElementById("connection_options").style.width = "0";
+                        document.getElementById("connection_options").style.display = "none";
+                        //document.getElementById("header").style.marginLeft= "0";
+                    }
+
+                var prevScrollpos = window.pageYOffset;
+                var header = document.getElementById("site-header");
+                var boxShadow = header.style.boxShadow;
+
+                window.onscroll = function() {
+                    var currentScrollPos = window.pageYOffset;
+                    // detect scroll down
+                    if (prevScrollpos > currentScrollPos) {
+                        header.style.top = "0";
+                        header.style.boxShadow = boxShadow;
+                        prevScrollpos = currentScrollPos;
+                    } else if (prevScrollpos <= currentScrollPos) {
+                        header.style.top = "-55px";
+                        header.style.boxShadow = "none"
+                        prevScrollpos = currentScrollPos;
+                    }
+                }
+
+            let control_container = document.getElementById("control-container");
+            let controls = document.getElementById("controls");
+
+            control_container.addEventListener("mouseenter", function(event) {
+                controls.style.display = "inline";
+//                controls.style.visibility = "visible";
+                controls.style.opacity = 1;
+                console.info("mouseenter");
+            }, false);
+
+            control_container.addEventListener("mouseleave", function(event) {
+                // controls.style.visibility = "hidden";
+                // controls.style.display = "none";
+                controls.style.opacity = 0;
+                console.info("mouseleave");
+            }, false);
+
+            </script>
+            
+        </nav>
+
+    </div>
+
+</header><main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post">
+
+    <header class="post-header">
+        <h1 class="post-title">Continuations 🚧</h1>
+    </header>
+  
+    <header class="nav-header">
+    <p style="text-align:center;">
+        
+        
+        
+        <a alt="Part" href="/lia/part5/index/">Part</a>
+        &bullet;
+        
+        
+        <a alt="Source code" href="https://github.com/lclem/lia/blob/main/src/part5/Continuations.lagda.md">Source</a>
+        
+        
+        
+    </p>
+</header>
+
+  
+    <div class="post-content">
+        <h2>Contents</h2>    
+        <ul id="toc" class="section-nav">
+<li class="toc-entry toc-h1"><a href="#references">References</a></li>
+</ul><pre class="Agda"><a id="39" class="Symbol">{-#</a> <a id="43" class="Keyword">OPTIONS</a> <a id="51" class="Pragma">--allow-unsolved-metas</a> <a id="74" class="Symbol">#-}</a>
+<a id="78" class="Keyword">module</a> <a id="85" href="/lia/part5/Continuations/" class="Module">part5.Continuations</a> <a id="105" class="Keyword">where</a>
+<a id="111" class="Keyword">open</a> <a id="116" class="Keyword">import</a> <a id="123" href="/lia/part0/index/" class="Module">part0.index</a> <a id="135" class="Keyword">hiding</a> <a id="142" class="Symbol">(</a><a id="143" href="/lia/part0/Naturals/#6982" class="Datatype">AExp</a><a id="147" class="Symbol">;</a> <a id="149" href="/lia/part0/Naturals/#7093" class="Function Operator">A⟦_⟧</a><a id="153" class="Symbol">;</a> <a id="155" href="/lia/part0/List/#23605" class="Function Operator">_≈_</a><a id="158" class="Symbol">;</a> <a id="160" href="/lia/part0/List/#31344" class="Datatype Operator">_⊑_</a><a id="163" class="Symbol">)</a> <a id="165" class="Keyword">renaming</a> <a id="174" class="Symbol">(</a><a id="175" href="/lia/part0/Naturals/#266" class="Primitive Operator">_+_</a> <a id="179" class="Symbol">to</a> <a id="Nat._+_"></a><a id="182" href="/lia/part5/Continuations/#182" class="Primitive Operator">_+ℕ_</a><a id="186" class="Symbol">;</a> <a id="188" href="/lia/part0/Naturals/#288" class="Primitive Operator">_*_</a> <a id="192" class="Symbol">to</a> <a id="Nat._*_"></a><a id="195" href="/lia/part5/Continuations/#195" class="Primitive Operator">_·ℕ_</a><a id="199" class="Symbol">;</a> <a id="201" href="/lia/part0/Naturals/#798" class="Datatype Operator">_≤_</a> <a id="205" class="Symbol">to</a> <a id="_≤_"></a><a id="208" href="/lia/part5/Continuations/#208" class="Datatype Operator">_≤ℕ_</a><a id="212" class="Symbol">)</a> <a id="214" class="Keyword">public</a></pre>
+<pre class="Agda"><a id="factorial"></a><a id="230" href="/lia/part5/Continuations/#230" class="Function">factorial</a> <a id="240" class="Symbol">:</a> <a id="242" href="/lia/part0/Naturals/#301" class="Function">ℕ</a> <a id="244" class="Symbol">→</a> <a id="246" href="/lia/part0/Naturals/#301" class="Function">ℕ</a>
+<a id="248" href="/lia/part5/Continuations/#230" class="Function">factorial</a> <a id="258" class="Number">0</a> <a id="260" class="Symbol">=</a> <a id="262" class="Number">0</a>
+<a id="264" href="/lia/part5/Continuations/#230" class="Function">factorial</a> <a id="274" class="Symbol">(</a><a id="275" href="Agda.Builtin.Nat.html#223" class="InductiveConstructor">suc</a> <a id="279" href="/lia/part5/Continuations/#279" class="Bound">n</a><a id="280" class="Symbol">)</a> <a id="282" class="Symbol">=</a> <a id="284" href="Agda.Builtin.Nat.html#223" class="InductiveConstructor">suc</a> <a id="288" href="/lia/part5/Continuations/#279" class="Bound">n</a> <a id="290" href="/lia/part5/Continuations/#195" class="Primitive Operator">·ℕ</a> <a id="293" href="/lia/part5/Continuations/#230" class="Function">factorial</a> <a id="303" href="/lia/part5/Continuations/#279" class="Bound">n</a>
+
+<a id="factorial-cont"></a><a id="306" href="/lia/part5/Continuations/#306" class="Function">factorial-cont</a> <a id="321" class="Symbol">:</a> <a id="323" href="/lia/part0/Naturals/#301" class="Function">ℕ</a> <a id="325" class="Symbol">→</a> <a id="327" class="Symbol">(</a><a id="328" href="/lia/part0/Naturals/#301" class="Function">ℕ</a> <a id="330" class="Symbol">→</a> <a id="332" href="/lia/part0/Naturals/#301" class="Function">ℕ</a><a id="333" class="Symbol">)</a> <a id="335" class="Symbol">→</a> <a id="337" href="/lia/part0/Naturals/#301" class="Function">ℕ</a>
+<a id="339" href="/lia/part5/Continuations/#306" class="Function">factorial-cont</a> <a id="354" class="Number">0</a> <a id="356" href="/lia/part5/Continuations/#356" class="Bound">κ</a> <a id="358" class="Symbol">=</a> <a id="360" href="/lia/part5/Continuations/#356" class="Bound">κ</a> <a id="362" class="Number">0</a>
+<a id="364" href="/lia/part5/Continuations/#306" class="Function">factorial-cont</a> <a id="379" class="Symbol">(</a><a id="380" href="Agda.Builtin.Nat.html#223" class="InductiveConstructor">suc</a> <a id="384" href="/lia/part5/Continuations/#384" class="Bound">n</a><a id="385" class="Symbol">)</a> <a id="387" href="/lia/part5/Continuations/#387" class="Bound">κ</a> <a id="389" class="Symbol">=</a> <a id="391" href="/lia/part5/Continuations/#306" class="Function">factorial-cont</a> <a id="406" href="/lia/part5/Continuations/#384" class="Bound">n</a> <a id="408" class="Symbol">(λ</a> <a id="411" href="/lia/part5/Continuations/#411" class="Bound">m</a> <a id="413" class="Symbol">→</a> <a id="415" href="/lia/part5/Continuations/#387" class="Bound">κ</a> <a id="417" class="Symbol">(</a><a id="418" href="Agda.Builtin.Nat.html#223" class="InductiveConstructor">suc</a> <a id="422" href="/lia/part5/Continuations/#384" class="Bound">n</a> <a id="424" href="/lia/part5/Continuations/#195" class="Primitive Operator">·ℕ</a> <a id="427" href="/lia/part5/Continuations/#411" class="Bound">m</a><a id="428" class="Symbol">))</a>
+
+<a id="factorial-lemma"></a><a id="432" href="/lia/part5/Continuations/#432" class="Function">factorial-lemma</a> <a id="448" class="Symbol">:</a> <a id="450" class="Symbol">∀</a> <a id="452" href="/lia/part5/Continuations/#452" class="Bound">n</a> <a id="454" class="Symbol">→</a> <a id="456" href="/lia/part5/Continuations/#230" class="Function">factorial</a> <a id="466" href="/lia/part5/Continuations/#452" class="Bound">n</a> <a id="468" href="Agda.Builtin.Equality.html#151" class="Datatype Operator">≡</a> <a id="470" href="/lia/part5/Continuations/#306" class="Function">factorial-cont</a> <a id="485" href="/lia/part5/Continuations/#452" class="Bound">n</a> <a id="487" href="/lia/part0/Utils/#311" class="Function">id</a>
+<a id="490" href="/lia/part5/Continuations/#432" class="Function">factorial-lemma</a> <a id="506" href="/lia/part5/Continuations/#506" class="Bound">n</a> <a id="508" class="Symbol">=</a> <a id="510" href="/lia/part5/Continuations/#527" class="Function">go</a> <a id="513" href="/lia/part5/Continuations/#506" class="Bound">n</a> <a id="515" href="/lia/part0/Utils/#311" class="Function">id</a> <a id="518" class="Keyword">where</a>
+
+  <a id="527" href="/lia/part5/Continuations/#527" class="Function">go</a> <a id="530" class="Symbol">:</a> <a id="532" class="Symbol">∀</a> <a id="534" href="/lia/part5/Continuations/#534" class="Bound">n</a> <a id="536" href="/lia/part5/Continuations/#536" class="Bound">κ</a> <a id="538" class="Symbol">→</a> <a id="540" href="/lia/part5/Continuations/#536" class="Bound">κ</a> <a id="542" class="Symbol">(</a><a id="543" href="/lia/part5/Continuations/#230" class="Function">factorial</a> <a id="553" href="/lia/part5/Continuations/#534" class="Bound">n</a><a id="554" class="Symbol">)</a> <a id="556" href="Agda.Builtin.Equality.html#151" class="Datatype Operator">≡</a> <a id="558" href="/lia/part5/Continuations/#306" class="Function">factorial-cont</a> <a id="573" href="/lia/part5/Continuations/#534" class="Bound">n</a> <a id="575" href="/lia/part5/Continuations/#536" class="Bound">κ</a>
+  <a id="579" href="/lia/part5/Continuations/#527" class="Function">go</a> <a id="582" href="Agda.Builtin.Nat.html#210" class="InductiveConstructor">zero</a> <a id="587" href="/lia/part5/Continuations/#587" class="Bound">κ</a> <a id="589" class="Symbol">=</a> <a id="591" href="Agda.Builtin.Equality.html#208" class="InductiveConstructor">refl</a>
+  <a id="598" href="/lia/part5/Continuations/#527" class="Function">go</a> <a id="601" class="Symbol">(</a><a id="602" href="Agda.Builtin.Nat.html#223" class="InductiveConstructor">suc</a> <a id="606" href="/lia/part5/Continuations/#606" class="Bound">n</a><a id="607" class="Symbol">)</a> <a id="609" href="/lia/part5/Continuations/#609" class="Bound">κ</a> <a id="611" class="Keyword">rewrite</a> <a id="619" href="/lia/part5/Continuations/#527" class="Function">go</a> <a id="622" href="/lia/part5/Continuations/#606" class="Bound">n</a> <a id="624" class="Symbol">(λ</a> <a id="627" href="/lia/part5/Continuations/#627" class="Bound">m</a> <a id="629" class="Symbol">→</a> <a id="631" href="/lia/part5/Continuations/#609" class="Bound">κ</a> <a id="633" class="Symbol">(</a><a id="634" href="/lia/part5/Continuations/#627" class="Bound">m</a> <a id="636" href="/lia/part5/Continuations/#182" class="Primitive Operator">+ℕ</a> <a id="639" href="/lia/part5/Continuations/#606" class="Bound">n</a> <a id="641" href="/lia/part5/Continuations/#195" class="Primitive Operator">·ℕ</a> <a id="644" href="/lia/part5/Continuations/#627" class="Bound">m</a><a id="645" class="Symbol">))</a> <a id="648" class="Symbol">=</a> <a id="650" href="Agda.Builtin.Equality.html#208" class="InductiveConstructor">refl</a></pre>
+
+<p>Exercise: Do the same for Fibonacci.</p>
+
+<pre class="Agda"><a id="fib"></a><a id="702" href="/lia/part5/Continuations/#702" class="Function">fib</a> <a id="706" class="Symbol">:</a> <a id="708" href="/lia/part0/Naturals/#301" class="Function">ℕ</a> <a id="710" class="Symbol">→</a> <a id="712" href="/lia/part0/Naturals/#301" class="Function">ℕ</a>
+<a id="714" href="/lia/part5/Continuations/#702" class="Function">fib</a> <a id="718" class="Number">0</a> <a id="720" class="Symbol">=</a> <a id="722" class="Number">0</a>
+<a id="724" href="/lia/part5/Continuations/#702" class="Function">fib</a> <a id="728" class="Number">1</a> <a id="730" class="Symbol">=</a> <a id="732" class="Number">1</a>
+<a id="734" href="/lia/part5/Continuations/#702" class="Function">fib</a> <a id="738" class="Symbol">(</a><a id="739" href="Agda.Builtin.Nat.html#223" class="InductiveConstructor">suc</a> <a id="743" class="Symbol">(</a><a id="744" href="Agda.Builtin.Nat.html#223" class="InductiveConstructor">suc</a> <a id="748" href="/lia/part5/Continuations/#748" class="Bound">n</a><a id="749" class="Symbol">))</a> <a id="752" class="Symbol">=</a> <a id="754" href="/lia/part5/Continuations/#702" class="Function">fib</a> <a id="758" class="Symbol">(</a><a id="759" href="Agda.Builtin.Nat.html#223" class="InductiveConstructor">suc</a> <a id="763" href="/lia/part5/Continuations/#748" class="Bound">n</a><a id="764" class="Symbol">)</a> <a id="766" href="/lia/part5/Continuations/#182" class="Primitive Operator">+ℕ</a> <a id="769" href="/lia/part5/Continuations/#702" class="Function">fib</a> <a id="773" href="/lia/part5/Continuations/#748" class="Bound">n</a>
+
+<a id="fib-cont"></a><a id="776" href="/lia/part5/Continuations/#776" class="Function">fib-cont</a> <a id="785" class="Symbol">:</a> <a id="787" href="/lia/part0/Naturals/#301" class="Function">ℕ</a> <a id="789" class="Symbol">→</a> <a id="791" class="Symbol">(</a><a id="792" href="/lia/part0/Naturals/#301" class="Function">ℕ</a> <a id="794" class="Symbol">→</a> <a id="796" href="/lia/part0/Naturals/#301" class="Function">ℕ</a><a id="797" class="Symbol">)</a> <a id="799" class="Symbol">→</a> <a id="801" href="/lia/part0/Naturals/#301" class="Function">ℕ</a>
+<a id="803" href="/lia/part5/Continuations/#776" class="Function">fib-cont</a> <a id="812" class="Number">0</a> <a id="814" href="/lia/part5/Continuations/#814" class="Bound">κ</a> <a id="816" class="Symbol">=</a> <a id="818" href="/lia/part5/Continuations/#814" class="Bound">κ</a> <a id="820" class="Number">0</a>
+<a id="822" href="/lia/part5/Continuations/#776" class="Function">fib-cont</a> <a id="831" class="Number">1</a> <a id="833" href="/lia/part5/Continuations/#833" class="Bound">κ</a> <a id="835" class="Symbol">=</a> <a id="837" href="/lia/part5/Continuations/#833" class="Bound">κ</a> <a id="839" class="Number">1</a> 
+<a id="842" href="/lia/part5/Continuations/#776" class="Function">fib-cont</a> <a id="851" class="Symbol">(</a><a id="852" href="Agda.Builtin.Nat.html#223" class="InductiveConstructor">suc</a> <a id="856" class="Symbol">(</a><a id="857" href="Agda.Builtin.Nat.html#223" class="InductiveConstructor">suc</a> <a id="861" href="/lia/part5/Continuations/#861" class="Bound">n</a><a id="862" class="Symbol">))</a> <a id="865" href="/lia/part5/Continuations/#865" class="Bound">κ</a> <a id="867" class="Symbol">=</a> <a id="869" href="/lia/part5/Continuations/#776" class="Function">fib-cont</a> <a id="878" class="Symbol">(</a><a id="879" href="Agda.Builtin.Nat.html#223" class="InductiveConstructor">suc</a> <a id="883" href="/lia/part5/Continuations/#861" class="Bound">n</a><a id="884" class="Symbol">)</a> <a id="886" class="Symbol">λ</a> <a id="888" href="/lia/part5/Continuations/#888" class="Bound">a</a> <a id="890" class="Symbol">→</a> <a id="892" href="/lia/part5/Continuations/#776" class="Function">fib-cont</a> <a id="901" href="/lia/part5/Continuations/#861" class="Bound">n</a> <a id="903" class="Symbol">λ</a> <a id="905" href="/lia/part5/Continuations/#905" class="Bound">b</a> <a id="907" class="Symbol">→</a> <a id="909" href="/lia/part5/Continuations/#865" class="Bound">κ</a> <a id="911" class="Symbol">(</a><a id="912" href="/lia/part5/Continuations/#888" class="Bound">a</a> <a id="914" href="/lia/part5/Continuations/#182" class="Primitive Operator">+ℕ</a> <a id="917" href="/lia/part5/Continuations/#905" class="Bound">b</a><a id="918" class="Symbol">)</a>
+
+<a id="fib-lemma"></a><a id="921" href="/lia/part5/Continuations/#921" class="Function">fib-lemma</a> <a id="931" class="Symbol">:</a> <a id="933" class="Symbol">∀</a> <a id="935" href="/lia/part5/Continuations/#935" class="Bound">n</a> <a id="937" class="Symbol">→</a> <a id="939" href="/lia/part5/Continuations/#776" class="Function">fib-cont</a> <a id="948" href="/lia/part5/Continuations/#935" class="Bound">n</a> <a id="950" href="/lia/part0/Utils/#311" class="Function">id</a> <a id="953" href="Agda.Builtin.Equality.html#151" class="Datatype Operator">≡</a> <a id="955" href="/lia/part5/Continuations/#702" class="Function">fib</a> <a id="959" href="/lia/part5/Continuations/#935" class="Bound">n</a>
+<a id="961" href="/lia/part5/Continuations/#921" class="Function">fib-lemma</a> <a id="971" href="/lia/part5/Continuations/#971" class="Bound">n</a> <a id="973" class="Symbol">=</a> <a id="975" href="/lia/part5/Continuations/#992" class="Function">go</a> <a id="978" href="/lia/part5/Continuations/#971" class="Bound">n</a> <a id="980" href="/lia/part0/Utils/#311" class="Function">id</a> <a id="983" class="Keyword">where</a>
+
+  <a id="992" href="/lia/part5/Continuations/#992" class="Function">go</a> <a id="995" class="Symbol">:</a> <a id="997" class="Symbol">∀</a> <a id="999" href="/lia/part5/Continuations/#999" class="Bound">n</a> <a id="1001" href="/lia/part5/Continuations/#1001" class="Bound">κ</a> <a id="1003" class="Symbol">→</a> <a id="1005" href="/lia/part5/Continuations/#776" class="Function">fib-cont</a> <a id="1014" href="/lia/part5/Continuations/#999" class="Bound">n</a> <a id="1016" href="/lia/part5/Continuations/#1001" class="Bound">κ</a> <a id="1018" href="Agda.Builtin.Equality.html#151" class="Datatype Operator">≡</a> <a id="1020" href="/lia/part5/Continuations/#1001" class="Bound">κ</a> <a id="1022" class="Symbol">(</a><a id="1023" href="/lia/part5/Continuations/#702" class="Function">fib</a> <a id="1027" href="/lia/part5/Continuations/#999" class="Bound">n</a><a id="1028" class="Symbol">)</a>
+  <a id="1032" href="/lia/part5/Continuations/#992" class="Function">go</a> <a id="1035" href="Agda.Builtin.Nat.html#210" class="InductiveConstructor">zero</a> <a id="1040" href="/lia/part5/Continuations/#1040" class="Bound">κ</a> <a id="1042" class="Symbol">=</a> <a id="1044" href="Agda.Builtin.Equality.html#208" class="InductiveConstructor">refl</a>
+  <a id="1051" href="/lia/part5/Continuations/#992" class="Function">go</a> <a id="1054" class="Symbol">(</a><a id="1055" href="Agda.Builtin.Nat.html#223" class="InductiveConstructor">suc</a> <a id="1059" href="Agda.Builtin.Nat.html#210" class="InductiveConstructor">zero</a><a id="1063" class="Symbol">)</a> <a id="1065" href="/lia/part5/Continuations/#1065" class="Bound">κ</a> <a id="1067" class="Symbol">=</a> <a id="1069" href="Agda.Builtin.Equality.html#208" class="InductiveConstructor">refl</a>
+  <a id="1076" href="/lia/part5/Continuations/#992" class="Function">go</a> <a id="1079" class="Symbol">(</a><a id="1080" href="Agda.Builtin.Nat.html#223" class="InductiveConstructor">suc</a> <a id="1084" class="Symbol">(</a><a id="1085" href="Agda.Builtin.Nat.html#223" class="InductiveConstructor">suc</a> <a id="1089" href="/lia/part5/Continuations/#1089" class="Bound">n</a><a id="1090" class="Symbol">))</a> <a id="1093" href="/lia/part5/Continuations/#1093" class="Bound">κ</a>
+    <a id="1099" class="Keyword">rewrite</a> <a id="1107" href="/lia/part5/Continuations/#992" class="Function">go</a> <a id="1110" class="Symbol">(</a><a id="1111" href="Agda.Builtin.Nat.html#223" class="InductiveConstructor">suc</a> <a id="1115" href="/lia/part5/Continuations/#1089" class="Bound">n</a><a id="1116" class="Symbol">)</a> <a id="1118" class="Symbol">(λ</a> <a id="1121" href="/lia/part5/Continuations/#1121" class="Bound">a</a> <a id="1123" class="Symbol">→</a> <a id="1125" href="/lia/part5/Continuations/#776" class="Function">fib-cont</a> <a id="1134" href="/lia/part5/Continuations/#1089" class="Bound">n</a> <a id="1136" class="Symbol">(λ</a> <a id="1139" href="/lia/part5/Continuations/#1139" class="Bound">b</a> <a id="1141" class="Symbol">→</a> <a id="1143" href="/lia/part5/Continuations/#1093" class="Bound">κ</a> <a id="1145" class="Symbol">(</a><a id="1146" href="/lia/part5/Continuations/#1121" class="Bound">a</a> <a id="1148" href="/lia/part5/Continuations/#182" class="Primitive Operator">+ℕ</a> <a id="1151" href="/lia/part5/Continuations/#1139" class="Bound">b</a><a id="1152" class="Symbol">)))</a> <a id="1156" class="Symbol">|</a>
+            <a id="1170" href="/lia/part5/Continuations/#992" class="Function">go</a> <a id="1173" href="/lia/part5/Continuations/#1089" class="Bound">n</a> <a id="1175" class="Symbol">(λ</a> <a id="1178" href="/lia/part5/Continuations/#1178" class="Bound">b</a> <a id="1180" class="Symbol">→</a> <a id="1182" href="/lia/part5/Continuations/#1093" class="Bound">κ</a> <a id="1184" class="Symbol">(</a><a id="1185" href="/lia/part5/Continuations/#702" class="Function">fib</a> <a id="1189" class="Symbol">(</a><a id="1190" href="Agda.Builtin.Nat.html#223" class="InductiveConstructor">suc</a> <a id="1194" href="/lia/part5/Continuations/#1089" class="Bound">n</a><a id="1195" class="Symbol">)</a> <a id="1197" href="/lia/part5/Continuations/#182" class="Primitive Operator">+ℕ</a> <a id="1200" href="/lia/part5/Continuations/#1178" class="Bound">b</a><a id="1201" class="Symbol">))</a> <a id="1204" class="Symbol">=</a> <a id="1206" href="Agda.Builtin.Equality.html#208" class="InductiveConstructor">refl</a></pre>
+
+<p>Alternative order of evaluation:</p>
+
+<pre class="Agda"><a id="fib-cont2"></a><a id="1254" href="/lia/part5/Continuations/#1254" class="Function">fib-cont2</a> <a id="1264" class="Symbol">:</a> <a id="1266" href="/lia/part0/Naturals/#301" class="Function">ℕ</a> <a id="1268" class="Symbol">→</a> <a id="1270" class="Symbol">(</a><a id="1271" href="/lia/part0/Naturals/#301" class="Function">ℕ</a> <a id="1273" class="Symbol">→</a> <a id="1275" href="/lia/part0/Naturals/#301" class="Function">ℕ</a><a id="1276" class="Symbol">)</a> <a id="1278" class="Symbol">→</a> <a id="1280" href="/lia/part0/Naturals/#301" class="Function">ℕ</a>
+<a id="1282" href="/lia/part5/Continuations/#1254" class="Function">fib-cont2</a> <a id="1292" class="Number">0</a> <a id="1294" href="/lia/part5/Continuations/#1294" class="Bound">κ</a> <a id="1296" class="Symbol">=</a> <a id="1298" href="/lia/part5/Continuations/#1294" class="Bound">κ</a> <a id="1300" class="Number">0</a>
+<a id="1302" href="/lia/part5/Continuations/#1254" class="Function">fib-cont2</a> <a id="1312" class="Number">1</a> <a id="1314" href="/lia/part5/Continuations/#1314" class="Bound">κ</a> <a id="1316" class="Symbol">=</a> <a id="1318" href="/lia/part5/Continuations/#1314" class="Bound">κ</a> <a id="1320" class="Number">1</a> 
+<a id="1323" href="/lia/part5/Continuations/#1254" class="Function">fib-cont2</a> <a id="1333" class="Symbol">(</a><a id="1334" href="Agda.Builtin.Nat.html#223" class="InductiveConstructor">suc</a> <a id="1338" class="Symbol">(</a><a id="1339" href="Agda.Builtin.Nat.html#223" class="InductiveConstructor">suc</a> <a id="1343" href="/lia/part5/Continuations/#1343" class="Bound">n</a><a id="1344" class="Symbol">))</a> <a id="1347" href="/lia/part5/Continuations/#1347" class="Bound">κ</a> <a id="1349" class="Symbol">=</a> <a id="1351" href="/lia/part5/Continuations/#1254" class="Function">fib-cont2</a> <a id="1361" href="/lia/part5/Continuations/#1343" class="Bound">n</a> <a id="1363" class="Symbol">λ</a> <a id="1365" href="/lia/part5/Continuations/#1365" class="Bound">a</a> <a id="1367" class="Symbol">→</a> <a id="1369" href="/lia/part5/Continuations/#1254" class="Function">fib-cont2</a> <a id="1379" class="Symbol">(</a><a id="1380" href="Agda.Builtin.Nat.html#223" class="InductiveConstructor">suc</a> <a id="1384" href="/lia/part5/Continuations/#1343" class="Bound">n</a><a id="1385" class="Symbol">)</a> <a id="1387" class="Symbol">λ</a> <a id="1389" href="/lia/part5/Continuations/#1389" class="Bound">b</a> <a id="1391" class="Symbol">→</a> <a id="1393" href="/lia/part5/Continuations/#1347" class="Bound">κ</a> <a id="1395" class="Symbol">(</a><a id="1396" href="/lia/part5/Continuations/#1365" class="Bound">a</a> <a id="1398" href="/lia/part5/Continuations/#182" class="Primitive Operator">+ℕ</a> <a id="1401" href="/lia/part5/Continuations/#1389" class="Bound">b</a><a id="1402" class="Symbol">)</a></pre>
+
+<div id="refs">
+
+  <h1 id="references">
+<a class="anchor" href="#references" aria-hidden="true"><span class="octicon octicon-link"></span></a>References</h1>
+
+</div>
+
+    </div>
+  
+    <header class="nav-header">
+    <p style="text-align:center;">
+        
+        
+        
+        <a alt="Part" href="/lia/part5/index/">Part</a>
+        &bullet;
+        
+        
+        <a alt="Source code" href="https://github.com/lclem/lia/blob/main/src/part5/Continuations.lagda.md">Source</a>
+        
+        
+        
+    </p>
+</header>
+
+    <p class="p-name"> Last-modified: Jan  8 08:05:53 2021 </p>
+  </article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/lia/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Logic in Agda</h2><div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Lorenzo Clemente</li>
+          <li><a class="u-email" href="mailto:clementelorenzo@gmail.com">clementelorenzo@gmail.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/lclem"><svg class="svg-icon"><use xlink:href="/lia/assets/minima-social-icons.svg#github"></use></svg> <span class="username">lclem</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3"></div>
+    </div>This work is licensed under a <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>
+  </div>
+</footer>
+
+<!-- Parse the Latex divs with Katex
+<script type="text/javascript">
+  $("script[type='math/tex']").replaceWith(
+    function(){
+      var tex = $(this).text();
+      return katex.renderToString(tex, {displayMode: false});
+  });
+  
+  $("script[type='math/tex; mode=display']").replaceWith(
+    function(){
+      var tex = $(this).text();
+      return katex.renderToString(tex.replace(/%.*/g, ''), {displayMode: true});
+  });
+</script>
+-->
+
+<script type="text/javascript" src="/lia/assets/hidebox.js"></script>
+</body>
+
+</html>
