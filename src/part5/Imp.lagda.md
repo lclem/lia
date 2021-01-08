@@ -4,7 +4,7 @@ title: "Imperative programs 🚧"
 
 ```
 {-# OPTIONS --allow-unsolved-metas #-}
-module part5.Programs where
+module part5.Imp where
 open import part5.Exp hiding (_↝_; _,_⇒_; ⇒-det; ↝*-trans; _↝*⟨⟩_; _↝⟨_⟩_; _↝*⟨_⟩_; _,_↝_,_)
 ```
 
