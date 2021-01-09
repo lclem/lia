@@ -36,7 +36,7 @@ private
     x : VarName
     f : FunName
     e e′ e₀ e₁ e₂ : Exp
-    k m n n₀ n₁ : ℕ
+    k k′ m n n₀ n₁ : ℕ
 ```
 
 ```
@@ -91,13 +91,15 @@ private
 infix 4 _,_⇒_
 data _,_⇒_ : Exp → Env → ℕ → Set where
 
-  ⇒-Num :
-    -------------
-    # n , γ ⇒ n
+  instance
+    ⇒-Num :
+      ------------
+      # n , γ ⇒ n
 
-  ⇒-Var :
-    ---------------
-    ` x , (ϱ , τ) ⇒ ϱ x
+  instance 
+    ⇒-Var :
+      --------------------
+      ` x , (ϱ , τ) ⇒ ϱ x
 
   ⇒-Add :
     e₀ , γ ⇒ n₀ →
@@ -134,6 +136,42 @@ data _,_⇒_ : Exp → Env → ℕ → Set where
     e₁ , (ϱ , τ [ f ↦ x , e₀ ]) ⇒ n →
     ------------------------------------
     Rec f [ x ]≔ e₀ In e₁ , (ϱ , τ) ⇒ n
+```
+
+```
+instance instance-Add : ⦃ e₀ , γ ⇒ n₀ ⦄ → ⦃ e₁ , γ ⇒ n₁ ⦄ → e₀ + e₁ , γ ⇒ n₀ +ℕ n₁
+instance-Add = ⇒-Add by-inst by-inst
+
+instance instance-Sub : ⦃ e₀ , γ ⇒ n₀ ⦄ → ⦃ e₁ , γ ⇒ n₁ ⦄ → e₀ - e₁ , γ ⇒ n₀ -ℕ n₁
+instance-Sub = ⇒-Sub by-inst by-inst
+
+instance instance-Mul : ⦃ e₀ , γ ⇒ n₀ ⦄ → ⦃ e₁ , γ ⇒ n₁ ⦄ → e₀ · e₁ , γ ⇒ n₀ ·ℕ n₁
+instance-Mul = ⇒-Mul by-inst by-inst
+
+-- instance instance-Add : ⦃ e₀ , γ ⇒ n₀ ⦄ → ⦃ e₁ , γ ⇒ n₁ ⦄ → e₀ + e₁ , γ ⇒ n₀ +ℕ n₁
+-- instance-Add = ⇒-Add by-inst by-inst
+
+-- instance instance-Add : ⦃ e₀ , γ ⇒ n₀ ⦄ → ⦃ e₁ , γ ⇒ n₁ ⦄ → e₀ + e₁ , γ ⇒ n₀ +ℕ n₁
+-- instance-Add = ⇒-Add by-inst by-inst
+
+-- instance instance-Add : ⦃ e₀ , γ ⇒ n₀ ⦄ → ⦃ e₁ , γ ⇒ n₁ ⦄ → e₀ + e₁ , γ ⇒ n₀ +ℕ n₁
+-- instance-Add = ⇒-Add by-inst by-inst
+
+-- instance instance-Add : ⦃ e₀ , γ ⇒ n₀ ⦄ → ⦃ e₁ , γ ⇒ n₁ ⦄ → e₀ + e₁ , γ ⇒ n₀ +ℕ n₁
+-- instance-Add = ⇒-Add by-inst by-inst
+
+-- instance instance-Add : ⦃ e₀ , γ ⇒ n₀ ⦄ → ⦃ e₁ , γ ⇒ n₁ ⦄ → e₀ + e₁ , γ ⇒ n₀ +ℕ n₁
+-- instance-Add = ⇒-Add by-inst by-inst
+
+instance instance-Rec : ⦃ e₁ , (ϱ , τ [ f ↦ x , e₀ ]) ⇒ n ⦄ → Rec f [ x ]≔ e₀ In e₁ , (ϱ , τ) ⇒ n
+instance-Rec ⦃ δ ⦄ = ⇒-Rec δ
+```
+
+Example:
+
+```
+_ : # 4 + # 3 , γ₀ ⇒ 7
+_ = by-inst
 ```
 
 ## Denotational semantics
@@ -211,6 +249,26 @@ _ : ⟦ factorial ⟧ γ₀ # 1000 ≡ Just 120
 _ = refl
 ```
 
+Monotonicity:
+
+```
+mon-eval : ∀ e →
+           ⟦ e ⟧ γ # k ≡ Just n →
+           k ≤ℕ k′ →
+           ---------------------
+           ⟦ e ⟧ γ # k′ ≡ Just n
+
+mon-eval (# n) eq k≤k′ = {!   !}
+mon-eval (` x) eq k≤k′ = {!   !}
+mon-eval (e + e₁) eq k≤k′ = {!   !}
+mon-eval (e - e₁) eq k≤k′ = {!   !}
+mon-eval (e · e₁) eq k≤k′ = {!   !}
+mon-eval (If e Then e₁ Else e₂) eq k≤k′ = {!   !}
+mon-eval (f $ e) eq k≤k′ = {!   !}
+mon-eval (Let x ≔ e In e₁) eq k≤k′ = {!   !}
+mon-eval (Rec f [ x ]≔ e In e₁) eq k≤k′ = {!   !}
+```
+
 ## Agreement
 
 ```
@@ -230,11 +288,38 @@ agree-1 {k = suc k} (e₀ + e₁) eq
        agree-1 e₁ eq₁
 ... | ind₀ | ind₁ rewrite eq₀ | eq₁ | sym (Just-inv eq) = ⇒-Add ind₀ ind₁
 
-agree-1 (e - e₁) eq = {!   !}
-agree-1 (e · e₁) eq = {!   !}
+agree-1 {k = suc k} (e₀ - e₁) eq
+  with lift2-lemma _-ℕ_ eq
+... | n₀ , n₁ , eq₀ , eq₁
+  with agree-1 e₀ eq₀ |
+       agree-1 e₁ eq₁
+... | ind₀ | ind₁ rewrite eq₀ | eq₁ | sym (Just-inv eq) = ⇒-Sub ind₀ ind₁
+
+agree-1 {k = suc k} (e₀ · e₁) eq
+  with lift2-lemma _·ℕ_ eq
+... | n₀ , n₁ , eq₀ , eq₁
+  with agree-1 e₀ eq₀ |
+       agree-1 e₁ eq₁
+... | ind₀ | ind₁ rewrite eq₀ | eq₁ | sym (Just-inv eq) = ⇒-Mul ind₀ ind₁
 
 agree-1 (If e Then e₁ Else e₂) eq = {!   !}
+
 agree-1 (f $ e) eq = {!   !}
+
 agree-1 (Let x ≔ e In e₁) eq = {!   !}
+
 agree-1 (Rec f [ x ]≔ e In e₁) eq = {!   !}
+
+agree-2 : e , γ ⇒ n → ∃[ k ] ⟦ e ⟧ γ # k ≡ Just n
+agree-2 ⇒-Num = 1 , refl
+agree-2 ⇒-Var = 1 , refl
+agree-2 (⇒-Add δ₀ δ₁)
+  with agree-2 δ₀ | 
+       agree-2 δ₁
+... | _ , eq₀ | _ , eq₁ = _ , {!   !}
+agree-2 (⇒-Sub δ₀ δ₁) = {!   !}
+agree-2 (⇒-Mul δ₀ δ₁) = {!   !}
+agree-2 (⇛-App δ₀ δ₁) = {!   !}
+agree-2 (⇒-Let δ₀ δ₁) = {!   !}
+agree-2 (⇒-Rec δ) = {!   !}
 ```
