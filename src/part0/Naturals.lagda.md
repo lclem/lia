@@ -83,7 +83,12 @@ n≤sucn : ∀ {n} → n ≤ suc n
 n≤sucn {zero} = 0≤n
 n≤sucn {suc n} = s≤s n≤sucn
 
-postulate m≤n→m≤sucn : ∀ {m n} → m ≤ n → m ≤ suc n
+n≤suc2n : ∀ {n} → n ≤ suc (suc n)
+n≤suc2n = {!   !}
+
+postulate m≤n→m≤sucn : m ≤ n → m ≤ suc n
+postulate m≤n→m≤suc2n : m ≤ n → m ≤ suc (suc n)
+postulate m≤n→m≤suc3n : m ≤ n → m ≤ suc (suc (suc n))
 postulate n≤sucsucn : ∀ {n} → n ≤ suc (suc n)
 
 suc-< : ∀ {m n : ℕ} → suc m < suc n → m < n
@@ -255,14 +260,20 @@ postulate sucm+n≡m+sucn : {m n : ℕ} → suc m + n ≡ m + suc n
 suc-lemma : m + suc n ≡ suc m + n -- the commuting variant of the above
 suc-lemma = {!   !}
 
-≤+ mon-≤-left : ∀ {m n} → m ≤ m + n
+≤+ mon-≤-left : m ≤ m + n
 ≤+ {zero} {n} = 0≤n
 ≤+ {suc m} {n} = s≤s (≤+ {m} {n})
 
 mon-≤-left = ≤+
 
-mon-≤-right : ∀ {m n} → m ≤ n + m
+mon-≤-right : m ≤ n + m
 mon-≤-right = {!   !}
+
+mon-trans-≤-left : k ≤ m → k ≤ m + n
+mon-trans-≤-left = {!   !}
+
+mon-trans-≤-right : k ≤ m → k ≤ n + m
+mon-trans-≤-right = {!   !}
 
 -- infixl 12 _*_
 

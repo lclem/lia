@@ -94,19 +94,33 @@ infix 11 _#
 pattern _,,_ δ₀ δ₁ = step δ₀ δ₁
 pattern _# δ = stop δ
 
-seq-lemma : c , s ⇝* s′ →
+⨟-lemma-1 : c , s ⇝* s′ →
             d , s′ ⇝* s″ →
             ---------------
             c ⨟ d , s ⇝* s″
 
-seq-lemma (δ #) δ₁ = (seq-0 δ) ,, δ₁
-seq-lemma (δ ,, δ₀) δ₁ = (seq-1 δ) ,, (seq-lemma δ₀ δ₁)
+⨟-lemma-1 (δ #) δ₁ = (seq-0 δ) ,, δ₁
+⨟-lemma-1 (δ ,, δ₀) δ₁ = (seq-1 δ) ,, (⨟-lemma-1 δ₀ δ₁)
+
+⨟-lemma-2 :
+  c ⨟ d , s ⇝* s′ →
+  ----------------------------------
+  ∃[ s″ ] c , s ⇝* s″ × d , s″ ⇝* s′
+
+⨟-lemma-2 (seq-0 δ₀ ,, δ₁) = _ , δ₀ # , δ₁
+⨟-lemma-2 (seq-1 δ₀ ,, δ₁)
+    with ⨟-lemma-2 δ₁
+... | _ , δ₂ , δ₃ = _ , (δ₀ ,, δ₂) , δ₃
 
 assoc-seq : c ⨟ (c′ ⨟ c″) , s ⇝* s′ →
-            -----------------------
+            -------------------------
             (c ⨟ c′) ⨟ c″ , s ⇝* s′
 
-assoc-seq = {!   !}
+assoc-seq δ
+  with ⨟-lemma-2 δ
+... | s″ , δ₀ , δ₁
+  with ⨟-lemma-2 δ₁
+... | s⁗ , δ₂ , δ₃ = ⨟-lemma-1 (⨟-lemma-1 δ₀ δ₂) δ₃
 ```
 
 Encode imperative programs as equivalent regular programs.
@@ -135,7 +149,7 @@ imp2reg-lemma-1 ⇒-assign = assign #
 imp2reg-lemma-1 (⇒-seq c,s⇒s′′ d,s′′⇒s′)
   with imp2reg-lemma-1 c,s⇒s′′ |
        imp2reg-lemma-1 d,s′′⇒s′
-... | δ₀ | δ₁ = seq-lemma δ₀ δ₁
+... | δ₀ | δ₁ = ⨟-lemma-1 δ₀ δ₁
 
 imp2reg-lemma-1 (⇒-if-tt ⟦b⟧s≡tt c,s⇒s′) =
   or-left ,,
@@ -158,7 +172,7 @@ imp2reg-lemma-1 (⇒-while-tt {b = b} {s = s} ⟦b⟧s≡tt c,s⇒s′ w,s′⇒
 ... | δ₀ | δ₁ =
   seq-1 star-step ,,
   seq-1 (seq-1 (seq-0 (test ⟦b⟧s≡tt))) ,,
-  assoc-seq (seq-lemma δ₀ δ₁)
+  assoc-seq (⨟-lemma-1 δ₀ δ₁)
 
 imp2reg-lemma-1 (⇒-while-ff {b = b} {s = s} ⟦b⟧s≡ff) = seq-0 star-stop ,, test ¬𝔹⟦b⟧s≡tt #
 
@@ -201,17 +215,35 @@ data _,_⇝*_#_ : Reg → State → State → ℕ → Set where
 pattern _# δ = stop δ
 pattern _,,_ δ₀ δ₁ = step δ₀ δ₁
 
-remove-gas : c , s ⇝* s′ # n → c , s ⇝* s′
-remove-gas δ = {!   !}
+-- remove-gas : c , s ⇝* s′ # n → c , s ⇝* s′
+-- remove-gas δ = {!   !}
 
 add-gas : c , s ⇝* s′ → ∃[ n ] c , s ⇝* s′ # n
-add-gas δ = {!   !}
+add-gas (δ #) = _ , δ #
+add-gas (δ ,, δ′)
+  with add-gas δ′
+... | _ , δ″ = _ , (δ ,, δ″)
+```
+
+Quantitative transitivity:
+
+```
+⨟-lemma#-1 :
+  c , s ⇝* s″ # m →
+  d , s″ ⇝* s′ # n →
+  -----------------------------
+  c ⨟ d , s ⇝* s′ # suc (m + n)
+
+⨟-lemma#-1 (δ₀ #) δ₁ = seq-0 δ₀ ,, δ₁
+⨟-lemma#-1 (δ ,, δ₀) δ₁
+  with ⨟-lemma#-1 δ₀ δ₁
+... | δ₂ = seq-1 δ ,, δ₂
 ```
 
 The following lemma is analogous to !remoteRef(part5)(Imp)(⨟-lemma-2)
 
 ```
-⨟-lemma-2 :
+⨟-lemma#-2 :
   c ⨟ d , s ⇝* s′ # m →
   -------------------------
   ∃[ s″ ] ∃[ m1 ] ∃[ m2 ]
@@ -219,36 +251,12 @@ The following lemma is analogous to !remoteRef(part5)(Imp)(⨟-lemma-2)
       d , s″ ⇝* s′ # m2 ×
       suc (m1 +ℕ m2) ≡ m
 
-⨟-lemma-2 (seq-0 δ₀ ,, δ) = _ , 0 , _ , δ₀ # , δ , refl
+⨟-lemma#-2 (seq-0 δ₀ ,, δ) = _ , 0 , _ , δ₀ # , δ , refl
 
-⨟-lemma-2 (seq-1 δ₀ ,, δ)
-  with ⨟-lemma-2 δ
+⨟-lemma#-2 (seq-1 δ₀ ,, δ)
+  with ⨟-lemma#-2 δ
 ... | s″ , m₁ , m₂ , δ₁ , δ₂ , m1+m2≡n =
       s″ , suc m₁ , m₂ , (δ₀ ,, δ₁) , δ₂ , cong suc m1+m2≡n
-```
-
-Quantitative transitivity:
-
-```
-⨟-lemma-1 :
-  c , s ⇝* s″ # m →
-  d , s″ ⇝* s′ # n →
-  -----------------------------
-  c ⨟ d , s ⇝* s′ # suc (m + n)
-
-⨟-lemma-1 (δ₀ #) δ₁ = seq-0 δ₀ ,, δ₁
-⨟-lemma-1 (δ ,, δ₀) δ₁
-  with ⨟-lemma-1 δ₀ δ₁
-... | δ₂ = seq-1 δ ,, δ₂
-
--- ⨟-lemma-1 stop der2 = one ↝-seq-right der2
--- ⨟-lemma-1 {c} {d} {s} {s′} {s′′} (one {y = c′ , s′′′} der0 der1) der2
---     with ⨟-lemma-1 der1 der2
--- ... | der = start
---               c ⨟ d , s ↝⟨ ↝-seq-left der0 ⟩
---               c′ ⨟ d , s′′′ ↝*⟨ der ⟩
---               skip , s′ 
---             end
 ```
 
 ```
@@ -276,7 +284,7 @@ imp2reg-lemma-2 {n = n} c δ = go c δ (<-wf n) where
   go (x ≔ e) (assign #) (acc a) = ⇒-assign
 
   go (c ⨟ d) δ (acc a)
-    with ⨟-lemma-2 δ
+    with ⨟-lemma#-2 δ
   ... | s‶ , m₁ , m₂ , δ₁ , δ₂ , eq rewrite sym eq
     with go c δ₁ (a m₁ (s≤s mon-≤-left)) |
          go d δ₂ (a m₂ (s≤s mon-≤-right))
@@ -293,13 +301,13 @@ imp2reg-lemma-2 {n = n} c δ = go c δ (<-wf n) where
   go (while b do: c) (seq-0 star-stop ,, test ⟦¬b⟧s≡tt #) (acc a) = ⇒-while-ff (¬𝔹-tt-ff ⟦¬b⟧s≡tt)
   
   go (while b do: c) (seq-1 star-step ,, seq-1 (seq-1 (seq-0 (test ⟦b⟧s≡tt))) ,, δ) (acc a)
-    with ⨟-lemma-2 δ 
-  ... | s‶ , m₁ , m₂ , δ₁ , δ₂ , eq -- rewrite sym eq
-    with ⨟-lemma-2 δ₁
+    with ⨟-lemma#-2 δ 
+  ... | s‶ , m₁ , m₂ , δ₁ , δ₂ , eq
+    with ⨟-lemma#-2 δ₁
   ... | s‷  , m₃ , m₄ , δ₃ , δ₄ , eq′
-    rewrite sym eq | sym eq′
-    with go c δ₃ (a _ (s≤s {!   !})) |
-         go _ (⨟-lemma-1 δ₄ δ₂) (a _ (s≤s (s≤s {!   !})))
+    rewrite sym eq | sym eq′ | assoc-+ {m₃} {m₄} {m₂}
+    with go c δ₃ (a _ (s≤s (mon-trans-≤-right {n = 3} mon-≤-left))) |
+         go _ (⨟-lemma#-1 δ₄ δ₂) (a _ (s≤s (s≤s (mon-trans-≤-right {n = 2} (mon-≤-right {m₄ +ℕ m₂} {m₃})))))
   ... | ⇒-der1 | ⇒-der2 = ⇒-while-tt ⟦b⟧s≡tt ⇒-der1 ⇒-der2
 
 imp2reg-lemma : ∀ {c} → c , s ⇒ s′ ↔ imp2reg c , s ⇝* s′
