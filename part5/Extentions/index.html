@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Imperative programs 🚧 | Logic in Agda</title><!-- Begin Jekyll SEO tag v2.6.1 -->
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="Imperative programs 🚧" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Propositional and fist-order logic developed with the proof assistant Agda." />
+<meta property="og:description" content="Propositional and fist-order logic developed with the proof assistant Agda." />
+<link rel="canonical" href="/lia/part5/Extentions/" />
+<meta property="og:url" content="/lia/part5/Extentions/" />
+<meta property="og:site_name" content="Logic in Agda" />
+<script type="application/ld+json">
+{"url":"/lia/part5/Extentions/","@type":"WebPage","description":"Propositional and fist-order logic developed with the proof assistant Agda.","headline":"Imperative programs 🚧","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/lia/assets/main.css">
+
+  <!-- <link rel="stylesheet" href="/lia/assets/custom.css"> --><!-- Mathjax Support -->
+  <script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+  <!-- Load KaTeX -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1.1/katex.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1.1/katex.min.js"></script>
+
+<script type="text/x-thebe-config">
+  {
+    bootstrap: true,
+    requestKernel: true,
+    runAllCells: false,
+    selector: "[data-executable]",
+    predefinedOutput: false,
+    codeMirrorConfig: {
+        //theme: "idea",
+        language: "agda",
+        readOnly: false,
+        lineNumbers: true,
+        keyMap: "default",
+//        gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
+    },
+    kernelOptions: {
+        name: "agda",
+        kernelName: "agda",
+        path: "src/",
+        loadFromStore: true,
+        persistent: false,
+        // notebook server configuration; not needed with binder
+        serverSettings: {
+              baseUrl: "http://127.0.0.1:8888",
+              token: "test-secret",
+            },
+    },
+    binderOptions: {
+      repo: "lclem/lia", // need to put here the actual github repo (if it is a fork)
+      ref: "main",
+      binderUrl: "https://mybinder.org",
+      repoProvider: "github",
+      savedSession: {
+        enabled: true,
+        maxAge: 86400, // the max age in seconds to consider re-using a session
+        storagePrefix: "thebe-binder-lia-"
+      },
+    },
+  }
+</script>
+
+<!-- <script type="text/javascript" src="https://unpkg.com/thebelab@latest"></script> -->
+
+<!-- our own version of the thebe library: -->
+<script type="text/javascript" src="/lia/thebe/lib/index.js"></script>
+
+<!-- highlighting for Agda -->
+<script src="/lia/codemirror-agda/lib/index.js"></script>
+
+</head>
+<body><header class="site-header" id="site-header">
+
+    <div class="wrapper">
+
+        <a class="site-title" href="/lia/">Logic in Agda</a>
+
+        <nav class="site-nav">
+            <!-- <span class="menu-icon">
+                <svg viewBox="0 0 18 15" width="18px" height="15px">
+                    <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+                    <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+                    <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+                </svg>
+            </span> -->
+
+            <div class="trigger">
+                <a class="page-link" href="/lia/part0/index/">Part 0</a>
+                <a class="page-link" href="/lia/part1/index/">Part 1</a>
+                <a class="page-link" href="/lia/part2/index/">Part 2</a>
+                <a class="page-link" href="/lia/part3/index/">Part 3</a>
+                <a class="page-link" href="/lia/part4/index/">Part 4</a>
+                <a class="page-link" href="/lia/part5/index/">Part 5</a>
+
+                <span class="kernel-status">
+                    <button class="kernel-status-button" onclick="kernel_status_clicked()" title="kernel status"></button>
+                    <span id="kernel-messages" class="kernel-messages"></span>
+                </span>
+
+                <div id="connection_options" class="options sidebar" style="text-align: left; line-height: normal; max-width: 800px; padding: 10px; border-radius: 15px;">
+                    <!-- display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: space-between; -->
+                    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+                    <div>
+                        <label for="username" style="color: white;">User:</label>
+                        <input type="text" placeholder="github username" id="username" name="username">
+                        <label for="password" style="color: white;">Password:</label>
+                        <input type="password" placeholder="password" id="password" name="password">
+                    </div>
+                    <div>
+                        <label for="loadFromStore" style="color: white;">Load code from browser store:</label>
+                        <label class="switch" style="vertical-align: middle; margin: 10px;">
+                            <input type="checkbox" id="loadFromStore" name="loadFromStore">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div>
+                        <label for="baseUrl" style="color: white;">Base URL:</label>
+                        <input type="text" placeholder="baseUrl" id="baseUrl" name="baseUrl" value="http://127.0.0.1:8888">
+                        <label for="token" style="color: white;">Token:</label>
+                        <input type="text" placeholder="token" id="token" name="token" value="test-secret">
+                    </div>
+                    <div>
+                        <label for="useBinder" style="color: white;">Use binder:</label>
+                        <label class="switch" style="vertical-align: middle; margin: 10px;">
+                            <input type="checkbox" id="useBinder" name="useBinder">
+                            <span class="slider round"></span>
+                        </label>
+                        <label for="savedSession" style="color: white;">Reuse session:</label>
+                        <label class="switch" style="vertical-align: middle; margin: 10px;">
+                            <input type="checkbox" id="savedSession" name="savedSession">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div>
+                        <label for="repository" style="color: white;">Github repo:</label>
+                        <input type="text" placeholder="repository" id="repository" name="repository" value="">
+
+                        <label for="ref" style="color: white;">Branch:</label>
+                        <input type="text" placeholder="ref" id="ref" name="ref" value="main">
+
+                        <label for="binderUrl" style="color: white;">Binder URL:</label>                        
+                        <input type="text" placeholder="binderUrl" id="binderUrl" name="binderUrl" value="https://mybinder.org">
+                    </div>
+                </div>
+
+                <span class="control-container" id="control-container">
+                    <svg class="progress-ring" id="progress-ring" width="30" height="30" title="exercise progress" onclick="kernel_status_clicked()">
+                        <circle
+                            id="progress-circle"
+                            class="progress-ring__circle"
+                            stroke="black"
+                            stroke-width="2.5"
+                            fill="transparent"
+                            r="14"
+                            cx="15"
+                            cy="15"/>
+                        <circle
+                            stroke="lightgray"
+                            stroke-width="0.5"
+                            fill="transparent"
+                            r="14"
+                            cx="15"
+                            cy="15"/>
+                    </svg>
+                    <div id="connection_options" class="options sidebar" style="text-align: left; line-height: normal; max-width: 800px; padding: 10px; border-radius: 15px;"></div>
+                    <span class="progress-text" id="progress-text" onclick="kernel_status_clicked()"> 0/0 </span>
+
+                    <span id="controls" class="controls">
+                        <svg version="1.1" id="run-all" class="run-all" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                            width="15" height="15" viewBox="0 0 163.861 163.861" style="enable-background:new 0 0 163.861 163.861;"
+                            xml:space="preserve">
+                            <g>
+                                <path d="M34.857,3.613C20.084-4.861,8.107,2.081,8.107,19.106v125.637c0,17.042,11.977,23.975,26.75,15.509L144.67,97.275
+                                    c14.778-8.477,14.778-22.211,0-30.686L34.857,3.613z"/>
+                            </g>
+                        </svg>
+                    </span>
+                </span>
+            </div>
+
+            <style>
+                .switch {
+                    position: relative;
+                    display: inline-block;
+                    width: 40px;
+                    height: 20px;
+                }
+
+                /* Hide default HTML checkbox */
+                .switch input {
+                    opacity: 0;
+                    width: 0;
+                    height: 0;
+                }
+
+                /* The slider */
+                .slider {
+                    position: absolute;
+                    cursor: pointer;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background-color: #ccc;
+                    -webkit-transition: .4s;
+                    transition: .4s;
+                }
+
+                .slider:before {
+                    position: absolute;
+                    content: "";
+                    height: 16px;
+                    width: 16px;
+                    left: 2px;
+                    /* right: 4px; */
+                    bottom: 2px;
+                    top: 2px;
+                    background-color: white;
+                    -webkit-transition: .4s;
+                    transition: .4s;
+                }
+
+                input:checked + .slider {
+                    background-color: #2196F3;
+                }
+
+                input:focus + .slider {
+                    box-shadow: 0 0 1px #2196F3;
+                }
+
+                input:checked + .slider:before {
+                    -webkit-transform: translateX(18px);
+                    -ms-transform: translateX(18px);
+                    transform: translateX(18px);
+                }
+
+                /* Rounded sliders */
+                .slider.round {
+                    border-radius: 30px;
+                }
+
+                .slider.round:before {
+                border-radius: 50%;
+                }
+
+                .sidebar input[type=text] {
+                    padding: 6px;
+                    margin-top: 8px;
+                    /* font-size: 17px; */
+                    border: none;
+                    /* width: 150px; */
+                }
+
+                .sidebar {
+                    /* height: 100%; */
+                    width: 0;
+                    position: fixed;
+                    z-index: 1000;
+                    top: 0;
+                    right: 20px;
+                    background-color: rgba(17, 17, 17, 0.637);
+                    /* overflow-x: hidden; */
+                    transition: 0.5s;
+                    padding-top: 60px;
+                    display: none;
+                    margin-top: 60px;
+                }
+
+                .sidebar .closebtn {
+                    position: absolute;
+                    color: white;
+                    top: 0;
+                    right: 10px;
+                    font-size: 24px;
+                    margin-left: 20px;
+                }
+
+                .progress-ring, .run-all {
+                    vertical-align: middle;
+                }
+
+                .control-container {
+                    transition: all .2s ease-in-out;
+                }
+
+                .controls {
+                    display: none;
+                    opacity: 0;
+                    margin-right: 10px;
+                    transition: all .5s ease-in-out;
+                }
+
+                .run-all:hover {
+                    filter: brightness(135%);
+                }
+
+                .progress-ring__circle {
+                    transition: 0.35s stroke-dashoffset;
+                    transform: rotate(-90deg);
+                    transform-origin: 50% 50%;
+                    visibility: hidden;
+                }
+
+                .progress-text {
+                    position: relative;
+                    top: 0;
+                    left: -25px;
+                    font-size: 8px;
+                    vertical-align: middle;
+                    align-self: center;
+                }
+
+                .progress-text:hover, .progress-ring:hover, .progress-ring__circle:hover, .run-all {
+                    cursor: pointer;
+                }
+            </style>
+
+            <script>
+
+                //  var storedUsername = localStorage.getItem("username");
+                //  localStorage.setItem("username", storedUsername.value);
+            
+                function doStore(input, key) {
+
+                    if(input.type == "checkbox") {
+                        var checked = localStorage.getItem(key);
+
+                        if (checked == "yes") {
+                            localStorage.setItem(key, "no");
+                        }
+                        else {
+                            localStorage.setItem(key, "yes");
+                        }
+
+                        console.info("checked: ", localStorage.getItem(key));
+                    }
+                    else {
+                        console.info("value: ", input.value);
+                        localStorage.setItem(key, input.value);
+                    }
+                }
+
+                function persistInput(input) {
+                    var key = "input-" + input.id;
+                    var storedValue = localStorage.getItem(key);
+                
+                    console.info("Persisting input: ", input);
+                
+                    // if there is a stored value, use it
+                    if (storedValue) {
+
+                        if(input.type != "password") {
+                            console.info("restoring value ", storedValue, " for ", input);
+                        }
+
+                        if(input.type == "checkbox") {
+                            if(storedValue=="yes") {
+                                input.setAttribute("checked", "");
+                            }
+                            else {
+                                input.removeAttribute("checked");
+                            }
+                        }
+                        else {
+                            input.value = storedValue;
+                        }
+                    }
+                    // if there is no stored value, store the current value
+                    else {
+                        doStore(input, key);
+                    }
+
+                    input.addEventListener('input', function () {
+                        console.info("input changed: key = ", key, "; value = ", input);
+                        doStore(input, key);
+                    });
+                    }
+                
+                    persistInput(document.getElementById("username"));
+                    persistInput(document.getElementById("password"));
+
+                    persistInput(document.getElementById("loadFromStore"));
+
+                    persistInput(document.getElementById("baseUrl"));
+                    persistInput(document.getElementById("token"));
+
+                    persistInput(document.getElementById("useBinder"));
+                    persistInput(document.getElementById("savedSession"));
+                    persistInput(document.getElementById("repository"));
+                    persistInput(document.getElementById("ref"));
+                    persistInput(document.getElementById("binderUrl"));
+
+                    // init
+                    document.getElementById("connection_options").style.display = "none";
+
+                    function kernel_status_clicked() {
+                
+                        console.info("Clicked kernel status");
+
+                        document.getElementById("kernel-messages").style.display = "none";
+
+                        document.getElementById("connection_options").style.width = "750px";
+                        document.getElementById("connection_options").style.display = "block";
+                        //document.getElementById("header").style.marginLeft = "250px";
+
+                    }
+
+                    function closeNav() {
+
+                        document.getElementById("kernel-messages").style.display = "inline";
+
+                        document.getElementById("connection_options").style.width = "0";
+                        document.getElementById("connection_options").style.display = "none";
+                        //document.getElementById("header").style.marginLeft= "0";
+                    }
+
+                var prevScrollpos = window.pageYOffset;
+                var header = document.getElementById("site-header");
+                var boxShadow = header.style.boxShadow;
+
+                window.onscroll = function() {
+                    var currentScrollPos = window.pageYOffset;
+                    // detect scroll down
+                    if (prevScrollpos > currentScrollPos) {
+                        header.style.top = "0";
+                        header.style.boxShadow = boxShadow;
+                        prevScrollpos = currentScrollPos;
+                    } else if (prevScrollpos <= currentScrollPos) {
+                        header.style.top = "-55px";
+                        header.style.boxShadow = "none"
+                        prevScrollpos = currentScrollPos;
+                    }
+                }
+
+            let control_container = document.getElementById("control-container");
+            let controls = document.getElementById("controls");
+
+            control_container.addEventListener("mouseenter", function(event) {
+                controls.style.display = "inline";
+//                controls.style.visibility = "visible";
+                controls.style.opacity = 1;
+                console.info("mouseenter");
+            }, false);
+
+            control_container.addEventListener("mouseleave", function(event) {
+                // controls.style.visibility = "hidden";
+                // controls.style.display = "none";
+                controls.style.opacity = 0;
+                console.info("mouseleave");
+            }, false);
+
+            </script>
+            
+        </nav>
+
+    </div>
+
+</header><main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post">
+
+    <header class="post-header">
+        <h1 class="post-title">Imperative programs 🚧</h1>
+    </header>
+  
+    <header class="nav-header">
+    <p style="text-align:center;">
+        
+        
+        
+        <a alt="Part" href="/lia/part5/index/">Part</a>
+        &bullet;
+        
+        
+        <a alt="Source code" href="https://github.com/lclem/lia/blob/main/src/part5/Extentions.lagda.md">Source</a>
+        
+        
+        
+    </p>
+</header>
+
+  
+    <div class="post-content">
+        <h2>Contents</h2>    
+        <ul id="toc" class="section-nav">
+<li class="toc-entry toc-h1"><a href="#side-effects">Side effects</a>
+<ul>
+<li class="toc-entry toc-h2"><a href="#arithmetic-expressions">Arithmetic expressions</a></li>
+<li class="toc-entry toc-h2"><a href="#boolean-expressions">Boolean expressions</a></li>
+<li class="toc-entry toc-h2"><a href="#programs">Programs</a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h1"><a href="#references">References</a></li>
+</ul><pre class="Agda"><a id="45" class="Symbol">{-#</a> <a id="49" class="Keyword">OPTIONS</a> <a id="57" class="Pragma">--allow-unsolved-metas</a> <a id="80" class="Symbol">#-}</a>
+<a id="84" class="Keyword">module</a> <a id="91" href="/lia/part5/Extentions/" class="Module">part5.Extentions</a> <a id="108" class="Keyword">where</a>
+<a id="114" class="Keyword">open</a> <a id="119" class="Keyword">import</a> <a id="126" href="/lia/part0/index/" class="Module">part0.index</a> <a id="138" class="Keyword">hiding</a> <a id="145" class="Symbol">(</a><a id="146" href="/lia/part0/Naturals/#7324" class="Datatype">AExp</a><a id="150" class="Symbol">;</a> <a id="152" href="/lia/part0/Naturals/#7435" class="Function Operator">A⟦_⟧</a><a id="156" class="Symbol">;</a> <a id="158" href="/lia/part0/List/#23605" class="Function Operator">_≈_</a><a id="161" class="Symbol">)</a> <a id="163" class="Keyword">renaming</a> <a id="172" class="Symbol">(</a><a id="173" href="/lia/part0/Naturals/#266" class="Primitive Operator">_+_</a> <a id="177" class="Symbol">to</a> <a id="Nat._+_"></a><a id="180" href="/lia/part5/Extentions/#180" class="Primitive Operator">_+ℕ_</a><a id="184" class="Symbol">;</a> <a id="186" href="/lia/part0/Naturals/#288" class="Primitive Operator">_*_</a> <a id="190" class="Symbol">to</a> <a id="Nat._*_"></a><a id="193" href="/lia/part5/Extentions/#193" class="Primitive Operator">_·ℕ_</a><a id="197" class="Symbol">;</a> <a id="199" href="/lia/part0/Naturals/#798" class="Datatype Operator">_≤_</a> <a id="203" class="Symbol">to</a> <a id="_≤_"></a><a id="206" href="/lia/part5/Extentions/#206" class="Datatype Operator">_≤ℕ_</a><a id="210" class="Symbol">)</a> <a id="212" class="Keyword">public</a>
+<a id="219" class="Keyword">open</a> <a id="224" class="Keyword">import</a> <a id="231" href="/lia/part5/Exp/" class="Module">part5.Exp</a> <a id="241" class="Keyword">using</a> <a id="247" class="Symbol">(</a><a id="248" href="/lia/part5/Exp/#544" class="Function">VarName</a><a id="255" class="Symbol">)</a>
+<a id="257" class="Keyword">open</a> <a id="262" class="Keyword">import</a> <a id="269" href="/lia/part5/Imp/" class="Module">part5.Imp</a> <a id="279" class="Keyword">using</a> <a id="285" class="Symbol">(</a><a id="286" href="/lia/part5/Imp/#1231" class="Function">State</a><a id="291" class="Symbol">)</a>
+
+<a id="294" class="Keyword">private</a>
+  <a id="304" class="Keyword">variable</a>
+    <a id="317" href="/lia/part5/Extentions/#317" class="Generalizable">m</a> <a id="319" href="/lia/part5/Extentions/#319" class="Generalizable">n</a> <a id="321" href="/lia/part5/Extentions/#321" class="Generalizable">n₀</a> <a id="324" href="/lia/part5/Extentions/#324" class="Generalizable">n₁</a> <a id="327" class="Symbol">:</a> <a id="329" href="/lia/part0/Naturals/#301" class="Function">ℕ</a>
+    <a id="335" href="/lia/part5/Extentions/#335" class="Generalizable">x</a> <a id="337" href="/lia/part5/Extentions/#337" class="Generalizable">y</a> <a id="339" class="Symbol">:</a> <a id="341" href="/lia/part5/Exp/#544" class="Function">VarName</a>
+    <a id="353" href="/lia/part5/Extentions/#353" class="Generalizable">s</a> <a id="355" href="/lia/part5/Extentions/#355" class="Generalizable">s′</a> <a id="358" href="/lia/part5/Extentions/#358" class="Generalizable">s″</a> <a id="361" href="/lia/part5/Extentions/#361" class="Generalizable">s‴</a> <a id="364" class="Symbol">:</a> <a id="366" href="/lia/part5/Imp/#1231" class="Function">State</a></pre>
+
+<h1 id="side-effects">
+<a class="anchor" href="#side-effects" aria-hidden="true"><span class="octicon octicon-link"></span></a>Side effects</h1>
+
+<pre class="Agda"><a id="397" class="Keyword">module</a> <a id="SideEffects"></a><a id="404" href="/lia/part5/Extentions/#404" class="Module">SideEffects</a> <a id="416" class="Keyword">where</a></pre>
+
+<h2 id="arithmetic-expressions">
+<a class="anchor" href="#arithmetic-expressions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Arithmetic expressions</h2>
+
+<pre class="Agda"><a id="458" class="Keyword">data</a> <a id="AExp"></a><a id="463" href="/lia/part5/Extentions/#463" class="Datatype">AExp</a> <a id="468" class="Symbol">:</a> <a id="470" class="PrimitiveType">Set</a>
+<a id="474" class="Keyword">data</a> <a id="Cmd"></a><a id="479" href="/lia/part5/Extentions/#479" class="Datatype">Cmd</a> <a id="483" class="Symbol">:</a> <a id="485" class="PrimitiveType">Set</a>
+
+<a id="490" class="Keyword">data</a> <a id="495" href="/lia/part5/Extentions/#463" class="Datatype">AExp</a> <a id="500" class="Keyword">where</a>
+  <a id="AExp.Num"></a><a id="508" href="/lia/part5/Extentions/#508" class="InductiveConstructor">Num</a> <a id="512" class="Symbol">:</a> <a id="514" class="Symbol">(</a><a id="515" href="/lia/part5/Extentions/#515" class="Bound">n</a> <a id="517" class="Symbol">:</a> <a id="519" href="/lia/part0/Naturals/#301" class="Function">ℕ</a><a id="520" class="Symbol">)</a> <a id="522" class="Symbol">→</a> <a id="524" href="/lia/part5/Extentions/#463" class="Datatype">AExp</a>
+  <a id="AExp.Var"></a><a id="531" href="/lia/part5/Extentions/#531" class="InductiveConstructor">Var</a> <a id="535" class="Symbol">:</a> <a id="537" class="Symbol">(</a><a id="538" href="/lia/part5/Extentions/#538" class="Bound">x</a> <a id="540" class="Symbol">:</a> <a id="542" href="/lia/part5/Exp/#544" class="Function">VarName</a><a id="549" class="Symbol">)</a> <a id="551" class="Symbol">→</a> <a id="553" href="/lia/part5/Extentions/#463" class="Datatype">AExp</a>
+  <a id="AExp.Add"></a><a id="560" href="/lia/part5/Extentions/#560" class="InductiveConstructor">Add</a> <a id="564" class="Symbol">:</a> <a id="566" class="Symbol">(</a><a id="567" href="/lia/part5/Extentions/#567" class="Bound">e</a> <a id="569" href="/lia/part5/Extentions/#569" class="Bound">f</a> <a id="571" class="Symbol">:</a> <a id="573" href="/lia/part5/Extentions/#463" class="Datatype">AExp</a><a id="577" class="Symbol">)</a> <a id="579" class="Symbol">→</a> <a id="581" href="/lia/part5/Extentions/#463" class="Datatype">AExp</a>
+  <a id="AExp.Mul"></a><a id="588" href="/lia/part5/Extentions/#588" class="InductiveConstructor">Mul</a> <a id="592" class="Symbol">:</a> <a id="594" class="Symbol">(</a><a id="595" href="/lia/part5/Extentions/#595" class="Bound">e</a> <a id="597" href="/lia/part5/Extentions/#597" class="Bound">f</a> <a id="599" class="Symbol">:</a> <a id="601" href="/lia/part5/Extentions/#463" class="Datatype">AExp</a><a id="605" class="Symbol">)</a> <a id="607" class="Symbol">→</a> <a id="609" href="/lia/part5/Extentions/#463" class="Datatype">AExp</a>
+  <a id="AExp.Let"></a><a id="616" href="/lia/part5/Extentions/#616" class="InductiveConstructor">Let</a> <a id="620" class="Symbol">:</a> <a id="622" class="Symbol">(</a><a id="623" href="/lia/part5/Extentions/#623" class="Bound">x</a> <a id="625" class="Symbol">:</a> <a id="627" href="/lia/part5/Exp/#544" class="Function">VarName</a><a id="634" class="Symbol">)</a> <a id="636" class="Symbol">(</a><a id="637" href="/lia/part5/Extentions/#637" class="Bound">e</a> <a id="639" href="/lia/part5/Extentions/#639" class="Bound">f</a> <a id="641" class="Symbol">:</a> <a id="643" href="/lia/part5/Extentions/#463" class="Datatype">AExp</a><a id="647" class="Symbol">)</a> <a id="649" class="Symbol">→</a> <a id="651" href="/lia/part5/Extentions/#463" class="Datatype">AExp</a>
+  <a id="AExp._ResultIs_"></a><a id="658" href="/lia/part5/Extentions/#658" class="InductiveConstructor Operator">_ResultIs_</a> <a id="669" class="Symbol">:</a> <a id="671" href="/lia/part5/Extentions/#479" class="Datatype">Cmd</a> <a id="675" class="Symbol">→</a> <a id="677" href="/lia/part5/Extentions/#463" class="Datatype">AExp</a> <a id="682" class="Symbol">→</a> <a id="684" href="/lia/part5/Extentions/#463" class="Datatype">AExp</a>
+
+<a id="690" class="Keyword">pattern</a> <a id="$_"></a><a id="698" href="/lia/part5/Extentions/#698" class="InductiveConstructor Operator">$_</a> <a id="701" href="/lia/part5/Extentions/#709" class="Bound">n</a> <a id="703" class="Symbol">=</a> <a id="705" class="InductiveConstructor">Num</a> <a id="709" href="/lia/part5/Extentions/#709" class="Bound">n</a>
+<a id="711" class="Keyword">pattern</a> <a id="`_"></a><a id="719" href="/lia/part5/Extentions/#719" class="InductiveConstructor Operator">`_</a> <a id="722" href="/lia/part5/Extentions/#730" class="Bound">x</a> <a id="724" class="Symbol">=</a> <a id="726" href="/lia/part5/Extentions/#531" class="InductiveConstructor">Var</a> <a id="730" href="/lia/part5/Extentions/#730" class="Bound">x</a>
+<a id="732" class="Keyword">pattern</a> <a id="_+_"></a><a id="740" href="/lia/part5/Extentions/#740" class="InductiveConstructor Operator">_+_</a> <a id="744" href="/lia/part5/Extentions/#754" class="Bound">x</a> <a id="746" href="/lia/part5/Extentions/#756" class="Bound">y</a> <a id="748" class="Symbol">=</a> <a id="750" href="/lia/part5/Extentions/#560" class="InductiveConstructor">Add</a> <a id="754" href="/lia/part5/Extentions/#754" class="Bound">x</a> <a id="756" href="/lia/part5/Extentions/#756" class="Bound">y</a>
+<a id="758" class="Keyword">pattern</a> <a id="_·_"></a><a id="766" href="/lia/part5/Extentions/#766" class="InductiveConstructor Operator">_·_</a> <a id="770" href="/lia/part5/Extentions/#780" class="Bound">x</a> <a id="772" href="/lia/part5/Extentions/#782" class="Bound">y</a> <a id="774" class="Symbol">=</a> <a id="776" href="/lia/part5/Extentions/#588" class="InductiveConstructor">Mul</a> <a id="780" href="/lia/part5/Extentions/#780" class="Bound">x</a> <a id="782" href="/lia/part5/Extentions/#782" class="Bound">y</a>
+<a id="784" class="Keyword">pattern</a> <a id="Let_≔_In_"></a><a id="792" href="/lia/part5/Extentions/#792" class="InductiveConstructor Operator">Let_≔_In_</a> <a id="802" href="/lia/part5/Extentions/#814" class="Bound">x</a> <a id="804" href="/lia/part5/Extentions/#816" class="Bound">e</a> <a id="806" href="/lia/part5/Extentions/#818" class="Bound">f</a> <a id="808" class="Symbol">=</a> <a id="810" href="/lia/part5/Extentions/#616" class="InductiveConstructor">Let</a> <a id="814" href="/lia/part5/Extentions/#814" class="Bound">x</a> <a id="816" href="/lia/part5/Extentions/#816" class="Bound">e</a> <a id="818" href="/lia/part5/Extentions/#818" class="Bound">f</a>
+
+<a id="821" class="Keyword">infix</a> <a id="827" class="Number">50</a> <a id="830" href="/lia/part5/Extentions/#698" class="InductiveConstructor Operator">$_</a> <a id="833" href="/lia/part5/Extentions/#719" class="InductiveConstructor Operator">`_</a>
+<a id="836" class="Keyword">infixr</a> <a id="843" class="Number">30</a> <a id="846" href="/lia/part5/Extentions/#766" class="InductiveConstructor Operator">_·_</a>
+<a id="850" class="Keyword">infixl</a> <a id="857" class="Number">25</a> <a id="860" href="/lia/part5/Extentions/#740" class="InductiveConstructor Operator">_+_</a>
+<a id="864" class="Keyword">infixr</a> <a id="871" class="Number">20</a> <a id="874" href="/lia/part5/Extentions/#792" class="InductiveConstructor Operator">Let_≔_In_</a>
+<a id="884" class="Keyword">infixl</a> <a id="891" class="Number">20</a> <a id="894" href="/lia/part5/Extentions/#658" class="InductiveConstructor Operator">_ResultIs_</a>
+
+<a id="906" class="Keyword">private</a>
+  <a id="916" class="Keyword">variable</a>
+    <a id="929" href="/lia/part5/Extentions/#929" class="Generalizable">e</a> <a id="931" href="/lia/part5/Extentions/#931" class="Generalizable">e₀</a> <a id="934" href="/lia/part5/Extentions/#934" class="Generalizable">e₁</a> <a id="937" href="/lia/part5/Extentions/#937" class="Generalizable">f</a> <a id="939" class="Symbol">:</a> <a id="941" href="/lia/part5/Extentions/#463" class="Datatype">AExp</a>
+    <a id="950" href="/lia/part5/Extentions/#950" class="Generalizable">c</a> <a id="952" href="/lia/part5/Extentions/#952" class="Generalizable">c₀</a> <a id="955" href="/lia/part5/Extentions/#955" class="Generalizable">c₁</a> <a id="958" href="/lia/part5/Extentions/#958" class="Generalizable">d</a> <a id="960" class="Symbol">:</a> <a id="962" href="/lia/part5/Extentions/#479" class="Datatype">Cmd</a></pre>
+
+<p>We have a new construct <code class="language-plaintext highlighter-rouge">c ResultIs e</code> which evaluates the program <code class="language-plaintext highlighter-rouge">c</code>
+and then evaluates to expression <code class="language-plaintext highlighter-rouge">e</code>. In order to keep track of the new
+state caused by evaluating <code class="language-plaintext highlighter-rouge">c</code>, we will need to propagate the state
+around. Since the evaluation of programs is not a total function, we
+will develop a big-steps operational semantics.</p>
+
+<pre class="Agda"><a id="1304" class="Keyword">infix</a> <a id="1310" class="Number">4</a> <a id="1312" href="/lia/part5/Extentions/#1343" class="Datatype Operator">_,_⇒A_,_</a> <a id="1321" href="/lia/part5/Extentions/#2277" class="Datatype Operator">_,_⇒B_,_</a>  <a id="1331" href="/lia/part5/Extentions/#1390" class="Datatype Operator">_,_⇒_</a>
+
+<a id="1338" class="Keyword">data</a> <a id="_,_⇒A_,_"></a><a id="1343" href="/lia/part5/Extentions/#1343" class="Datatype Operator">_,_⇒A_,_</a> <a id="1352" class="Symbol">:</a> <a id="1354" href="/lia/part5/Extentions/#463" class="Datatype">AExp</a> <a id="1359" class="Symbol">→</a> <a id="1361" href="/lia/part5/Imp/#1231" class="Function">State</a> <a id="1367" class="Symbol">→</a> <a id="1369" href="/lia/part0/Naturals/#301" class="Function">ℕ</a> <a id="1371" class="Symbol">→</a> <a id="1373" href="/lia/part5/Imp/#1231" class="Function">State</a> <a id="1379" class="Symbol">→</a> <a id="1381" class="PrimitiveType">Set</a>
+<a id="1385" class="Keyword">data</a> <a id="_,_⇒_"></a><a id="1390" href="/lia/part5/Extentions/#1390" class="Datatype Operator">_,_⇒_</a> <a id="1396" class="Symbol">:</a> <a id="1398" href="/lia/part5/Extentions/#479" class="Datatype">Cmd</a> <a id="1402" class="Symbol">→</a> <a id="1404" href="/lia/part5/Imp/#1231" class="Function">State</a> <a id="1410" class="Symbol">→</a> <a id="1412" href="/lia/part5/Imp/#1231" class="Function">State</a> <a id="1418" class="Symbol">→</a> <a id="1420" class="PrimitiveType">Set</a> 
+
+<a id="1426" class="Keyword">data</a> <a id="1431" href="/lia/part5/Extentions/#1343" class="Datatype Operator">_,_⇒A_,_</a> <a id="1440" class="Keyword">where</a>
+
+  <a id="_,_⇒A_,_.⇒-Num"></a><a id="1449" href="/lia/part5/Extentions/#1449" class="InductiveConstructor">⇒-Num</a> <a id="1455" class="Symbol">:</a>
+    <a id="1461" class="Comment">-----------------</a>
+    <a id="1483" href="/lia/part5/Extentions/#508" class="InductiveConstructor">Num</a> <a id="1487" href="/lia/part5/Extentions/#319" class="Generalizable">n</a> <a id="1489" href="/lia/part5/Extentions/#1343" class="Datatype Operator">,</a> <a id="1491" href="/lia/part5/Extentions/#353" class="Generalizable">s</a> <a id="1493" href="/lia/part5/Extentions/#1343" class="Datatype Operator">⇒A</a> <a id="1496" href="/lia/part5/Extentions/#319" class="Generalizable">n</a> <a id="1498" href="/lia/part5/Extentions/#1343" class="Datatype Operator">,</a> <a id="1500" href="/lia/part5/Extentions/#353" class="Generalizable">s</a>
+
+  <a id="_,_⇒A_,_.⇒-Var"></a><a id="1505" href="/lia/part5/Extentions/#1505" class="InductiveConstructor">⇒-Var</a> <a id="1511" class="Symbol">:</a>
+    <a id="1517" class="Comment">--------------------</a>
+    <a id="1542" href="/lia/part5/Extentions/#531" class="InductiveConstructor">Var</a> <a id="1546" href="/lia/part5/Extentions/#335" class="Generalizable">x</a> <a id="1548" href="/lia/part5/Extentions/#1343" class="Datatype Operator">,</a> <a id="1550" href="/lia/part5/Extentions/#353" class="Generalizable">s</a> <a id="1552" href="/lia/part5/Extentions/#1343" class="Datatype Operator">⇒A</a> <a id="1555" href="/lia/part5/Extentions/#353" class="Generalizable">s</a> <a id="1557" href="/lia/part5/Extentions/#335" class="Generalizable">x</a> <a id="1559" href="/lia/part5/Extentions/#1343" class="Datatype Operator">,</a> <a id="1561" href="/lia/part5/Extentions/#353" class="Generalizable">s</a>
+
+  <a id="_,_⇒A_,_.⇒-Add"></a><a id="1566" href="/lia/part5/Extentions/#1566" class="InductiveConstructor">⇒-Add</a> <a id="1572" class="Symbol">:</a>
+    <a id="1578" href="/lia/part5/Extentions/#929" class="Generalizable">e</a> <a id="1580" href="/lia/part5/Extentions/#1343" class="Datatype Operator">,</a> <a id="1582" href="/lia/part5/Extentions/#353" class="Generalizable">s</a> <a id="1584" href="/lia/part5/Extentions/#1343" class="Datatype Operator">⇒A</a> <a id="1587" href="/lia/part5/Extentions/#317" class="Generalizable">m</a> <a id="1589" href="/lia/part5/Extentions/#1343" class="Datatype Operator">,</a> <a id="1591" href="/lia/part5/Extentions/#355" class="Generalizable">s′</a> <a id="1594" class="Symbol">→</a>
+    <a id="1600" href="/lia/part5/Extentions/#937" class="Generalizable">f</a> <a id="1602" href="/lia/part5/Extentions/#1343" class="Datatype Operator">,</a> <a id="1604" href="/lia/part5/Extentions/#355" class="Generalizable">s′</a> <a id="1607" href="/lia/part5/Extentions/#1343" class="Datatype Operator">⇒A</a> <a id="1610" href="/lia/part5/Extentions/#319" class="Generalizable">n</a> <a id="1612" href="/lia/part5/Extentions/#1343" class="Datatype Operator">,</a> <a id="1614" href="/lia/part5/Extentions/#358" class="Generalizable">s″</a> <a id="1617" class="Symbol">→</a>
+    <a id="1623" class="Comment">-----------------------</a>
+    <a id="1651" href="/lia/part5/Extentions/#929" class="Generalizable">e</a> <a id="1653" href="/lia/part5/Extentions/#740" class="InductiveConstructor Operator">+</a> <a id="1655" href="/lia/part5/Extentions/#937" class="Generalizable">f</a> <a id="1657" href="/lia/part5/Extentions/#1343" class="Datatype Operator">,</a> <a id="1659" href="/lia/part5/Extentions/#353" class="Generalizable">s</a> <a id="1661" href="/lia/part5/Extentions/#1343" class="Datatype Operator">⇒A</a> <a id="1664" href="/lia/part5/Extentions/#317" class="Generalizable">m</a> <a id="1666" href="/lia/part5/Extentions/#180" class="Primitive Operator">+ℕ</a> <a id="1669" href="/lia/part5/Extentions/#319" class="Generalizable">n</a> <a id="1671" href="/lia/part5/Extentions/#1343" class="Datatype Operator">,</a> <a id="1673" href="/lia/part5/Extentions/#358" class="Generalizable">s″</a>
+
+  <a id="_,_⇒A_,_.⇒-Mul"></a><a id="1679" href="/lia/part5/Extentions/#1679" class="InductiveConstructor">⇒-Mul</a> <a id="1685" class="Symbol">:</a>
+    <a id="1691" href="/lia/part5/Extentions/#929" class="Generalizable">e</a> <a id="1693" href="/lia/part5/Extentions/#1343" class="Datatype Operator">,</a> <a id="1695" href="/lia/part5/Extentions/#353" class="Generalizable">s</a> <a id="1697" href="/lia/part5/Extentions/#1343" class="Datatype Operator">⇒A</a> <a id="1700" href="/lia/part5/Extentions/#317" class="Generalizable">m</a> <a id="1702" href="/lia/part5/Extentions/#1343" class="Datatype Operator">,</a> <a id="1704" href="/lia/part5/Extentions/#355" class="Generalizable">s′</a> <a id="1707" class="Symbol">→</a>
+    <a id="1713" href="/lia/part5/Extentions/#937" class="Generalizable">f</a> <a id="1715" href="/lia/part5/Extentions/#1343" class="Datatype Operator">,</a> <a id="1717" href="/lia/part5/Extentions/#355" class="Generalizable">s′</a> <a id="1720" href="/lia/part5/Extentions/#1343" class="Datatype Operator">⇒A</a> <a id="1723" href="/lia/part5/Extentions/#319" class="Generalizable">n</a> <a id="1725" href="/lia/part5/Extentions/#1343" class="Datatype Operator">,</a> <a id="1727" href="/lia/part5/Extentions/#358" class="Generalizable">s″</a> <a id="1730" class="Symbol">→</a>
+    <a id="1736" class="Comment">-----------------------</a>
+    <a id="1764" href="/lia/part5/Extentions/#929" class="Generalizable">e</a> <a id="1766" href="/lia/part5/Extentions/#766" class="InductiveConstructor Operator">·</a> <a id="1768" href="/lia/part5/Extentions/#937" class="Generalizable">f</a> <a id="1770" href="/lia/part5/Extentions/#1343" class="Datatype Operator">,</a> <a id="1772" href="/lia/part5/Extentions/#353" class="Generalizable">s</a> <a id="1774" href="/lia/part5/Extentions/#1343" class="Datatype Operator">⇒A</a> <a id="1777" href="/lia/part5/Extentions/#317" class="Generalizable">m</a> <a id="1779" href="/lia/part5/Extentions/#193" class="Primitive Operator">·ℕ</a> <a id="1782" href="/lia/part5/Extentions/#319" class="Generalizable">n</a> <a id="1784" href="/lia/part5/Extentions/#1343" class="Datatype Operator">,</a> <a id="1786" href="/lia/part5/Extentions/#358" class="Generalizable">s″</a> 
+
+  <a id="_,_⇒A_,_.⇒-Let"></a><a id="1793" href="/lia/part5/Extentions/#1793" class="InductiveConstructor">⇒-Let</a> <a id="1799" class="Symbol">:</a>
+    <a id="1805" href="/lia/part5/Extentions/#929" class="Generalizable">e</a> <a id="1807" href="/lia/part5/Extentions/#1343" class="Datatype Operator">,</a> <a id="1809" href="/lia/part5/Extentions/#353" class="Generalizable">s</a> <a id="1811" href="/lia/part5/Extentions/#1343" class="Datatype Operator">⇒A</a> <a id="1814" href="/lia/part5/Extentions/#317" class="Generalizable">m</a> <a id="1816" href="/lia/part5/Extentions/#1343" class="Datatype Operator">,</a> <a id="1818" href="/lia/part5/Extentions/#355" class="Generalizable">s′</a> <a id="1821" class="Symbol">→</a>
+    <a id="1827" href="/lia/part5/Extentions/#937" class="Generalizable">f</a> <a id="1829" href="/lia/part5/Extentions/#1343" class="Datatype Operator">,</a> <a id="1831" href="/lia/part5/Extentions/#355" class="Generalizable">s′</a> <a id="1834" href="/lia/part0/Functions/#570" class="Function Operator">[</a> <a id="1836" href="/lia/part5/Extentions/#335" class="Generalizable">x</a> <a id="1838" href="/lia/part0/Functions/#570" class="Function Operator">↦</a> <a id="1840" href="/lia/part5/Extentions/#317" class="Generalizable">m</a> <a id="1842" href="/lia/part0/Functions/#570" class="Function Operator">]</a> <a id="1844" href="/lia/part5/Extentions/#1343" class="Datatype Operator">⇒A</a> <a id="1847" href="/lia/part5/Extentions/#319" class="Generalizable">n</a> <a id="1849" href="/lia/part5/Extentions/#1343" class="Datatype Operator">,</a> <a id="1851" href="/lia/part5/Extentions/#358" class="Generalizable">s″</a> <a id="1854" class="Symbol">→</a>
+    <a id="1860" class="Comment">---------------------</a>
+    <a id="1886" href="/lia/part5/Extentions/#616" class="InductiveConstructor">Let</a> <a id="1890" href="/lia/part5/Extentions/#335" class="Generalizable">x</a> <a id="1892" href="/lia/part5/Extentions/#929" class="Generalizable">e</a> <a id="1894" href="/lia/part5/Extentions/#937" class="Generalizable">f</a> <a id="1896" href="/lia/part5/Extentions/#1343" class="Datatype Operator">,</a> <a id="1898" href="/lia/part5/Extentions/#353" class="Generalizable">s</a> <a id="1900" href="/lia/part5/Extentions/#1343" class="Datatype Operator">⇒A</a> <a id="1903" href="/lia/part5/Extentions/#319" class="Generalizable">n</a> <a id="1905" href="/lia/part5/Extentions/#1343" class="Datatype Operator">,</a> <a id="1907" href="/lia/part5/Extentions/#358" class="Generalizable">s″</a>
+
+  <a id="_,_⇒A_,_.→-ResultIs"></a><a id="1913" href="/lia/part5/Extentions/#1913" class="InductiveConstructor">→-ResultIs</a> <a id="1924" class="Symbol">:</a>
+    <a id="1930" href="/lia/part5/Extentions/#950" class="Generalizable">c</a> <a id="1932" href="/lia/part5/Extentions/#1390" class="Datatype Operator">,</a> <a id="1934" href="/lia/part5/Extentions/#353" class="Generalizable">s</a> <a id="1936" href="/lia/part5/Extentions/#1390" class="Datatype Operator">⇒</a> <a id="1938" href="/lia/part5/Extentions/#355" class="Generalizable">s′</a> <a id="1941" class="Symbol">→</a>
+    <a id="1947" href="/lia/part5/Extentions/#929" class="Generalizable">e</a> <a id="1949" href="/lia/part5/Extentions/#1343" class="Datatype Operator">,</a> <a id="1951" href="/lia/part5/Extentions/#355" class="Generalizable">s′</a> <a id="1954" href="/lia/part5/Extentions/#1343" class="Datatype Operator">⇒A</a> <a id="1957" href="/lia/part5/Extentions/#319" class="Generalizable">n</a> <a id="1959" href="/lia/part5/Extentions/#1343" class="Datatype Operator">,</a> <a id="1961" href="/lia/part5/Extentions/#358" class="Generalizable">s″</a> <a id="1964" class="Symbol">→</a>
+    <a id="1970" class="Comment">-------------------------</a>
+    <a id="2000" href="/lia/part5/Extentions/#950" class="Generalizable">c</a> <a id="2002" href="/lia/part5/Extentions/#658" class="InductiveConstructor Operator">ResultIs</a> <a id="2011" href="/lia/part5/Extentions/#929" class="Generalizable">e</a> <a id="2013" href="/lia/part5/Extentions/#1343" class="Datatype Operator">,</a> <a id="2015" href="/lia/part5/Extentions/#353" class="Generalizable">s</a> <a id="2017" href="/lia/part5/Extentions/#1343" class="Datatype Operator">⇒A</a> <a id="2020" href="/lia/part5/Extentions/#319" class="Generalizable">n</a> <a id="2022" href="/lia/part5/Extentions/#1343" class="Datatype Operator">,</a> <a id="2024" href="/lia/part5/Extentions/#358" class="Generalizable">s″</a></pre>
+
+<h2 id="boolean-expressions">
+<a class="anchor" href="#boolean-expressions" aria-hidden="true"><span class="octicon octicon-link"></span></a>Boolean expressions</h2>
+
+<pre class="Agda"><a id="2061" class="Keyword">data</a> <a id="BExp"></a><a id="2066" href="/lia/part5/Extentions/#2066" class="Datatype">BExp</a> <a id="2071" class="Symbol">:</a> <a id="2073" class="PrimitiveType">Set</a> <a id="2077" class="Keyword">where</a>
+  <a id="BExp.tt"></a><a id="2085" href="/lia/part5/Extentions/#2085" class="InductiveConstructor">tt</a> <a id="2088" class="Symbol">:</a> <a id="2090" href="/lia/part5/Extentions/#2066" class="Datatype">BExp</a>
+  <a id="BExp.ff"></a><a id="2097" href="/lia/part5/Extentions/#2097" class="InductiveConstructor">ff</a> <a id="2100" class="Symbol">:</a> <a id="2102" href="/lia/part5/Extentions/#2066" class="Datatype">BExp</a>
+  <a id="BExp.Not"></a><a id="2109" href="/lia/part5/Extentions/#2109" class="InductiveConstructor">Not</a> <a id="2113" class="Symbol">:</a> <a id="2115" href="/lia/part5/Extentions/#2066" class="Datatype">BExp</a> <a id="2120" class="Symbol">→</a> <a id="2122" href="/lia/part5/Extentions/#2066" class="Datatype">BExp</a>
+  <a id="BExp.Or"></a><a id="2129" href="/lia/part5/Extentions/#2129" class="InductiveConstructor">Or</a> <a id="2132" class="Symbol">:</a> <a id="2134" href="/lia/part5/Extentions/#2066" class="Datatype">BExp</a> <a id="2139" class="Symbol">→</a> <a id="2141" href="/lia/part5/Extentions/#2066" class="Datatype">BExp</a> <a id="2146" class="Symbol">→</a> <a id="2148" href="/lia/part5/Extentions/#2066" class="Datatype">BExp</a>
+  <a id="BExp.And"></a><a id="2155" href="/lia/part5/Extentions/#2155" class="InductiveConstructor">And</a> <a id="2159" class="Symbol">:</a> <a id="2161" href="/lia/part5/Extentions/#2066" class="Datatype">BExp</a> <a id="2166" class="Symbol">→</a> <a id="2168" href="/lia/part5/Extentions/#2066" class="Datatype">BExp</a> <a id="2173" class="Symbol">→</a> <a id="2175" href="/lia/part5/Extentions/#2066" class="Datatype">BExp</a>
+  <a id="BExp.Leq"></a><a id="2182" href="/lia/part5/Extentions/#2182" class="InductiveConstructor">Leq</a> <a id="2186" class="Symbol">:</a> <a id="2188" href="/lia/part5/Extentions/#463" class="Datatype">AExp</a> <a id="2193" class="Symbol">→</a> <a id="2195" href="/lia/part5/Extentions/#463" class="Datatype">AExp</a> <a id="2200" class="Symbol">→</a> <a id="2202" href="/lia/part5/Extentions/#2066" class="Datatype">BExp</a>
+
+<a id="2208" class="Keyword">private</a>
+  <a id="2218" class="Keyword">variable</a>
+    <a id="2231" href="/lia/part5/Extentions/#2231" class="Generalizable">b</a> <a id="2233" href="/lia/part5/Extentions/#2233" class="Generalizable">b₀</a> <a id="2236" href="/lia/part5/Extentions/#2236" class="Generalizable">b₁</a> <a id="2239" class="Symbol">:</a> <a id="2241" href="/lia/part5/Extentions/#2066" class="Datatype">BExp</a>
+    <a id="2250" href="/lia/part5/Extentions/#2250" class="Generalizable">v</a> <a id="2252" href="/lia/part5/Extentions/#2252" class="Generalizable">v₀</a> <a id="2255" href="/lia/part5/Extentions/#2255" class="Generalizable">v₁</a>  <a id="2259" class="Symbol">:</a> <a id="2261" href="/lia/part0/Booleans/#259" class="Datatype">𝔹</a></pre>
+<pre class="Agda"><a id="2272" class="Keyword">data</a> <a id="_,_⇒B_,_"></a><a id="2277" href="/lia/part5/Extentions/#2277" class="Datatype Operator">_,_⇒B_,_</a> <a id="2286" class="Symbol">:</a> <a id="2288" href="/lia/part5/Extentions/#2066" class="Datatype">BExp</a> <a id="2293" class="Symbol">→</a> <a id="2295" href="/lia/part5/Imp/#1231" class="Function">State</a> <a id="2301" class="Symbol">→</a> <a id="2303" href="/lia/part0/Booleans/#259" class="Datatype">𝔹</a> <a id="2305" class="Symbol">→</a> <a id="2307" href="/lia/part5/Imp/#1231" class="Function">State</a> <a id="2313" class="Symbol">→</a> <a id="2315" class="PrimitiveType">Set</a> <a id="2319" class="Keyword">where</a>
+
+  <a id="_,_⇒B_,_.⇒-tt"></a><a id="2328" href="/lia/part5/Extentions/#2328" class="InductiveConstructor">⇒-tt</a> <a id="2333" class="Symbol">:</a>
+    <a id="2339" class="Comment">---------------</a>
+    <a id="2359" href="/lia/part5/Extentions/#2085" class="InductiveConstructor">tt</a> <a id="2362" href="/lia/part5/Extentions/#2277" class="Datatype Operator">,</a> <a id="2364" href="/lia/part5/Extentions/#353" class="Generalizable">s</a> <a id="2366" href="/lia/part5/Extentions/#2277" class="Datatype Operator">⇒B</a> <a id="2369" href="/lia/part0/Booleans/#284" class="InductiveConstructor">tt</a> <a id="2372" href="/lia/part5/Extentions/#2277" class="Datatype Operator">,</a> <a id="2374" href="/lia/part5/Extentions/#353" class="Generalizable">s</a>
+
+  <a id="_,_⇒B_,_.⇒-ff"></a><a id="2379" href="/lia/part5/Extentions/#2379" class="InductiveConstructor">⇒-ff</a> <a id="2384" class="Symbol">:</a>
+    <a id="2390" class="Comment">---------------</a>
+    <a id="2410" href="/lia/part5/Extentions/#2097" class="InductiveConstructor">ff</a> <a id="2413" href="/lia/part5/Extentions/#2277" class="Datatype Operator">,</a> <a id="2415" href="/lia/part5/Extentions/#353" class="Generalizable">s</a> <a id="2417" href="/lia/part5/Extentions/#2277" class="Datatype Operator">⇒B</a> <a id="2420" href="/lia/part0/Booleans/#275" class="InductiveConstructor">ff</a> <a id="2423" href="/lia/part5/Extentions/#2277" class="Datatype Operator">,</a> <a id="2425" href="/lia/part5/Extentions/#353" class="Generalizable">s</a>
+
+  <a id="_,_⇒B_,_.⇒-Not"></a><a id="2430" href="/lia/part5/Extentions/#2430" class="InductiveConstructor">⇒-Not</a> <a id="2436" class="Symbol">:</a>
+    <a id="2442" href="/lia/part5/Extentions/#2231" class="Generalizable">b</a> <a id="2444" href="/lia/part5/Extentions/#2277" class="Datatype Operator">,</a> <a id="2446" href="/lia/part5/Extentions/#353" class="Generalizable">s</a> <a id="2448" href="/lia/part5/Extentions/#2277" class="Datatype Operator">⇒B</a> <a id="2451" href="/lia/part5/Extentions/#2250" class="Generalizable">v</a> <a id="2453" href="/lia/part5/Extentions/#2277" class="Datatype Operator">,</a> <a id="2455" href="/lia/part5/Extentions/#355" class="Generalizable">s′</a> <a id="2458" class="Symbol">→</a>
+    <a id="2464" class="Comment">----------------------</a>
+    <a id="2491" href="/lia/part5/Extentions/#2109" class="InductiveConstructor">Not</a> <a id="2495" href="/lia/part5/Extentions/#2231" class="Generalizable">b</a> <a id="2497" href="/lia/part5/Extentions/#2277" class="Datatype Operator">,</a> <a id="2499" href="/lia/part5/Extentions/#353" class="Generalizable">s</a> <a id="2501" href="/lia/part5/Extentions/#2277" class="Datatype Operator">⇒B</a> <a id="2504" href="/lia/part0/Booleans/#1119" class="Function Operator">¬𝔹</a> <a id="2507" href="/lia/part5/Extentions/#2250" class="Generalizable">v</a> <a id="2509" href="/lia/part5/Extentions/#2277" class="Datatype Operator">,</a> <a id="2511" href="/lia/part5/Extentions/#355" class="Generalizable">s′</a>
+
+  <a id="_,_⇒B_,_.⇒-Or"></a><a id="2517" href="/lia/part5/Extentions/#2517" class="InductiveConstructor">⇒-Or</a> <a id="2522" class="Symbol">:</a>
+    <a id="2528" href="/lia/part5/Extentions/#2233" class="Generalizable">b₀</a> <a id="2531" href="/lia/part5/Extentions/#2277" class="Datatype Operator">,</a> <a id="2533" href="/lia/part5/Extentions/#353" class="Generalizable">s</a> <a id="2535" href="/lia/part5/Extentions/#2277" class="Datatype Operator">⇒B</a> <a id="2538" href="/lia/part5/Extentions/#2252" class="Generalizable">v₀</a> <a id="2541" href="/lia/part5/Extentions/#2277" class="Datatype Operator">,</a> <a id="2543" href="/lia/part5/Extentions/#355" class="Generalizable">s′</a> <a id="2546" class="Symbol">→</a>
+    <a id="2552" href="/lia/part5/Extentions/#2236" class="Generalizable">b₁</a> <a id="2555" href="/lia/part5/Extentions/#2277" class="Datatype Operator">,</a> <a id="2557" href="/lia/part5/Extentions/#355" class="Generalizable">s′</a> <a id="2560" href="/lia/part5/Extentions/#2277" class="Datatype Operator">⇒B</a> <a id="2563" href="/lia/part5/Extentions/#2255" class="Generalizable">v₁</a> <a id="2566" href="/lia/part5/Extentions/#2277" class="Datatype Operator">,</a> <a id="2568" href="/lia/part5/Extentions/#358" class="Generalizable">s″</a> <a id="2571" class="Symbol">→</a>
+    <a id="2577" class="Comment">-----------------------------</a>
+    <a id="2611" href="/lia/part5/Extentions/#2129" class="InductiveConstructor">Or</a> <a id="2614" href="/lia/part5/Extentions/#2233" class="Generalizable">b₀</a> <a id="2617" href="/lia/part5/Extentions/#2236" class="Generalizable">b₁</a> <a id="2620" href="/lia/part5/Extentions/#2277" class="Datatype Operator">,</a> <a id="2622" href="/lia/part5/Extentions/#353" class="Generalizable">s</a> <a id="2624" href="/lia/part5/Extentions/#2277" class="Datatype Operator">⇒B</a> <a id="2627" href="/lia/part5/Extentions/#2252" class="Generalizable">v₀</a> <a id="2630" href="/lia/part0/Booleans/#1061" class="Function Operator">∨𝔹</a> <a id="2633" href="/lia/part5/Extentions/#2255" class="Generalizable">v₁</a> <a id="2636" href="/lia/part5/Extentions/#2277" class="Datatype Operator">,</a> <a id="2638" href="/lia/part5/Extentions/#358" class="Generalizable">s″</a>
+
+  <a id="_,_⇒B_,_.⇒-And"></a><a id="2644" href="/lia/part5/Extentions/#2644" class="InductiveConstructor">⇒-And</a> <a id="2650" class="Symbol">:</a>
+    <a id="2656" href="/lia/part5/Extentions/#2233" class="Generalizable">b₀</a> <a id="2659" href="/lia/part5/Extentions/#2277" class="Datatype Operator">,</a> <a id="2661" href="/lia/part5/Extentions/#353" class="Generalizable">s</a> <a id="2663" href="/lia/part5/Extentions/#2277" class="Datatype Operator">⇒B</a> <a id="2666" href="/lia/part5/Extentions/#2252" class="Generalizable">v₀</a> <a id="2669" href="/lia/part5/Extentions/#2277" class="Datatype Operator">,</a> <a id="2671" href="/lia/part5/Extentions/#355" class="Generalizable">s′</a> <a id="2674" class="Symbol">→</a>
+    <a id="2680" href="/lia/part5/Extentions/#2236" class="Generalizable">b₁</a> <a id="2683" href="/lia/part5/Extentions/#2277" class="Datatype Operator">,</a> <a id="2685" href="/lia/part5/Extentions/#355" class="Generalizable">s′</a> <a id="2688" href="/lia/part5/Extentions/#2277" class="Datatype Operator">⇒B</a> <a id="2691" href="/lia/part5/Extentions/#2255" class="Generalizable">v₁</a> <a id="2694" href="/lia/part5/Extentions/#2277" class="Datatype Operator">,</a> <a id="2696" href="/lia/part5/Extentions/#358" class="Generalizable">s″</a> <a id="2699" class="Symbol">→</a>
+    <a id="2705" class="Comment">-----------------------------</a>
+    <a id="2739" href="/lia/part5/Extentions/#2155" class="InductiveConstructor">And</a> <a id="2743" href="/lia/part5/Extentions/#2233" class="Generalizable">b₀</a> <a id="2746" href="/lia/part5/Extentions/#2236" class="Generalizable">b₁</a> <a id="2749" href="/lia/part5/Extentions/#2277" class="Datatype Operator">,</a> <a id="2751" href="/lia/part5/Extentions/#353" class="Generalizable">s</a> <a id="2753" href="/lia/part5/Extentions/#2277" class="Datatype Operator">⇒B</a> <a id="2756" href="/lia/part5/Extentions/#2252" class="Generalizable">v₀</a> <a id="2759" href="/lia/part0/Booleans/#1003" class="Function Operator">∧𝔹</a> <a id="2762" href="/lia/part5/Extentions/#2255" class="Generalizable">v₁</a> <a id="2765" href="/lia/part5/Extentions/#2277" class="Datatype Operator">,</a> <a id="2767" href="/lia/part5/Extentions/#358" class="Generalizable">s″</a>
+
+  <a id="_,_⇒B_,_.⇒-Leq"></a><a id="2773" href="/lia/part5/Extentions/#2773" class="InductiveConstructor">⇒-Leq</a> <a id="2779" class="Symbol">:</a>
+    <a id="2785" href="/lia/part5/Extentions/#931" class="Generalizable">e₀</a> <a id="2788" href="/lia/part5/Extentions/#1343" class="Datatype Operator">,</a> <a id="2790" href="/lia/part5/Extentions/#353" class="Generalizable">s</a> <a id="2792" href="/lia/part5/Extentions/#1343" class="Datatype Operator">⇒A</a> <a id="2795" href="/lia/part5/Extentions/#321" class="Generalizable">n₀</a> <a id="2798" href="/lia/part5/Extentions/#1343" class="Datatype Operator">,</a> <a id="2800" href="/lia/part5/Extentions/#355" class="Generalizable">s′</a> <a id="2803" class="Symbol">→</a>
+    <a id="2809" href="/lia/part5/Extentions/#934" class="Generalizable">e₁</a> <a id="2812" href="/lia/part5/Extentions/#1343" class="Datatype Operator">,</a> <a id="2814" href="/lia/part5/Extentions/#355" class="Generalizable">s′</a> <a id="2817" href="/lia/part5/Extentions/#1343" class="Datatype Operator">⇒A</a> <a id="2820" href="/lia/part5/Extentions/#324" class="Generalizable">n₁</a> <a id="2823" href="/lia/part5/Extentions/#1343" class="Datatype Operator">,</a> <a id="2825" href="/lia/part5/Extentions/#358" class="Generalizable">s″</a> <a id="2828" class="Symbol">→</a>
+    <a id="2834" class="Comment">----------------------------------</a>
+    <a id="2873" href="/lia/part5/Extentions/#2182" class="InductiveConstructor">Leq</a> <a id="2877" href="/lia/part5/Extentions/#931" class="Generalizable">e₀</a> <a id="2880" href="/lia/part5/Extentions/#934" class="Generalizable">e₁</a> <a id="2883" href="/lia/part5/Extentions/#2277" class="Datatype Operator">,</a> <a id="2885" href="/lia/part5/Extentions/#353" class="Generalizable">s</a> <a id="2887" href="/lia/part5/Extentions/#2277" class="Datatype Operator">⇒B</a> <a id="2890" href="/lia/part0/Booleans/#367" class="Function Operator">⌞</a> <a id="2892" href="/lia/part5/Extentions/#321" class="Generalizable">n₀</a> <a id="2895" href="/lia/part0/Naturals/#1135" class="Function Operator">≤?</a> <a id="2898" href="/lia/part5/Extentions/#324" class="Generalizable">n₁</a> <a id="2901" href="/lia/part0/Booleans/#367" class="Function Operator">⌟</a> <a id="2903" href="/lia/part5/Extentions/#2277" class="Datatype Operator">,</a> <a id="2905" href="/lia/part5/Extentions/#358" class="Generalizable">s″</a></pre>
+
+<h2 id="programs">
+<a class="anchor" href="#programs" aria-hidden="true"><span class="octicon octicon-link"></span></a>Programs</h2>
+
+<pre class="Agda"><a id="2930" class="Keyword">infixr</a> <a id="2937" class="Number">20</a> <a id="2940" href="/lia/part5/Extentions/#3017" class="InductiveConstructor Operator">_⨟_</a>
+<a id="2944" class="Keyword">infix</a> <a id="2950" class="Number">25</a> <a id="2953" href="/lia/part5/Extentions/#2988" class="InductiveConstructor Operator">_≔_</a>
+
+<a id="2958" class="Keyword">data</a> <a id="2963" href="/lia/part5/Extentions/#479" class="Datatype">Cmd</a> <a id="2967" class="Keyword">where</a>
+  <a id="Cmd.skip"></a><a id="2975" href="/lia/part5/Extentions/#2975" class="InductiveConstructor">skip</a> <a id="2980" class="Symbol">:</a> <a id="2982" href="/lia/part5/Extentions/#479" class="Datatype">Cmd</a>
+  <a id="Cmd._≔_"></a><a id="2988" href="/lia/part5/Extentions/#2988" class="InductiveConstructor Operator">_≔_</a> <a id="2992" class="Symbol">:</a> <a id="2994" href="/lia/part5/Exp/#544" class="Function">VarName</a> <a id="3002" class="Symbol">→</a> <a id="3004" href="/lia/part5/Extentions/#463" class="Datatype">AExp</a> <a id="3009" class="Symbol">→</a> <a id="3011" href="/lia/part5/Extentions/#479" class="Datatype">Cmd</a>
+  <a id="Cmd._⨟_"></a><a id="3017" href="/lia/part5/Extentions/#3017" class="InductiveConstructor Operator">_⨟_</a> <a id="3021" class="Symbol">:</a> <a id="3023" href="/lia/part5/Extentions/#479" class="Datatype">Cmd</a> <a id="3027" class="Symbol">→</a> <a id="3029" href="/lia/part5/Extentions/#479" class="Datatype">Cmd</a> <a id="3033" class="Symbol">→</a> <a id="3035" href="/lia/part5/Extentions/#479" class="Datatype">Cmd</a>
+  <a id="Cmd.if_then_else_"></a><a id="3041" href="/lia/part5/Extentions/#3041" class="InductiveConstructor Operator">if_then_else_</a> <a id="3055" class="Symbol">:</a> <a id="3057" href="/lia/part5/Extentions/#2066" class="Datatype">BExp</a> <a id="3062" class="Symbol">→</a> <a id="3064" href="/lia/part5/Extentions/#479" class="Datatype">Cmd</a> <a id="3068" class="Symbol">→</a> <a id="3070" href="/lia/part5/Extentions/#479" class="Datatype">Cmd</a> <a id="3074" class="Symbol">→</a> <a id="3076" href="/lia/part5/Extentions/#479" class="Datatype">Cmd</a>
+  <a id="Cmd.while_do:_"></a><a id="3082" href="/lia/part5/Extentions/#3082" class="InductiveConstructor Operator">while_do:_</a> <a id="3093" class="Symbol">:</a> <a id="3095" href="/lia/part5/Extentions/#2066" class="Datatype">BExp</a> <a id="3100" class="Symbol">→</a> <a id="3102" href="/lia/part5/Extentions/#479" class="Datatype">Cmd</a> <a id="3106" class="Symbol">→</a> <a id="3108" href="/lia/part5/Extentions/#479" class="Datatype">Cmd</a></pre>
+<pre class="Agda"><a id="3121" class="Keyword">data</a> <a id="3126" href="/lia/part5/Extentions/#1390" class="Datatype Operator">_,_⇒_</a>  <a id="3133" class="Keyword">where</a>
+
+  <a id="_,_⇒_.⇒-skip"></a><a id="3142" href="/lia/part5/Extentions/#3142" class="InductiveConstructor">⇒-skip</a> <a id="3149" class="Symbol">:</a>
+    <a id="3155" class="Comment">------------</a>
+    <a id="3172" href="/lia/part5/Extentions/#2975" class="InductiveConstructor">skip</a> <a id="3177" href="/lia/part5/Extentions/#1390" class="Datatype Operator">,</a> <a id="3179" href="/lia/part5/Extentions/#353" class="Generalizable">s</a> <a id="3181" href="/lia/part5/Extentions/#1390" class="Datatype Operator">⇒</a> <a id="3183" href="/lia/part5/Extentions/#353" class="Generalizable">s</a>
+
+  <a id="_,_⇒_.⇒-assign"></a><a id="3188" href="/lia/part5/Extentions/#3188" class="InductiveConstructor">⇒-assign</a> <a id="3197" class="Symbol">:</a>
+    <a id="3203" href="/lia/part5/Extentions/#929" class="Generalizable">e</a> <a id="3205" href="/lia/part5/Extentions/#1343" class="Datatype Operator">,</a> <a id="3207" href="/lia/part5/Extentions/#353" class="Generalizable">s</a> <a id="3209" href="/lia/part5/Extentions/#1343" class="Datatype Operator">⇒A</a> <a id="3212" href="/lia/part5/Extentions/#319" class="Generalizable">n</a> <a id="3214" href="/lia/part5/Extentions/#1343" class="Datatype Operator">,</a> <a id="3216" href="/lia/part5/Extentions/#355" class="Generalizable">s′</a> <a id="3219" class="Symbol">→</a>
+    <a id="3225" class="Comment">-------------------------</a>
+    <a id="3255" href="/lia/part5/Extentions/#335" class="Generalizable">x</a> <a id="3257" href="/lia/part5/Extentions/#2988" class="InductiveConstructor Operator">≔</a> <a id="3259" href="/lia/part5/Extentions/#929" class="Generalizable">e</a> <a id="3261" href="/lia/part5/Extentions/#1390" class="Datatype Operator">,</a> <a id="3263" href="/lia/part5/Extentions/#353" class="Generalizable">s</a> <a id="3265" href="/lia/part5/Extentions/#1390" class="Datatype Operator">⇒</a> <a id="3267" href="/lia/part5/Extentions/#355" class="Generalizable">s′</a> <a id="3270" href="/lia/part0/Functions/#570" class="Function Operator">[</a> <a id="3272" href="/lia/part5/Extentions/#335" class="Generalizable">x</a> <a id="3274" href="/lia/part0/Functions/#570" class="Function Operator">↦</a> <a id="3276" href="/lia/part5/Extentions/#319" class="Generalizable">n</a> <a id="3278" href="/lia/part0/Functions/#570" class="Function Operator">]</a>
+
+  <a id="_,_⇒_.⇒-seq"></a><a id="3283" href="/lia/part5/Extentions/#3283" class="InductiveConstructor">⇒-seq</a> <a id="3289" class="Symbol">:</a>
+    <a id="3295" href="/lia/part5/Extentions/#950" class="Generalizable">c</a> <a id="3297" href="/lia/part5/Extentions/#1390" class="Datatype Operator">,</a> <a id="3299" href="/lia/part5/Extentions/#353" class="Generalizable">s</a> <a id="3301" href="/lia/part5/Extentions/#1390" class="Datatype Operator">⇒</a> <a id="3303" href="/lia/part5/Extentions/#355" class="Generalizable">s′</a> <a id="3306" class="Symbol">→</a>
+    <a id="3312" href="/lia/part5/Extentions/#958" class="Generalizable">d</a> <a id="3314" href="/lia/part5/Extentions/#1390" class="Datatype Operator">,</a> <a id="3316" href="/lia/part5/Extentions/#355" class="Generalizable">s′</a> <a id="3319" href="/lia/part5/Extentions/#1390" class="Datatype Operator">⇒</a> <a id="3321" href="/lia/part5/Extentions/#358" class="Generalizable">s″</a> <a id="3324" class="Symbol">→</a>
+    <a id="3330" class="Comment">---------------</a>
+    <a id="3350" href="/lia/part5/Extentions/#950" class="Generalizable">c</a> <a id="3352" href="/lia/part5/Extentions/#3017" class="InductiveConstructor Operator">⨟</a> <a id="3354" href="/lia/part5/Extentions/#958" class="Generalizable">d</a> <a id="3356" href="/lia/part5/Extentions/#1390" class="Datatype Operator">,</a> <a id="3358" href="/lia/part5/Extentions/#353" class="Generalizable">s</a> <a id="3360" href="/lia/part5/Extentions/#1390" class="Datatype Operator">⇒</a> <a id="3362" href="/lia/part5/Extentions/#358" class="Generalizable">s″</a>
+
+  <a id="_,_⇒_.⇒-if-tt"></a><a id="3368" href="/lia/part5/Extentions/#3368" class="InductiveConstructor">⇒-if-tt</a> <a id="3376" class="Symbol">:</a>
+    <a id="3382" href="/lia/part5/Extentions/#2231" class="Generalizable">b</a> <a id="3384" href="/lia/part5/Extentions/#2277" class="Datatype Operator">,</a> <a id="3386" href="/lia/part5/Extentions/#353" class="Generalizable">s</a> <a id="3388" href="/lia/part5/Extentions/#2277" class="Datatype Operator">⇒B</a> <a id="3391" href="/lia/part0/Booleans/#284" class="InductiveConstructor">tt</a> <a id="3394" href="/lia/part5/Extentions/#2277" class="Datatype Operator">,</a> <a id="3396" href="/lia/part5/Extentions/#355" class="Generalizable">s′</a> <a id="3399" class="Symbol">→</a>
+    <a id="3405" href="/lia/part5/Extentions/#950" class="Generalizable">c</a> <a id="3407" href="/lia/part5/Extentions/#1390" class="Datatype Operator">,</a> <a id="3409" href="/lia/part5/Extentions/#355" class="Generalizable">s′</a> <a id="3412" href="/lia/part5/Extentions/#1390" class="Datatype Operator">⇒</a> <a id="3414" href="/lia/part5/Extentions/#358" class="Generalizable">s″</a> <a id="3417" class="Symbol">→</a>
+    <a id="3423" class="Comment">---------------------------</a>
+    <a id="3455" href="/lia/part5/Extentions/#3041" class="InductiveConstructor Operator">if</a> <a id="3458" href="/lia/part5/Extentions/#2231" class="Generalizable">b</a> <a id="3460" href="/lia/part5/Extentions/#3041" class="InductiveConstructor Operator">then</a> <a id="3465" href="/lia/part5/Extentions/#950" class="Generalizable">c</a> <a id="3467" href="/lia/part5/Extentions/#3041" class="InductiveConstructor Operator">else</a> <a id="3472" href="/lia/part5/Extentions/#958" class="Generalizable">d</a> <a id="3474" href="/lia/part5/Extentions/#1390" class="Datatype Operator">,</a> <a id="3476" href="/lia/part5/Extentions/#353" class="Generalizable">s</a> <a id="3478" href="/lia/part5/Extentions/#1390" class="Datatype Operator">⇒</a> <a id="3480" href="/lia/part5/Extentions/#358" class="Generalizable">s″</a>
+    
+  <a id="_,_⇒_.⇒-if-ff"></a><a id="3490" href="/lia/part5/Extentions/#3490" class="InductiveConstructor">⇒-if-ff</a> <a id="3498" class="Symbol">:</a>
+    <a id="3504" href="/lia/part5/Extentions/#2231" class="Generalizable">b</a> <a id="3506" href="/lia/part5/Extentions/#2277" class="Datatype Operator">,</a> <a id="3508" href="/lia/part5/Extentions/#353" class="Generalizable">s</a> <a id="3510" href="/lia/part5/Extentions/#2277" class="Datatype Operator">⇒B</a> <a id="3513" href="/lia/part0/Booleans/#275" class="InductiveConstructor">ff</a> <a id="3516" href="/lia/part5/Extentions/#2277" class="Datatype Operator">,</a> <a id="3518" href="/lia/part5/Extentions/#355" class="Generalizable">s′</a> <a id="3521" class="Symbol">→</a>
+    <a id="3527" href="/lia/part5/Extentions/#958" class="Generalizable">d</a> <a id="3529" href="/lia/part5/Extentions/#1390" class="Datatype Operator">,</a> <a id="3531" href="/lia/part5/Extentions/#355" class="Generalizable">s′</a> <a id="3534" href="/lia/part5/Extentions/#1390" class="Datatype Operator">⇒</a> <a id="3536" href="/lia/part5/Extentions/#358" class="Generalizable">s″</a> <a id="3539" class="Symbol">→</a>
+    <a id="3545" class="Comment">---------------------------</a>
+    <a id="3577" href="/lia/part5/Extentions/#3041" class="InductiveConstructor Operator">if</a> <a id="3580" href="/lia/part5/Extentions/#2231" class="Generalizable">b</a> <a id="3582" href="/lia/part5/Extentions/#3041" class="InductiveConstructor Operator">then</a> <a id="3587" href="/lia/part5/Extentions/#950" class="Generalizable">c</a> <a id="3589" href="/lia/part5/Extentions/#3041" class="InductiveConstructor Operator">else</a> <a id="3594" href="/lia/part5/Extentions/#958" class="Generalizable">d</a> <a id="3596" href="/lia/part5/Extentions/#1390" class="Datatype Operator">,</a> <a id="3598" href="/lia/part5/Extentions/#353" class="Generalizable">s</a> <a id="3600" href="/lia/part5/Extentions/#1390" class="Datatype Operator">⇒</a> <a id="3602" href="/lia/part5/Extentions/#358" class="Generalizable">s″</a>
+
+  <a id="_,_⇒_.⇒-while-tt"></a><a id="3608" href="/lia/part5/Extentions/#3608" class="InductiveConstructor">⇒-while-tt</a> <a id="3619" class="Symbol">:</a>
+    <a id="3625" href="/lia/part5/Extentions/#2231" class="Generalizable">b</a> <a id="3627" href="/lia/part5/Extentions/#2277" class="Datatype Operator">,</a> <a id="3629" href="/lia/part5/Extentions/#353" class="Generalizable">s</a> <a id="3631" href="/lia/part5/Extentions/#2277" class="Datatype Operator">⇒B</a> <a id="3634" href="/lia/part0/Booleans/#284" class="InductiveConstructor">tt</a> <a id="3637" href="/lia/part5/Extentions/#2277" class="Datatype Operator">,</a> <a id="3639" href="/lia/part5/Extentions/#355" class="Generalizable">s′</a> <a id="3642" class="Symbol">→</a>
+    <a id="3648" href="/lia/part5/Extentions/#950" class="Generalizable">c</a> <a id="3650" href="/lia/part5/Extentions/#1390" class="Datatype Operator">,</a> <a id="3652" href="/lia/part5/Extentions/#355" class="Generalizable">s′</a> <a id="3655" href="/lia/part5/Extentions/#1390" class="Datatype Operator">⇒</a> <a id="3657" href="/lia/part5/Extentions/#358" class="Generalizable">s″</a> <a id="3660" class="Symbol">→</a>
+    <a id="3666" href="/lia/part5/Extentions/#3082" class="InductiveConstructor Operator">while</a> <a id="3672" href="/lia/part5/Extentions/#2231" class="Generalizable">b</a> <a id="3674" href="/lia/part5/Extentions/#3082" class="InductiveConstructor Operator">do:</a> <a id="3678" href="/lia/part5/Extentions/#950" class="Generalizable">c</a> <a id="3680" href="/lia/part5/Extentions/#1390" class="Datatype Operator">,</a> <a id="3682" href="/lia/part5/Extentions/#358" class="Generalizable">s″</a> <a id="3685" href="/lia/part5/Extentions/#1390" class="Datatype Operator">⇒</a> <a id="3687" href="/lia/part5/Extentions/#361" class="Generalizable">s‴</a> <a id="3690" class="Symbol">→</a>
+    <a id="3696" class="Comment">--------------------------</a>
+    <a id="3727" href="/lia/part5/Extentions/#3082" class="InductiveConstructor Operator">while</a> <a id="3733" href="/lia/part5/Extentions/#2231" class="Generalizable">b</a> <a id="3735" href="/lia/part5/Extentions/#3082" class="InductiveConstructor Operator">do:</a> <a id="3739" href="/lia/part5/Extentions/#950" class="Generalizable">c</a> <a id="3741" href="/lia/part5/Extentions/#1390" class="Datatype Operator">,</a> <a id="3743" href="/lia/part5/Extentions/#353" class="Generalizable">s</a> <a id="3745" href="/lia/part5/Extentions/#1390" class="Datatype Operator">⇒</a> <a id="3747" href="/lia/part5/Extentions/#361" class="Generalizable">s‴</a>
+  
+  <a id="_,_⇒_.⇒-while-ff"></a><a id="3755" href="/lia/part5/Extentions/#3755" class="InductiveConstructor">⇒-while-ff</a> <a id="3766" class="Symbol">:</a>
+    <a id="3772" href="/lia/part5/Extentions/#2231" class="Generalizable">b</a> <a id="3774" href="/lia/part5/Extentions/#2277" class="Datatype Operator">,</a> <a id="3776" href="/lia/part5/Extentions/#353" class="Generalizable">s</a> <a id="3778" href="/lia/part5/Extentions/#2277" class="Datatype Operator">⇒B</a> <a id="3781" href="/lia/part0/Booleans/#275" class="InductiveConstructor">ff</a> <a id="3784" href="/lia/part5/Extentions/#2277" class="Datatype Operator">,</a> <a id="3786" href="/lia/part5/Extentions/#355" class="Generalizable">s′</a> <a id="3789" class="Symbol">→</a>
+    <a id="3795" class="Comment">---------------------</a>
+    <a id="3821" href="/lia/part5/Extentions/#3082" class="InductiveConstructor Operator">while</a> <a id="3827" href="/lia/part5/Extentions/#2231" class="Generalizable">b</a> <a id="3829" href="/lia/part5/Extentions/#3082" class="InductiveConstructor Operator">do:</a> <a id="3833" href="/lia/part5/Extentions/#950" class="Generalizable">c</a> <a id="3835" href="/lia/part5/Extentions/#1390" class="Datatype Operator">,</a> <a id="3837" href="/lia/part5/Extentions/#353" class="Generalizable">s</a> <a id="3839" href="/lia/part5/Extentions/#1390" class="Datatype Operator">⇒</a> <a id="3841" href="/lia/part5/Extentions/#355" class="Generalizable">s′</a></pre>
+
+<div id="refs">
+
+  <h1 id="references">
+<a class="anchor" href="#references" aria-hidden="true"><span class="octicon octicon-link"></span></a>References</h1>
+
+</div>
+
+    </div>
+  
+    <header class="nav-header">
+    <p style="text-align:center;">
+        
+        
+        
+        <a alt="Part" href="/lia/part5/index/">Part</a>
+        &bullet;
+        
+        
+        <a alt="Source code" href="https://github.com/lclem/lia/blob/main/src/part5/Extentions.lagda.md">Source</a>
+        
+        
+        
+    </p>
+</header>
+
+    <p class="p-name"> Last-modified: Jan  9 17:39:48 2021 </p>
+  </article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/lia/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Logic in Agda</h2><div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Lorenzo Clemente</li>
+          <li><a class="u-email" href="mailto:clementelorenzo@gmail.com">clementelorenzo@gmail.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/lclem"><svg class="svg-icon"><use xlink:href="/lia/assets/minima-social-icons.svg#github"></use></svg> <span class="username">lclem</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3"></div>
+    </div>This work is licensed under a <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>
+  </div>
+</footer>
+
+<!-- Parse the Latex divs with Katex
+<script type="text/javascript">
+  $("script[type='math/tex']").replaceWith(
+    function(){
+      var tex = $(this).text();
+      return katex.renderToString(tex, {displayMode: false});
+  });
+  
+  $("script[type='math/tex; mode=display']").replaceWith(
+    function(){
+      var tex = $(this).text();
+      return katex.renderToString(tex.replace(/%.*/g, ''), {displayMode: true});
+  });
+</script>
+-->
+
+<script type="text/javascript" src="/lia/assets/hidebox.js"></script>
+</body>
+
+</html>
