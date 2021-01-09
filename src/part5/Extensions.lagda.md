@@ -1,10 +1,10 @@
 ---
-title: "Imperative programs 🚧"
+title: "Extensions 🚧"
 ---
 
 ```
 {-# OPTIONS --allow-unsolved-metas #-}
-module part5.Extentions where
+module part5.Extensions where
 open import part0.index hiding (AExp; A⟦_⟧; _≈_) renaming (_+_ to _+ℕ_; _*_ to _·ℕ_; _≤_ to _≤ℕ_) public
 open import part5.Exp using (VarName)
 open import part5.Imp using (State)
