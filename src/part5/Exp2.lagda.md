@@ -52,7 +52,7 @@ Since division by zero can occur,
 not every expression has a value.
 To model this, we construct a new domain by adding `⊥`.
 (An alternative way would be by modelling evaluation as a partial function,
-but this is not possible in Agda since its functions are total.)
+but this is not possible since Agda's functions are total.)
 
 ```
 data ℕ⊥ : Set where

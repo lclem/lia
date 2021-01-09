@@ -835,4 +835,174 @@ congruence = congruence-1 , congruence-2
 
 # Axiomatic semantics
 
-TODO.
+## Assertions
+
+```
+Assn = State → Set
+
+infix 3 _==>_
+_==>_ : Assn → Assn → Set
+P ==> Q = ∀ {s} → P s → Q s
+
+_<==>_ : Assn → Assn → Set
+P <==> Q = P ==> Q × Q ==> P
+
+-- substitution for assertions
+_Assn[_↦_] : Assn → VarName → AExp → Assn
+P Assn[ x ↦ e ] = λ s → P (s [ x ↦ A⟦ e ⟧ s ])
+```
+
+## Hoare triples
+
+```
+-- Hoare triple
+infix 50 _⟬_⟭_
+_⟬_⟭_ : Assn → Cmd → Assn → Set
+P ⟬ c ⟭ Q = ∀ {s s'} → P s → c , s ⇒ s' → Q s'
+
+p0 : ∀ P → P ⟬ skip ⟭ P
+p0 P Ps ⇒-skip = Ps
+
+p1 : ∀ c P → (\_ → F) ⟬ c ⟭ P
+p1 c P P⊥ c,s⇒s' = F-elim P⊥
+
+p3 : ∀ P → P ⟬ while tt do: skip ⟭ (\_ → F)
+p3 P Ps (⇒-while-tt x ⇒-skip d) = p3 P Ps d
+```
+
+```
+rule-≔ : ∀ {P x e} → (P Assn[ x ↦ e ]) ⟬ x ≔ e ⟭ P
+rule-≔ Ps ⇒-assign = Ps
+
+rule-==>-post : ∀ {P Q Q' c} → P ⟬ c ⟭ Q → Q ==> Q' → P ⟬ c ⟭ Q'
+rule-==>-post PcQ Q==>Q' Ps c,s⇒s' = Q==>Q' (PcQ Ps c,s⇒s')
+
+rule-==>-pre : ∀ {P P' Q c} → P' ==> P → P ⟬ c ⟭ Q → P' ⟬ c ⟭ Q
+rule-==>-pre P'==>P PcQ P's c,s⇒s' = PcQ (P'==>P  P's) c,s⇒s'
+
+rule-==> : ∀ {P P' Q Q' c} → P' ==> P → P ⟬ c ⟭ Q → Q ==> Q' → P' ⟬ c ⟭ Q'
+rule-==> P'==>P PcQ Q==>Q' = rule-==>-post (rule-==>-pre P'==>P PcQ) Q==>Q'
+
+Q==>Q : ∀ {Q} → Q ==> Q
+Q==>Q Qs = Qs
+
+rule-skip : ∀ {P} → P ⟬ skip ⟭ P
+rule-skip Ps ⇒-skip = Ps
+
+rule-⨟ : ∀ {P Q R c d} → Q ⟬ d ⟭ R → P ⟬ c ⟭ Q → P ⟬ c ⨟ d ⟭ R
+rule-⨟ QdR PcQ Ps (⇒-seq c,s⇒s' d,s'⇒s'') = QdR (PcQ Ps c,s⇒s') d,s'⇒s''
+
+infixl 20 _&_
+_&_ : Assn → Assn → Assn
+P & Q = \s → P s × Q s
+
+infixl 15 _∨∨_
+_∨∨_ : Assn → Assn → Assn
+P ∨∨ Q = \s → P s ⊎ Q s
+
+infix 25 !_
+!_ : Assn → Assn
+! P = \s → ~ P s
+
+infixl 15 _===>_
+_===>_ : Assn → Assn → Assn
+P ===> Q = \s → P s → Q s
+
+bassn : BExp → Assn
+bassn b = \s → B⟦ b ⟧ s ≡ tt
+
+postulate bassn-false0 : ∀ {b s} → B⟦ b ⟧ s ≡ ff → (! bassn b) s
+postulate bassn-false1 : ∀ {b s} → (! bassn b) s → B⟦ b ⟧ s ≡ ff
+
+rule-ite : ∀ {P Q c d b} →
+    (P & bassn b) ⟬ c ⟭ Q →
+    (P & ! bassn b) ⟬ d ⟭ Q →
+    P ⟬ if b then c else d ⟭ Q
+rule-ite PbcQ _ Ps (⇒-if-tt b≡true c,s⇒s') = PbcQ (Ps , b≡true) c,s⇒s'
+rule-ite {b = b} PbcQ P!bcQ Ps (⇒-if-ff .{b} {s} {d} {s'} b≡false d,s⇒s') = P!bcQ {s = s} {s' = s'} (Ps , bassn-false0 {b = b} {s = s} b≡false) d,s⇒s'
+
+rule-while : ∀ {P b c} →
+    (P & bassn b) ⟬ c ⟭ P →
+    P ⟬ while b do: c ⟭ (P & ! bassn b)
+rule-while PbcP Ps (⇒-while-tt b≡true d d') = rule-while PbcP (PbcP (Ps , b≡true ) d) d'
+rule-while _ Ps (⇒-while-ff b≡false) = Ps , cheat -- (bassn-false0 b≡false)
+    where postulate cheat : ∀ {p} → p
+
+--p4 : ∀ P Q → P ⟬ while tt do: skip ⟭ Q
+--p4 P Q = rule-while (rule-==>-pre ? (rule-skip {P})) ...
+
+-- p2 : ∀ x n P → P ⟬ x ≔ num n ⟭ (\s → s x ≡ n)
+-- p2 x n P Ps ⇒-assign = ?
+
+is-wp : Assn → Cmd → Assn → Set (lsuc lzero)
+is-wp P c Q = ∀[ R ] (R ⟬ c ⟭ Q → R ==> P)
+
+ite-help0 : ∀ {A B C D} → (A & B ==> C) → (A & ! B ==> D) → (A ==> ((B ===> C) & (! B ===> D)))
+ite-help0 A&B==>C A&!B==>D As = (λ Bs → A&B==>C (As , Bs)) , (λ !Bs → A&!B==>D (As , !Bs))       
+
+ite-help1 : ∀ {A B C D} → (A ==> ((B ===> C) & (! B ===> D))) → (A & B ==> C) × (A & ! B ==> D)
+ite-help1 {A} {B} {C} {D} x = A&B==>C , A&!B==>D where
+    A&B==>C : A & B ==> C
+    A&B==>C (As , Bs) = fst (x As) Bs
+    A&!B==>D : A & ! B ==> D
+    A&!B==>D (As , !Bs) = snd (x As) !Bs
+    
+-- computation and proof of weakest preconditions
+wp : (c : Cmd) → (Q : Assn) → ∃[ P ] P ⟬ c ⟭ Q × is-wp P c Q
+
+wp skip Q = Q , rule-skip , WP where
+    WP : is-wp Q skip Q
+    WP R RskipQ Rs = RskipQ Rs ⇒-skip
+
+wp (x ≔ e) Q = Q Assn[ x ↦ e ] , rule-≔ {Q} , WP where
+    WP : is-wp (Q Assn[ x ↦ e ]) (x ≔ e) Q
+    WP R Rx≔eQ Rs = Rx≔eQ Rs ⇒-assign
+
+wp (c ⨟ d) Q with wp d Q
+... | R , RdQ , is-wpRdQ with wp c R
+... | P , PcR , is-wpPcR = P , rule-⨟ RdQ PcR , WP where 
+    WP : is-wp P (c ⨟ d) Q
+    WP S ScdQ Ss = is-wpPcR S ScR Ss where
+        ScR : ∀ {s s'} → S s → c , s ⇒ s' → R s'
+        ScR {s} {s'} Ss c,s⇒s' = is-wpRdQ (_,_⇒_ c s) g c,s⇒s' where
+            g : ∀ {s' s''} → c , s ⇒ s' → d , s' ⇒ s'' → Q s''
+            g c,s⇒s' d,s'⇒s'' = ScdQ Ss (⇒-seq c,s⇒s' d,s'⇒s'')
+
+wp (if b then c else d) Q with wp c Q | wp d Q
+... | P , PcQ , is-wpPcQ | R , RdQ , is-wpRdQ = S , SiteQ , is-wpSiteQ where
+    S : Assn
+    S = ((bassn b) ===> P) & ((! (bassn b)) ===> R)
+    SiteQ : S ⟬ if b then c else d ⟭ Q
+    SiteQ (b=>Ps , _) (⇒-if-tt ⟦b⟧Bs≡true c,s⇒s') = PcQ (b=>Ps ⟦b⟧Bs≡true) c,s⇒s'
+    SiteQ {s' = s'} (_ , !b=>Rs) (⇒-if-ff ⟦b⟧Bs≡false d,s⇒s') = RdQ (!b=>Rs (bassn-false0 {b} ⟦b⟧Bs≡false)) d,s⇒s'
+    is-wpSiteQ : is-wp S (if b then c else d) Q
+    is-wpSiteQ T TiteQ {s = s} = T==>S where
+        Tb : Assn
+        Tb = T & bassn b
+        T!b = T & ! bassn b
+        TbcQ : Tb ⟬ c ⟭ Q
+        TbcQ (Ts , bs ) c,s⇒s' = TiteQ Ts (⇒-if-tt bs c,s⇒s')
+        T!bdQ : T!b ⟬ d ⟭ Q
+        T!bdQ (Ts , !bs) d,s⇒s' = TiteQ Ts (⇒-if-ff (bassn-false1 {b} !bs) d,s⇒s')
+        Tb==>P : Tb ==> P
+        Tb==>P = is-wpPcQ Tb TbcQ
+        T!b==>R : T!b ==> R
+        T!b==>R = is-wpRdQ T!b T!bdQ
+        T==>S : T ==> S
+        T==>S = ite-help0 {T} {bassn b} {P} {R} Tb==>P T!b==>R
+
+-- cheating here by not defining it inductively;
+-- instead we define it directly (could have done this for an arbitrary c, without structural induction)
+-- a fully inductive definition would even prove expressivity of wp's in arithmetic
+wp (while b do: c) Q = P , P⟬w⟭Q , iswp where
+    P : Assn
+    P s = ∀ {s'} → (while b do: c , s ⇒ s') → Q s'
+    P⟬w⟭Q : P ⟬ while b do: c ⟭ Q
+    P⟬w⟭Q Ps w,s⇒s' = Ps w,s⇒s'
+    iswp : is-wp P (while b do: c) Q
+    iswp _ R⟬w⟭Q Rs = R⟬w⟭Q Rs
+
+-- rule-inv-⨟ : ∀ {P R c d} → P ⟬ c ⨟ d ⟭ R → ∃[ Q ] P ⟬ c ⟭ Q ∧ Q ⟬ d ⟭ R
+-- rule-inv-⨟ PcdR = ?
+
+```
