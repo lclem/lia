@@ -29,7 +29,8 @@ private
 
 Erasure:
 
-⌊_⌋
+Alternative symbol: ⌊_⌋
+
 ```
 ⌞_⌟ : ∀ {ℓ} {A : Set ℓ} → Dec A → 𝔹
 ⌞ yes _ ⌟ = tt
