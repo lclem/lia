@@ -193,24 +193,26 @@ Evaluation with gas:
 ```
 data ℕ⊥ : Set where
   ⊥ : ℕ⊥
-  Just : ℕ → ℕ⊥
+  ⌊_⌋ : ℕ → ℕ⊥
+
+infix 10 ⌊_⌋
 
 private variable m⊥ n⊥ u v u₀ u₁ u₂ v₀ v₁ v₂ : ℕ⊥
 
-Just-inv : Just m ≡ Just n → m ≡ n
+Just-inv : ⌊ m ⌋ ≡ ⌊ n ⌋ → m ≡ n
 Just-inv refl = refl
 
-⊥≡Just-elim : ⊥ ≡ Just m → ∀ {ℓ} {A : Set ℓ} → A
+⊥≡Just-elim : ⊥ ≡ ⌊ m ⌋ → ∀ {ℓ} {A : Set ℓ} → A
 ⊥≡Just-elim ()
 
 infix 5 _⊑_ _⊒_
 data _⊑_ : ℕ⊥ → ℕ⊥ → Set where
   ⊑-⊥ : ⊥ ⊑ m⊥
-  ⊑-Just : Just m ⊑ Just m
+  ⊑-Just : ⌊ m ⌋ ⊑ ⌊ m ⌋
 
 refl-⊑ : v ⊑ v
 refl-⊑ {⊥} = ⊑-⊥
-refl-⊑ {Just _} = ⊑-Just
+refl-⊑ {⌊ _ ⌋} = ⊑-Just
 
 trans-⊑ : v₀ ⊑ v₁ → v₁ ⊑ v₂ → v₀ ⊑ v₂
 trans-⊑ ⊑-⊥ ⊑-Just = ⊑-⊥
@@ -223,26 +225,26 @@ v₀ ⊒ v₁ = v₁ ⊑ v₀
 ⊑-⊥-lemma : v ⊑ ⊥ → v ≡ ⊥
 ⊑-⊥-lemma ⊑-⊥ = refl
 
-⊑-Just-lemma : Just m ⊑ n⊥ → n⊥ ≡ Just m
+⊑-Just-lemma : ⌊ m ⌋ ⊑ n⊥ → n⊥ ≡ ⌊ m ⌋
 ⊑-Just-lemma ⊑-Just = refl
 
 lift : (ℕ → ℕ) → ℕ⊥ → ℕ⊥
 lift f ⊥ = ⊥
-lift f (Just x) = Just (f x)
+lift f (⌊ x ⌋) = ⌊ f x ⌋
 
 lift2 : (ℕ → ℕ → ℕ) → ℕ⊥ → ℕ⊥ → ℕ⊥
 lift2 f ⊥ _ = ⊥
-lift2 f (Just _) ⊥ = ⊥
-lift2 f (Just m) (Just n) = Just (f m n)
+lift2 f (⌊ _ ⌋) ⊥ = ⊥
+lift2 f (⌊ m ⌋) (⌊ n ⌋) = ⌊ f m n ⌋
 
 lift2-lemma : ∀ f →
-  lift2 f v₀ v₁ ≡ Just n →
+  lift2 f v₀ v₁ ≡ ⌊ n ⌋ →
   -------------------------------------------
-  ∃[ n₀ ] ∃[ n₁ ] v₀ ≡ Just n₀ × v₁ ≡ Just n₁
+  ∃[ n₀ ] ∃[ n₁ ] v₀ ≡ ⌊ n₀ ⌋ × v₁ ≡ ⌊ n₁ ⌋
 
 lift2-lemma {v₀} {v₁} f eq
   with v₀ | v₁
-... | Just n₀ | Just n₁ = n₀ , n₁ , refl , refl
+... | ⌊ n₀ ⌋ | ⌊ n₁ ⌋ = n₀ , n₁ , refl , refl
 
 mon-lift2 : (f : ℕ → ℕ → ℕ) →
   u₀ ⊑ u₁ →
@@ -265,20 +267,20 @@ _·⊥_ = lift2 _·ℕ_
 
 ite : ℕ⊥ → ℕ⊥ → ℕ⊥ → ℕ⊥
 ite ⊥ _ _ = ⊥
-ite (Just 0) v₀ v₁ = v₀
-ite (Just (suc _)) v₀ v₁ = v₁
+ite (⌊ 0 ⌋) v₀ v₁ = v₀
+ite (⌊ suc _ ⌋) v₀ v₁ = v₁
 
 mon-ite : u₀ ⊑ v₀ → u₁ ⊑ v₁ → u₂ ⊑ v₂ → ite u₀ u₁ u₂ ⊑ ite v₀ v₁ v₂
 mon-ite ⊑-⊥ _ _ = ⊑-⊥
-mon-ite {u₀ = Just 0} ⊑-Just u₁⊑v₁ u₂⊑v₂ = u₁⊑v₁
-mon-ite {u₀ = Just (suc _)} ⊑-Just u₁⊑v₁ u₂⊑v₂ = u₂⊑v₂
+mon-ite {u₀ = ⌊ 0 ⌋} ⊑-Just u₁⊑v₁ u₂⊑v₂ = u₁⊑v₁
+mon-ite {u₀ = ⌊ suc _ ⌋} ⊑-Just u₁⊑v₁ u₂⊑v₂ = u₂⊑v₂
 
 ⟦_⟧_#_ : Exp → Env → ℕ → ℕ⊥
 
 ⟦ _ ⟧ _ # 0 = ⊥
 
-⟦ # n ⟧ γ # suc _ = Just n
-⟦ ` x ⟧ (ϱ , _) # suc _ = Just (ϱ x)
+⟦ # n ⟧ γ # suc _ = ⌊ n ⌋
+⟦ ` x ⟧ (ϱ , _) # suc _ = ⌊ ϱ x ⌋
 
 ⟦ e₀ + e₁ ⟧ γ # suc k = ⟦ e₀ ⟧ γ # k +⊥ ⟦ e₁ ⟧ γ # k
 ⟦ e₀ - e₁ ⟧ γ # suc k = ⟦ e₀ ⟧ γ # k -⊥ ⟦ e₁ ⟧ γ # k
@@ -289,21 +291,21 @@ mon-ite {u₀ = Just (suc _)} ⊑-Just u₁⊑v₁ u₂⊑v₂ = u₂⊑v₂
 ⟦ f $ e ⟧ γ@(ϱ , τ) # suc k
   with ⟦ e ⟧ γ # k
 ... | ⊥ = ⊥
-... | Just m = let x , e′ = τ f in ⟦ e′ ⟧ (ϱ [ x ↦ m ] , τ) # k
+... | ⌊ m ⌋ = let x , e′ = τ f in ⟦ e′ ⟧ (ϱ [ x ↦ m ] , τ) # k
 
 ⟦ Let x ≔ e₀ In e₁ ⟧ γ@(ϱ , τ) # suc k
   with ⟦ e₀ ⟧ γ # k
 ... | ⊥ = ⊥
-... | Just m = ⟦ e₁ ⟧ (ϱ [ x ↦ m ] , τ) # k
+... | ⌊ m ⌋ = ⟦ e₁ ⟧ (ϱ [ x ↦ m ] , τ) # k
 
 ⟦ Rec f [ x ]≔ e₀ In e₁ ⟧ (ϱ , τ) # suc k = ⟦ e₁ ⟧ (ϱ , τ [ f ↦ x , e₀ ]) # k
 ```
 
 ```
-_ : ⟦ If # 0 Then # 20 · # 30 - # 1 Else # 20 ⟧ γ₀ # 10 ≡ Just 599
+_ : ⟦ If # 0 Then # 20 · # 30 - # 1 Else # 20 ⟧ γ₀ # 10 ≡ ⌊ 599 ⌋
 _ = refl
 
-_ : ⟦ factorial ⟧ γ₀ # 1000 ≡ Just 120
+_ : ⟦ factorial ⟧ γ₀ # 1000 ≡ ⌊ 120 ⌋
 _ = refl
 ```
 
@@ -346,7 +348,7 @@ mon-eval {k = suc k} {k′ = suc k′} (If e₀ Then e₁ Else e₂) ⟦e⟧⊒v
 mon-eval {γ@(ϱ , τ)} {suc k} {v} {suc k′} (f $ e) ⟦e⟧⊒v (s≤s k≤k′)
   with inspect (⟦ e ⟧ γ # k)
 ... | it ⊥ eq-e rewrite eq-e | ⊑-⊥-lemma ⟦e⟧⊒v = ⊑-⊥
-... | it (Just m) eq-e
+... | it (⌊ m ⌋) eq-e
   with inspect (τ f) |
        mon-eval {γ = γ} e refl-⊑ k≤k′
 ... | it (x , e′) eq-τ | ind-e
@@ -358,7 +360,7 @@ mon-eval {γ@(ϱ , τ)} {suc k} {v} {suc k′} (Let x ≔ e₀ In e₁) ⟦e⟧�
   with inspect (⟦ e₀ ⟧ γ # k)
 ... | it ⊥ eq-e₀
   rewrite eq-e₀ | ⊑-⊥-lemma ⟦e⟧⊒v = ⊑-⊥
-... | it (Just m) eq-e₀
+... | it (⌊ m ⌋) eq-e₀
   with mon-eval {γ = γ} e₀ refl-⊑ k≤k′
 ... | ind-e₀
   rewrite eq-e₀ | ⊑-Just-lemma ind-e₀
@@ -370,11 +372,11 @@ mon-eval {γ@(ϱ , τ)} {suc k} {v} {suc k′} (Rec f [ x ]≔ e₀ In e₁) ⟦
 ... | ind-e₁ = trans-⊑ ⟦e⟧⊒v ind-e₁
 ```
 
-## Agreement
+## Agreement of the semantics
 
 ```
 agree-1 : ∀ e k →
-  ⟦ e ⟧ γ # k ≡ Just n →
+  ⟦ e ⟧ γ # k ≡ ⌊ n ⌋ →
   ----------------------
   e , γ ⇒ n
 
@@ -407,13 +409,13 @@ agree-1 (e₀ · e₁) (suc k) eq
 agree-1 {γ} (If e₀ Then e₁ Else e₂) (suc k) eq
   with inspect (⟦ e₀ ⟧ γ # k)
 ... | it ⊥ eq-e₀ rewrite eq-e₀ = ⊥≡Just-elim eq
-... | it (Just 0) eq-e₀ rewrite eq-e₀ = ⇒-IfThenElse-tt (agree-1 e₀ k eq-e₀) (agree-1 e₁ k eq)
-... | it (Just (suc _)) eq-e₀ rewrite eq-e₀ = ⇒-IfThenElse-ff (agree-1 e₀ k eq-e₀) (agree-1 e₂ k eq)
+... | it (⌊ 0 ⌋) eq-e₀ rewrite eq-e₀ = ⇒-IfThenElse-tt (agree-1 e₀ k eq-e₀) (agree-1 e₁ k eq)
+... | it (⌊ suc _ ⌋) eq-e₀ rewrite eq-e₀ = ⇒-IfThenElse-ff (agree-1 e₀ k eq-e₀) (agree-1 e₂ k eq)
 
 agree-1 {γ@(ϱ , τ)} {n} (f $ e) (suc k) eq
   with inspect (⟦ e ⟧ γ # k)
 ... | it ⊥ eq-e rewrite eq-e = ⊥≡Just-elim eq
-... | it (Just m) eq-e
+... | it (⌊ m ⌋) eq-e
   with inspect (τ f) |
        agree-1 {γ} e k eq-e
 ... | it (x , e′) eq-τ | ind-e
@@ -427,7 +429,7 @@ agree-1 {γ@(ϱ , τ)} {n} (f $ e) (suc k) eq
 agree-1 {γ} (Let x ≔ e₀ In e₁) (suc k) eq
   with inspect (⟦ e₀ ⟧ γ # k)
 ... | it ⊥ eq-e₀ rewrite eq-e₀ = ⊥≡Just-elim eq
-... | it (Just m) eq-e₀
+... | it (⌊ m ⌋) eq-e₀
   rewrite eq-e₀
   with agree-1 e₀ k eq-e₀ |
        agree-1 e₁ k eq
@@ -440,11 +442,11 @@ agree-1 {γ@(ϱ , τ)} (Rec f [ x ]≔ e₀ In e₁) (suc k) eq
 
 ```
 help : ∀ k₀ k₁ →
-       ⟦ e₀ ⟧ γ₀ # k₀ ≡ Just n₀ →
-       ⟦ e₁ ⟧ γ₁ # k₁ ≡ Just n₁ →
+       ⟦ e₀ ⟧ γ₀ # k₀ ≡ ⌊ n₀ ⌋ →
+       ⟦ e₁ ⟧ γ₁ # k₁ ≡ ⌊ n₁ ⌋ →
        ---------------------------------
-       ⟦ e₀ ⟧ γ₀ # max k₀ k₁ ≡ Just n₀ ×
-       ⟦ e₁ ⟧ γ₁ # max k₀ k₁ ≡ Just n₁
+       ⟦ e₀ ⟧ γ₀ # max k₀ k₁ ≡ ⌊ n₀ ⌋ ×
+       ⟦ e₁ ⟧ γ₁ # max k₀ k₁ ≡ ⌊ n₁ ⌋
 
 help {e₀} {γ₀} {n₀} {e₁} {γ₁} {n₁} k₀ k₁ eq₀ eq₁
   with max-left {k₀} {k₁} |
@@ -455,20 +457,20 @@ help {e₀} {γ₀} {n₀} {e₁} {γ₁} {n₁} k₀ k₁ eq₀ eq₁
 ... | le₀ | le₁
   rewrite eq₀ | eq₁ = ⊑-Just-lemma le₀ , ⊑-Just-lemma le₁
 
-help2 : ∀ f → u ≡ Just m → v ≡ Just n → lift2 f u v ≡ Just (f m n)
+help2 : ∀ f → u ≡ ⌊ m ⌋ → v ≡ ⌊ n ⌋ → lift2 f u v ≡ ⌊ f m n ⌋
 help2 _ refl refl = refl
 
 agree-2 : e , γ ⇒ n →
           ---------------------------
-          ∃[ k ] ⟦ e ⟧ γ # k ≡ Just n
+          ∃[ k ] ⟦ e ⟧ γ # k ≡ ⌊ n ⌋
 
 agree-2-help :
   e₀ , γ ⇒ n₀ →
   e₁ , γ ⇒ n₁ →
   ---------------------------------
   ∃[ k₀ ] ∃[ k₁ ]
-    ⟦ e₀ ⟧ γ # max k₀ k₁ ≡ Just n₀ ×
-    ⟦ e₁ ⟧ γ # max k₀ k₁ ≡ Just n₁
+    ⟦ e₀ ⟧ γ # max k₀ k₁ ≡ ⌊ n₀ ⌋ ×
+    ⟦ e₁ ⟧ γ # max k₀ k₁ ≡ ⌊ n₁ ⌋
 
 agree-2-help δ₀ δ₁
   with agree-2 δ₀ | agree-2 δ₁
@@ -495,14 +497,14 @@ agree-2 {If e₀ Then e₁ Else e₂} {γ} {n} (⇒-IfThenElse-tt δ₀ δ₁)
   with agree-2-help δ₀ δ₁
 ... | k₀ , k₁ , eq₀′ , eq₁′ = suc (max k₀ k₁) , goal where
 
-  goal : ite (⟦ e₀ ⟧ γ # max k₀ k₁) (⟦ e₁ ⟧ γ # max k₀ k₁) (⟦ e₂ ⟧ γ # max k₀ k₁) ≡ Just n
+  goal : ite (⟦ e₀ ⟧ γ # max k₀ k₁) (⟦ e₁ ⟧ γ # max k₀ k₁) (⟦ e₂ ⟧ γ # max k₀ k₁) ≡ ⌊ n ⌋
   goal rewrite eq₀′ | eq₁′ = refl
 
 agree-2 {If e₀ Then e₁ Else e₂} {γ} {n} (⇒-IfThenElse-ff δ₀ δ₁)
   with agree-2-help δ₀ δ₁
 ... | k₀ , k₁ , eq₀′ , eq₁′ = suc (max k₀ k₁) , goal where
 
-  goal : ite (⟦ e₀ ⟧ γ # max k₀ k₁) (⟦ e₁ ⟧ γ # max k₀ k₁) (⟦ e₂ ⟧ γ # max k₀ k₁) ≡ Just n
+  goal : ite (⟦ e₀ ⟧ γ # max k₀ k₁) (⟦ e₁ ⟧ γ # max k₀ k₁) (⟦ e₂ ⟧ γ # max k₀ k₁) ≡ ⌊ n ⌋
   goal rewrite eq₀′ | eq₁′ = refl
 
 agree-2 {f $ e} {γ@(ϱ , τ)} {n} (⇛-App δ₀ δ₁)
@@ -511,10 +513,29 @@ agree-2 {f $ e} {γ@(ϱ , τ)} {n} (⇛-App δ₀ δ₁)
   with help k₀ k₁ eq₀  eq₁
 ... | eq₀′ , eq₁′ = suc (max k₀ k₁) , goal where
 
-  goal : ⟦ f $ e ⟧ ϱ , τ # suc (max k₀ k₁) ≡ Just n
+  goal : ⟦ f $ e ⟧ ϱ , τ # suc (max k₀ k₁) ≡ ⌊ n ⌋
   goal rewrite eq₀′ | eq₁′ | eq-τ = refl
 
-agree-2 (⇒-Let δ₀ δ₁) = {!   !}
+agree-2 e@{Let x ≔ e₀ In e₁} {γ@(ϱ , τ)} {n} (⇒-Let δ₀ δ₁)
+  with agree-2 δ₀ | agree-2 δ₁
+... | k₀ , eq₀ | k₁ , eq₁
+  with help k₀ k₁ eq₀  eq₁
+... | eq₀′ , eq₁′ = suc (max k₀ k₁) , goal where
 
-agree-2 (⇒-Rec δ) = {!   !}
+  goal : ⟦ e ⟧ ϱ , τ # suc (max k₀ k₁) ≡ ⌊ n ⌋
+  goal rewrite eq₀′ | eq₁′ = refl
+
+agree-2 {Rec f [ x ]≔ e₀ In e₁} {γ@(ϱ , τ)} {n} (⇒-Rec δ)
+  with agree-2 δ
+... | k , eq = suc k , eq
 ```
+
+## Contextual equivalence
+
+
+
+# Eager evaluation with static binding
+
+# Lazy evaluation with dynamic binding
+
+# Lazy evaluation with static binding
