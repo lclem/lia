@@ -324,23 +324,31 @@ mon-eval {k = suc k} {k′ = suc k′} (If e₀ Then e₁ Else e₂) ⟦e⟧⊒v
        mon-eval e₂ refl-⊑ k≤k′
 ... | ind₀ | ind₁ | ind₂ = trans-⊑ ⟦e⟧⊒v (mon-ite ind₀ ind₁ ind₂)
 
-mon-eval {γ = γ@(ϱ , τ)} {k = suc k} {k′ = suc k′} (f $ e) ⟦e⟧⊒v (s≤s k≤k′)
+mon-eval {γ@(ϱ , τ)} {suc k} {v} {suc k′} (f $ e) ⟦e⟧⊒v (s≤s k≤k′)
   with inspect (⟦ e ⟧ γ # k)
 ... | it ⊥ eq-e rewrite eq-e | ⊑-⊥-lemma ⟦e⟧⊒v = ⊑-⊥
-mon-eval {γ@(ϱ , τ)} {suc k} {v} {suc k′} (f $ e) ⟦e⟧⊒v (s≤s k≤k′) | it (Just m) eq-e = goal where
+... | it (Just m) eq-e
+  with inspect (τ f) |
+       mon-eval {γ = γ} e refl-⊑ k≤k′
+... | it (x , e′) eq-τ | ind-e
+  rewrite eq-e | ⊑-Just-lemma ind-e | eq-τ
+  with mon-eval {γ = ϱ [ x ↦ m ] , τ} e′ refl-⊑ k≤k′
+... | ind-e′ = trans-⊑ ⟦e⟧⊒v ind-e′
 
-  goal : ⟦ f $ e ⟧ γ # suc k′ ⊒ v
-  goal
-    with inspect (τ f) |
-         mon-eval {γ = γ} e refl-⊑ k≤k′
-  ... | it (x , e′) eq-τ | ind-e
-    rewrite eq-e | ⊑-Just-lemma ind-e | eq-τ
-    with mon-eval {γ = ϱ [ x ↦ m ] , τ} e′ refl-⊑ k≤k′
-  ... | ind-e′ = trans-⊑ ⟦e⟧⊒v ind-e′
+mon-eval {γ@(ϱ , τ)} {suc k} {v} {suc k′} (Let x ≔ e₀ In e₁) ⟦e⟧⊒v (s≤s k≤k′)
+  with inspect (⟦ e₀ ⟧ γ # k)
+... | it ⊥ eq-e₀
+  rewrite eq-e₀ | ⊑-⊥-lemma ⟦e⟧⊒v = ⊑-⊥
+... | it (Just m) eq-e₀
+  with mon-eval {γ = γ} e₀ refl-⊑ k≤k′
+... | ind-e₀
+  rewrite eq-e₀ | ⊑-Just-lemma ind-e₀
+    with mon-eval {γ = ϱ [ x ↦ m ] , τ} e₁ refl-⊑ k≤k′
+... | ind-e₁ = trans-⊑ ⟦e⟧⊒v ind-e₁
 
-mon-eval {k = suc k} {k′ = suc k′} (Let x ≔ e₀ In e₁) ⟦e⟧⊒v (s≤s k≤k′) = {!   !}
-
-mon-eval {k = suc k} {k′ = suc k′} (Rec f [ x ]≔ e₀ In e₁) ⟦e⟧⊒v (s≤s k≤k′) = {!   !}
+mon-eval {γ@(ϱ , τ)} {suc k} {v} {suc k′} (Rec f [ x ]≔ e₀ In e₁) ⟦e⟧⊒v (s≤s k≤k′)
+  with mon-eval {γ = ϱ , τ [ f ↦ x , e₀ ]} e₁ refl-⊑ k≤k′
+... | ind-e₁ = trans-⊑ ⟦e⟧⊒v ind-e₁
 ```
 
 ## Agreement
