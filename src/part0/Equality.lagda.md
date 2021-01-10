@@ -175,14 +175,12 @@ instance
   ... | yes refl = yes refl
 ```
 
-
-
 # Inspection idiom
 
 ```
 data Inspect {A : Set ℓ} (x : A) : Set ℓ where
   it : (y : A) → x ≡ y → Inspect x
 
-inspect : ∀ (x : A) → Inspect x
+inspect : ∀ {A : Set ℓ} (x : A) → Inspect x
 inspect x = it x refl
 ```
