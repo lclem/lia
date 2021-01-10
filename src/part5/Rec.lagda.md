@@ -33,7 +33,7 @@ data Exp : Set where
 
 private
   variable
-    x : VarName
+    x y : VarName
     f : FunName
     e e′ e₀ e₁ e₂ : Exp
     k k′ k₀ k₁ m n n₀ n₁ : ℕ
@@ -72,8 +72,8 @@ Env = VarEnv × FunEnv
 ϱ₀ : VarEnv
 ϱ₀ = const 0
 
-τ₀ : FunEnv
-τ₀ = const (x₀ , # 0)
+-- τ₀ : FunEnv
+-- τ₀ = const (x₀ , # 0)
 
 -- γ₀ : Env
 -- γ₀ = ϱ₀ , τ₀
@@ -82,7 +82,7 @@ private
   variable
     γ γ₀ γ₁ : Env
     ϱ : VarEnv
-    τ : FunEnv
+    τ τ′ τ₀ τ₁ : FunEnv
 ```
 
 ## Natural semantics
@@ -131,7 +131,7 @@ data _,_⇒_ : Exp → Env → ℕ → Set where
     -----------------------------
     If e₀ Then e₁ Else e₂ , γ ⇒ n
 
-  ⇛-App :
+  ⇒-App :
     e , (ϱ , τ) ⇒ m →
     let (x , e′) = τ f in
     e′ , (ϱ [ x ↦ m ] , τ) ⇒ n →
@@ -309,6 +309,13 @@ _ : ⟦ factorial ⟧ γ₀ # 1000 ≡ ⌊ 120 ⌋
 _ = refl
 ```
 
+Denotational convergence to a value:
+
+```
+⟦_⟧_⇓_ : Exp → Env → ℕ → Set
+⟦ e ⟧ γ ⇓ n = ∃[ k ] ⟦ e ⟧ γ # k ≡ ⌊ n ⌋
+```
+
 Monotonicity of evaluation w.r.t. the number of steps
 (more steps → more values):
 
@@ -421,7 +428,7 @@ agree-1 {γ@(ϱ , τ)} {n} (f $ e) (suc k) eq
 ... | it (x , e′) eq-τ | ind-e
   rewrite eq-e | eq-τ
   with agree-1 {ϱ [ x ↦ m ] , τ} e′ k eq
-... | ind-e′ = ⇛-App ind-e goal where
+... | ind-e′ = ⇒-App ind-e goal where
 
     goal : snd (τ f) , (ϱ [ fst (τ f) ↦ m ] , τ) ⇒ n
     goal rewrite eq-τ = ind-e′
@@ -461,8 +468,8 @@ help2 : ∀ f → u ≡ ⌊ m ⌋ → v ≡ ⌊ n ⌋ → lift2 f u v ≡ ⌊ f 
 help2 _ refl refl = refl
 
 agree-2 : e , γ ⇒ n →
-          ---------------------------
-          ∃[ k ] ⟦ e ⟧ γ # k ≡ ⌊ n ⌋
+          -----------
+          ⟦ e ⟧ γ ⇓ n
 
 agree-2-help :
   e₀ , γ ⇒ n₀ →
@@ -507,7 +514,7 @@ agree-2 {If e₀ Then e₁ Else e₂} {γ} {n} (⇒-IfThenElse-ff δ₀ δ₁)
   goal : ite (⟦ e₀ ⟧ γ # max k₀ k₁) (⟦ e₁ ⟧ γ # max k₀ k₁) (⟦ e₂ ⟧ γ # max k₀ k₁) ≡ ⌊ n ⌋
   goal rewrite eq₀′ | eq₁′ = refl
 
-agree-2 {f $ e} {γ@(ϱ , τ)} {n} (⇛-App δ₀ δ₁)
+agree-2 {f $ e} {γ@(ϱ , τ)} {n} (⇒-App δ₀ δ₁)
   with inspect (τ f) | agree-2 δ₀ | agree-2 δ₁
 ... | it (x , e′) eq-τ | k₀ , eq₀ | k₁ , eq₁
   with help k₀ k₁ eq₀  eq₁
@@ -530,9 +537,249 @@ agree-2 {Rec f [ x ]≔ e₀ In e₁} {γ@(ϱ , τ)} {n} (⇒-Rec δ)
 ... | k , eq = suc k , eq
 ```
 
+```
+agree : ∀ e → ⟦ e ⟧ γ ⇓ n ↔ e , γ ⇒ n
+agree e = (λ{ (k , eq) → agree-1 e k eq }) , agree-2
+```
+
 ## Contextual equivalence
 
+Notice that we only have zeroth-order context in this language,
+i.e., we can only replace an integral variable `x` with an expression of the language.
 
+Substitution:
+
+```
+infix 101 _E[_↦_]
+_E[_↦_] : Exp → VarName → Exp → Exp
+
+(# n) E[ x ↦ f ] = # n
+
+(` y) E[ x ↦ f ]
+  with x ≡? y
+... | yes _ = f
+... | no _ = ` y
+
+(e₀ + e₁) E[ x ↦ f ] = e₀ E[ x ↦ f ] + e₁ E[ x ↦ f ]
+(e₀ - e₁) E[ x ↦ f ] = e₀ E[ x ↦ f ] - e₁ E[ x ↦ f ]
+(e₀ · e₁) E[ x ↦ f ] = e₀ E[ x ↦ f ] · e₁ E[ x ↦ f ]
+
+(If e₀ Then e₁ Else e₂) E[ x ↦ f ] = If e₀ E[ x ↦ f ] Then e₁ E[ x ↦ f ] Else e₂ E[ x ↦ f ]
+
+(g $ e) E[ x ↦ f ] = g $ e E[ x ↦ f ]
+
+(Let y ≔ e₀ In e₁) E[ x ↦ f ]
+  with x ≡? y | e₀ E[ x ↦ f ]
+... | yes _ | e′ = Let y ≔ e′ In e₁
+... | no _ | e′ = Let y ≔ e′ In e₁ E[ x ↦ f ]
+
+(Rec g [ y ]≔ e₀ In e₁) E[ x ↦ f ]
+  with x ≡? y | e₁ E[ x ↦ f ]
+... | yes _ | e′ = Rec g [ y ]≔ e₀ In e′
+... | no _ | e′ = Rec g [ y ]≔ e₀ E[ x ↦ f ] In e′
+```
+
+Operational equivalence:
+
+```
+_∼_ : ∀ e₀ e₁ → Set
+e₀ ∼ e₁ = ∀ γ n → e₀ , γ ⇒ n ↔ e₁ , γ ⇒ n
+
+sym-∼ : e₀ ∼ e₁ → e₁ ∼ e₀
+sym-∼ e₀∼e₁ γ n = snd (e₀∼e₁ γ n) , (fst (e₀∼e₁ γ n))
+```
+
+Operational simulation (one-sided version):
+
+```
+_≾_ : ∀ e₀ e₁ → Set
+e₀ ≾ e₁ = ∀ γ n → e₀ , γ ⇒ n → e₁ , γ ⇒ n
+
+∼→≾ : e₀ ∼ e₁ → e₀ ≾ e₁
+∼→≾ e₀∼e₁ γ n = fst (e₀∼e₁ γ n)
+```
+
+Operational simulation is a preorder:
+
+```
+refl-≾ : e ≾ e
+refl-≾ γ n = id
+```
+
+Extended to function environments:
+
+```
+_≾FunEnv_ : (τ τ′ : FunEnv) → Set
+τ ≾FunEnv τ′ = ∀[ f ]
+  let (x , e) = τ f 
+      (x′ , e′ ) = τ′ f in
+      x ≡ x′ × e ≾ e′
+
+refl-≾FunEnv : τ ≾FunEnv τ
+refl-≾FunEnv  f = refl , refl-≾
+
+≾FunEnv-update-1 : ∀ f → e₀ ≾ e₁ → τ [ f ↦ x , e₀ ] ≾FunEnv τ [ f ↦ x , e₁ ]
+≾FunEnv-update-1 {τ = τ} f e₀≾e₁ g  
+  with f ≡? g
+... | yes refl = refl , e₀≾e₁
+... | no _ = refl-≾FunEnv {τ = τ} g
+
+-- ≾FunEnv-update : ∀ f →
+--   τ₀ ≾FunEnv τ₁ →
+--   e₀ ≾ e₁ →
+--   -------------------------------------------
+--   τ₀ [ f ↦ x , e₀ ] ≾FunEnv τ₁ [ f ↦ x , e₁ ]
+
+-- ≾FunEnv-update = {!   !}
+
+≾FunEnv-update-same : ∀ f →
+  τ₀ ≾FunEnv τ₁ →
+  -------------------------------------------
+  τ₀ [ f ↦ x , e ] ≾FunEnv τ₁ [ f ↦ x , e ]
+
+≾FunEnv-update-same f τ₀≾τ₁ g
+  with f ≡? g | τ₀≾τ₁ g
+... | yes refl | eq , _ rewrite eq = refl , λ _ _ → id
+... | no _ | eq , τ₀g≾τ₁g rewrite eq = refl , τ₀g≾τ₁g
+```
+
+```
+mon-≾FunEnv :
+  e , (ϱ , τ) ⇒ m →
+  τ ≾FunEnv τ′ →
+  -----------------
+  e , (ϱ , τ′) ⇒ m
+
+mon-≾FunEnv ⇒-Num τ≾τ′ = ⇒-Num
+mon-≾FunEnv ⇒-Var τ≾τ′ = ⇒-Var
+
+mon-≾FunEnv (⇒-Add δ₀ δ₁) τ≾τ′
+  with mon-≾FunEnv δ₀ τ≾τ′ |
+       mon-≾FunEnv δ₁ τ≾τ′
+... | ind₀ | ind₁ = ⇒-Add ind₀ ind₁
+
+mon-≾FunEnv (⇒-Sub δ₀ δ₁) τ≾τ′
+  with mon-≾FunEnv δ₀ τ≾τ′ |
+       mon-≾FunEnv δ₁ τ≾τ′
+... | ind₀ | ind₁ = ⇒-Sub ind₀ ind₁
+
+mon-≾FunEnv (⇒-Mul δ₀ δ₁) τ≾τ′
+  with mon-≾FunEnv δ₀ τ≾τ′ |
+       mon-≾FunEnv δ₁ τ≾τ′
+... | ind₀ | ind₁ = ⇒-Mul ind₀ ind₁
+
+mon-≾FunEnv (⇒-IfThenElse-tt δ₀ δ₁) τ≾τ′
+  with mon-≾FunEnv δ₀ τ≾τ′ |
+       mon-≾FunEnv δ₁ τ≾τ′
+... | ind₀ | ind₁ = ⇒-IfThenElse-tt ind₀ ind₁
+
+mon-≾FunEnv (⇒-IfThenElse-ff δ₀ δ₁) τ≾τ′
+  with mon-≾FunEnv δ₀ τ≾τ′ |
+       mon-≾FunEnv δ₁ τ≾τ′
+... | ind₀ | ind₁ = ⇒-IfThenElse-ff ind₀ ind₁
+
+mon-≾FunEnv (⇒-App {f = f} δ₀ δ₁) τ≾τ′
+  with τ≾τ′ f
+... | eq , τf≾τ′f rewrite eq
+  with mon-≾FunEnv δ₀ τ≾τ′ |
+       mon-≾FunEnv δ₁ τ≾τ′
+... | ind₀ | ind₁ = ⇒-App ind₀ (τf≾τ′f _ _ ind₁)
+
+mon-≾FunEnv (⇒-Let δ₀ δ₁) τ≾τ′
+  with mon-≾FunEnv δ₀ τ≾τ′ |
+       mon-≾FunEnv δ₁ τ≾τ′
+... | ind₀ | ind₁ = ⇒-Let ind₀ ind₁
+
+mon-≾FunEnv (⇒-Rec {f = f} δ) τ≾τ′
+  with τ≾τ′ f
+... | eq , τf≾τ′f = ⇒-Rec (mon-≾FunEnv δ ((≾FunEnv-update-same f τ≾τ′)))
+```
+
+Contextual equivalence:
+
+```
+_≈_ : ∀ e₀ e₁ → Set
+e₀ ≈ e₁ = ∀ c x → c E[ x ↦ e₀ ] ∼ c E[ x ↦ e₁ ]
+```
+
+Contextual simulation:
+
+```
+_≼_ : ∀ e₀ e₁ → Set
+e₀ ≼ e₁ = ∀ c x → c E[ x ↦ e₀ ] ≾ c E[ x ↦ e₁ ]
+```
+
+Operational simulation is a (pre-)congruence:
+
+```
+cong-≾ : e₀ ≾ e₁ → e₀ ≼ e₁
+
+cong-≾ e₀≾e₁ (# n) x γ m δ = δ
+
+cong-≾ e₀≾e₁ (` y) x γ m δ
+  with x ≡? y
+... | yes refl = e₀≾e₁ γ m δ
+... | no _ = δ
+
+cong-≾ e₀≾e₁ (c₀ + c₁) x γ _ (⇒-Add δ₀ δ₁)
+  with cong-≾ e₀≾e₁ c₀ x γ _ δ₀ |
+       cong-≾ e₀≾e₁ c₁ x γ _ δ₁
+... | ind₀ | ind₁ = ⇒-Add ind₀ ind₁
+
+cong-≾ e₀≾e₁ (c₀ - c₁) x γ _ (⇒-Sub δ₀ δ₁)
+  with cong-≾ e₀≾e₁ c₀ x γ _ δ₀ |
+       cong-≾ e₀≾e₁ c₁ x γ _ δ₁
+... | ind₀ | ind₁ = ⇒-Sub ind₀ ind₁
+
+cong-≾ e₀≾e₁ (c₀ · c₁) x γ _ (⇒-Mul δ₀ δ₁)
+  with cong-≾ e₀≾e₁ c₀ x γ _ δ₀ |
+       cong-≾ e₀≾e₁ c₁ x γ _ δ₁
+... | ind₀ | ind₁ = ⇒-Mul ind₀ ind₁
+
+cong-≾ e₀≾e₁ (If c₀ Then c₁ Else c₂) x γ _ (⇒-IfThenElse-tt δ₀ δ₁)
+  with cong-≾ e₀≾e₁ c₀ x γ 0 δ₀ |
+       cong-≾ e₀≾e₁ c₁ x γ _ δ₁
+... | ind₀ | ind₁ = ⇒-IfThenElse-tt ind₀ ind₁
+
+cong-≾ e₀≾e₁ (If c₀ Then c₁ Else c₂) x γ _ (⇒-IfThenElse-ff δ₀ δ₁)
+  with cong-≾ e₀≾e₁ c₀ x _ _ δ₀ |
+       cong-≾ e₀≾e₁ c₂ x _ _ δ₁
+... | ind₀ | ind₁ = ⇒-IfThenElse-ff ind₀ ind₁
+
+cong-≾ e₀≾e₁ (f $ c) x (ϱ , τ) _ (⇒-App δ₀ δ₁)
+  with cong-≾ e₀≾e₁ c x _ _ δ₀
+... | ind₀ = ⇒-App ind₀ δ₁
+
+cong-≾ e₀≾e₁ (Let y ≔ c₀ In c₁) x γ _ δ
+  with x ≡? y | δ
+... | yes refl | ⇒-Let δ₀ δ₁ = ⇒-Let (cong-≾ e₀≾e₁ c₀ x _ _ δ₀) δ₁
+... | no _ | ⇒-Let δ₀ δ₁ = ⇒-Let (cong-≾ e₀≾e₁ c₀ x _ _ δ₀) (cong-≾ e₀≾e₁ c₁ x _ _ δ₁)
+
+cong-≾ e₀≾e₁ (Rec g [ y ]≔ c₀ In c₁) x γ m δ
+  with x ≡? y | δ
+... | yes refl | ⇒-Rec δ′ = ⇒-Rec (cong-≾ e₀≾e₁ c₁ x _ _ δ′)
+... | no _ | ⇒-Rec {τ = τ} δ′
+  with cong-≾ e₀≾e₁ c₁ x _ _ δ′
+... | ind = ⇒-Rec (mon-≾FunEnv ind (≾FunEnv-update-1 g (cong-≾ e₀≾e₁ c₀ x)))
+```
+
+```
+fa0 : e₀ ≈ e₁ → e₀ ∼ e₁
+fa0 e₀≈e₁ γ n = e₀≈e₁ (` x₀) x₀ γ n
+```
+
+
+```
+fa1 : e₀ ∼ e₁ → e₀ ≈ e₁
+fa1 e₀∼e₁ c x γ m = cong-≾ (∼→≾ e₀∼e₁) c x γ m , cong-≾ (∼→≾ (sym-∼ e₀∼e₁)) c x γ m
+```
+
+The denotational semantics is fully abstract:
+
+```
+full-abstraction : e₀ ≈ e₁ ↔ e₀ ∼ e₁
+full-abstraction = fa0 , fa1
+```
 
 # Eager evaluation with static binding
 
