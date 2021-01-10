@@ -131,11 +131,14 @@ max-zero-right (suc m) = refl
 -- {-# REWRITE  #-}
 
 -- instance
-max-prop-left : m ≤ max m n 
-max-prop-left {m} {n}
+max-left : m ≤ max m n 
+max-left {m} {n}
   with m ≤? n
 ... | yes m≤n = m≤n
 ... | (no _) = refl-≤
+
+max-right : m ≤ max n m
+max-right {m} {n} = {!   !}
 
 -- instance
 sym-max : max m n ≡ max n m

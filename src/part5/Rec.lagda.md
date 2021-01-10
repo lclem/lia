@@ -36,7 +36,7 @@ private
     x : VarName
     f : FunName
     e e′ e₀ e₁ e₂ : Exp
-    k k′ m n n₀ n₁ : ℕ
+    k k′ k₀ k₁ m n n₀ n₁ : ℕ
 ```
 
 ```
@@ -75,12 +75,12 @@ Env = VarEnv × FunEnv
 τ₀ : FunEnv
 τ₀ = const (x₀ , # 0)
 
-γ₀ : Env
-γ₀ = ϱ₀ , τ₀
+-- γ₀ : Env
+-- γ₀ = ϱ₀ , τ₀
 
 private
   variable
-    γ : Env
+    γ γ₀ γ₁ : Env
     ϱ : VarEnv
     τ : FunEnv
 ```
@@ -119,12 +119,24 @@ data _,_⇒_ : Exp → Env → ℕ → Set where
     ------------------
     e₀ · e₁ , γ ⇒ n₀ ·ℕ n₁
 
+  ⇒-IfThenElse-tt :
+    e₀ , γ ⇒ 0 →
+    e₁ , γ ⇒ n →
+    -----------------------------
+    If e₀ Then e₁ Else e₂ , γ ⇒ n
+
+  ⇒-IfThenElse-ff :
+    e₀ , γ ⇒ suc m →
+    e₂ , γ ⇒ n →
+    -----------------------------
+    If e₀ Then e₁ Else e₂ , γ ⇒ n
+
   ⇛-App :
     e , (ϱ , τ) ⇒ m →
     let (x , e′) = τ f in
     e′ , (ϱ [ x ↦ m ] , τ) ⇒ n →
     -----------------------------
-    (f $ e) , (ϱ , τ) ⇒ m
+    (f $ e) , (ϱ , τ) ⇒ n
 
   ⇒-Let :
     e₀ , (ϱ , τ) ⇒ m →
@@ -183,10 +195,13 @@ data ℕ⊥ : Set where
   ⊥ : ℕ⊥
   Just : ℕ → ℕ⊥
 
-private variable m⊥ n⊥ v u₀ u₁ u₂ v₀ v₁ v₂ : ℕ⊥
+private variable m⊥ n⊥ u v u₀ u₁ u₂ v₀ v₁ v₂ : ℕ⊥
 
 Just-inv : Just m ≡ Just n → m ≡ n
 Just-inv refl = refl
+
+⊥≡Just-elim : ⊥ ≡ Just m → ∀ {ℓ} {A : Set ℓ} → A
+⊥≡Just-elim ()
 
 infix 5 _⊑_ _⊒_
 data _⊑_ : ℕ⊥ → ℕ⊥ → Set where
@@ -220,7 +235,11 @@ lift2 f ⊥ _ = ⊥
 lift2 f (Just _) ⊥ = ⊥
 lift2 f (Just m) (Just n) = Just (f m n)
 
-lift2-lemma : ∀ f → lift2 f v₀ v₁ ≡ Just n → ∃[ n₀ ] ∃[ n₁ ] v₀ ≡ Just n₀ × v₁ ≡ Just n₁
+lift2-lemma : ∀ f →
+  lift2 f v₀ v₁ ≡ Just n →
+  -------------------------------------------
+  ∃[ n₀ ] ∃[ n₁ ] v₀ ≡ Just n₀ × v₁ ≡ Just n₁
+
 lift2-lemma {v₀} {v₁} f eq
   with v₀ | v₁
 ... | Just n₀ | Just n₁ = n₀ , n₁ , refl , refl
@@ -354,54 +373,148 @@ mon-eval {γ@(ϱ , τ)} {suc k} {v} {suc k′} (Rec f [ x ]≔ e₀ In e₁) ⟦
 ## Agreement
 
 ```
--- prop-+ : ⟦ e₀ + e₁ ⟧ γ # k ≡ Just n → k ≡ suc k′
--- prop-+
+agree-1 : ∀ e k →
+  ⟦ e ⟧ γ # k ≡ Just n →
+  ----------------------
+  e , γ ⇒ n
 
-agree-1 : ∀ e → ⟦ e ⟧ γ # k ≡ Just n → e , γ ⇒ n
+agree-1 (# n) (suc k) refl = ⇒-Num
 
-agree-1 {k = suc k} (# n) refl = ⇒-Num
+agree-1 (` x) (suc k) refl = ⇒-Var
 
-agree-1 {k = suc k} (` x) refl = ⇒-Var
-
-agree-1 {k = suc k} (e₀ + e₁) eq
+agree-1 (e₀ + e₁) (suc k) eq
   with lift2-lemma _+ℕ_ eq
 ... | n₀ , n₁ , eq₀ , eq₁
-  with agree-1 e₀ eq₀ |
-       agree-1 e₁ eq₁
-... | ind₀ | ind₁ = {!   !} -- rewrite eq₀ | eq₁ = ? -- | sym (Just-inv eq) = ? -- ⇒-Add ind₀ ind₁
+  with agree-1 e₀ k eq₀ |
+       agree-1 e₁ k eq₁
+... | ind₀ | ind₁
+  rewrite eq₀ | eq₁ | sym (Just-inv eq) = ⇒-Add ind₀ ind₁
 
-agree-1 {k = suc k} (e₀ - e₁) eq
+agree-1 (e₀ - e₁) (suc k) eq
   with lift2-lemma _-ℕ_ eq
 ... | n₀ , n₁ , eq₀ , eq₁
-  with agree-1 e₀ eq₀ |
-       agree-1 e₁ eq₁
-... | ind₀ | ind₁ = {!   !} -- rewrite eq₀ | eq₁ | sym (Just-inv eq) = ⇒-Sub ind₀ ind₁
+  with agree-1 e₀ k eq₀ |
+       agree-1 e₁ k eq₁
+... | ind₀ | ind₁ rewrite eq₀ | eq₁ | sym (Just-inv eq) = ⇒-Sub ind₀ ind₁
 
-agree-1 {k = suc k} (e₀ · e₁) eq
+agree-1 (e₀ · e₁) (suc k) eq
   with lift2-lemma _·ℕ_ eq
 ... | n₀ , n₁ , eq₀ , eq₁
-  with agree-1 e₀ eq₀ |
-       agree-1 e₁ eq₁
-... | ind₀ | ind₁ = {!   !} -- rewrite eq₀ | eq₁ | sym (Just-inv eq) = ⇒-Mul ind₀ ind₁
+  with agree-1 e₀ k eq₀ |
+       agree-1 e₁ k eq₁
+... | ind₀ | ind₁ rewrite eq₀ | eq₁ | sym (Just-inv eq) = ⇒-Mul ind₀ ind₁
 
-agree-1 (If e Then e₁ Else e₂) eq = {!   !}
+agree-1 {γ} (If e₀ Then e₁ Else e₂) (suc k) eq
+  with inspect (⟦ e₀ ⟧ γ # k)
+... | it ⊥ eq-e₀ rewrite eq-e₀ = ⊥≡Just-elim eq
+... | it (Just 0) eq-e₀ rewrite eq-e₀ = ⇒-IfThenElse-tt (agree-1 e₀ k eq-e₀) (agree-1 e₁ k eq)
+... | it (Just (suc _)) eq-e₀ rewrite eq-e₀ = ⇒-IfThenElse-ff (agree-1 e₀ k eq-e₀) (agree-1 e₂ k eq)
 
-agree-1 (f $ e) eq = {!   !}
+agree-1 {γ@(ϱ , τ)} {n} (f $ e) (suc k) eq
+  with inspect (⟦ e ⟧ γ # k)
+... | it ⊥ eq-e rewrite eq-e = ⊥≡Just-elim eq
+... | it (Just m) eq-e
+  with inspect (τ f) |
+       agree-1 {γ} e k eq-e
+... | it (x , e′) eq-τ | ind-e
+  rewrite eq-e | eq-τ
+  with agree-1 {ϱ [ x ↦ m ] , τ} e′ k eq
+... | ind-e′ = ⇛-App ind-e goal where
 
-agree-1 (Let x ≔ e In e₁) eq = {!   !}
+    goal : snd (τ f) , (ϱ [ fst (τ f) ↦ m ] , τ) ⇒ n
+    goal rewrite eq-τ = ind-e′
 
-agree-1 (Rec f [ x ]≔ e In e₁) eq = {!   !}
+agree-1 {γ} (Let x ≔ e₀ In e₁) (suc k) eq
+  with inspect (⟦ e₀ ⟧ γ # k)
+... | it ⊥ eq-e₀ rewrite eq-e₀ = ⊥≡Just-elim eq
+... | it (Just m) eq-e₀
+  rewrite eq-e₀
+  with agree-1 e₀ k eq-e₀ |
+       agree-1 e₁ k eq
+... | ind-e₀ | ind-e₁ = ⇒-Let ind-e₀ ind-e₁
 
-agree-2 : e , γ ⇒ n → ∃[ k ] ⟦ e ⟧ γ # k ≡ Just n
+agree-1 {γ@(ϱ , τ)} (Rec f [ x ]≔ e₀ In e₁) (suc k) eq
+  with agree-1 {γ = ϱ , τ [ f ↦ x , e₀ ]} e₁ k eq
+... | ind-e₀ = ⇒-Rec ind-e₀
+```
+
+```
+help : ∀ k₀ k₁ →
+       ⟦ e₀ ⟧ γ₀ # k₀ ≡ Just n₀ →
+       ⟦ e₁ ⟧ γ₁ # k₁ ≡ Just n₁ →
+       ---------------------------------
+       ⟦ e₀ ⟧ γ₀ # max k₀ k₁ ≡ Just n₀ ×
+       ⟦ e₁ ⟧ γ₁ # max k₀ k₁ ≡ Just n₁
+
+help {e₀} {γ₀} {n₀} {e₁} {γ₁} {n₁} k₀ k₁ eq₀ eq₁
+  with max-left {k₀} {k₁} |
+       max-right {k₁} {k₀}
+... | k₀≤max | k₁≤max
+  with mon-eval {γ₀} e₀ refl-⊑ k₀≤max |
+       mon-eval {γ₁} e₁ refl-⊑ k₁≤max
+... | le₀ | le₁
+  rewrite eq₀ | eq₁ = ⊑-Just-lemma le₀ , ⊑-Just-lemma le₁
+
+help2 : ∀ f → u ≡ Just m → v ≡ Just n → lift2 f u v ≡ Just (f m n)
+help2 _ refl refl = refl
+
+agree-2 : e , γ ⇒ n →
+          ---------------------------
+          ∃[ k ] ⟦ e ⟧ γ # k ≡ Just n
+
+agree-2-help :
+  e₀ , γ ⇒ n₀ →
+  e₁ , γ ⇒ n₁ →
+  ---------------------------------
+  ∃[ k₀ ] ∃[ k₁ ]
+    ⟦ e₀ ⟧ γ # max k₀ k₁ ≡ Just n₀ ×
+    ⟦ e₁ ⟧ γ # max k₀ k₁ ≡ Just n₁
+
+agree-2-help δ₀ δ₁
+  with agree-2 δ₀ | agree-2 δ₁
+... | k₀ , eq₀ | k₁ , eq₁
+  with help k₀ k₁ eq₀ eq₁
+... | eq₀′ , eq₁′ = k₀ , k₁ , eq₀′ , eq₁′
+
 agree-2 ⇒-Num = 1 , refl
 agree-2 ⇒-Var = 1 , refl
+
 agree-2 (⇒-Add δ₀ δ₁)
-  with agree-2 δ₀ | 
-       agree-2 δ₁
-... | _ , eq₀ | _ , eq₁ = _ , {!   !}
-agree-2 (⇒-Sub δ₀ δ₁) = {!   !}
-agree-2 (⇒-Mul δ₀ δ₁) = {!   !}
-agree-2 (⇛-App δ₀ δ₁) = {!   !}
+  with agree-2-help δ₀ δ₁
+... | k₀ , k₁ , eq₀′ , eq₁′ = suc (max k₀ k₁) , help2 _+ℕ_ eq₀′ eq₁′
+
+agree-2 (⇒-Sub δ₀ δ₁)
+  with agree-2-help δ₀ δ₁
+... | k₀ , k₁ , eq₀′ , eq₁′ = suc (max k₀ k₁) , help2 _-ℕ_ eq₀′ eq₁′
+
+agree-2 (⇒-Mul δ₀ δ₁)
+  with agree-2-help δ₀ δ₁
+... | k₀ , k₁ , eq₀′ , eq₁′ = suc (max k₀ k₁) , help2 _·ℕ_ eq₀′ eq₁′
+
+agree-2 {If e₀ Then e₁ Else e₂} {γ} {n} (⇒-IfThenElse-tt δ₀ δ₁)
+  with agree-2-help δ₀ δ₁
+... | k₀ , k₁ , eq₀′ , eq₁′ = suc (max k₀ k₁) , goal where
+
+  goal : ite (⟦ e₀ ⟧ γ # max k₀ k₁) (⟦ e₁ ⟧ γ # max k₀ k₁) (⟦ e₂ ⟧ γ # max k₀ k₁) ≡ Just n
+  goal rewrite eq₀′ | eq₁′ = refl
+
+agree-2 {If e₀ Then e₁ Else e₂} {γ} {n} (⇒-IfThenElse-ff δ₀ δ₁)
+  with agree-2-help δ₀ δ₁
+... | k₀ , k₁ , eq₀′ , eq₁′ = suc (max k₀ k₁) , goal where
+
+  goal : ite (⟦ e₀ ⟧ γ # max k₀ k₁) (⟦ e₁ ⟧ γ # max k₀ k₁) (⟦ e₂ ⟧ γ # max k₀ k₁) ≡ Just n
+  goal rewrite eq₀′ | eq₁′ = refl
+
+agree-2 {f $ e} {γ@(ϱ , τ)} {n} (⇛-App δ₀ δ₁)
+  with inspect (τ f) | agree-2 δ₀ | agree-2 δ₁
+... | it (x , e′) eq-τ | k₀ , eq₀ | k₁ , eq₁
+  with help k₀ k₁ eq₀  eq₁
+... | eq₀′ , eq₁′ = suc (max k₀ k₁) , goal where
+
+  goal : ⟦ f $ e ⟧ ϱ , τ # suc (max k₀ k₁) ≡ Just n
+  goal rewrite eq₀′ | eq₁′ | eq-τ = refl
+
 agree-2 (⇒-Let δ₀ δ₁) = {!   !}
+
 agree-2 (⇒-Rec δ) = {!   !}
 ```
