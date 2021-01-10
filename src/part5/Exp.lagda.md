@@ -138,7 +138,7 @@ _ : ⟦ add-one ⟧ ϱ₀ ≡ 201
 _ = refl
 ```
 
-!exercise(#exercise-BExp-semantics)
+!exercise(#exercise:BExp-semantics)
 ~~~~~~~~~~~~~~~~
 
 Write the denotational semantics of Boolean expressions.
