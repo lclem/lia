@@ -493,6 +493,7 @@
 <ul>
 <li class="toc-entry toc-h2"><a href="#function-space">Function space</a></li>
 <li class="toc-entry toc-h2"><a href="#decidable-properties-behave-classically">Decidable properties behave classically</a></li>
+<li class="toc-entry toc-h2"><a href="#transport-of-decidability">Transport of decidability</a></li>
 </ul>
 </li>
 <li class="toc-entry toc-h1"><a href="#references">References</a></li>
@@ -569,6 +570,13 @@
 <a id="2052" class="Symbol">...</a> <a id="2056" class="Symbol">|</a> <a id="2058" href="/lia/part0/Decidable/#186" class="InductiveConstructor">yes</a> <a id="2062" href="/lia/part0/Decidable/#2062" class="Bound">a</a> <a id="2064" class="Symbol">=</a> <a id="2066" href="/lia/part0/Decidable/#2062" class="Bound">a</a> 
 <a id="2069" class="Symbol">...</a> <a id="2073" class="Symbol">|</a> <a id="2075" href="/lia/part0/Decidable/#204" class="InductiveConstructor">no</a> <a id="2078" href="/lia/part0/Decidable/#2078" class="Bound">~a</a> <a id="2081" class="Symbol">=</a> <a id="2083" href="/lia/part0/Logic/#2277" class="Function">F-elim</a> <a id="2090" class="Symbol">(</a><a id="2091" class="Bound">~~a</a> <a id="2095" href="/lia/part0/Decidable/#2078" class="Bound">~a</a><a id="2097" class="Symbol">)</a></pre>
 
+<h2 id="transport-of-decidability">
+<a class="anchor" href="#transport-of-decidability" aria-hidden="true"><span class="octicon octicon-link"></span></a>Transport of decidability</h2>
+
+<pre class="Agda"><a id="dec-iso"></a><a id="2140" href="/lia/part0/Decidable/#2140" class="Function">dec-iso</a> <a id="2148" class="Symbol">:</a> <a id="2150" class="Symbol">∀</a> <a id="2152" class="Symbol">{</a><a id="2153" href="/lia/part0/Decidable/#2153" class="Bound">ℓ</a> <a id="2155" href="/lia/part0/Decidable/#2155" class="Bound">m</a><a id="2156" class="Symbol">}</a> <a id="2158" class="Symbol">{</a><a id="2159" href="/lia/part0/Decidable/#2159" class="Bound">A</a> <a id="2161" class="Symbol">:</a> <a id="2163" class="PrimitiveType">Set</a> <a id="2167" href="/lia/part0/Decidable/#2153" class="Bound">ℓ</a><a id="2168" class="Symbol">}</a> <a id="2170" class="Symbol">{</a><a id="2171" href="/lia/part0/Decidable/#2171" class="Bound">B</a> <a id="2173" class="Symbol">:</a> <a id="2175" class="PrimitiveType">Set</a> <a id="2179" href="/lia/part0/Decidable/#2155" class="Bound">m</a><a id="2180" class="Symbol">}</a> <a id="2182" class="Symbol">→</a> <a id="2184" href="/lia/part0/Decidable/#150" class="Datatype">Dec</a> <a id="2188" href="/lia/part0/Decidable/#2159" class="Bound">A</a> <a id="2190" class="Symbol">→</a> <a id="2192" class="Symbol">(</a><a id="2193" href="/lia/part0/Decidable/#2159" class="Bound">A</a> <a id="2195" href="/lia/part0/Logic/#3145" class="Function Operator">↔</a> <a id="2197" href="/lia/part0/Decidable/#2171" class="Bound">B</a><a id="2198" class="Symbol">)</a> <a id="2200" class="Symbol">→</a> <a id="2202" href="/lia/part0/Decidable/#150" class="Datatype">Dec</a> <a id="2206" href="/lia/part0/Decidable/#2171" class="Bound">B</a>
+<a id="2208" href="/lia/part0/Decidable/#2140" class="Function">dec-iso</a> <a id="2216" class="Symbol">(</a><a id="2217" href="/lia/part0/Decidable/#186" class="InductiveConstructor">yes</a> <a id="2221" href="/lia/part0/Decidable/#2221" class="Bound">a</a><a id="2222" class="Symbol">)</a> <a id="2224" class="Symbol">(</a><a id="2225" href="/lia/part0/Decidable/#2225" class="Bound">f</a> <a id="2227" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="2229" href="/lia/part0/Decidable/#2229" class="Bound">g</a><a id="2230" class="Symbol">)</a> <a id="2232" class="Symbol">=</a> <a id="2234" href="/lia/part0/Decidable/#186" class="InductiveConstructor">yes</a> <a id="2238" class="Symbol">(</a><a id="2239" href="/lia/part0/Decidable/#2225" class="Bound">f</a> <a id="2241" href="/lia/part0/Decidable/#2221" class="Bound">a</a><a id="2242" class="Symbol">)</a>
+<a id="2244" href="/lia/part0/Decidable/#2140" class="Function">dec-iso</a> <a id="2252" class="Symbol">(</a><a id="2253" href="/lia/part0/Decidable/#204" class="InductiveConstructor">no</a> <a id="2256" href="/lia/part0/Decidable/#2256" class="Bound">~a</a><a id="2258" class="Symbol">)</a> <a id="2260" class="Symbol">(</a><a id="2261" href="/lia/part0/Decidable/#2261" class="Bound">f</a> <a id="2263" href="/lia/part0/Logic/#1838" class="InductiveConstructor Operator">,</a> <a id="2265" href="/lia/part0/Decidable/#2265" class="Bound">g</a><a id="2266" class="Symbol">)</a> <a id="2268" class="Symbol">=</a> <a id="2270" href="/lia/part0/Decidable/#204" class="InductiveConstructor">no</a> <a id="2273" class="Symbol">λ</a> <a id="2275" href="/lia/part0/Decidable/#2275" class="Bound">b</a> <a id="2277" class="Symbol">→</a> <a id="2279" href="/lia/part0/Decidable/#2256" class="Bound">~a</a> <a id="2282" class="Symbol">(</a><a id="2283" href="/lia/part0/Decidable/#2265" class="Bound">g</a> <a id="2285" href="/lia/part0/Decidable/#2275" class="Bound">b</a><a id="2286" class="Symbol">)</a></pre>
+
 <div id="refs">
 
   <h1 id="references">
@@ -594,7 +602,7 @@
     </p>
 </header>
 
-    <p class="p-name"> Last-modified: Jan 10 19:34:12 2021 </p>
+    <p class="p-name"> Last-modified: Jan 11 09:52:52 2021 </p>
   </article>
       </div>
     </main><footer class="site-footer h-card">
