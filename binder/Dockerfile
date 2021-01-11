@@ -12,7 +12,15 @@ USER root
 RUN apt-get update
 RUN apt-get install --yes python3-pip
 
-USER $NB_UID
+# Provide password-less sudo to NB_USER
+RUN \
+    sed -i /etc/sudoers -re 's/^%sudo.*/%sudo ALL=(ALL:ALL) NOPASSWD: ALL/g' && \
+    sed -i /etc/sudoers -re 's/^root.*/root ALL=(ALL:ALL) NOPASSWD: ALL/g' && \
+    sed -i /etc/sudoers -re 's/^#includedir.*/## **Removed the include directive** ##"/g' && \
+    echo "${NB_USER} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \  
+    chmod g+w /etc/passwd
+
+USER $NB_USER
 
 RUN python3 -m pip install --upgrade pip && \
     python3 -m pip install notebook
@@ -30,11 +38,11 @@ RUN ls -la
 
 #tmp/repo2docker* && ls -la && cd agda-kernel && make kernel-install
 
-COPY --chown=$NB_UID:users . /home/$NB_USER/
+COPY --chown=$NB_USER:users . /home/$NB_USER/
 #COPY ./agda-stdlib /home/$NB_USER/agda-stdlib
-COPY --chown=$NB_UID:users ./src /home/$NB_USER/
+COPY --chown=$NB_USER:users ./src /home/$NB_USER/
 
-USER $NB_UID
+USER $NB_USER
 
 WORKDIR /home/$NB_USER/
 RUN cd agda-kernel && make kernel-install
@@ -55,12 +63,5 @@ RUN cd "/home/$NB_USER/" && agda part2/index.lagda.md
 RUN cd "/home/$NB_USER/" && agda part3/index.lagda.md
 RUN cd "/home/$NB_USER/" && agda part4/index.lagda.md
 RUN cd "/home/$NB_USER/" && agda part5/index.lagda.md
-
-# RUN cd "/home/$NB_USER/src" && agda part0/index.lagda.md
-# RUN cd "/home/$NB_USER/src" && agda part1/index.lagda.md
-# RUN cd "/home/$NB_USER/src" && agda part2/index.lagda.md
-# RUN cd "/home/$NB_USER/src" && agda part3/index.lagda.md
-# RUN cd "/home/$NB_USER/src" && agda part4/index.lagda.md
-# RUN cd "/home/$NB_USER/src" && agda part5/index.lagda.md
 
 #ENV JUPYTER_ENABLE_LAB=yes
