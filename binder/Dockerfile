@@ -56,12 +56,11 @@ RUN cd "/home/$NB_USER/" && agda part3/index.lagda.md
 RUN cd "/home/$NB_USER/" && agda part4/index.lagda.md
 RUN cd "/home/$NB_USER/" && agda part5/index.lagda.md
 
-RUN cd "/home/$NB_USER/src" && agda TypeOf.agda
-RUN cd "/home/$NB_USER/src" && agda part0/index.lagda.md
-RUN cd "/home/$NB_USER/src" && agda part1/index.lagda.md
-RUN cd "/home/$NB_USER/src" && agda part2/index.lagda.md
-RUN cd "/home/$NB_USER/src" && agda part3/index.lagda.md
-RUN cd "/home/$NB_USER/src" && agda part4/index.lagda.md
-RUN cd "/home/$NB_USER/src" && agda part5/index.lagda.md
+# RUN cd "/home/$NB_USER/src" && agda part0/index.lagda.md
+# RUN cd "/home/$NB_USER/src" && agda part1/index.lagda.md
+# RUN cd "/home/$NB_USER/src" && agda part2/index.lagda.md
+# RUN cd "/home/$NB_USER/src" && agda part3/index.lagda.md
+# RUN cd "/home/$NB_USER/src" && agda part4/index.lagda.md
+# RUN cd "/home/$NB_USER/src" && agda part5/index.lagda.md
 
 #ENV JUPYTER_ENABLE_LAB=yes
