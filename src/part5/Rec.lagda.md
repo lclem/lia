@@ -1,5 +1,5 @@
 ---
-title: "Recursion expressions 🚧"
+title: "First-order recursion 🚧"
 ---
 
 ```
@@ -544,7 +544,7 @@ agree e = (λ{ (k , eq) → agree-1 e k eq }) , agree-2
 
 ## Contextual equivalence
 
-Notice that we only have zeroth-order context in this language,
+Notice that we only have zeroth-order contexts in this language,
 i.e., we can only replace an integral variable `x` with an expression of the language.
 
 Substitution:
