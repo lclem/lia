@@ -12,5 +12,6 @@ open import part5.Imp
 open import part5.Extensions
 open import part5.Continuations
 open import part5.Rec
+open import part5.HigherOrder
 open import part5.Reg
 ```
