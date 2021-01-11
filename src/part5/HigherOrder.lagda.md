@@ -76,6 +76,7 @@ private
 ```
 
 ```
+--
 ```
 
 Example:
@@ -271,6 +272,7 @@ T⟦ μ f · e ⟧ ρ = lift⊥ (type-Rec (ρ f)) (T⟦ e ⟧ ρ)
 # Eager evaluation with dynamic binding
 
 ```
+--
 ```
 
 # Eager evaluation with static binding
