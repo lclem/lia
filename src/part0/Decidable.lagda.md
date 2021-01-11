@@ -81,3 +81,11 @@ doublenegation a? ~~a
 ... | yes a = a 
 ... | no ~a = F-elim (~~a ~a) 
 ```
+
+## Transport of decidability 
+
+```
+dec-iso : ∀ {ℓ m} {A : Set ℓ} {B : Set m} → Dec A → (A ↔ B) → Dec B
+dec-iso (yes a) (f , g) = yes (f a)
+dec-iso (no ~a) (f , g) = no λ b → ~a (g b)
+```

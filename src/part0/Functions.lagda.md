@@ -134,13 +134,6 @@ update-∘ f g a b = extensionality go where
   ... | no _ = refl
 ```
 
-## Injective functions
-
-```
-Injective : ∀ {ℓ m} {A : Set ℓ} {B : Set m} → (A → B) → Set (ℓ ⊔ m)
-Injective f = ∀[ a0 ] ∀[ a1 ] (f a0 ≡ f a1 → a0 ≡ a1)
-```
-
 ## Function chains
 
 ```
