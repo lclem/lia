@@ -7,6 +7,7 @@ title: Equality🚧
 
 module part0.Equality where
 open import part0.Decidable public
+open import Agda.Builtin.Equality public
 
 private
   variable
@@ -15,12 +16,12 @@ private
     B : Set m
     x y z : A
 
-infix 4 _≡_ _≢_
-data _≡_ {ℓ} {A : Set ℓ} (x : A) : A → Set where
-    refl : x ≡ x
+-- infix 4 _≡_ _≢_
+-- data _≡_ {ℓ} {A : Set ℓ} (x : A) : A → Set where
+--     refl : x ≡ x
 
 -- this helps with the rewrite directive
-{-# BUILTIN EQUALITY _≡_ #-}
+-- {-# BUILTIN EQUALITY _≡_ #-}
 {-# BUILTIN REWRITE _≡_ #-}
 
 sym : x ≡ y → y ≡ x
@@ -54,6 +55,24 @@ cong-auto {f = f} = cong f
 cong2 : ∀ {ℓ m n} {A : Set ℓ} {B : Set m} {C : Set n} (f : A → B → C) {x y : A} {z t : B} → x ≡ y → z ≡ t → f x z ≡ f y t
 cong2 f refl refl = refl
 
+-- curried version
+cong2′ : ∀ {ℓ m n} {A : Set ℓ} {B : Set m} {C : Set n} (f : A → B → C) {x y : A} {z t : B} → (x ≡ y × z ≡ t) → f x z ≡ f y t
+cong2′ f (refl , refl) = refl
+```
+
+
+```
+Injective : ∀ {ℓ m} {A : Set ℓ} {B : Set m} → (A → B) → Set (ℓ ⊔ m)
+Injective f = ∀[ a0 ] ∀[ a1 ] (f a0 ≡ f a1 → a0 ≡ a1)
+
+Injective2 : ∀ {ℓ m n} {A : Set ℓ} {B : Set m} {C : Set n} → (A → B → C) → Set (ℓ ⊔ m ⊔ n)
+Injective2 f = ∀[ a0 ] ∀[ a1 ] ∀[ b0 ] ∀[ b1 ] (f a0 b0 ≡ f a1 b1 → a0 ≡ a1 × b0 ≡ b1)
+```
+
+```
+cong2-inv : ∀ {ℓ m n} {A : Set ℓ} {B : Set m} {C : Set n} {f : A → B → C} {x y : A} {z t : B} → Injective2 f → f x z ≡ f y t → x ≡ y × z ≡ t
+cong2-inv inj eq = inj _ _ _ _ eq
+
 subst : ∀ {ℓ m} {A : Set ℓ} {x y : A} (P : A → Set m) → x ≡ y → P x → P y
 subst P refl px = px
 
@@ -81,7 +100,7 @@ x ≡⟨ x≡y ⟩ y≡z = trans x≡y y≡z
 _∎ : ∀ {ℓ} {A : Set ℓ} (x : A) → x ≡ x
 x ∎ = refl
 
-_≢_ : ∀ {ℓ} {A : Set ℓ} (x y : A) → Set
+_≢_ : ∀ {ℓ} {A : Set ℓ} (x y : A) → Set ℓ
 x ≢ y = ~ (x ≡ y)
 
 ~x≢x : ∀ {ℓ} {A : Set ℓ} {x : A} → ~ (x ≢ x)
@@ -174,14 +193,12 @@ instance
   ... | yes refl = yes refl
 ```
 
-
-
 # Inspection idiom
 
 ```
 data Inspect {A : Set ℓ} (x : A) : Set ℓ where
   it : (y : A) → x ≡ y → Inspect x
 
-inspect : ∀ (x : A) → Inspect x
+inspect : ∀ {A : Set ℓ} (x : A) → Inspect x
 inspect x = it x refl
 ```

@@ -12,3 +12,5 @@ tmp/
 html/
 .jekyll-cache
 *conflicted\ copy*
+*.agda
+.ipynb_checkpoints/

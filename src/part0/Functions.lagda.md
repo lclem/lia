@@ -25,7 +25,8 @@ flip f c a = f a c
 infixl 300 _[_↦_]
 
 update : {{_ : Eq A}} → Π A B → (a : A) → B a → Π A B
-update f a b c with a ≡? c
+update f a b c
+  with a ≡? c
 ... | yes refl = b
 ... | no _ = f c
 
@@ -123,13 +124,14 @@ doubleupdate {A = A} {ρ = ρ} x {a} {b} = extensionality p where
 updateUndo : ∀ {ℓ m} {A : Set ℓ} {B : A → Set m} {{_ : Eq A}} (ρ : Π A B) (a : A) {b : B a} →
   ρ [ a ↦ b ] [ a ↦ ρ a ] ≡ ρ
 updateUndo ρ a = {!   !}
-```
 
-## Injective functions
+update-∘ : ∀ {ℓ m n} {A : Set ℓ} {B : Set m} {C : Set n} {{_ : Eq A}} (f : A → B) (g : B → C) (a : A) (b : B) → g ∘ (f [ a ↦ b ]) ≡ (g ∘ f) [ a ↦ g b ]
+update-∘ f g a b = extensionality go where
 
-```
-Injective : ∀ {ℓ m} {A : Set ℓ} {B : Set m} → (A → B) → Set ℓ
-Injective f = ∀[ a0 ] ∀[ a1 ] (f a0 ≡ f a1 → a0 ≡ a1)
+  go : ∀ a′ → (g ∘ (f [ a ↦ b ])) a′ ≡ ((g ∘ f) [ a ↦ g b ]) a′
+  go a′ with a ≡? a′
+  ... | yes refl = refl
+  ... | no _ = refl
 ```
 
 ## Function chains
@@ -157,8 +159,6 @@ _∎→ : ∀ {ℓ} (A : Set ℓ) → A → A
 A ∎→ = λ a → a
 
 _QED = _∎→
-
-
 ```
 
 Use case:

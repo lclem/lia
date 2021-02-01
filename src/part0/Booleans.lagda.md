@@ -21,11 +21,16 @@ In this section we introduce *Boolean values*.
 data 𝔹 : Set where
   ff : 𝔹
   tt : 𝔹
+
+private
+  variable
+    a b : 𝔹
 ```
 
 Erasure:
 
-⌊_⌋
+Alternative symbol: ⌊_⌋
+
 ```
 ⌞_⌟ : ∀ {ℓ} {A : Set ℓ} → Dec A → 𝔹
 ⌞ yes _ ⌟ = tt
@@ -39,8 +44,11 @@ tt≢ff ()
 ff≢tt : ff ≢ tt
 ff≢tt ()
 
-ff≢tt-elim : ff ≡ tt → whatever
-ff≢tt-elim ff≡tt = F-elim (ff≢tt ff≡tt)
+ff≡tt-elim : ff ≡ tt → whatever
+ff≡tt-elim ff≡tt = F-elim (ff≢tt ff≡tt)
+
+tt≡ff-elim : tt ≡ ff → whatever
+tt≡ff-elim tt≡ff = F-elim (tt≢ff tt≡ff)
 
 a≡ff→a≡tt-elim : ∀ {a} → a ≡ ff → a ≡ tt → whatever
 a≡ff→a≡tt-elim refl ()
@@ -208,6 +216,12 @@ push¬⇔𝔹 ff ff = refl
 ```
 
 ## Basic properties
+
+```
+¬𝔹-tt-ff : ¬𝔹 a ≡ tt → a ≡ ff
+¬𝔹-tt-ff {ff} _ = refl
+¬𝔹-tt-ff {tt} ()
+```
 
 ### Idempotence
 

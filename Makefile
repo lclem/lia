@@ -6,7 +6,7 @@ SRCDIR := src
 BUILDDIR := $(SRCDIR)/_build
 INCLUDES := _includes
 SVGS := $(INCLUDES)/svgs
-PARTS := part0 part1 part2
+PARTS := part0 part1 part2 part3 part4 part5
 #part1 part2 part3 part4
 AGDA := agda
 PP := ./pp/pp-macos
@@ -36,7 +36,7 @@ endif
 
 PANDOC := $(PANDOCEXEC) --filter=pandoc-numbering --bibliography=$(BIB) --csl=$(CSL) --metadata link-citations=true --from markdown --to markdown_phpextra
 #--metadata numbersections=true --metadata number-sections=true --number-sections 
-$(info PANDOC: $(PANDOC))
+#$(info PANDOC: $(PANDOC))
 
 #$(info PARTS:$(PARTS))
 
@@ -324,9 +324,14 @@ $(OUTDIR)/$1/$2.md: $(TMPDIR)/$1.$2.md
 # WARNING: the number of added lines will affect the following!
 
 	@echo "1 \c"
-# STEP 0: expand solution entries
+# STEP 0: apply PP macros
 
-	@$(PP) -import pp-macros.txt $(TMPDIR)/$1.$2.1.md > $(TMPDIR)/$1.$2.2.md
+ifneq ($(wildcard $(SRCDIR)/$1/$2.pp),)
+# additionally import a chapter-specific pp macrofile, if it exists
+	@$(PP) -import=macros.pp -import=$(SRCDIR)/$1/$2.pp -D part=$1 -D chapter=$2 $(TMPDIR)/$1.$2.1.md > $(TMPDIR)/$1.$2.2.md
+else
+	@$(PP) -import=macros.pp -D part=$1 -D chapter=$2 $(TMPDIR)/$1.$2.1.md > $(TMPDIR)/$1.$2.2.md
+endif
 	@echo "2 \c"
 
 # 2>/dev/null || true

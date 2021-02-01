@@ -17,11 +17,14 @@ open import part0.TList public
 open import part0.Finite public
 open import part0.Enumerable public
 open import part0.Tree public
+open import part0.WellFounded public
 ```
 
-<executable-pre data-executable="true" data-language="agda">
-
+!codemirrorCustom(test)
+~~~~
 module test where
+
+-- BEGIN SOLUTION
 
 open import part0.Naturals
 
@@ -40,9 +43,13 @@ data Two : Set where
     one : Two
     two : Two
 
-select : Two → A → A → A
-select x a₀ a₁ = {! x !}
-</executable-pre>
+G : Two → Set → Set → Set
+G one A _ = A
+G two _ B = B
+
+select : (x : Two) → A → B → G x A B
+select x a b = {!  !}
+~~~~
 
 An example citation to [@Craig:JSL:1957]
 and another to the same [@Craig:JSL:1957],
@@ -51,8 +58,3 @@ or even just (@Craig:JSL:1957),
 finally another one [@Langford:AM:1926:B],
 and then Craig again [@Craig:JSL:1957].
 
-::: {#refs}
-
-# References
-
-:::

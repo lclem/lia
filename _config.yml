@@ -78,6 +78,7 @@ exclude:
   - "*#*"
   - "*!*"
   - "*.md.sed"
+  - "*.pp"
   - "binder"
   - "thebe/node_modules/"
   - "thebe/src"
@@ -109,3 +110,4 @@ exclude:
   - "codemirror-agda/package.json"
   - "codemirror-agda/README.md"
   - "codemirror-agda/src"
+  - "agda-kernel/"

@@ -156,201 +156,22 @@ is syntactically identical to the formula
 φ₁ = ` p₀ ∨ ((¬ ` p₀) ∨ ` p₁)
 ```
 
-## Equality
+## Decidable equality
 
 From time to time we need to check whether two formulas are syntactically equal,
 i.e., are the very same formula.
 For example, `` ` p ∨ ` q`` is syntactically equal to itself,
 but it is different from `` ` q ∨ ` p``.
-A naïve way to decide equality would be to list all the 8 × 8 = 64 pairs of constructors,
 
-    instance eqFormula : Eq (Formula)
-    _≡?_ {{eqFormula}} = go where
-      go : ∀ φ ψ → Dec (φ ≡ ψ)
-      go ⊤ ⊤ = yes refl
-      go ⊤ ⊥ = no λ ()
-      go ⊤ (` _) = no λ ()
-    ...
 
-which is not practical [^no-split-on-catchall].
-We will follow another, more interesting route.
-
-1. First, we create an enumeration for the logical connectives,
-for which we can easily prove decidability of equality.
-
-2. Then, we injectively map formulas to labelled trees,
-for which decidable equality is easier to prove [^dec-eq-reference].
-
-[^no-split-on-catchall]:
-    The issue is that Agda does not perform splits on a catch-all pattern `_`,
-    thus preventing the following intuitive linear-sized code from working:
-  
-        instance eqFormula : Eq (Formula)
-        _≡?_ {{eqFormula}} = go where
-          go : ∀ φ ψ → Dec (φ ≡ ψ)
-          go ⊤ ⊤ = yes refl
-          go ⊤ _ = no (λ ())
-        ...
-    This seems to be an often-made [complaint](https://github.com/agda/agda/issues/4804) about Agda.
-
-[^dec-eq-reference]: We present a solution inspired from a discussion on
-[stackoverflow](https://stackoverflow.com/questions/45150324/decidable-equality-in-agda-with-less-than-n2-cases).
-
-**Step 1**.
-We begin by defining an enumeration type for the formula constructors (connectives).
-
-```
-data Connective : Set where
-  True False Not And Or Implies Iff : Connective
-```
-
-We can injectively map elements of `Connective` to the natural numbers `ℕ` in the obvious way.
-
-```
-c2ℕ : Connective → ℕ
-c2ℕ True = 0
-c2ℕ False = 1
-c2ℕ Not = 2
-c2ℕ And = 3
-c2ℕ Or = 4
-c2ℕ Implies = 5
-c2ℕ Iff = 6
-```
-
-Thanks to pattern matching,
-we only need to consider 7 cases (linearly many in the number of constructors of `Formula`)
-to show that `c2ℕ` is injective:
-
-```
-c2ℕ-inj : Injective c2ℕ
-c2ℕ-inj True True _ = refl
-c2ℕ-inj False False _ = refl
-c2ℕ-inj Not Not _ = refl
-c2ℕ-inj And And _ = refl
-c2ℕ-inj Or Or _ = refl
-c2ℕ-inj Implies Implies _ = refl
-c2ℕ-inj Iff Iff _ = refl
-```
-
-Since equality is decidable on natural numbers `ℕ`
-and `Connective` maps injectively to `ℕ`,
-equality is decidable for `Connective` as well.
-
-```
-instance eqConnective : Eq Connective
-_≡?_ {{eqConnective}} = go where
-
-  go : ∀ C1 C2 → Dec (C1 ≡ C2)
-  go C1 C2 with c2ℕ C1 ≡? c2ℕ C2
-  -- by injectivity
-  ... | yes eq = yes (c2ℕ-inj C1 C2 eq)
-  -- by functionality
-  ... | no neq = no λ{refl → neq refl}
-```
-
-**Step 2**.
-We now injectively map formulas to `Connective ⊎ PropName`-labelled trees.
-Since `Connective` and `PropName` have decidable equality,
-so does their tagged union `Connective ⊎ VarName`.
-
-```
-FormulaTree = Tree (Connective ⊎ PropName)
-```
-
-We map formulas to trees by structural induction as follows:
-
-```
-Formula2Tree : Formula → FormulaTree
-Formula2Tree ⊤ = Node (left True) ε
-Formula2Tree ⊥ = Node (left False) ε
-Formula2Tree (` p) = Node (right p) ε
-Formula2Tree (¬ φ) = Node (left Not) ([ (Formula2Tree φ) ])
-Formula2Tree (φ ∨ ψ) = Node (left Or) ([ (Formula2Tree φ) (Formula2Tree ψ) ])
-Formula2Tree (φ ∧ ψ) = Node (left And) ([ (Formula2Tree φ) (Formula2Tree ψ) ])
-Formula2Tree (φ ⇒ ψ) = Node (left Implies) ([ (Formula2Tree φ) (Formula2Tree ψ) ])
-Formula2Tree (φ ⇔ ψ) = Node (left Iff) ([ (Formula2Tree φ) (Formula2Tree ψ) ])
-```
-
-!exercise(#exercise:Formula2Tree-inj)(`Formula2Tree-inj`)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Prove that the mapping `Formula2Tree` is injective.
-
-```
-Formula2Tree-inj : Injective Formula2Tree
-```
-
-<pre data-executable="true" data-language="agda">
-module part1.Semantics.ex-Formula2Tree-inj where
-
-open import part0.index
-
-postulate n' : ℕ
-  
-open import part1.Semantics n' hiding (Formula2Tree-inj)
-
-Formula2Tree-inj : Injective Formula2Tree
-Formula2Tree-inj = ?
-</pre>
-
-*Hint:* Exploit the fact that the list constructor `_∷_` is injective on both arguments
-(c.f. !remoteRef(part0)(List)(∷-inj-left) and !remoteRef(part0)(List)(∷-inj-right) from !chapterRef(part0)(List)).
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-```
-Formula2Tree-inj ⊤ ⊤ _ = refl
-Formula2Tree-inj ⊥ ⊥ _ = refl
-Formula2Tree-inj (` p) (` p) refl = refl
-Formula2Tree-inj (¬ a) (¬ b) eql
-  with Formula2Tree-inj _ _ (∷-inj-left (Node-inj-right eql))
-... | refl = refl
-Formula2Tree-inj (φ ∧ ψ) (φ' ∧ ψ') eql
-  with Formula2Tree-inj _ _ (∷-inj-left (Node-inj-right eql)) |
-       Formula2Tree-inj _ _ (∷-inj-left (∷-inj-right (Node-inj-right eql)))
-... | refl | refl = refl
-Formula2Tree-inj (φ ∨ ψ) (φ' ∨ ψ') eql
-  with Formula2Tree-inj _ _ (∷-inj-left (Node-inj-right eql)) |
-       Formula2Tree-inj _ _ (∷-inj-left (∷-inj-right (Node-inj-right eql)))
-... | refl | refl = refl
-Formula2Tree-inj (φ ⇒ ψ) (φ' ⇒ ψ') eql
-  with Formula2Tree-inj _ _ (∷-inj-left (Node-inj-right eql)) |
-       Formula2Tree-inj _ _ (∷-inj-left (∷-inj-right (Node-inj-right eql)))
-... | refl | refl = refl
-Formula2Tree-inj (φ ⇔ ψ) (φ' ⇔ ψ') eql
-  with Formula2Tree-inj _ _ (∷-inj-left (Node-inj-right eql)) |
-       Formula2Tree-inj _ _ (∷-inj-left (∷-inj-right (Node-inj-right eql)))
-... | refl | refl = refl
-```
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-With this ingredients in hand,
-we can show that `Formula` has decidable equality:
+Since formulas are built from finitely many constructors,
+it is conceptually easy to show that they enjoy decidable equality:
 
 ```
 instance eqFormula : Eq Formula
-_≡?_ {{eqFormula}} = go where
-  
-    go : ∀ φ ψ → Dec (φ ≡ ψ)
-    go φ ψ with Formula2Tree φ ≡? Formula2Tree ψ
-    ... | yes eq = yes (Formula2Tree-inj _ _ eq)
-    ... | no neq = no λ{refl → neq refl}
 ```
 
-!example(#example:equality)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-We demonstrate decidability of formula equality. We have
-
-```
-_ : (` p₀ ∨ ` p₁ ≡? ` p₀ ∨ ` p₁) ≡ yes _
-_ = refl
-```
-
-but
-
-```
-_ : (` p₀ ∨ ` p₁ ≡? ` p₁ ∨ ` p₀) ≡ no _
-_ = refl
-```
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+We defer the details of the proof to the [appendix](#app-decidable-equality).
 
 # Semantics
 
@@ -490,7 +311,31 @@ invariance : ∀ φ →
 
 !exercise(#exercise:invariance)(`invariance`)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Prove invariance of the semantics.
+Prove invariance of the semantics[^split-bug].
+
+[^split-bug]:
+    Currently there is a [bug](https://github.com/agda/agda/issues/3209) in Agda when case-splitting (Ctr-c+Ctrl-c) on an argument (such as `Formula`) which is defined in a parametric module (such as `part1.Semantics`).
+    For instance, if we case-split on `φ` in 
+
+        fun : Formula → Formula
+        fun φ = {! φ !}
+
+    we get
+
+        fun part1.Semantics.Formula.⊥ = ?
+        fun part1.Semantics.Formula.⊤ = ?
+        fun (part1.Semantics.Formula.` p) = ?
+        ...
+
+    instead of the expected
+    
+        fun ⊥ = ?
+        fun ⊤ = ?
+        fun (` p) = ?
+        ...
+
+!codemirror(invariance)
+
 *Hint*: Proceed by structural induction on formulas. In the variable case, use the assumption `Agree ϱ ϱ′ (props φ)`.
 In the inductive cases, use the fact that if `ϱ` and `ϱ′` agree on their value on the propositions in `φ ∧ ψ`,
 then they do so on `φ`, resp., `ψ`.
@@ -530,6 +375,8 @@ coincidence : ∀ {b} φ →
   ---------------------------
   ⟦ φ ⟧ ϱ ≡ ⟦ φ ⟧ ϱ [ p ↦ b ]
 ```
+
+!codemirror(coincidence)
 
 *Hint* : Use invariance of the semantics.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -605,6 +452,9 @@ _F2[_,_↦_,_] : Formula → PropName → PropName → Formula → Formula → F
 ```
 
 What happens if `p ≡ q` ?
+
+!codemirror(subst2)(_F2[_,_↦_,_])
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
@@ -647,6 +497,9 @@ One could say that the substitution lemma shows a certain *commutation rule* bet
 !exercise(#exercise:substitution)(`substitution`) 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Prove the substitution lemma.
+
+!codemirror(substitution)
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
@@ -685,6 +538,8 @@ subst-id : ∀ φ p ξ →
   ----------------
   φ F[ p ↦ ξ ] ≡ φ
 ```
+
+!codemirror(subst-id)
 
 *Hint:* Proceed by structural induction,
 using the assumption `p ~∈ props φ` in the variable case;
@@ -735,6 +590,8 @@ the former provides direct evidence that `q` is not in `props φ`
 and thus it is stronger.
 The two happen to be equivalent thanks to the conversion functions
 !remoteRef(part0)(List)(~∈→∉) and !remoteRef(part0)(List)(∉→~∈)
+
+!codemirror(rename-undo)
 
 *Hint:* Proceed by induction on the evidence `q ∉ props φ` that `q` is not in `φ`.
 The auxiliary functions !remoteRef(part0)(List)(∉-++-left) and !remoteRef(part0)(List)(∉-++-right) will be useful in the inductive cases.
@@ -843,6 +700,9 @@ tautology-subst : ∀ φ p ψ →
   -------------------------
   Tautology (φ F[ p ↦ ψ ])
 ```
+
+!codemirror(tautology-subst)
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 The proof is an immediate application of the substitution lemma:
@@ -905,6 +765,9 @@ Prove that the entailment relation is a preorder:
 refl-⇛ : ∀ φ → φ ⇛ φ
 trans-⇛ : ∀ φ ψ ξ → φ ⇛ ψ → ψ ⇛ ξ → φ ⇛ ξ
 ```
+
+!codemirror2(entailment-preorder)(refl-⇛)(trans-⇛)
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
@@ -970,6 +833,8 @@ entailment-implication : ∀ φ ψ → φ ⇛ ψ ↔ Tautology (φ ⇒ ψ)
 entailment-equivalence : ∀ φ ψ → φ ⟺ ψ ↔ Tautology (φ ⇔ ψ)
 ```
 
+!codemirror2(entailment-implication)(entailment-implication)(entailment-equivalence)
+
 Prove the two properties above.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1034,7 +899,7 @@ as shown in the next exercise.
 
 !exercise(#exercise:common-equivalences)(Common equivalences)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Prove the folowing equivalences.
+Prove the following equivalences.
 *Hint:* Use the method of truth tables.
 
 ```
@@ -1060,6 +925,23 @@ deMorganImplies : ∀ φ ψ → ¬ (φ ⇒ ψ) ⟺ φ ∧ ¬ ψ
 deMorganIff-left : ∀ φ ψ → ¬ (φ ⇔ ψ) ⟺ ¬ φ ⇔ ψ
 deMorganIff-right : ∀ φ ψ → ¬ (φ ⇔ ψ) ⟺ φ ⇔ ¬ ψ
 ```
+
+!codemirrorCustom(common-equivalences)
+~~~~
+module !part().!chapter().common-equivalences where
+open import TypeOf
+open import !part().!chapter() renaming (idempotAnd to idempotAnd-orig; commAnd to commAnd-orig; commOr to commOr-orig)
+
+idempotAnd : typeOf idempotAnd-orig
+commAnd : typeOf commAnd-orig
+commOr : typeOf commOr-orig
+
+-- BEGIN SOLUTION
+idempotAnd = ?
+commAnd  = ?
+commOr = ?
+~~~~
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
@@ -1192,6 +1074,9 @@ cong2F : ∀ φ₀ φ₁ ψ₀ ψ₁ ξ p₀ p₁ →
   -----------------------------------------------------
   ξ F2[ p₀ , p₁ ↦ φ₀ , φ₁ ] ⟺ ξ F2[ p₀ , p₁ ↦ ψ₀ , ψ₁ ]
 ```
+
+!codemirror(cong2F)
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
@@ -1275,7 +1160,9 @@ p∧¬p-unsat {p} (ϱ , equiv) with ϱ p
 
 !exercise(#exercise:tau-sat)(Tautology and satisfiability)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Elaborate and prove a natural property connecting whether `φ` is a tautology and satisfiability.
+Elaborate and prove a natural property relating tautology and satisfiability.
+
+!codemirror(tau-sat)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 One possible property is the following:
@@ -1304,6 +1191,8 @@ tau-sat φ = tau→sat , sat→tau where
 !exercise(#exercise:equiv-unsat)(Equivalence and unsatisfiability)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Express unsatisfiability in terms of logical equivalence.
+
+!codemirror(equiv-unsat)(equiv↔unsat)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 One possible property is that a formula is unsatisfiable if, and only if, it is logically equivalent to !ref(⊥):
@@ -1382,7 +1271,10 @@ conjProp2 : ∀ φs ϱ →
 
 !exercise(#exercise:long-conjunctions)(Long conjunctions)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Prove the two defining properties !ref(conjProp1) and !ref(conjProp2) of long conjunctions
+Prove the two defining properties !ref(conjProp1) and !ref(conjProp2) of long conjunctions.
+
+!codemirror(conjProp12)(conjProp1)(conjProp2)
+
 *Hint:* Use the corresponding properties for Booleans.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1428,6 +1320,9 @@ disjProp-ff : ∀ φs ϱ →
 !exercise(#exercise:long-disjunctions)(Long disjunctions) 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Prove the two defining properties !ref(disjProp-tt) and !ref(disjProp-ff) above.
+
+!codemirror2(disjProp)(disjProp-tt)(disjProp-ff)
+
 *Hint:* Use the corresponding properties for Booleans.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1497,6 +1392,8 @@ perm-sat : ∀ {Γ Δ ϱ} →
   All (λ φ → ⟦ φ ⟧ ϱ ≡ tt) Δ
 ```
 
+!codemirror(perm-sat)
+
 *Hint*: Proceed by structural induction on permutations.
 Deduce that the logical consequence relation is invariant under context permutation:
 
@@ -1507,6 +1404,9 @@ perm-⊨ : ∀ {Γ Δ} φ →
   -----
   Δ ⊨ φ
 ```
+
+!codemirror(perm-sem)(perm-⊨)
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
@@ -1552,6 +1452,9 @@ context2 : ∀ Γ {φ} →
   -----
   Γ ⊨ φ
 ```
+
+!codemirror2(context12)(context1)(context2)
+
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
@@ -1634,6 +1537,8 @@ semDT2 : ∀ φ ψ →
 !exercise(#exercise:sem-DT)(Semantic deduction theorem)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Prove the two parts !ref(semDT2) and !ref(semDT1) of the semantic deduction theorem.
+
+!codemirror2(semDT)(semDT1)(semDT2)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
@@ -2210,6 +2115,8 @@ dual-involutive :
   φ ⁻ ⁻  ≡ φ
 ```
 
+!codemirror(dual-involutive)
+
 The extra assumption `Formula[⊥,⊤,¬,∨,∧] φ` dispenses us from considering formulas with implication or bi-implication.
 ~~~~~~
 ~~~~~~
@@ -2291,6 +2198,8 @@ duality-equivalence-1 :
   ---------
   φ ⁻ ⟺ ψ ⁻
 ```
+
+!codemirror(duality-equivalence-1)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ```
@@ -2312,6 +2221,8 @@ duality-equivalence-2 :
   φ ⟺ ψ
 ```
 
+!codemirror(duality-equivalence-2)
+
 *Hint:* Use !ref(duality-equivalence-1) and the fact that dualisation preserves `{⊥,⊤,¬,∨,∧}` formulas:
 
 ```
@@ -2320,6 +2231,8 @@ dual-preservation :
   ------------------------
   Formula[⊥,⊤,¬,∨,∧] (φ ⁻)
 ```
+
+!codemirror(dual-preservation)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 We begin by proving that dualisation preserves `{⊥,⊤,¬,∨,∧}` formulas:
@@ -2368,6 +2281,8 @@ duality-tautology : ∀ {φ} →
   Tautology (¬ φ ⁻)
 ```
 
+!codemirror(duality-tautology)
+
 *Hint*: Use the fact that a tautology is logically equivalent to !remoteRef(part1)(Semantics)(Formula)(⊤);
 c.f. !remoteRef(part1)(Semantics)(tautology-equivalence).
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -2393,3 +2308,186 @@ we have that `¬ φ ⁻` is logically equivalent to `¬ ¬ ⊤`
 4) Thanks to !remoteRef(part1)(Semantics)(¬¬⊤⟺⊤), `¬ φ ⁻` is logically equivalent to !remoteRef(part1)(Semantics)(Formula)(⊤).
 5) The proof is concluded by applying the right-to-left direction of !remoteRef(part1)(Semantics)(tautology-equivalence).
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# Appendix
+
+## Decidable equality {#app-decidable-equality}
+
+
+A naïve way to decide equality would be to list all the 8 × 8 = 64 pairs of constructors,
+
+    instance eqFormula : Eq (Formula)
+    _≡?_ {{eqFormula}} = go where
+      go : ∀ φ ψ → Dec (φ ≡ ψ)
+      go ⊤ ⊤ = yes refl
+      go ⊤ ⊥ = no λ ()
+      go ⊤ (` _) = no λ ()
+    ...
+
+which is not practical [^no-split-on-catchall].
+We will follow another, more interesting route.
+
+1. First, we create an enumeration for the logical connectives,
+for which we can easily prove decidability of equality.
+
+2. Then, we injectively map formulas to labelled trees,
+for which decidable equality is easier to prove [^dec-eq-reference].
+
+[^no-split-on-catchall]:
+    The issue is that Agda does not perform splits on a catch-all pattern `_`,
+    thus preventing the following intuitive linear-sized code from working:
+  
+        instance eqFormula : Eq (Formula)
+        _≡?_ {{eqFormula}} = go where
+          go : ∀ φ ψ → Dec (φ ≡ ψ)
+          go ⊤ ⊤ = yes refl
+          go ⊤ _ = no (λ ())
+        ...
+    This seems to be an often-made [complaint](https://github.com/agda/agda/issues/4804) about Agda.
+
+[^dec-eq-reference]: We present a solution inspired from a discussion on
+[stackoverflow](https://stackoverflow.com/questions/45150324/decidable-equality-in-agda-with-less-than-n2-cases).
+
+**Step 1**.
+We begin by defining an enumeration type for the formula constructors (connectives).
+
+```
+data Connective : Set where
+  True False Not And Or Implies Iff : Connective
+```
+
+We can injectively map elements of `Connective` to the natural numbers `ℕ` in the obvious way.
+
+```
+c2ℕ : Connective → ℕ
+c2ℕ True = 0
+c2ℕ False = 1
+c2ℕ Not = 2
+c2ℕ And = 3
+c2ℕ Or = 4
+c2ℕ Implies = 5
+c2ℕ Iff = 6
+```
+
+Thanks to pattern matching,
+we only need to consider 7 cases (linearly many in the number of constructors of `Formula`)
+to show that `c2ℕ` is injective:
+
+```
+c2ℕ-inj : Injective c2ℕ
+c2ℕ-inj True True _ = refl
+c2ℕ-inj False False _ = refl
+c2ℕ-inj Not Not _ = refl
+c2ℕ-inj And And _ = refl
+c2ℕ-inj Or Or _ = refl
+c2ℕ-inj Implies Implies _ = refl
+c2ℕ-inj Iff Iff _ = refl
+```
+
+Since equality is decidable on natural numbers `ℕ`
+and `Connective` maps injectively to `ℕ`,
+equality is decidable for `Connective` as well.
+
+```
+instance eqConnective : Eq Connective
+_≡?_ {{eqConnective}} = go where
+
+  go : ∀ C1 C2 → Dec (C1 ≡ C2)
+  go C1 C2 with c2ℕ C1 ≡? c2ℕ C2
+  -- by injectivity
+  ... | yes eq = yes (c2ℕ-inj C1 C2 eq)
+  -- by functionality
+  ... | no neq = no λ{refl → neq refl}
+```
+
+**Step 2**.
+We now injectively map formulas to `Connective ⊎ PropName`-labelled trees.
+Since `Connective` and `PropName` have decidable equality,
+so does their tagged union `Connective ⊎ VarName`.
+
+```
+FormulaTree = Tree (Connective ⊎ PropName)
+```
+
+We map formulas to trees by structural induction as follows:
+
+```
+Formula2Tree : Formula → FormulaTree
+Formula2Tree ⊤ = Node (left True) ε
+Formula2Tree ⊥ = Node (left False) ε
+Formula2Tree (` p) = Node (right p) ε
+Formula2Tree (¬ φ) = Node (left Not) ([ (Formula2Tree φ) ])
+Formula2Tree (φ ∨ ψ) = Node (left Or) ([ (Formula2Tree φ) (Formula2Tree ψ) ])
+Formula2Tree (φ ∧ ψ) = Node (left And) ([ (Formula2Tree φ) (Formula2Tree ψ) ])
+Formula2Tree (φ ⇒ ψ) = Node (left Implies) ([ (Formula2Tree φ) (Formula2Tree ψ) ])
+Formula2Tree (φ ⇔ ψ) = Node (left Iff) ([ (Formula2Tree φ) (Formula2Tree ψ) ])
+```
+
+!exercise(#exercise:Formula2Tree-inj)(`Formula2Tree-inj`)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Prove that the mapping `Formula2Tree` is injective.
+
+```
+Formula2Tree-inj : Injective Formula2Tree
+```
+
+!codemirror(Formula2Tree-inj)
+
+*Hint:* Exploit the fact that the list constructor `_∷_` is injective on both arguments
+(c.f. !remoteRef(part0)(List)(∷-inj-left) and !remoteRef(part0)(List)(∷-inj-right) from !chapterRef(part0)(List)).
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
+Formula2Tree-inj ⊤ ⊤ _ = refl
+Formula2Tree-inj ⊥ ⊥ _ = refl
+Formula2Tree-inj (` p) (` p) refl = refl
+Formula2Tree-inj (¬ a) (¬ b) eql
+  with Formula2Tree-inj _ _ (∷-inj-left (Node-inj-right eql))
+... | refl = refl
+Formula2Tree-inj (φ ∧ ψ) (φ' ∧ ψ') eql
+  with Formula2Tree-inj _ _ (∷-inj-left (Node-inj-right eql)) |
+       Formula2Tree-inj _ _ (∷-inj-left (∷-inj-right (Node-inj-right eql)))
+... | refl | refl = refl
+Formula2Tree-inj (φ ∨ ψ) (φ' ∨ ψ') eql
+  with Formula2Tree-inj _ _ (∷-inj-left (Node-inj-right eql)) |
+       Formula2Tree-inj _ _ (∷-inj-left (∷-inj-right (Node-inj-right eql)))
+... | refl | refl = refl
+Formula2Tree-inj (φ ⇒ ψ) (φ' ⇒ ψ') eql
+  with Formula2Tree-inj _ _ (∷-inj-left (Node-inj-right eql)) |
+       Formula2Tree-inj _ _ (∷-inj-left (∷-inj-right (Node-inj-right eql)))
+... | refl | refl = refl
+Formula2Tree-inj (φ ⇔ ψ) (φ' ⇔ ψ') eql
+  with Formula2Tree-inj _ _ (∷-inj-left (Node-inj-right eql)) |
+       Formula2Tree-inj _ _ (∷-inj-left (∷-inj-right (Node-inj-right eql)))
+... | refl | refl = refl
+```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+With this ingredients in hand,
+we can show that `Formula` has decidable equality:
+
+```
+_≡?_ {{eqFormula}} = go where
+  
+    go : ∀ φ ψ → Dec (φ ≡ ψ)
+    go φ ψ with Formula2Tree φ ≡? Formula2Tree ψ
+    ... | yes eq = yes (Formula2Tree-inj _ _ eq)
+    ... | no neq = no λ{refl → neq refl}
+```
+
+!example(#example:equality)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+We demonstrate decidability of formula equality. We have
+
+```
+_ : (` p₀ ∨ ` p₁ ≡? ` p₀ ∨ ` p₁) ≡ yes _
+_ = refl 
+```
+
+but
+
+```
+_ : (` p₀ ∨ ` p₁ ≡? ` p₁ ∨ ` p₀) ≡ no _
+_ = {! refl !}
+```
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

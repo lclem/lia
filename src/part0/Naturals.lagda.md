@@ -8,16 +8,19 @@ title: Natural numbers🚧
 
 module part0.Naturals where
 open import part0.Equality public
+open import Agda.Builtin.Nat using (Nat; zero; suc) renaming (_+_ to infixl 11 _+_; _*_ to infixl 12 _*_) public
 
-data ℕ : Set where
-  zero : ℕ
-  suc : ℕ → ℕ
+ℕ = Nat
 
-{-# BUILTIN NATURAL ℕ #-}
+-- data ℕ : Set where
+--   zero : ℕ
+--   suc : ℕ → ℕ
+
+-- {-# BUILTIN NATURAL ℕ #-}
 
 private
   variable
-    k m n : ℕ
+    k l m n : ℕ
 
 suc-inj : ∀ {m n : ℕ} → suc m ≡ suc n → m ≡ n
 suc-inj refl = refl
@@ -34,7 +37,7 @@ instance
   eqℕ : Eq ℕ
   _≡?_ {{eqℕ}} = _≟ℕ_
 
-infix 5 _≤_ _<_ _≥_ _>_
+infix 5 _≤_ _<_ _≥_ _>_ _≤?_
 
 data _≤_ : ℕ → ℕ → Set where
   instance 0≤n : ∀ {n : ℕ} → zero ≤ n
@@ -54,7 +57,6 @@ refl-≤ {suc n} = s≤s refl-≤
 suc-≤ : ∀ {m n : ℕ} → suc m ≤ suc n → m ≤ n
 suc-≤ (s≤s p) = p
 
--- TODO
 _≤?_ : ∀ m n → Dec (m ≤ n)
 zero ≤? n = yes 0≤n
 suc m ≤? zero = no λ ()
@@ -81,7 +83,12 @@ n≤sucn : ∀ {n} → n ≤ suc n
 n≤sucn {zero} = 0≤n
 n≤sucn {suc n} = s≤s n≤sucn
 
-postulate m≤n→m≤sucn : ∀ {m n} → m ≤ n → m ≤ suc n
+n≤suc2n : ∀ {n} → n ≤ suc (suc n)
+n≤suc2n = {!   !}
+
+postulate m≤n→m≤sucn : m ≤ n → m ≤ suc n
+postulate m≤n→m≤suc2n : m ≤ n → m ≤ suc (suc n)
+postulate m≤n→m≤suc3n : m ≤ n → m ≤ suc (suc (suc n))
 postulate n≤sucsucn : ∀ {n} → n ≤ suc (suc n)
 
 suc-< : ∀ {m n : ℕ} → suc m < suc n → m < n
@@ -124,11 +131,14 @@ max-zero-right (suc m) = refl
 -- {-# REWRITE  #-}
 
 -- instance
-max-prop-left : m ≤ max m n 
-max-prop-left {m} {n}
+max-left : m ≤ max m n 
+max-left {m} {n}
   with m ≤? n
 ... | yes m≤n = m≤n
 ... | (no _) = refl-≤
+
+max-right : m ≤ max n m
+max-right {m} {n} = {!   !}
 
 -- instance
 sym-max : max m n ≡ max n m
@@ -154,7 +164,7 @@ inst-max-≤-right {{arg}} = max-≤-right arg
 _ : max m n ≤ m
 _ = {!   !}
 
-n<suc2n : ∀ {n} → n < suc (suc n)
+n<suc2n : n < suc (suc n)
 n<suc2n {n} = trans-< (n<sucn {n}) (n<sucn {suc n})
 
 <→≢ : ∀ {m n} → m < n → m ≢ n
@@ -212,7 +222,7 @@ _end< _∎< : (x : ℕ) → x ≤ x
 _ end< = refl-≤
 _ ∎< = refl-≤
 
-test : (x0 x y z : ℕ) → x0 ≤ x → x ≤ y → y < z → x0 < z
+private test : (x0 x y z : ℕ) → x0 ≤ x → x ≤ y → y < z → x0 < z
 test x0 x y z p0 p q =
   begin<
     x0 ≤<⟨ p0 ⟩
@@ -225,12 +235,16 @@ test x0 x y z p0 p q =
 ~n<n {zero} = λ ()
 ~n<n {suc n} q with ~n<n {n}
 ... | p = p (suc-≤ q)
+```
 
-infixl 11 _+_
+# Addition
 
-_+_ : ℕ → ℕ → ℕ
-zero + m = m
-suc n + m = suc (n + m)
+```
+-- infixl 11 _+_
+
+-- _+_ : ℕ → ℕ → ℕ
+-- zero + m = m
+-- suc n + m = suc (n + m)
 
 -- check that the definition above is equivalent to the built-in one
 -- {-# BUILTIN NATPLUS _+_ #-}
@@ -245,17 +259,30 @@ n+0≡n (suc n) rewrite n+0≡n n = refl
 {-# REWRITE n+0≡n #-}
 
 postulate sucm+n≡m+sucn : {m n : ℕ} → suc m + n ≡ m + suc n
-postulate suc-lemma : {m n : ℕ} → m + suc n ≡ suc m + n -- the commuting variant of the above
 
-≤+ : ∀ {m n} → m ≤ m + n
+suc-lemma : m + suc n ≡ suc m + n -- the commuting variant of the above
+suc-lemma = {!   !}
+
+≤+ mon-≤-left : m ≤ m + n
 ≤+ {zero} {n} = 0≤n
 ≤+ {suc m} {n} = s≤s (≤+ {m} {n})
 
-infixl 12 _*_
+mon-≤-left = ≤+
 
-_*_ : ℕ → ℕ → ℕ
-zero * m = zero
-suc n * m = m + n * m
+mon-≤-right : m ≤ n + m
+mon-≤-right = {!   !}
+
+mon-trans-≤-left : k ≤ m → k ≤ m + n
+mon-trans-≤-left = {!   !}
+
+mon-trans-≤-right : k ≤ m → k ≤ n + m
+mon-trans-≤-right = {!   !}
+
+-- infixl 12 _*_
+
+-- _*_ : ℕ → ℕ → ℕ
+-- zero * m = zero
+-- suc n * m = m + n * m
 
 -- {-# BUILTIN NATTIMES _*_ #-}
 ```
@@ -280,10 +307,10 @@ postulate comm-+ : ∀ {m n} → m + n ≡ n + m
 {-# REWRITE n*1≡n  #-}
 
 m≤1+n→~m≤n→m≡1+n : m ≤ 1 + n → ~ (m ≤ n) → m ≡ 1 + n
-m≤1+n→~m≤n→m≡1+n = ?
+m≤1+n→~m≤n→m≡1+n = {!   !}
 
 m≤1+n→~m≡1+n→m≤n : m ≤ 1 + n → ~ (m ≡ 1 + n) → m ≤ n
-m≤1+n→~m≡1+n→m≤n = ?
+m≤1+n→~m≡1+n→m≤n = {!   !}
 
 -- monus
 infixl 11 _∸_
@@ -315,7 +342,6 @@ m∸n≤m (suc m) n
 ## Arithmetic expressions
 
 ```
-
 data AExp : Set where
   Num : ℕ → AExp
   Suc : AExp → AExp
@@ -330,6 +356,14 @@ A⟦ e *E f ⟧ = A⟦ e ⟧ * A⟦ f ⟧
 ```
 
 ## Arithmetic contexts
+
+```
+<-+-left : l < m → l + n < m + n
+<-+-left = {!   !}
+
+<-+-right : l < m → n + l < n + m
+<-+-right = {!   !}
+```
 
 ```
 infixl 20 _+C_
@@ -350,11 +384,40 @@ aCtxApply (Suc ctx) e = Suc (aCtxApply ctx e)
 aCtxApply (ctx1 +C ctx2) e = aCtxApply ctx1 e +E aCtxApply ctx2 e
 aCtxApply (ctx1 *C ctx2) e = aCtxApply ctx1 e *E aCtxApply ctx2 e
 
-postulate cong-< : ∀ {a b} → (ctx : ACtx) → a < b → A⟦ aCtxApply ctx (Num a) ⟧ < A⟦ aCtxApply ctx (Num b) ⟧
+-- this is actually false: 0 * □
+-- postulate cong-< : ∀ {a b} → (ctx : ACtx) → a < b → A⟦ aCtxApply ctx (Num a) ⟧ < A⟦ aCtxApply ctx (Num b) ⟧
+
 postulate cong-≤ : ∀ {a b} → (ctx : ACtx) → a ≤ b → A⟦ aCtxApply ctx (Num a) ⟧ ≤ A⟦ aCtxApply ctx (Num b) ⟧
 
 longAnd : ∀ {ℓ} → Set ℓ → ℕ → Set ℓ
 longAnd _ zero = T
 longAnd A (suc zero) = A
 longAnd A (suc (suc n)) = A × longAnd A (suc n)
+```
+
+```
+open import Relation.Binary.PropositionalEquality
+open ≡-Reasoning
+open import Data.Nat.Solver using (module +-*-Solver)
+open +-*-Solver
+
+ex₅ : ∀ m n → m * (n + zero) ≡ n * m
+ex₅ = solve 2 (λ m n → m :* (n :+ con 0) :=  n :* m) refl
+
+open import Data.Nat.Tactic.RingSolver public
+_ : ∀ m n → m * (n + 0) ≡ n * m
+_ = solve-∀
+```
+
+# Exponentiation
+
+```
+infixl 100 _^_
+_^_ : ℕ → ℕ → ℕ
+0 ^ 0 = 0
+(suc _) ^ 0 = 1
+m ^ suc n = m * m ^ n
+
+_ : 2 ^ 5 ≡ 32
+_ = refl
 ```

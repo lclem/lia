@@ -11,6 +11,7 @@
   </title>
   {%- seo title=false -%}
   <link rel="stylesheet" href="{{ "assets/main.css" | relative_url }}">
+
   <!-- <link rel="stylesheet" href="{{ "/assets/custom.css" | relative_url }}"> -->
   {%- if jekyll.environment == 'production' and site.google_analytics -%}
     {%- include google-analytics.html -%}
@@ -36,13 +37,14 @@
         readOnly: false,
         lineNumbers: true,
         keyMap: "default",
+//        gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
     },
     kernelOptions: {
         name: "agda",
         kernelName: "agda",
         path: "src/",
         loadFromStore: true,
-        persistent: true,
+        persistent: false,
         // notebook server configuration; not needed with binder
         serverSettings: {
               baseUrl: "http://127.0.0.1:8888",

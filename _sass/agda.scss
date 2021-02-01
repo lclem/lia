@@ -32,7 +32,7 @@
     border-radius: 3px !important;
 }
 
-a { color: #2a7ae2; text-decoration: none; }
+a, a:-webkit-any-link, a:link, a:toc-entry { color: #2a7ae2; text-decoration: none; }
 a:visited { color: #1756a9; }
 a:hover { color: #111; text-decoration: underline; }
 
@@ -41,6 +41,7 @@ pre.highlight {
     @include code-container;
     border-style: dashed !important;
 }
+
 code {
     @include code-font;
     //white-space: normal;
@@ -102,8 +103,14 @@ pre.Spec {
   //font-family: monospace;
   @include code-font;
   height: 300px;
-  color: black;
+  //color: black;
   direction: ltr;
+  -webkit-tap-highlight-color: black;
+}
+
+.CodeMirror-foldmarker {
+  visibility: hidden;
+  display: none;
 }
 
 /* PADDING */
@@ -114,6 +121,10 @@ pre.Spec {
 .CodeMirror pre.CodeMirror-line,
 .CodeMirror pre.CodeMirror-line-like {
   padding: 0 4px; /* Horizontal padding of content */
+}
+
+.CodeMirror-lines .readOnly {
+  background-color: #cccccc !important;
 }
 
 .CodeMirror-scrollbar-filler, .CodeMirror-gutter-filler {
@@ -344,6 +355,7 @@ div.CodeMirror span.CodeMirror-nonmatchingbracket {color: #a22;}
 .CodeMirror-gutter-wrapper ::selection { background-color: #d3e7f8 !important; }
 .CodeMirror-gutter-wrapper ::-moz-selection { background-color: #d3e7f8 !important; }
 
+
 .CodeMirror-lines {
   cursor: text;
   min-height: 1px; /* prevents collapsing before first draw */
@@ -440,10 +452,11 @@ div.CodeMirror-dragcursors {
   border-color: #cce7ff !important;
 }
 
-
 .CodeMirror-crosshair { cursor: crosshair; }
-.CodeMirror-line::selection, .CodeMirror-line > span::selection, .CodeMirror-line > span > span::selection { background: #d3e7f8 !important; }
-.CodeMirror-line::-moz-selection, .CodeMirror-line > span::-moz-selection, .CodeMirror-line > span > span::-moz-selection { background: #d3e7f8 !important; }
+.CodeMirror-line::selection, .CodeMirror-line > span::selection, .CodeMirror-line > span > span::selection { background: #d3e7f8; }
+.CodeMirror-line::-moz-selection, .CodeMirror-line > span::-moz-selection, .CodeMirror-line > span > span::-moz-selection { background: #d3e7f8; }
+
+span.CodeMirror-selectedtext { background: #d3e7f8 !important; }
 
 .cm-searching {
   background-color: #ffa;
@@ -463,8 +476,6 @@ div.CodeMirror-dragcursors {
 /* See issue #2901 */
 .cm-tab-wrap-hack:after { content: ''; }
 
-/* Help users use markselection to safely style text background */
-span.CodeMirror-selectedtext { background: none; }
 
 .p-Widget, .lm-Widget {
     box-sizing: border-box;
@@ -503,7 +514,7 @@ span.CodeMirror-selectedtext { background: none; }
 }
 
 .highlighter-rouge .highlight {
-  background: #eef !important;
+//  background: #eef;
 }
 
 // buttons
@@ -557,8 +568,14 @@ span.CodeMirror-selectedtext { background: none; }
   width: 25px; 
   transition: none;
   padding: 5px;
+  border: 0;
   filter: opacity(25%);
+  -webkit-appearance: button;
+  outline: transparent;
 }
+
+// .kernel-status-button:focus {
+// }
 
 button.kernel-status-button:hover {
   cursor: pointer; 
@@ -566,6 +583,11 @@ button.kernel-status-button:hover {
 }
 
 button.kernel-status-button-connected {
+  filter: opacity(100%);
+}
+
+button.kernel-status-button-disconnected {
+  background-image: url(../assets/images/kernel-broken.png);
   filter: opacity(100%);
 }
 
@@ -632,6 +654,23 @@ button.kernel-status-button-connected {
   @include status-badge-common;
   box-shadow: inset 0px 0px 0px #7ac142;
   animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+}
+
+.info-area {
+ display: none;
+//  visibility: hidden;
+}
+
+// .status-badge-error:hover .info-area,
+// .status-badge-warning:hover .info-area,
+// .status-badge-ok:hover .info-area,
+//.status-badge-unknown:hover .info-area,
+// .status-badge-running:hover .info-area
+
+svg.status-badge-warning:hover {
+  cursor: pointer;
+  display: block;
+  visibility: visible;
 }
 
 .checkmark__circle {
@@ -830,6 +869,10 @@ button.kernel-status-button-connected {
   padding: 8px;
 }
 
+.jp-RenderedText pre, .jp-RenderedJavaScript pre, .jp-RenderedHTMLCommon pre {
+  margin-bottom: 0px;
+}
+
 // nope
 .thebelab-input {
   border-bottom: 1px solid #cecedd;
@@ -845,14 +888,16 @@ header.site-header {
   width: 100%;
   height: 50px;
   z-index: 10;
-
+  padding-bottom: 5px;
   background: white;
   -webkit-box-shadow: 0 7px 8px rgba(0, 0, 0, 0.12);
   -moz-box-shadow: 0 7px 8px rgba(0, 0, 0, 0.12);
   box-shadow: 0 7px 8px rgba(0, 0, 0, 0.12);
-//  padding:40px;
-  //background: lightblue;
   text-align: center;
+  border-top: none;
+  min-height: 0;
+  transition: top 0.3s; /* Transition effect when sliding down (and up) */
+
 }
   
 content > div {
@@ -905,6 +950,17 @@ content > div {
   opacity:1;
 }
 
+span.cell-count {
+
+  text-align: center;
+  height: 10px;
+  position: absolute;
+  top: 125%;
+  line-height: normal;
+  background: transparent;
+  
+}
+
 //.kernel-status-button
 span.kernel-messages {
 
@@ -915,16 +971,17 @@ span.kernel-messages {
   z-index: 100;
   margin-left: -600px;
 
-  max-height: 500px;
+  height: 250px;
 
   // only vertical scrollbars
-  overflow-y: auto;
-  overflow-x: none;
+  overflow: auto;
 
   top: 125%;
   position: absolute;
   line-height: normal;
   opacity: 50%;
+
+//  visibility: visible;
 }
 
 span.kernel-status:hover span.kernel-messages  {
@@ -950,3 +1007,23 @@ div.cell-toolbar {
   padding: 5px;
 }
 
+pre {
+  background-color: transparent;
+  border: none;
+}
+
+.info-area-button {
+  cursor: pointer;
+  position: absolute;
+  bottom: 0px;
+  right: 5px;
+  visibility: hidden;
+}
+
+.show-info-area {
+  content: url("../assets/images/show.svg");
+}
+
+.hide-info-area {
+  content: url("../assets/images/hide.svg");
+}

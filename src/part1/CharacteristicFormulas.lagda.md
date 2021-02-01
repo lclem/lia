@@ -1021,7 +1021,7 @@ monCharLit-completeness ϱ p ϱ′ ⟦φ⟧ϱ′≡tt
     with inspect (ϱ p) | inspect (ϱ′ p)
 ... | it tt eq | it tt eq′ rewrite ⟦φ⟧ϱ′≡tt | eq | eq′ = tt≤tt
 ... | it ff eq | it tt eq′ rewrite ⟦φ⟧ϱ′≡tt | eq | eq′ = ff≤tt
-... | it tt eq | it ff eq′ rewrite ⟦φ⟧ϱ′≡tt | eq | eq′ = ff≢tt-elim ⟦φ⟧ϱ′≡tt
+... | it tt eq | it ff eq′ rewrite ⟦φ⟧ϱ′≡tt | eq | eq′ = ff≡tt-elim ⟦φ⟧ϱ′≡tt
 ... | it ff eq | it ff eq′ rewrite ⟦φ⟧ϱ′≡tt | eq | eq′ = ff≤ff
 ```
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
