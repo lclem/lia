@@ -39,7 +39,7 @@ open import !part().!chapter() renaming (!2 to !2-orig)
 ~~~~~~~~~~~~~~~~~
 module !part().!chapter().!1 where
 open import TypeOf
-open import !part().!chapter() renaming (!2 to !2-orig; !3 to !3-orig;)
+open import !part().!chapter() renaming (!2 to !2-orig; !3 to !3-orig)
 ~~~~~~~~~~~~~~~~~
 
 !define(preamble)
@@ -67,10 +67,23 @@ open import !part().!chapter() renaming (!2 to !2-orig; !3 to !3-orig;)
 !codemirrorCustom(!1)
 ~~~~~~~~~
 !define(name)(!ifne(!2)()(!2)(!1))
+!define(code)
+~~~
 !preamble(!1)(!name)
 !name : typeOf !name-orig
+
 -- BEGIN SOLUTION
 !name = ?
+~~~
+!code
+!comment
+~~~
+!define(dirname)(src/!part()/!chapter())
+!define(filename)(!dirname/!1.agda)
+!exec(mkdir -p !dirname)
+!exec(touch !filename)
+!lit(!filename)()(!code)
+~~~
 ~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~
 

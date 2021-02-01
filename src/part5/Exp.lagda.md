@@ -150,6 +150,8 @@ B⟦_⟧_ : BExp → Env → 𝔹
 
 !codemirror(BExp-semantics)(B⟦_⟧_)
 
+!codemirror(BExp-semantics2)(B⟦_⟧_)
+
 *Hint:* In the `Leq` case you will need `_≤?_`.
 
 ~~~~~~~~~~~~~~~~

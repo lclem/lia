@@ -783,6 +783,13 @@ full-abstraction = fa0 , fa1
 
 # Eager evaluation with static binding
 
+Since this is a first-order language and under eager evaluation the arguments must evaluate to a number first,
+there is no distinction between dynamic and static binding.
+
 # Lazy evaluation with dynamic binding
+
+In lazy evaluation arguments are not evaluated,
+and thus may contain free variables in general.
+The way in which these free variables are interpreted distinguishes dynamic from static binding.
 
 # Lazy evaluation with static binding

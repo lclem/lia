@@ -23,3 +23,4 @@ group :epub do
   gem 'safe_yaml'
   gem 'liquid'
 end
+gem "webrick", "~> 1.7"
