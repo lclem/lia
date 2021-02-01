@@ -39,7 +39,6 @@ RUN ls -la
 #tmp/repo2docker* && ls -la && cd agda-kernel && make kernel-install
 
 COPY --chown=$NB_USER:users . /home/$NB_USER/
-#COPY ./agda-stdlib /home/$NB_USER/agda-stdlib
 COPY --chown=$NB_USER:users ./src /home/$NB_USER/
 
 USER $NB_USER
