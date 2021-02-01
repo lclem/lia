@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The untyped lambda calculus 🚧 | Logic in Agda</title><!-- Begin Jekyll SEO tag v2.7.1 -->
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="The untyped lambda calculus 🚧" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Propositional and fist-order logic developed with the proof assistant Agda." />
+<meta property="og:description" content="Propositional and fist-order logic developed with the proof assistant Agda." />
+<link rel="canonical" href="/lia/part5/Untyped/" />
+<meta property="og:url" content="/lia/part5/Untyped/" />
+<meta property="og:site_name" content="Logic in Agda" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="The untyped lambda calculus 🚧" />
+<script type="application/ld+json">
+{"url":"/lia/part5/Untyped/","description":"Propositional and fist-order logic developed with the proof assistant Agda.","@type":"WebPage","headline":"The untyped lambda calculus 🚧","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/lia/assets/main.css">
+
+  <!-- <link rel="stylesheet" href="/lia/assets/custom.css"> --><!-- Mathjax Support -->
+  <script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+  <!-- Load KaTeX -->
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1.1/katex.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/KaTeX/0.1.1/katex.min.js"></script>
+
+<script type="text/x-thebe-config">
+  {
+    bootstrap: true,
+    requestKernel: true,
+    runAllCells: false,
+    selector: "[data-executable]",
+    predefinedOutput: false,
+    codeMirrorConfig: {
+        //theme: "idea",
+        language: "agda",
+        readOnly: false,
+        lineNumbers: true,
+        keyMap: "default",
+//        gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
+    },
+    kernelOptions: {
+        name: "agda",
+        kernelName: "agda",
+        path: "src/",
+        loadFromStore: true,
+        persistent: false,
+        // notebook server configuration; not needed with binder
+        serverSettings: {
+              baseUrl: "http://127.0.0.1:8888",
+              token: "test-secret",
+            },
+    },
+    binderOptions: {
+      repo: "lclem/lia", // need to put here the actual github repo (if it is a fork)
+      ref: "main",
+      binderUrl: "https://mybinder.org",
+      repoProvider: "github",
+      savedSession: {
+        enabled: true,
+        maxAge: 86400, // the max age in seconds to consider re-using a session
+        storagePrefix: "thebe-binder-lia-"
+      },
+    },
+  }
+</script>
+
+<!-- <script type="text/javascript" src="https://unpkg.com/thebelab@latest"></script> -->
+
+<!-- our own version of the thebe library: -->
+<script type="text/javascript" src="/lia/thebe/lib/index.js"></script>
+
+<!-- highlighting for Agda -->
+<script src="/lia/codemirror-agda/lib/index.js"></script>
+
+</head>
+<body><header class="site-header" id="site-header">
+
+    <div class="wrapper">
+
+        <a class="site-title" href="/lia/">Logic in Agda</a>
+
+        <nav class="site-nav">
+            <!-- <span class="menu-icon">
+                <svg viewBox="0 0 18 15" width="18px" height="15px">
+                    <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+                    <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+                    <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+                </svg>
+            </span> -->
+
+            <div class="trigger">
+                <a class="page-link" href="/lia/part0/index/">Part 0</a>
+                <a class="page-link" href="/lia/part1/index/">Part 1</a>
+                <a class="page-link" href="/lia/part2/index/">Part 2</a>
+                <a class="page-link" href="/lia/part3/index/">Part 3</a>
+                <a class="page-link" href="/lia/part4/index/">Part 4</a>
+                <a class="page-link" href="/lia/part5/index/">Part 5</a>
+
+                <span class="kernel-status">
+                    <button class="kernel-status-button" onclick="kernel_status_clicked()" title="kernel status"></button>
+                    <span id="kernel-messages" class="kernel-messages"></span>
+                </span>
+
+                <div id="connection_options" class="options sidebar" style="text-align: left; line-height: normal; max-width: 800px; padding: 10px; border-radius: 15px;">
+                    <!-- display: flex; flex-direction: row; flex-wrap: nowrap; justify-content: space-between; -->
+                    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+                    <div>
+                        <label for="username" style="color: white;">User:</label>
+                        <input type="text" placeholder="github username" id="username" name="username">
+                        <label for="password" style="color: white;">Password:</label>
+                        <input type="password" placeholder="password" id="password" name="password">
+                    </div>
+                    <div>
+                        <label for="loadFromStore" style="color: white;">Load code from browser store:</label>
+                        <label class="switch" style="vertical-align: middle; margin: 10px;">
+                            <input type="checkbox" id="loadFromStore" name="loadFromStore">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div>
+                        <label for="baseUrl" style="color: white;">Base URL:</label>
+                        <input type="text" placeholder="baseUrl" id="baseUrl" name="baseUrl" value="http://127.0.0.1:8888">
+                        <label for="token" style="color: white;">Token:</label>
+                        <input type="text" placeholder="token" id="token" name="token" value="test-secret">
+                    </div>
+                    <div>
+                        <label for="useBinder" style="color: white;">Use binder:</label>
+                        <label class="switch" style="vertical-align: middle; margin: 10px;">
+                            <input type="checkbox" id="useBinder" name="useBinder">
+                            <span class="slider round"></span>
+                        </label>
+                        <label for="savedSession" style="color: white;">Reuse session:</label>
+                        <label class="switch" style="vertical-align: middle; margin: 10px;">
+                            <input type="checkbox" id="savedSession" name="savedSession">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                    <div>
+                        <label for="repository" style="color: white;">Github repo:</label>
+                        <input type="text" placeholder="repository" id="repository" name="repository" value="">
+
+                        <label for="ref" style="color: white;">Branch:</label>
+                        <input type="text" placeholder="ref" id="ref" name="ref" value="main">
+
+                        <label for="binderUrl" style="color: white;">Binder URL:</label>                        
+                        <input type="text" placeholder="binderUrl" id="binderUrl" name="binderUrl" value="https://mybinder.org">
+                    </div>
+                </div>
+
+                <span class="control-container" id="control-container">
+                    <svg class="progress-ring" id="progress-ring" width="30" height="30" title="exercise progress" onclick="kernel_status_clicked()">
+                        <circle
+                            id="progress-circle"
+                            class="progress-ring__circle"
+                            stroke="black"
+                            stroke-width="2.5"
+                            fill="transparent"
+                            r="14"
+                            cx="15"
+                            cy="15"/>
+                        <circle
+                            stroke="lightgray"
+                            stroke-width="0.5"
+                            fill="transparent"
+                            r="14"
+                            cx="15"
+                            cy="15"/>
+                    </svg>
+                    <div id="connection_options" class="options sidebar" style="text-align: left; line-height: normal; max-width: 800px; padding: 10px; border-radius: 15px;"></div>
+                    <span class="progress-text" id="progress-text" onclick="kernel_status_clicked()"> 0/0 </span>
+
+                    <span id="controls" class="controls">
+                        <svg version="1.1" id="run-all" class="run-all" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                            width="15" height="15" viewBox="0 0 163.861 163.861" style="enable-background:new 0 0 163.861 163.861;"
+                            xml:space="preserve">
+                            <g>
+                                <path d="M34.857,3.613C20.084-4.861,8.107,2.081,8.107,19.106v125.637c0,17.042,11.977,23.975,26.75,15.509L144.67,97.275
+                                    c14.778-8.477,14.778-22.211,0-30.686L34.857,3.613z"/>
+                            </g>
+                        </svg>
+                    </span>
+                </span>
+            </div>
+
+            <style>
+                .switch {
+                    position: relative;
+                    display: inline-block;
+                    width: 40px;
+                    height: 20px;
+                }
+
+                /* Hide default HTML checkbox */
+                .switch input {
+                    opacity: 0;
+                    width: 0;
+                    height: 0;
+                }
+
+                /* The slider */
+                .slider {
+                    position: absolute;
+                    cursor: pointer;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background-color: #ccc;
+                    -webkit-transition: .4s;
+                    transition: .4s;
+                }
+
+                .slider:before {
+                    position: absolute;
+                    content: "";
+                    height: 16px;
+                    width: 16px;
+                    left: 2px;
+                    /* right: 4px; */
+                    bottom: 2px;
+                    top: 2px;
+                    background-color: white;
+                    -webkit-transition: .4s;
+                    transition: .4s;
+                }
+
+                input:checked + .slider {
+                    background-color: #2196F3;
+                }
+
+                input:focus + .slider {
+                    box-shadow: 0 0 1px #2196F3;
+                }
+
+                input:checked + .slider:before {
+                    -webkit-transform: translateX(18px);
+                    -ms-transform: translateX(18px);
+                    transform: translateX(18px);
+                }
+
+                /* Rounded sliders */
+                .slider.round {
+                    border-radius: 30px;
+                }
+
+                .slider.round:before {
+                border-radius: 50%;
+                }
+
+                .sidebar input[type=text] {
+                    padding: 6px;
+                    margin-top: 8px;
+                    /* font-size: 17px; */
+                    border: none;
+                    /* width: 150px; */
+                }
+
+                .sidebar {
+                    /* height: 100%; */
+                    width: 0;
+                    position: fixed;
+                    z-index: 1000;
+                    top: 0;
+                    right: 20px;
+                    background-color: rgba(17, 17, 17, 0.637);
+                    /* overflow-x: hidden; */
+                    transition: 0.5s;
+                    padding-top: 60px;
+                    display: none;
+                    margin-top: 60px;
+                }
+
+                .sidebar .closebtn {
+                    position: absolute;
+                    color: white;
+                    top: 0;
+                    right: 10px;
+                    font-size: 24px;
+                    margin-left: 20px;
+                }
+
+                .progress-ring, .run-all {
+                    vertical-align: middle;
+                }
+
+                .control-container {
+                    transition: all .2s ease-in-out;
+                }
+
+                .controls {
+                    display: none;
+                    opacity: 0;
+                    margin-right: 10px;
+                    transition: all .5s ease-in-out;
+                }
+
+                .run-all:hover {
+                    filter: brightness(135%);
+                }
+
+                .progress-ring__circle {
+                    transition: 0.35s stroke-dashoffset;
+                    transform: rotate(-90deg);
+                    transform-origin: 50% 50%;
+                    visibility: hidden;
+                }
+
+                .progress-text {
+                    position: relative;
+                    top: 0;
+                    left: -25px;
+                    font-size: 8px;
+                    vertical-align: middle;
+                    align-self: center;
+                }
+
+                .progress-text:hover, .progress-ring:hover, .progress-ring__circle:hover, .run-all {
+                    cursor: pointer;
+                }
+            </style>
+
+            <script>
+
+                //  var storedUsername = localStorage.getItem("username");
+                //  localStorage.setItem("username", storedUsername.value);
+            
+                function doStore(input, key) {
+
+                    if(input.type == "checkbox") {
+                        var checked = localStorage.getItem(key);
+
+                        if (checked == "yes") {
+                            localStorage.setItem(key, "no");
+                        }
+                        else {
+                            localStorage.setItem(key, "yes");
+                        }
+
+                        console.info("checked: ", localStorage.getItem(key));
+                    }
+                    else {
+                        console.info("value: ", input.value);
+                        localStorage.setItem(key, input.value);
+                    }
+                }
+
+                function persistInput(input) {
+                    var key = "input-" + input.id;
+                    var storedValue = localStorage.getItem(key);
+                
+                    console.info("Persisting input: ", input);
+                
+                    // if there is a stored value, use it
+                    if (storedValue) {
+
+                        if(input.type != "password") {
+                            console.info("restoring value ", storedValue, " for ", input);
+                        }
+
+                        if(input.type == "checkbox") {
+                            if(storedValue=="yes") {
+                                input.setAttribute("checked", "");
+                            }
+                            else {
+                                input.removeAttribute("checked");
+                            }
+                        }
+                        else {
+                            input.value = storedValue;
+                        }
+                    }
+                    // if there is no stored value, store the current value
+                    else {
+                        doStore(input, key);
+                    }
+
+                    input.addEventListener('input', function () {
+                        console.info("input changed: key = ", key, "; value = ", input);
+                        doStore(input, key);
+                    });
+                    }
+                
+                    persistInput(document.getElementById("username"));
+                    persistInput(document.getElementById("password"));
+
+                    persistInput(document.getElementById("loadFromStore"));
+
+                    persistInput(document.getElementById("baseUrl"));
+                    persistInput(document.getElementById("token"));
+
+                    persistInput(document.getElementById("useBinder"));
+                    persistInput(document.getElementById("savedSession"));
+                    persistInput(document.getElementById("repository"));
+                    persistInput(document.getElementById("ref"));
+                    persistInput(document.getElementById("binderUrl"));
+
+                    // init
+                    document.getElementById("connection_options").style.display = "none";
+
+                    function kernel_status_clicked() {
+                
+                        console.info("Clicked kernel status");
+
+                        document.getElementById("kernel-messages").style.display = "none";
+
+                        document.getElementById("connection_options").style.width = "750px";
+                        document.getElementById("connection_options").style.display = "block";
+                        //document.getElementById("header").style.marginLeft = "250px";
+
+                    }
+
+                    function closeNav() {
+
+                        document.getElementById("kernel-messages").style.display = "inline";
+
+                        document.getElementById("connection_options").style.width = "0";
+                        document.getElementById("connection_options").style.display = "none";
+                        //document.getElementById("header").style.marginLeft= "0";
+                    }
+
+                var prevScrollpos = window.pageYOffset;
+                var header = document.getElementById("site-header");
+                var boxShadow = header.style.boxShadow;
+
+                window.onscroll = function() {
+                    var currentScrollPos = window.pageYOffset;
+                    // detect scroll down
+                    if (prevScrollpos > currentScrollPos) {
+                        header.style.top = "0";
+                        header.style.boxShadow = boxShadow;
+                        prevScrollpos = currentScrollPos;
+                    } else if (prevScrollpos <= currentScrollPos) {
+                        header.style.top = "-55px";
+                        header.style.boxShadow = "none"
+                        prevScrollpos = currentScrollPos;
+                    }
+                }
+
+            let control_container = document.getElementById("control-container");
+            let controls = document.getElementById("controls");
+
+            control_container.addEventListener("mouseenter", function(event) {
+                controls.style.display = "inline";
+//                controls.style.visibility = "visible";
+                controls.style.opacity = 1;
+                console.info("mouseenter");
+            }, false);
+
+            control_container.addEventListener("mouseleave", function(event) {
+                // controls.style.visibility = "hidden";
+                // controls.style.display = "none";
+                controls.style.opacity = 0;
+                console.info("mouseleave");
+            }, false);
+
+            </script>
+            
+        </nav>
+
+    </div>
+
+</header><main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post">
+
+    <header class="post-header">
+        <h1 class="post-title">The untyped lambda calculus 🚧</h1>
+    </header>
+  
+    <header class="nav-header">
+    <p style="text-align:center;">
+        
+        
+        
+        <a alt="Part" href="/lia/part5/index/">Part</a>
+        &bullet;
+        
+        
+        <a alt="Source code" href="https://github.com/lclem/lia/blob/main/src/part5/Untyped.lagda.md">Source</a>
+        
+        
+        
+    </p>
+</header>
+
+  
+    <div class="post-content">
+        <h2>Contents</h2>    
+        <ul id="toc" class="section-nav">
+<li class="toc-entry toc-h1"><a href="#syntax">Syntax</a></li>
+<li class="toc-entry toc-h1"><a href="#eager-evaluation-with-dynamic-binding">Eager evaluation with dynamic binding</a>
+<ul>
+<li class="toc-entry toc-h2"><a href="#big-steps-operational-semantics">Big-steps operational semantics</a></li>
+<li class="toc-entry toc-h2"><a href="#denotational-semantics">Denotational semantics</a></li>
+<li class="toc-entry toc-h2"><a href="#agreement-of-the-operational-and-denotational-semantics">Agreement of the operational and denotational semantics</a></li>
+</ul>
+</li>
+<li class="toc-entry toc-h1"><a href="#eager-evaluation-with-static-binding">Eager evaluation with static binding</a></li>
+<li class="toc-entry toc-h1"><a href="#lazy-evaluation-with-dynamic-binding">Lazy evaluation with dynamic binding</a></li>
+<li class="toc-entry toc-h1"><a href="#lazy-evaluation-with-static-binding">Lazy evaluation with static binding</a></li>
+<li class="toc-entry toc-h1"><a href="#references">References</a></li>
+</ul><pre class="Agda"><a id="53" class="Symbol">{-#</a> <a id="57" class="Keyword">OPTIONS</a> <a id="65" class="Pragma">--allow-unsolved-metas</a> <a id="88" class="Symbol">#-}</a>
+<a id="92" class="Keyword">module</a> <a id="99" href="/lia/part5/Untyped/" class="Module">part5.Untyped</a> <a id="113" class="Keyword">where</a>
+<a id="119" class="Keyword">open</a> <a id="124" class="Keyword">import</a> <a id="131" href="/lia/part0/index/" class="Module">part0.index</a> <a id="143" class="Keyword">hiding</a> <a id="150" class="Symbol">(</a><a id="151" href="/lia/part0/Naturals/#7367" class="Datatype">AExp</a><a id="155" class="Symbol">;</a> <a id="157" href="/lia/part0/Naturals/#7478" class="Function Operator">A⟦_⟧</a><a id="161" class="Symbol">;</a> <a id="163" href="/lia/part0/List/#23605" class="Function Operator">_≈_</a><a id="166" class="Symbol">;</a> <a id="168" href="/lia/part0/List/#31344" class="Datatype Operator">_⊑_</a><a id="171" class="Symbol">;</a> <a id="173" href="/lia/part0/Utils/#526" class="Function Operator">_$_</a><a id="176" class="Symbol">;</a> <a id="178" href="/lia/part0/List/#31665" class="Function">trans-⊑</a><a id="185" class="Symbol">;</a> <a id="187" href="/lia/part0/List/#31557" class="Function">refl-⊑</a><a id="193" class="Symbol">)</a> <a id="195" class="Keyword">renaming</a> <a id="204" class="Symbol">(</a><a id="205" href="/lia/part0/Naturals/#266" class="Primitive Operator">_+_</a> <a id="209" class="Symbol">to</a> <a id="Nat._+_"></a><a id="212" href="/lia/part5/Untyped/#212" class="Primitive Operator">_+ℕ_</a><a id="216" class="Symbol">;</a> <a id="218" href="/lia/part0/Naturals/#288" class="Primitive Operator">_*_</a> <a id="222" class="Symbol">to</a> <a id="Nat._*_"></a><a id="225" href="/lia/part5/Untyped/#225" class="Primitive Operator">_·ℕ_</a><a id="229" class="Symbol">;</a> <a id="231" href="/lia/part0/Naturals/#6765" class="Function Operator">_∸_</a> <a id="235" class="Symbol">to</a> <a id="_∸_"></a><a id="238" href="/lia/part5/Untyped/#238" class="Function Operator">_-ℕ_</a><a id="242" class="Symbol">;</a> <a id="244" href="/lia/part0/Naturals/#798" class="Datatype Operator">_≤_</a> <a id="248" class="Symbol">to</a> <a id="_≤_"></a><a id="251" href="/lia/part5/Untyped/#251" class="Datatype Operator">_≤ℕ_</a><a id="255" class="Symbol">)</a> <a id="257" class="Keyword">public</a>
+<a id="264" class="Keyword">open</a> <a id="269" class="Keyword">import</a> <a id="276" href="/lia/part5/Maybe/" class="Module">part5.Maybe</a></pre>
+
+<h1 id="syntax">
+<a class="anchor" href="#syntax" aria-hidden="true"><span class="octicon octicon-link"></span></a>Syntax</h1>
+
+<pre class="Agda"><a id="VarName"></a><a id="307" href="/lia/part5/Untyped/#307" class="Function">VarName</a> <a id="315" class="Symbol">=</a> <a id="317" href="/lia/part0/Naturals/#301" class="Function">ℕ</a>
+
+<a id="320" class="Keyword">data</a> <a id="Exp"></a><a id="325" href="/lia/part5/Untyped/#325" class="Datatype">Exp</a> <a id="329" class="Symbol">:</a> <a id="331" class="PrimitiveType">Set</a> <a id="335" class="Keyword">where</a>
+
+  <a id="Exp.`_"></a><a id="344" href="/lia/part5/Untyped/#344" class="InductiveConstructor Operator">`_</a> <a id="347" class="Symbol">:</a> <a id="349" class="Symbol">(</a><a id="350" href="/lia/part5/Untyped/#350" class="Bound">x</a> <a id="352" class="Symbol">:</a> <a id="354" href="/lia/part5/Untyped/#307" class="Function">VarName</a><a id="361" class="Symbol">)</a> <a id="363" class="Symbol">→</a> <a id="365" href="/lia/part5/Untyped/#325" class="Datatype">Exp</a>
+
+  <a id="Exp.ƛ_⇒_"></a><a id="372" href="/lia/part5/Untyped/#372" class="InductiveConstructor Operator">ƛ_⇒_</a> <a id="377" class="Symbol">:</a> <a id="379" class="Symbol">(</a><a id="380" href="/lia/part5/Untyped/#380" class="Bound">x</a> <a id="382" class="Symbol">:</a> <a id="384" href="/lia/part5/Untyped/#307" class="Function">VarName</a><a id="391" class="Symbol">)</a> <a id="393" class="Symbol">(</a><a id="394" href="/lia/part5/Untyped/#394" class="Bound">e</a> <a id="396" class="Symbol">:</a> <a id="398" href="/lia/part5/Untyped/#325" class="Datatype">Exp</a><a id="401" class="Symbol">)</a> <a id="403" class="Symbol">→</a> <a id="405" href="/lia/part5/Untyped/#325" class="Datatype">Exp</a>
+  <a id="Exp._·_"></a><a id="411" href="/lia/part5/Untyped/#411" class="InductiveConstructor Operator">_·_</a> <a id="415" class="Symbol">:</a> <a id="417" class="Symbol">(</a><a id="418" href="/lia/part5/Untyped/#418" class="Bound">e₀</a> <a id="421" href="/lia/part5/Untyped/#421" class="Bound">e₁</a> <a id="424" class="Symbol">:</a> <a id="426" href="/lia/part5/Untyped/#325" class="Datatype">Exp</a><a id="429" class="Symbol">)</a> <a id="431" class="Symbol">→</a> <a id="433" href="/lia/part5/Untyped/#325" class="Datatype">Exp</a>
+
+<a id="438" class="Keyword">infix</a> <a id="444" class="Number">50</a> <a id="447" href="/lia/part5/Untyped/#344" class="InductiveConstructor Operator">`_</a>
+<a id="450" class="Keyword">infixl</a> <a id="457" class="Number">30</a> <a id="460" href="/lia/part5/Untyped/#411" class="InductiveConstructor Operator">_·_</a>
+<a id="464" class="Keyword">infixr</a> <a id="471" class="Number">17</a> <a id="474" href="/lia/part5/Untyped/#372" class="InductiveConstructor Operator">ƛ_⇒_</a>
+
+<a id="480" class="Keyword">private</a>
+  <a id="490" class="Keyword">variable</a>
+    <a id="503" href="/lia/part5/Untyped/#503" class="Generalizable">x</a> <a id="505" class="Symbol">:</a> <a id="507" href="/lia/part5/Untyped/#307" class="Function">VarName</a>
+    <a id="519" href="/lia/part5/Untyped/#519" class="Generalizable">e</a> <a id="521" href="/lia/part5/Untyped/#521" class="Generalizable">e′</a> <a id="524" href="/lia/part5/Untyped/#524" class="Generalizable">e₀</a> <a id="527" href="/lia/part5/Untyped/#527" class="Generalizable">e₁</a> <a id="530" href="/lia/part5/Untyped/#530" class="Generalizable">e₂</a> <a id="533" class="Symbol">:</a> <a id="535" href="/lia/part5/Untyped/#325" class="Datatype">Exp</a></pre>
+
+<p>Example:</p>
+
+<pre class="Agda"><a id="558" class="Comment">-- factorial : Exp</a>
+<a id="577" class="Comment">-- factorial = μ f₀ · ƛ x₀ · (If (` x₀) Then (# 1) Else ((` x₀) * ((` f₀) · (` x₀ - (# 1)))))</a></pre>
+
+<p>Free variables:</p>
+
+<pre class="Agda"><a id="∅"></a><a id="697" href="/lia/part5/Untyped/#697" class="Function">∅</a> <a id="699" class="Symbol">:</a> <a id="701" href="/lia/part5/Untyped/#307" class="Function">VarName</a> <a id="709" href="/lia/part0/List/#468" class="Datatype Operator">*</a>
+<a id="711" href="/lia/part5/Untyped/#697" class="Function">∅</a> <a id="713" class="Symbol">=</a> <a id="715" href="/lia/part0/List/#505" class="InductiveConstructor">ε</a>
+
+<a id="fv"></a><a id="718" href="/lia/part5/Untyped/#718" class="Function">fv</a> <a id="721" class="Symbol">:</a> <a id="723" href="/lia/part5/Untyped/#325" class="Datatype">Exp</a> <a id="727" class="Symbol">→</a> <a id="729" href="/lia/part5/Untyped/#307" class="Function">VarName</a> <a id="737" href="/lia/part0/List/#468" class="Datatype Operator">*</a>
+<a id="739" href="/lia/part5/Untyped/#718" class="Function">fv</a> <a id="742" class="Symbol">(</a><a id="743" href="/lia/part5/Untyped/#344" class="InductiveConstructor Operator">`</a> <a id="745" href="/lia/part5/Untyped/#745" class="Bound">x</a><a id="746" class="Symbol">)</a> <a id="748" class="Symbol">=</a> <a id="750" href="/lia/part0/List/#1792" class="Function">[</a> <a id="752" href="/lia/part5/Untyped/#745" class="Bound">x</a> <a id="754" href="/lia/part0/List/#2043" class="Function Operator">]</a>
+<a id="756" href="/lia/part5/Untyped/#718" class="Function">fv</a> <a id="759" class="Symbol">(</a><a id="760" href="/lia/part5/Untyped/#372" class="InductiveConstructor Operator">ƛ</a> <a id="762" href="/lia/part5/Untyped/#762" class="Bound">x</a> <a id="764" href="/lia/part5/Untyped/#372" class="InductiveConstructor Operator">⇒</a> <a id="766" href="/lia/part5/Untyped/#766" class="Bound">e</a><a id="767" class="Symbol">)</a> <a id="769" class="Symbol">=</a> <a id="771" href="/lia/part0/List/#4927" class="Function">remove</a> <a id="778" href="/lia/part5/Untyped/#762" class="Bound">x</a> <a id="780" class="Symbol">(</a><a id="781" href="/lia/part5/Untyped/#718" class="Function">fv</a> <a id="784" href="/lia/part5/Untyped/#766" class="Bound">e</a><a id="785" class="Symbol">)</a>
+<a id="787" href="/lia/part5/Untyped/#718" class="Function">fv</a> <a id="790" class="Symbol">(</a><a id="791" href="/lia/part5/Untyped/#791" class="Bound">e₀</a> <a id="794" href="/lia/part5/Untyped/#411" class="InductiveConstructor Operator">·</a> <a id="796" href="/lia/part5/Untyped/#796" class="Bound">e₁</a><a id="798" class="Symbol">)</a> <a id="800" class="Symbol">=</a> <a id="802" href="/lia/part5/Untyped/#718" class="Function">fv</a> <a id="805" href="/lia/part5/Untyped/#791" class="Bound">e₀</a> <a id="808" href="/lia/part0/List/#3100" class="Function Operator">++</a> <a id="811" href="/lia/part5/Untyped/#718" class="Function">fv</a> <a id="814" href="/lia/part5/Untyped/#796" class="Bound">e₁</a></pre>
+
+<p>Closed expressions:</p>
+
+<pre class="Agda"><a id="Closed"></a><a id="847" href="/lia/part5/Untyped/#847" class="Function">Closed</a> <a id="854" class="Symbol">:</a> <a id="856" href="/lia/part5/Untyped/#325" class="Datatype">Exp</a> <a id="860" class="Symbol">→</a> <a id="862" class="PrimitiveType">Set</a>
+<a id="866" href="/lia/part5/Untyped/#847" class="Function">Closed</a> <a id="873" href="/lia/part5/Untyped/#873" class="Bound">e</a> <a id="875" class="Symbol">=</a> <a id="877" href="/lia/part5/Untyped/#718" class="Function">fv</a> <a id="880" href="/lia/part5/Untyped/#873" class="Bound">e</a> <a id="882" href="Agda.Builtin.Equality.html#151" class="Datatype Operator">≡</a> <a id="884" href="/lia/part5/Untyped/#697" class="Function">∅</a></pre>
+
+<h1 id="eager-evaluation-with-dynamic-binding">
+<a class="anchor" href="#eager-evaluation-with-dynamic-binding" aria-hidden="true"><span class="octicon octicon-link"></span></a>Eager evaluation with dynamic binding</h1>
+
+<h2 id="big-steps-operational-semantics">
+<a class="anchor" href="#big-steps-operational-semantics" aria-hidden="true"><span class="octicon octicon-link"></span></a>Big-steps operational semantics</h2>
+
+<pre class="Agda"><a id="Env"></a><a id="972" href="/lia/part5/Untyped/#972" class="Function">Env</a> <a id="976" class="Symbol">=</a> <a id="978" href="/lia/part5/Untyped/#307" class="Function">VarName</a> <a id="986" class="Symbol">→</a> <a id="988" href="/lia/part5/Untyped/#325" class="Datatype">Exp</a>
+
+<a id="993" class="Keyword">private</a>
+  <a id="1003" class="Keyword">variable</a>
+    <a id="1016" href="/lia/part5/Untyped/#1016" class="Generalizable">ϱ</a> <a id="1018" class="Symbol">:</a> <a id="1020" href="/lia/part5/Untyped/#972" class="Function">Env</a>
+    <a id="1028" href="/lia/part5/Untyped/#1028" class="Generalizable">u</a> <a id="1030" href="/lia/part5/Untyped/#1030" class="Generalizable">u₀</a> <a id="1033" href="/lia/part5/Untyped/#1033" class="Generalizable">u₁</a> <a id="1036" href="/lia/part5/Untyped/#1036" class="Generalizable">v</a> <a id="1038" href="/lia/part5/Untyped/#1038" class="Generalizable">v₀</a> <a id="1041" href="/lia/part5/Untyped/#1041" class="Generalizable">v₁</a> <a id="1044" class="Symbol">:</a> <a id="1046" href="/lia/part5/Untyped/#325" class="Datatype">Exp</a>
+
+<a id="1051" class="Keyword">infix</a> <a id="1057" class="Number">10</a> <a id="1060" href="/lia/part5/Untyped/#1071" class="Datatype Operator">_⊢_⇒_</a>
+<a id="1066" class="Keyword">data</a> <a id="_⊢_⇒_"></a><a id="1071" href="/lia/part5/Untyped/#1071" class="Datatype Operator">_⊢_⇒_</a> <a id="1077" class="Symbol">:</a> <a id="1079" href="/lia/part5/Untyped/#972" class="Function">Env</a> <a id="1083" class="Symbol">→</a> <a id="1085" href="/lia/part5/Untyped/#325" class="Datatype">Exp</a> <a id="1089" class="Symbol">→</a> <a id="1091" href="/lia/part5/Untyped/#325" class="Datatype">Exp</a> <a id="1095" class="Symbol">→</a> <a id="1097" class="PrimitiveType">Set</a> <a id="1101" class="Keyword">where</a>
+
+  <a id="_⊢_⇒_.Var"></a><a id="1110" href="/lia/part5/Untyped/#1110" class="InductiveConstructor">Var</a> <a id="1114" class="Symbol">:</a> <a id="1116" href="/lia/part5/Untyped/#1016" class="Generalizable">ϱ</a> <a id="1118" href="/lia/part5/Untyped/#1071" class="Datatype Operator">⊢</a> <a id="1120" href="/lia/part5/Untyped/#344" class="InductiveConstructor Operator">`</a> <a id="1122" href="/lia/part5/Untyped/#503" class="Generalizable">x</a> <a id="1124" href="/lia/part5/Untyped/#1071" class="Datatype Operator">⇒</a> <a id="1126" href="/lia/part5/Untyped/#1016" class="Generalizable">ϱ</a> <a id="1128" href="/lia/part5/Untyped/#503" class="Generalizable">x</a>
+
+  <a id="_⊢_⇒_.Abs"></a><a id="1133" href="/lia/part5/Untyped/#1133" class="InductiveConstructor">Abs</a> <a id="1137" class="Symbol">:</a> <a id="1139" class="Comment">---------------------</a>
+        <a id="1169" href="/lia/part5/Untyped/#1016" class="Generalizable">ϱ</a> <a id="1171" href="/lia/part5/Untyped/#1071" class="Datatype Operator">⊢</a> <a id="1173" href="/lia/part5/Untyped/#372" class="InductiveConstructor Operator">ƛ</a> <a id="1175" href="/lia/part5/Untyped/#503" class="Generalizable">x</a> <a id="1177" href="/lia/part5/Untyped/#372" class="InductiveConstructor Operator">⇒</a> <a id="1179" href="/lia/part5/Untyped/#519" class="Generalizable">e</a> <a id="1181" href="/lia/part5/Untyped/#1071" class="Datatype Operator">⇒</a> <a id="1183" href="/lia/part5/Untyped/#372" class="InductiveConstructor Operator">ƛ</a> <a id="1185" href="/lia/part5/Untyped/#503" class="Generalizable">x</a> <a id="1187" href="/lia/part5/Untyped/#372" class="InductiveConstructor Operator">⇒</a> <a id="1189" href="/lia/part5/Untyped/#519" class="Generalizable">e</a>
+
+  <a id="_⊢_⇒_.App"></a><a id="1194" href="/lia/part5/Untyped/#1194" class="InductiveConstructor">App</a> <a id="1198" class="Symbol">:</a> <a id="1200" href="/lia/part5/Untyped/#1016" class="Generalizable">ϱ</a> <a id="1202" href="/lia/part5/Untyped/#1071" class="Datatype Operator">⊢</a> <a id="1204" href="/lia/part5/Untyped/#524" class="Generalizable">e₀</a> <a id="1207" href="/lia/part5/Untyped/#1071" class="Datatype Operator">⇒</a> <a id="1209" href="/lia/part5/Untyped/#372" class="InductiveConstructor Operator">ƛ</a> <a id="1211" href="/lia/part5/Untyped/#503" class="Generalizable">x</a> <a id="1213" href="/lia/part5/Untyped/#372" class="InductiveConstructor Operator">⇒</a> <a id="1215" href="/lia/part5/Untyped/#519" class="Generalizable">e</a> <a id="1217" class="Symbol">→</a>
+        <a id="1227" href="/lia/part5/Untyped/#1016" class="Generalizable">ϱ</a> <a id="1229" href="/lia/part5/Untyped/#1071" class="Datatype Operator">⊢</a> <a id="1231" href="/lia/part5/Untyped/#527" class="Generalizable">e₁</a> <a id="1234" href="/lia/part5/Untyped/#1071" class="Datatype Operator">⇒</a> <a id="1236" href="/lia/part5/Untyped/#1041" class="Generalizable">v₁</a> <a id="1239" class="Symbol">→</a>
+        <a id="1249" href="/lia/part5/Untyped/#1016" class="Generalizable">ϱ</a> <a id="1251" href="/lia/part0/Functions/#570" class="Function Operator">[</a> <a id="1253" href="/lia/part5/Untyped/#503" class="Generalizable">x</a> <a id="1255" href="/lia/part0/Functions/#570" class="Function Operator">↦</a> <a id="1257" href="/lia/part5/Untyped/#1041" class="Generalizable">v₁</a> <a id="1260" href="/lia/part0/Functions/#570" class="Function Operator">]</a> <a id="1262" href="/lia/part5/Untyped/#1071" class="Datatype Operator">⊢</a> <a id="1264" href="/lia/part5/Untyped/#519" class="Generalizable">e</a> <a id="1266" href="/lia/part5/Untyped/#1071" class="Datatype Operator">⇒</a> <a id="1268" href="/lia/part5/Untyped/#1036" class="Generalizable">v</a> <a id="1270" class="Symbol">→</a>
+        <a id="1280" class="Comment">----------------------</a>
+        <a id="1311" href="/lia/part5/Untyped/#1016" class="Generalizable">ϱ</a> <a id="1313" href="/lia/part5/Untyped/#1071" class="Datatype Operator">⊢</a> <a id="1315" href="/lia/part5/Untyped/#524" class="Generalizable">e₀</a> <a id="1318" href="/lia/part5/Untyped/#411" class="InductiveConstructor Operator">·</a> <a id="1320" href="/lia/part5/Untyped/#527" class="Generalizable">e₁</a> <a id="1323" href="/lia/part5/Untyped/#1071" class="Datatype Operator">⇒</a> <a id="1325" href="/lia/part5/Untyped/#1036" class="Generalizable">v</a></pre>
+
+<p>TODO: Illustrate the dynamic binding aspect.</p>
+
+<h3 id="deterministic-values">Deterministic values</h3>
+
+<pre class="Agda"><a id="det"></a><a id="1408" href="/lia/part5/Untyped/#1408" class="Function">det</a> <a id="1412" class="Symbol">:</a> <a id="1414" href="/lia/part5/Untyped/#1016" class="Generalizable">ϱ</a> <a id="1416" href="/lia/part5/Untyped/#1071" class="Datatype Operator">⊢</a> <a id="1418" href="/lia/part5/Untyped/#519" class="Generalizable">e</a> <a id="1420" href="/lia/part5/Untyped/#1071" class="Datatype Operator">⇒</a> <a id="1422" href="/lia/part5/Untyped/#1028" class="Generalizable">u</a> <a id="1424" class="Symbol">→</a>
+      <a id="1432" href="/lia/part5/Untyped/#1016" class="Generalizable">ϱ</a> <a id="1434" href="/lia/part5/Untyped/#1071" class="Datatype Operator">⊢</a> <a id="1436" href="/lia/part5/Untyped/#519" class="Generalizable">e</a> <a id="1438" href="/lia/part5/Untyped/#1071" class="Datatype Operator">⇒</a> <a id="1440" href="/lia/part5/Untyped/#1036" class="Generalizable">v</a> <a id="1442" class="Symbol">→</a>
+      <a id="1450" class="Comment">-----------</a>
+      <a id="1468" href="/lia/part5/Untyped/#1028" class="Generalizable">u</a> <a id="1470" href="Agda.Builtin.Equality.html#151" class="Datatype Operator">≡</a> <a id="1472" href="/lia/part5/Untyped/#1036" class="Generalizable">v</a>
+
+<a id="1475" href="/lia/part5/Untyped/#1408" class="Function">det</a> <a id="1479" href="/lia/part5/Untyped/#1479" class="Bound">δ</a> <a id="1481" href="/lia/part5/Untyped/#1481" class="Bound">σ</a> <a id="1483" class="Symbol">=</a> <a id="1485" class="Symbol">{!   !}</a></pre>
+
+<h2 id="denotational-semantics">
+<a class="anchor" href="#denotational-semantics" aria-hidden="true"><span class="octicon octicon-link"></span></a>Denotational semantics</h2>
+
+<p>Evaluation with gas.</p>
+
+<p>– You actually need a Krivine machine!</p>
+
+<pre class="Agda"><a id="Exp⊥"></a><a id="1592" href="/lia/part5/Untyped/#1592" class="Function">Exp⊥</a> <a id="1597" class="Symbol">=</a> <a id="1599" href="/lia/part5/Maybe/#386" class="Datatype">Maybe</a> <a id="1605" href="/lia/part5/Untyped/#325" class="Datatype">Exp</a>
+
+<a id="⟦_⟧_#_"></a><a id="1610" href="/lia/part5/Untyped/#1610" class="Function Operator">⟦_⟧_#_</a> <a id="1617" class="Symbol">:</a> <a id="1619" href="/lia/part5/Untyped/#325" class="Datatype">Exp</a> <a id="1623" class="Symbol">→</a> <a id="1625" href="/lia/part5/Untyped/#972" class="Function">Env</a> <a id="1629" class="Symbol">→</a> <a id="1631" href="/lia/part0/Naturals/#301" class="Function">ℕ</a> <a id="1633" class="Symbol">→</a> <a id="1635" href="/lia/part5/Untyped/#1592" class="Function">Exp⊥</a>
+
+<a id="1641" href="/lia/part5/Untyped/#1610" class="Function Operator">⟦</a> <a id="1643" href="/lia/part5/Untyped/#1643" class="Bound">e</a> <a id="1645" href="/lia/part5/Untyped/#1610" class="Function Operator">⟧</a> <a id="1647" href="/lia/part5/Untyped/#1647" class="Bound">ϱ</a> <a id="1649" href="/lia/part5/Untyped/#1610" class="Function Operator">#</a> <a id="1651" class="Number">0</a> <a id="1653" class="Symbol">=</a> <a id="1655" href="/lia/part5/Maybe/#481" class="InductiveConstructor">⊥</a>
+
+<a id="1658" href="/lia/part5/Untyped/#1610" class="Function Operator">⟦</a> <a id="1660" href="/lia/part5/Untyped/#344" class="InductiveConstructor Operator">`</a> <a id="1662" href="/lia/part5/Untyped/#1662" class="Bound">x</a> <a id="1664" href="/lia/part5/Untyped/#1610" class="Function Operator">⟧</a> <a id="1666" href="/lia/part5/Untyped/#1666" class="Bound">ϱ</a> <a id="1668" href="/lia/part5/Untyped/#1610" class="Function Operator">#</a> <a id="1670" href="Agda.Builtin.Nat.html#223" class="InductiveConstructor">suc</a> <a id="1674" href="/lia/part5/Untyped/#1674" class="Bound">n</a> <a id="1676" class="Symbol">=</a> <a id="1678" href="/lia/part5/Maybe/#501" class="InductiveConstructor Operator">⌊</a> <a id="1680" href="/lia/part5/Untyped/#1666" class="Bound">ϱ</a> <a id="1682" href="/lia/part5/Untyped/#1662" class="Bound">x</a> <a id="1684" href="/lia/part5/Maybe/#501" class="InductiveConstructor Operator">⌋</a>
+
+<a id="1687" href="/lia/part5/Untyped/#1610" class="Function Operator">⟦</a> <a id="1689" href="/lia/part5/Untyped/#372" class="InductiveConstructor Operator">ƛ</a> <a id="1691" href="/lia/part5/Untyped/#1691" class="Bound">x</a> <a id="1693" href="/lia/part5/Untyped/#372" class="InductiveConstructor Operator">⇒</a> <a id="1695" href="/lia/part5/Untyped/#1695" class="Bound">e</a> <a id="1697" href="/lia/part5/Untyped/#1610" class="Function Operator">⟧</a> <a id="1699" href="/lia/part5/Untyped/#1699" class="Bound">ϱ</a> <a id="1701" href="/lia/part5/Untyped/#1610" class="Function Operator">#</a> <a id="1703" href="Agda.Builtin.Nat.html#223" class="InductiveConstructor">suc</a> <a id="1707" href="/lia/part5/Untyped/#1707" class="Bound">n</a> <a id="1709" class="Symbol">=</a> <a id="1711" href="/lia/part5/Maybe/#501" class="InductiveConstructor Operator">⌊</a> <a id="1713" href="/lia/part5/Untyped/#372" class="InductiveConstructor Operator">ƛ</a> <a id="1715" href="/lia/part5/Untyped/#1691" class="Bound">x</a> <a id="1717" href="/lia/part5/Untyped/#372" class="InductiveConstructor Operator">⇒</a> <a id="1719" href="/lia/part5/Untyped/#1695" class="Bound">e</a> <a id="1721" href="/lia/part5/Maybe/#501" class="InductiveConstructor Operator">⌋</a>
+
+<a id="1724" href="/lia/part5/Untyped/#1610" class="Function Operator">⟦</a> <a id="1726" href="/lia/part5/Untyped/#1726" class="Bound">e₀</a> <a id="1729" href="/lia/part5/Untyped/#411" class="InductiveConstructor Operator">·</a> <a id="1731" href="/lia/part5/Untyped/#1731" class="Bound">e₁</a> <a id="1734" href="/lia/part5/Untyped/#1610" class="Function Operator">⟧</a> <a id="1736" href="/lia/part5/Untyped/#1736" class="Bound">ϱ</a> <a id="1738" href="/lia/part5/Untyped/#1610" class="Function Operator">#</a> <a id="1740" href="Agda.Builtin.Nat.html#223" class="InductiveConstructor">suc</a> <a id="1744" href="/lia/part5/Untyped/#1744" class="Bound">n</a>
+  <a id="1748" class="Keyword">with</a> <a id="1753" href="/lia/part5/Untyped/#1610" class="Function Operator">⟦</a> <a id="1755" href="/lia/part5/Untyped/#1726" class="Bound">e₀</a> <a id="1758" href="/lia/part5/Untyped/#1610" class="Function Operator">⟧</a> <a id="1760" href="/lia/part5/Untyped/#1736" class="Bound">ϱ</a> <a id="1762" href="/lia/part5/Untyped/#1610" class="Function Operator">#</a> <a id="1764" href="/lia/part5/Untyped/#1744" class="Bound">n</a> <a id="1766" class="Symbol">|</a> <a id="1768" href="/lia/part5/Untyped/#1610" class="Function Operator">⟦</a> <a id="1770" href="/lia/part5/Untyped/#1731" class="Bound">e₁</a> <a id="1773" href="/lia/part5/Untyped/#1610" class="Function Operator">⟧</a> <a id="1775" href="/lia/part5/Untyped/#1736" class="Bound">ϱ</a> <a id="1777" href="/lia/part5/Untyped/#1610" class="Function Operator">#</a> <a id="1779" href="/lia/part5/Untyped/#1744" class="Bound">n</a>
+<a id="1781" class="Symbol">...</a> <a id="1785" class="Symbol">|</a> <a id="1787" href="/lia/part5/Maybe/#501" class="InductiveConstructor Operator">⌊</a> <a id="1789" href="/lia/part5/Untyped/#372" class="InductiveConstructor Operator">ƛ</a> <a id="1791" href="/lia/part5/Untyped/#1791" class="Bound">x</a> <a id="1793" href="/lia/part5/Untyped/#372" class="InductiveConstructor Operator">⇒</a> <a id="1795" href="/lia/part5/Untyped/#1795" class="Bound">e</a> <a id="1797" href="/lia/part5/Maybe/#501" class="InductiveConstructor Operator">⌋</a> <a id="1799" class="Symbol">|</a> <a id="1801" href="/lia/part5/Maybe/#501" class="InductiveConstructor Operator">⌊</a> <a id="1803" href="/lia/part5/Untyped/#1803" class="Bound">v</a> <a id="1805" href="/lia/part5/Maybe/#501" class="InductiveConstructor Operator">⌋</a> <a id="1807" class="Symbol">=</a> <a id="1809" href="/lia/part5/Untyped/#1610" class="Function Operator">⟦</a> <a id="1811" href="/lia/part5/Untyped/#1795" class="Bound">e</a> <a id="1813" href="/lia/part5/Untyped/#1610" class="Function Operator">⟧</a> <a id="1815" class="Bound">ϱ</a> <a id="1817" href="/lia/part0/Functions/#570" class="Function Operator">[</a> <a id="1819" href="/lia/part5/Untyped/#1791" class="Bound">x</a> <a id="1821" href="/lia/part0/Functions/#570" class="Function Operator">↦</a> <a id="1823" href="/lia/part5/Untyped/#1803" class="Bound">v</a> <a id="1825" href="/lia/part0/Functions/#570" class="Function Operator">]</a> <a id="1827" href="/lia/part5/Untyped/#1610" class="Function Operator">#</a> <a id="1829" class="Bound">n</a>
+<a id="1831" class="CatchallClause Symbol">...</a><a id="1834" class="CatchallClause"> </a><a id="1835" class="CatchallClause Symbol">|</a><a id="1836" class="CatchallClause"> </a><a id="1837" class="CatchallClause Symbol">_</a><a id="1838" class="CatchallClause"> </a><a id="1839" class="CatchallClause Symbol">|</a><a id="1840" class="CatchallClause"> </a><a id="1841" class="CatchallClause Symbol">_</a> <a id="1843" class="Symbol">=</a> <a id="1845" href="/lia/part5/Maybe/#481" class="InductiveConstructor">⊥</a> <a id="1847" class="Comment">-- this is catching many cases</a></pre>
+
+<p>Example:</p>
+
+<pre class="Agda"><a id="ϱ₀"></a><a id="1897" href="/lia/part5/Untyped/#1897" class="Function">ϱ₀</a> <a id="1900" class="Symbol">:</a> <a id="1902" href="/lia/part5/Untyped/#972" class="Function">Env</a>
+<a id="1906" href="/lia/part5/Untyped/#1897" class="Function">ϱ₀</a> <a id="1909" class="Symbol">_</a> <a id="1911" class="Symbol">=</a> <a id="1913" href="/lia/part5/Untyped/#344" class="InductiveConstructor Operator">`</a> <a id="1915" class="Number">0</a>
+
+<a id="f"></a><a id="1918" href="/lia/part5/Untyped/#1918" class="Function">f</a> <a id="y"></a><a id="1920" href="/lia/part5/Untyped/#1920" class="Function">y</a> <a id="1922" class="Symbol">:</a> <a id="1924" href="/lia/part5/Untyped/#307" class="Function">VarName</a>
+<a id="1932" href="/lia/part5/Untyped/#1918" class="Function">f</a> <a id="1934" class="Symbol">=</a> <a id="1936" class="Number">2</a>
+<a id="1938" href="/lia/part5/Untyped/#1920" class="Function">y</a> <a id="1940" class="Symbol">=</a> <a id="1942" class="Number">3</a>
+
+<a id="0ᶜ"></a><a id="1945" href="/lia/part5/Untyped/#1945" class="Function">0ᶜ</a> <a id="1ᶜ"></a><a id="1948" href="/lia/part5/Untyped/#1948" class="Function">1ᶜ</a> <a id="2ᶜ"></a><a id="1951" href="/lia/part5/Untyped/#1951" class="Function">2ᶜ</a> <a id="1954" class="Symbol">:</a> <a id="1956" href="/lia/part5/Untyped/#325" class="Datatype">Exp</a>
+<a id="1960" href="/lia/part5/Untyped/#1945" class="Function">0ᶜ</a> <a id="1963" class="Symbol">=</a> <a id="1965" href="/lia/part5/Untyped/#372" class="InductiveConstructor Operator">ƛ</a> <a id="1967" href="/lia/part5/Untyped/#1918" class="Function">f</a> <a id="1969" href="/lia/part5/Untyped/#372" class="InductiveConstructor Operator">⇒</a> <a id="1971" href="/lia/part5/Untyped/#372" class="InductiveConstructor Operator">ƛ</a> <a id="1973" href="/lia/part5/Untyped/#1920" class="Function">y</a> <a id="1975" href="/lia/part5/Untyped/#372" class="InductiveConstructor Operator">⇒</a> <a id="1977" href="/lia/part5/Untyped/#344" class="InductiveConstructor Operator">`</a> <a id="1979" href="/lia/part5/Untyped/#1920" class="Function">y</a>
+<a id="1981" href="/lia/part5/Untyped/#1948" class="Function">1ᶜ</a> <a id="1984" class="Symbol">=</a> <a id="1986" href="/lia/part5/Untyped/#372" class="InductiveConstructor Operator">ƛ</a> <a id="1988" href="/lia/part5/Untyped/#1918" class="Function">f</a> <a id="1990" href="/lia/part5/Untyped/#372" class="InductiveConstructor Operator">⇒</a> <a id="1992" href="/lia/part5/Untyped/#372" class="InductiveConstructor Operator">ƛ</a> <a id="1994" href="/lia/part5/Untyped/#1920" class="Function">y</a> <a id="1996" href="/lia/part5/Untyped/#372" class="InductiveConstructor Operator">⇒</a> <a id="1998" href="/lia/part5/Untyped/#344" class="InductiveConstructor Operator">`</a> <a id="2000" href="/lia/part5/Untyped/#1918" class="Function">f</a> <a id="2002" href="/lia/part5/Untyped/#411" class="InductiveConstructor Operator">·</a> <a id="2004" href="/lia/part5/Untyped/#344" class="InductiveConstructor Operator">`</a> <a id="2006" href="/lia/part5/Untyped/#1920" class="Function">y</a>
+<a id="2008" href="/lia/part5/Untyped/#1951" class="Function">2ᶜ</a> <a id="2011" class="Symbol">=</a> <a id="2013" href="/lia/part5/Untyped/#372" class="InductiveConstructor Operator">ƛ</a> <a id="2015" href="/lia/part5/Untyped/#1918" class="Function">f</a> <a id="2017" href="/lia/part5/Untyped/#372" class="InductiveConstructor Operator">⇒</a> <a id="2019" href="/lia/part5/Untyped/#372" class="InductiveConstructor Operator">ƛ</a> <a id="2021" href="/lia/part5/Untyped/#1920" class="Function">y</a> <a id="2023" href="/lia/part5/Untyped/#372" class="InductiveConstructor Operator">⇒</a> <a id="2025" href="/lia/part5/Untyped/#344" class="InductiveConstructor Operator">`</a> <a id="2027" href="/lia/part5/Untyped/#1918" class="Function">f</a> <a id="2029" href="/lia/part5/Untyped/#411" class="InductiveConstructor Operator">·</a> <a id="2031" href="/lia/part5/Untyped/#344" class="InductiveConstructor Operator">`</a> <a id="2033" href="/lia/part5/Untyped/#1918" class="Function">f</a> <a id="2035" href="/lia/part5/Untyped/#411" class="InductiveConstructor Operator">·</a> <a id="2037" href="/lia/part5/Untyped/#344" class="InductiveConstructor Operator">`</a> <a id="2039" href="/lia/part5/Untyped/#1920" class="Function">y</a>
+
+<a id="_ᶜ"></a><a id="2042" href="/lia/part5/Untyped/#2042" class="Function Operator">_ᶜ</a> <a id="2045" class="Symbol">:</a> <a id="2047" href="/lia/part0/Naturals/#301" class="Function">ℕ</a> <a id="2049" class="Symbol">→</a> <a id="2051" href="/lia/part5/Untyped/#325" class="Datatype">Exp</a>
+<a id="2055" href="Agda.Builtin.Nat.html#210" class="InductiveConstructor">zero</a> <a id="2060" href="/lia/part5/Untyped/#2042" class="Function Operator">ᶜ</a> <a id="2062" class="Symbol">=</a> <a id="2064" href="/lia/part5/Untyped/#1945" class="Function">0ᶜ</a>
+<a id="2067" href="Agda.Builtin.Nat.html#223" class="InductiveConstructor">suc</a> <a id="2071" href="/lia/part5/Untyped/#2071" class="Bound">n</a> <a id="2073" href="/lia/part5/Untyped/#2042" class="Function Operator">ᶜ</a> <a id="2075" class="Symbol">=</a> <a id="2077" class="Symbol">{!   !}</a></pre>
+
+<h2 id="agreement-of-the-operational-and-denotational-semantics">
+<a class="anchor" href="#agreement-of-the-operational-and-denotational-semantics" aria-hidden="true"><span class="octicon octicon-link"></span></a>Agreement of the operational and denotational semantics</h2>
+
+<h1 id="eager-evaluation-with-static-binding">
+<a class="anchor" href="#eager-evaluation-with-static-binding" aria-hidden="true"><span class="octicon octicon-link"></span></a>Eager evaluation with static binding</h1>
+
+<h1 id="lazy-evaluation-with-dynamic-binding">
+<a class="anchor" href="#lazy-evaluation-with-dynamic-binding" aria-hidden="true"><span class="octicon octicon-link"></span></a>Lazy evaluation with dynamic binding</h1>
+
+<h1 id="lazy-evaluation-with-static-binding">
+<a class="anchor" href="#lazy-evaluation-with-static-binding" aria-hidden="true"><span class="octicon octicon-link"></span></a>Lazy evaluation with static binding</h1>
+
+<div id="refs">
+
+  <h1 id="references">
+<a class="anchor" href="#references" aria-hidden="true"><span class="octicon octicon-link"></span></a>References</h1>
+
+</div>
+
+    </div>
+  
+    <header class="nav-header">
+    <p style="text-align:center;">
+        
+        
+        
+        <a alt="Part" href="/lia/part5/index/">Part</a>
+        &bullet;
+        
+        
+        <a alt="Source code" href="https://github.com/lclem/lia/blob/main/src/part5/Untyped.lagda.md">Source</a>
+        
+        
+        
+    </p>
+</header>
+
+    <p class="p-name"> Last-modified: Feb  1 19:51:04 2021 </p>
+  </article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/lia/"></data>
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">Logic in Agda</h2><div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li class="p-name">Lorenzo Clemente</li>
+          <li><a class="u-email" href="mailto:clementelorenzo@gmail.com">clementelorenzo@gmail.com</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2"><ul class="social-media-list"><li><a href="https://github.com/lclem"><svg class="svg-icon"><use xlink:href="/lia/assets/minima-social-icons.svg#github"></use></svg> <span class="username">lclem</span></a></li></ul>
+</div>
+
+      <div class="footer-col footer-col-3"></div>
+    </div>This work is licensed under a <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>
+  </div>
+</footer>
+
+<!-- Parse the Latex divs with Katex
+<script type="text/javascript">
+  $("script[type='math/tex']").replaceWith(
+    function(){
+      var tex = $(this).text();
+      return katex.renderToString(tex, {displayMode: false});
+  });
+  
+  $("script[type='math/tex; mode=display']").replaceWith(
+    function(){
+      var tex = $(this).text();
+      return katex.renderToString(tex.replace(/%.*/g, ''), {displayMode: true});
+  });
+</script>
+-->
+
+<script type="text/javascript" src="/lia/assets/hidebox.js"></script>
+</body>
+
+</html>

@@ -3,19 +3,19 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Binding 🚧 | Logic in Agda</title><!-- Begin Jekyll SEO tag v2.7.1 -->
+  <title>The Maybe monad 🚧 | Logic in Agda</title><!-- Begin Jekyll SEO tag v2.7.1 -->
 <meta name="generator" content="Jekyll v3.9.0" />
-<meta property="og:title" content="Binding 🚧" />
+<meta property="og:title" content="The Maybe monad 🚧" />
 <meta property="og:locale" content="en_US" />
 <meta name="description" content="Propositional and fist-order logic developed with the proof assistant Agda." />
 <meta property="og:description" content="Propositional and fist-order logic developed with the proof assistant Agda." />
-<link rel="canonical" href="/lia/part5/Binding/" />
-<meta property="og:url" content="/lia/part5/Binding/" />
+<link rel="canonical" href="/lia/part5/Maybe/" />
+<meta property="og:url" content="/lia/part5/Maybe/" />
 <meta property="og:site_name" content="Logic in Agda" />
 <meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="Binding 🚧" />
+<meta property="twitter:title" content="The Maybe monad 🚧" />
 <script type="application/ld+json">
-{"url":"/lia/part5/Binding/","description":"Propositional and fist-order logic developed with the proof assistant Agda.","@type":"WebPage","headline":"Binding 🚧","@context":"https://schema.org"}</script>
+{"url":"/lia/part5/Maybe/","description":"Propositional and fist-order logic developed with the proof assistant Agda.","@type":"WebPage","headline":"The Maybe monad 🚧","@context":"https://schema.org"}</script>
 <!-- End Jekyll SEO tag -->
 <link rel="stylesheet" href="/lia/assets/main.css">
 
@@ -468,7 +468,7 @@
         <article class="post">
 
     <header class="post-header">
-        <h1 class="post-title">Binding 🚧</h1>
+        <h1 class="post-title">The Maybe monad 🚧</h1>
     </header>
   
     <header class="nav-header">
@@ -480,7 +480,7 @@
         &bullet;
         
         
-        <a alt="Source code" href="https://github.com/lclem/lia/blob/main/src/part5/Binding.lagda.md">Source</a>
+        <a alt="Source code" href="https://github.com/lclem/lia/blob/main/src/part5/Maybe.lagda.md">Source</a>
         
         
         
@@ -491,110 +491,103 @@
     <div class="post-content">
         <h2>Contents</h2>    
         <ul id="toc" class="section-nav">
-<li class="toc-entry toc-h1"><a href="#references">References</a></li>
-</ul><pre class="Agda"><a id="33" class="Symbol">{-#</a> <a id="37" class="Keyword">OPTIONS</a> <a id="45" class="Pragma">--allow-unsolved-metas</a> <a id="68" class="Symbol">#-}</a>
-<a id="72" class="Keyword">module</a> <a id="79" href="/lia/part5/Binding/" class="Module">part5.Binding</a> <a id="93" class="Keyword">where</a>
-<a id="99" class="Keyword">open</a> <a id="104" class="Keyword">import</a> <a id="111" href="/lia/part0/index/" class="Module">part0.index</a> <a id="123" class="Keyword">hiding</a> <a id="130" class="Symbol">(</a><a id="131" href="/lia/part0/Naturals/#7367" class="Datatype">AExp</a><a id="135" class="Symbol">;</a> <a id="137" href="/lia/part0/Naturals/#7478" class="Function Operator">A⟦_⟧</a><a id="141" class="Symbol">;</a> <a id="143" href="/lia/part0/List/#23605" class="Function Operator">_≈_</a><a id="146" class="Symbol">)</a> <a id="148" class="Keyword">renaming</a> <a id="157" class="Symbol">(</a><a id="158" href="/lia/part0/Naturals/#266" class="Primitive Operator">_+_</a> <a id="162" class="Symbol">to</a> <a id="Nat._+_"></a><a id="165" href="/lia/part5/Binding/#165" class="Primitive Operator">_+ℕ_</a><a id="169" class="Symbol">;</a> <a id="171" href="/lia/part0/Naturals/#288" class="Primitive Operator">_*_</a> <a id="175" class="Symbol">to</a> <a id="Nat._*_"></a><a id="178" href="/lia/part5/Binding/#178" class="Primitive Operator">_·ℕ_</a><a id="182" class="Symbol">;</a> <a id="184" href="/lia/part0/Naturals/#798" class="Datatype Operator">_≤_</a> <a id="188" class="Symbol">to</a> <a id="_≤_"></a><a id="191" href="/lia/part5/Binding/#191" class="Datatype Operator">_≤ℕ_</a><a id="195" class="Symbol">)</a> <a id="197" class="Keyword">public</a>
-<a id="204" class="Keyword">open</a> <a id="209" class="Keyword">import</a> <a id="216" href="/lia/part5/Exp/" class="Module">part5.Exp</a> <a id="226" class="Keyword">using</a> <a id="232" class="Symbol">(</a><a id="233" href="/lia/part5/Exp/#544" class="Function">VarName</a><a id="240" class="Symbol">)</a>
-<a id="242" class="Keyword">open</a> <a id="247" class="Keyword">import</a> <a id="254" href="/lia/part5/Imp/" class="Module">part5.Imp</a> <a id="264" class="Keyword">using</a> <a id="270" class="Symbol">(</a><a id="271" href="/lia/part5/Imp/#1231" class="Function">State</a><a id="276" class="Symbol">)</a>
+</ul><pre class="Agda"><a id="41" class="Symbol">{-#</a> <a id="45" class="Keyword">OPTIONS</a> <a id="53" class="Pragma">--allow-unsolved-metas</a> <a id="76" class="Symbol">#-}</a>
+<a id="80" class="Keyword">module</a> <a id="87" href="/lia/part5/Maybe/" class="Module">part5.Maybe</a> <a id="99" class="Keyword">where</a>
+<a id="105" class="Keyword">open</a> <a id="110" class="Keyword">import</a> <a id="117" href="/lia/part0/index/" class="Module">part0.index</a> <a id="129" class="Comment">-- hiding (AExp; A⟦_⟧; _≈_; _⊑_; _$_; trans-⊑; refl-⊑) renaming (_+_ to _+ℕ_; _*_ to _·ℕ_; _∸_ to _-ℕ_; _≤_ to _≤ℕ_) public</a></pre>
+<pre class="Agda"><a id="263" class="Keyword">private</a>
+    <a id="275" class="Keyword">variable</a>
+        <a id="292" href="/lia/part5/Maybe/#292" class="Generalizable">ℓ</a> <a id="294" href="/lia/part5/Maybe/#294" class="Generalizable">m</a> <a id="296" href="/lia/part5/Maybe/#296" class="Generalizable">n</a> <a id="298" href="/lia/part5/Maybe/#298" class="Generalizable">o</a> <a id="300" class="Symbol">:</a> <a id="302" href="Agda.Primitive.html#423" class="Postulate">Level</a>
+        <a id="316" href="/lia/part5/Maybe/#316" class="Generalizable">A</a> <a id="318" class="Symbol">:</a> <a id="320" class="PrimitiveType">Set</a> <a id="324" href="/lia/part5/Maybe/#292" class="Generalizable">ℓ</a>
+        <a id="334" href="/lia/part5/Maybe/#334" class="Generalizable">B</a> <a id="336" class="Symbol">:</a> <a id="338" class="PrimitiveType">Set</a> <a id="342" href="/lia/part5/Maybe/#294" class="Generalizable">m</a>
+        <a id="352" href="/lia/part5/Maybe/#352" class="Generalizable">C</a> <a id="354" class="Symbol">:</a> <a id="356" class="PrimitiveType">Set</a> <a id="360" href="/lia/part5/Maybe/#296" class="Generalizable">n</a>
+        <a id="370" href="/lia/part5/Maybe/#370" class="Generalizable">D</a> <a id="372" class="Symbol">:</a> <a id="374" class="PrimitiveType">Set</a> <a id="378" href="/lia/part5/Maybe/#298" class="Generalizable">o</a>
 
-<a id="x₀"></a><a id="279" href="/lia/part5/Binding/#279" class="Function">x₀</a> <a id="282" class="Symbol">:</a> <a id="284" href="/lia/part5/Exp/#544" class="Function">VarName</a>
-<a id="292" href="/lia/part5/Binding/#279" class="Function">x₀</a> <a id="295" class="Symbol">=</a> <a id="297" class="Number">0</a>
+<a id="381" class="Keyword">data</a> <a id="Maybe"></a><a id="386" href="/lia/part5/Maybe/#386" class="Datatype">Maybe</a> <a id="392" class="Symbol">(</a><a id="393" href="/lia/part5/Maybe/#393" class="Bound">A</a> <a id="395" class="Symbol">:</a> <a id="397" class="PrimitiveType">Set</a> <a id="401" href="/lia/part5/Maybe/#292" class="Generalizable">ℓ</a><a id="402" class="Symbol">)</a> <a id="404" class="Symbol">:</a> <a id="406" class="PrimitiveType">Set</a> <a id="410" href="/lia/part5/Maybe/#401" class="Bound">ℓ</a> <a id="412" class="Keyword">where</a>
+  <a id="Maybe.Nothing"></a><a id="420" href="/lia/part5/Maybe/#420" class="InductiveConstructor">Nothing</a> <a id="428" class="Symbol">:</a> <a id="430" href="/lia/part5/Maybe/#386" class="Datatype">Maybe</a> <a id="436" href="/lia/part5/Maybe/#393" class="Bound">A</a>
+  <a id="Maybe.Just"></a><a id="440" href="/lia/part5/Maybe/#440" class="InductiveConstructor">Just</a> <a id="445" class="Symbol">:</a> <a id="447" href="/lia/part5/Maybe/#393" class="Bound">A</a> <a id="449" class="Symbol">→</a> <a id="451" href="/lia/part5/Maybe/#386" class="Datatype">Maybe</a> <a id="457" href="/lia/part5/Maybe/#393" class="Bound">A</a>
 
-<a id="300" class="Keyword">private</a>
-  <a id="310" class="Keyword">variable</a>
-    <a id="323" href="/lia/part5/Binding/#323" class="Generalizable">m</a> <a id="325" href="/lia/part5/Binding/#325" class="Generalizable">n</a> <a id="327" href="/lia/part5/Binding/#327" class="Generalizable">n₀</a> <a id="330" href="/lia/part5/Binding/#330" class="Generalizable">n₁</a> <a id="333" class="Symbol">:</a> <a id="335" href="/lia/part0/Naturals/#301" class="Function">ℕ</a>
-    <a id="341" href="/lia/part5/Binding/#341" class="Generalizable">x</a> <a id="343" href="/lia/part5/Binding/#343" class="Generalizable">y</a> <a id="345" class="Symbol">:</a> <a id="347" href="/lia/part5/Exp/#544" class="Function">VarName</a>
-    <a id="359" href="/lia/part5/Binding/#359" class="Generalizable">s</a> <a id="361" href="/lia/part5/Binding/#361" class="Generalizable">s′</a> <a id="364" href="/lia/part5/Binding/#364" class="Generalizable">s″</a> <a id="367" href="/lia/part5/Binding/#367" class="Generalizable">s‴</a> <a id="370" class="Symbol">:</a> <a id="372" href="/lia/part5/Imp/#1231" class="Function">State</a></pre>
+<a id="460" class="Keyword">infix</a> <a id="466" class="Number">10</a> <a id="469" href="/lia/part5/Maybe/#501" class="InductiveConstructor Operator">⌊_⌋</a>
+<a id="473" class="Keyword">pattern</a> <a id="⊥"></a><a id="481" href="/lia/part5/Maybe/#481" class="InductiveConstructor">⊥</a> <a id="483" class="Symbol">=</a> <a id="485" href="/lia/part5/Maybe/#420" class="InductiveConstructor">Nothing</a>
+<a id="493" class="Keyword">pattern</a> <a id="⌊_⌋"></a><a id="501" href="/lia/part5/Maybe/#501" class="InductiveConstructor Operator">⌊_⌋</a> <a id="505" href="/lia/part5/Maybe/#514" class="Bound">a</a> <a id="507" class="Symbol">=</a> <a id="509" href="/lia/part5/Maybe/#440" class="InductiveConstructor">Just</a> <a id="514" href="/lia/part5/Maybe/#514" class="Bound">a</a>
 
-<p>We try to represend binding with HOAS:</p>
+<a id="517" class="Keyword">private</a>
+    <a id="529" class="Keyword">variable</a>
+        <a id="546" href="/lia/part5/Maybe/#546" class="Generalizable">A⊥</a> <a id="549" class="Symbol">:</a> <a id="551" href="/lia/part5/Maybe/#386" class="Datatype">Maybe</a> <a id="557" href="/lia/part5/Maybe/#316" class="Generalizable">A</a>
+        <a id="567" href="/lia/part5/Maybe/#567" class="Generalizable">B⊥</a> <a id="570" class="Symbol">:</a> <a id="572" href="/lia/part5/Maybe/#386" class="Datatype">Maybe</a> <a id="578" href="/lia/part5/Maybe/#334" class="Generalizable">B</a>
+        <a id="588" href="/lia/part5/Maybe/#588" class="Generalizable">C⊥</a> <a id="591" class="Symbol">:</a> <a id="593" href="/lia/part5/Maybe/#386" class="Datatype">Maybe</a> <a id="599" href="/lia/part5/Maybe/#352" class="Generalizable">C</a>
+        <a id="609" href="/lia/part5/Maybe/#609" class="Generalizable">a</a> <a id="611" class="Symbol">:</a> <a id="613" href="/lia/part5/Maybe/#316" class="Generalizable">A</a>
+        <a id="623" href="/lia/part5/Maybe/#623" class="Generalizable">a⊥</a> <a id="626" class="Symbol">:</a> <a id="628" href="/lia/part5/Maybe/#386" class="Datatype">Maybe</a> <a id="634" href="/lia/part5/Maybe/#316" class="Generalizable">A</a></pre>
+<pre class="Agda"><a id="lift"></a><a id="645" href="/lia/part5/Maybe/#645" class="Function">lift</a> <a id="650" class="Symbol">:</a> <a id="652" class="Symbol">(</a><a id="653" href="/lia/part5/Maybe/#316" class="Generalizable">A</a> <a id="655" class="Symbol">→</a> <a id="657" href="/lia/part5/Maybe/#316" class="Generalizable">A</a><a id="658" class="Symbol">)</a> <a id="660" class="Symbol">→</a> <a id="662" href="/lia/part5/Maybe/#386" class="Datatype">Maybe</a> <a id="668" href="/lia/part5/Maybe/#316" class="Generalizable">A</a> <a id="670" class="Symbol">→</a> <a id="672" href="/lia/part5/Maybe/#386" class="Datatype">Maybe</a> <a id="678" href="/lia/part5/Maybe/#316" class="Generalizable">A</a>
+<a id="680" href="/lia/part5/Maybe/#645" class="Function">lift</a> <a id="685" href="/lia/part5/Maybe/#685" class="Bound">f</a> <a id="687" href="/lia/part5/Maybe/#481" class="InductiveConstructor">⊥</a> <a id="689" class="Symbol">=</a> <a id="691" href="/lia/part5/Maybe/#481" class="InductiveConstructor">⊥</a>
+<a id="693" href="/lia/part5/Maybe/#645" class="Function">lift</a> <a id="698" href="/lia/part5/Maybe/#698" class="Bound">f</a> <a id="700" href="/lia/part5/Maybe/#501" class="InductiveConstructor Operator">⌊</a> <a id="702" href="/lia/part5/Maybe/#702" class="Bound">a</a> <a id="704" href="/lia/part5/Maybe/#501" class="InductiveConstructor Operator">⌋</a> <a id="706" class="Symbol">=</a> <a id="708" href="/lia/part5/Maybe/#501" class="InductiveConstructor Operator">⌊</a> <a id="710" href="/lia/part5/Maybe/#698" class="Bound">f</a> <a id="712" href="/lia/part5/Maybe/#702" class="Bound">a</a> <a id="714" href="/lia/part5/Maybe/#501" class="InductiveConstructor Operator">⌋</a>
 
-<pre class="Agda"><a id="427" class="Keyword">data</a> <a id="AExp"></a><a id="432" href="/lia/part5/Binding/#432" class="Datatype">AExp</a> <a id="437" class="Symbol">:</a> <a id="439" class="PrimitiveType">Set</a>
+<a id="lift2"></a><a id="717" href="/lia/part5/Maybe/#717" class="Function">lift2</a> <a id="723" class="Symbol">:</a> <a id="725" class="Symbol">(</a><a id="726" href="/lia/part5/Maybe/#316" class="Generalizable">A</a> <a id="728" class="Symbol">→</a> <a id="730" href="/lia/part5/Maybe/#334" class="Generalizable">B</a> <a id="732" class="Symbol">→</a> <a id="734" href="/lia/part5/Maybe/#352" class="Generalizable">C</a><a id="735" class="Symbol">)</a> <a id="737" class="Symbol">→</a> <a id="739" href="/lia/part5/Maybe/#386" class="Datatype">Maybe</a> <a id="745" href="/lia/part5/Maybe/#316" class="Generalizable">A</a> <a id="747" class="Symbol">→</a> <a id="749" href="/lia/part5/Maybe/#386" class="Datatype">Maybe</a> <a id="755" href="/lia/part5/Maybe/#334" class="Generalizable">B</a> <a id="757" class="Symbol">→</a> <a id="759" href="/lia/part5/Maybe/#386" class="Datatype">Maybe</a> <a id="765" href="/lia/part5/Maybe/#352" class="Generalizable">C</a>
+<a id="767" href="/lia/part5/Maybe/#717" class="Function">lift2</a> <a id="773" href="/lia/part5/Maybe/#773" class="Bound">f</a> <a id="775" href="/lia/part5/Maybe/#481" class="InductiveConstructor">⊥</a> <a id="777" class="Symbol">_</a> <a id="779" class="Symbol">=</a> <a id="781" href="/lia/part5/Maybe/#481" class="InductiveConstructor">⊥</a>
+<a id="783" href="/lia/part5/Maybe/#717" class="CatchallClause Function">lift2</a><a id="788" class="CatchallClause"> </a><a id="789" href="/lia/part5/Maybe/#789" class="CatchallClause Bound">f</a><a id="790" class="CatchallClause"> </a><a id="791" class="CatchallClause Symbol">_</a><a id="792" class="CatchallClause"> </a><a id="793" href="/lia/part5/Maybe/#481" class="CatchallClause InductiveConstructor">⊥</a> <a id="795" class="Symbol">=</a> <a id="797" href="/lia/part5/Maybe/#481" class="InductiveConstructor">⊥</a>
+<a id="799" href="/lia/part5/Maybe/#717" class="Function">lift2</a> <a id="805" href="/lia/part5/Maybe/#805" class="Bound">f</a> <a id="807" href="/lia/part5/Maybe/#501" class="InductiveConstructor Operator">⌊</a> <a id="809" href="/lia/part5/Maybe/#809" class="Bound">a</a> <a id="811" href="/lia/part5/Maybe/#501" class="InductiveConstructor Operator">⌋</a> <a id="813" href="/lia/part5/Maybe/#501" class="InductiveConstructor Operator">⌊</a> <a id="815" href="/lia/part5/Maybe/#815" class="Bound">b</a> <a id="817" href="/lia/part5/Maybe/#501" class="InductiveConstructor Operator">⌋</a> <a id="819" class="Symbol">=</a> <a id="821" href="/lia/part5/Maybe/#501" class="InductiveConstructor Operator">⌊</a> <a id="823" href="/lia/part5/Maybe/#805" class="Bound">f</a> <a id="825" href="/lia/part5/Maybe/#809" class="Bound">a</a> <a id="827" href="/lia/part5/Maybe/#815" class="Bound">b</a> <a id="829" href="/lia/part5/Maybe/#501" class="InductiveConstructor Operator">⌋</a>
 
-<a id="444" class="Keyword">data</a> <a id="449" href="/lia/part5/Binding/#432" class="Datatype">AExp</a> <a id="454" class="Keyword">where</a>
-  <a id="AExp.$_"></a><a id="462" href="/lia/part5/Binding/#462" class="InductiveConstructor Operator">$_</a> <a id="465" class="Symbol">:</a> <a id="467" class="Symbol">(</a><a id="468" href="/lia/part5/Binding/#468" class="Bound">n</a> <a id="470" class="Symbol">:</a> <a id="472" href="/lia/part0/Naturals/#301" class="Function">ℕ</a><a id="473" class="Symbol">)</a> <a id="475" class="Symbol">→</a> <a id="477" href="/lia/part5/Binding/#432" class="Datatype">AExp</a>
-  <a id="AExp.`_"></a><a id="484" href="/lia/part5/Binding/#484" class="InductiveConstructor Operator">`_</a> <a id="487" class="Symbol">:</a> <a id="489" class="Symbol">(</a><a id="490" href="/lia/part5/Binding/#490" class="Bound">x</a> <a id="492" class="Symbol">:</a> <a id="494" href="/lia/part5/Exp/#544" class="Function">VarName</a><a id="501" class="Symbol">)</a> <a id="503" class="Symbol">→</a> <a id="505" href="/lia/part5/Binding/#432" class="Datatype">AExp</a>
-  <a id="AExp._+_"></a><a id="512" href="/lia/part5/Binding/#512" class="InductiveConstructor Operator">_+_</a> <a id="516" class="Symbol">:</a> <a id="518" class="Symbol">(</a><a id="519" href="/lia/part5/Binding/#519" class="Bound">e₀</a> <a id="522" href="/lia/part5/Binding/#522" class="Bound">e₁</a> <a id="525" class="Symbol">:</a> <a id="527" href="/lia/part5/Binding/#432" class="Datatype">AExp</a><a id="531" class="Symbol">)</a> <a id="533" class="Symbol">→</a> <a id="535" href="/lia/part5/Binding/#432" class="Datatype">AExp</a>
-  <a id="AExp._·_"></a><a id="542" href="/lia/part5/Binding/#542" class="InductiveConstructor Operator">_·_</a> <a id="546" class="Symbol">:</a> <a id="548" class="Symbol">(</a><a id="549" href="/lia/part5/Binding/#549" class="Bound">e₀</a> <a id="552" href="/lia/part5/Binding/#552" class="Bound">e₁</a> <a id="555" class="Symbol">:</a> <a id="557" href="/lia/part5/Binding/#432" class="Datatype">AExp</a><a id="561" class="Symbol">)</a> <a id="563" class="Symbol">→</a> <a id="565" href="/lia/part5/Binding/#432" class="Datatype">AExp</a>
-  <a id="AExp.App"></a><a id="572" href="/lia/part5/Binding/#572" class="InductiveConstructor">App</a> <a id="576" class="Symbol">:</a> <a id="578" href="/lia/part5/Binding/#432" class="Datatype">AExp</a> <a id="583" class="Symbol">→</a> <a id="585" href="/lia/part5/Binding/#432" class="Datatype">AExp</a> <a id="590" class="Symbol">→</a> <a id="592" href="/lia/part5/Binding/#432" class="Datatype">AExp</a>
-  <a id="AExp.Abs"></a><a id="599" href="/lia/part5/Binding/#599" class="InductiveConstructor">Abs</a> <a id="603" class="Symbol">:</a> <a id="605" class="Symbol">(</a><a id="606" href="/lia/part5/Binding/#606" class="Bound">f</a> <a id="608" class="Symbol">:</a> <a id="610" href="/lia/part5/Exp/#544" class="Function">VarName</a> <a id="618" class="Symbol">→</a> <a id="620" href="/lia/part5/Binding/#432" class="Datatype">AExp</a><a id="624" class="Symbol">)</a> <a id="626" class="Symbol">→</a> <a id="628" href="/lia/part5/Binding/#432" class="Datatype">AExp</a>
+<a id="lift⊥"></a><a id="832" href="/lia/part5/Maybe/#832" class="Function">lift⊥</a> <a id="838" class="Symbol">:</a> <a id="840" class="Symbol">(</a><a id="841" href="/lia/part5/Maybe/#316" class="Generalizable">A</a> <a id="843" class="Symbol">→</a> <a id="845" href="/lia/part5/Maybe/#386" class="Datatype">Maybe</a> <a id="851" href="/lia/part5/Maybe/#334" class="Generalizable">B</a><a id="852" class="Symbol">)</a> <a id="854" class="Symbol">→</a> <a id="856" href="/lia/part5/Maybe/#386" class="Datatype">Maybe</a> <a id="862" href="/lia/part5/Maybe/#316" class="Generalizable">A</a> <a id="864" class="Symbol">→</a> <a id="866" href="/lia/part5/Maybe/#386" class="Datatype">Maybe</a> <a id="872" href="/lia/part5/Maybe/#334" class="Generalizable">B</a>
+<a id="874" href="/lia/part5/Maybe/#832" class="Function">lift⊥</a> <a id="880" href="/lia/part5/Maybe/#880" class="Bound">f</a> <a id="882" href="/lia/part5/Maybe/#481" class="InductiveConstructor">⊥</a> <a id="884" class="Symbol">=</a> <a id="886" href="/lia/part5/Maybe/#481" class="InductiveConstructor">⊥</a>
+<a id="888" href="/lia/part5/Maybe/#832" class="Function">lift⊥</a> <a id="894" href="/lia/part5/Maybe/#894" class="Bound">f</a> <a id="896" href="/lia/part5/Maybe/#501" class="InductiveConstructor Operator">⌊</a> <a id="898" href="/lia/part5/Maybe/#898" class="Bound">a</a> <a id="900" href="/lia/part5/Maybe/#501" class="InductiveConstructor Operator">⌋</a> <a id="902" class="Symbol">=</a> <a id="904" href="/lia/part5/Maybe/#894" class="Bound">f</a> <a id="906" href="/lia/part5/Maybe/#898" class="Bound">a</a>
 
-<a id="634" class="Keyword">infix</a> <a id="640" class="Number">50</a> <a id="643" href="/lia/part5/Binding/#462" class="InductiveConstructor Operator">$_</a> <a id="646" href="/lia/part5/Binding/#484" class="InductiveConstructor Operator">`_</a>
-<a id="649" class="Keyword">infixr</a> <a id="656" class="Number">30</a> <a id="659" href="/lia/part5/Binding/#542" class="InductiveConstructor Operator">_·_</a>
-<a id="663" class="Keyword">infixl</a> <a id="670" class="Number">25</a> <a id="673" href="/lia/part5/Binding/#512" class="InductiveConstructor Operator">_+_</a>
-<a id="677" class="Comment">--infixr 20 Let_</a>
+<a id="lift2⊥"></a><a id="909" href="/lia/part5/Maybe/#909" class="Function">lift2⊥</a> <a id="916" class="Symbol">:</a> <a id="918" class="Symbol">(</a><a id="919" href="/lia/part5/Maybe/#316" class="Generalizable">A</a> <a id="921" class="Symbol">→</a> <a id="923" href="/lia/part5/Maybe/#334" class="Generalizable">B</a> <a id="925" class="Symbol">→</a> <a id="927" href="/lia/part5/Maybe/#386" class="Datatype">Maybe</a> <a id="933" href="/lia/part5/Maybe/#352" class="Generalizable">C</a><a id="934" class="Symbol">)</a> <a id="936" class="Symbol">→</a> <a id="938" href="/lia/part5/Maybe/#386" class="Datatype">Maybe</a> <a id="944" href="/lia/part5/Maybe/#316" class="Generalizable">A</a> <a id="946" class="Symbol">→</a> <a id="948" href="/lia/part5/Maybe/#386" class="Datatype">Maybe</a> <a id="954" href="/lia/part5/Maybe/#334" class="Generalizable">B</a> <a id="956" class="Symbol">→</a> <a id="958" href="/lia/part5/Maybe/#386" class="Datatype">Maybe</a> <a id="964" href="/lia/part5/Maybe/#352" class="Generalizable">C</a>
+<a id="966" href="/lia/part5/Maybe/#909" class="Function">lift2⊥</a> <a id="973" href="/lia/part5/Maybe/#973" class="Bound">f</a> <a id="975" href="/lia/part5/Maybe/#481" class="InductiveConstructor">⊥</a> <a id="977" class="Symbol">_</a> <a id="979" class="Symbol">=</a> <a id="981" href="/lia/part5/Maybe/#481" class="InductiveConstructor">⊥</a>
+<a id="983" href="/lia/part5/Maybe/#909" class="CatchallClause Function">lift2⊥</a><a id="989" class="CatchallClause"> </a><a id="990" href="/lia/part5/Maybe/#990" class="CatchallClause Bound">f</a><a id="991" class="CatchallClause"> </a><a id="992" class="CatchallClause Symbol">_</a><a id="993" class="CatchallClause"> </a><a id="994" href="/lia/part5/Maybe/#481" class="CatchallClause InductiveConstructor">⊥</a> <a id="996" class="Symbol">=</a> <a id="998" href="/lia/part5/Maybe/#481" class="InductiveConstructor">⊥</a>
+<a id="1000" href="/lia/part5/Maybe/#909" class="Function">lift2⊥</a> <a id="1007" href="/lia/part5/Maybe/#1007" class="Bound">f</a> <a id="1009" href="/lia/part5/Maybe/#501" class="InductiveConstructor Operator">⌊</a> <a id="1011" href="/lia/part5/Maybe/#1011" class="Bound">a</a> <a id="1013" href="/lia/part5/Maybe/#501" class="InductiveConstructor Operator">⌋</a> <a id="1015" href="/lia/part5/Maybe/#501" class="InductiveConstructor Operator">⌊</a> <a id="1017" href="/lia/part5/Maybe/#1017" class="Bound">b</a> <a id="1019" href="/lia/part5/Maybe/#501" class="InductiveConstructor Operator">⌋</a> <a id="1021" class="Symbol">=</a> <a id="1023" href="/lia/part5/Maybe/#1007" class="Bound">f</a> <a id="1025" href="/lia/part5/Maybe/#1011" class="Bound">a</a> <a id="1027" href="/lia/part5/Maybe/#1017" class="Bound">b</a>
 
-<a id="695" class="Keyword">private</a>
-  <a id="705" class="Keyword">variable</a>
-    <a id="718" href="/lia/part5/Binding/#718" class="Generalizable">e</a> <a id="720" href="/lia/part5/Binding/#720" class="Generalizable">e₀</a> <a id="723" href="/lia/part5/Binding/#723" class="Generalizable">e₁</a> <a id="726" href="/lia/part5/Binding/#726" class="Generalizable">f</a> <a id="728" class="Symbol">:</a> <a id="730" href="/lia/part5/Binding/#432" class="Datatype">AExp</a></pre>
+<a id="lift3⊥"></a><a id="1030" href="/lia/part5/Maybe/#1030" class="Function">lift3⊥</a> <a id="1037" class="Symbol">:</a> <a id="1039" class="Symbol">(</a><a id="1040" href="/lia/part5/Maybe/#316" class="Generalizable">A</a> <a id="1042" class="Symbol">→</a> <a id="1044" href="/lia/part5/Maybe/#334" class="Generalizable">B</a> <a id="1046" class="Symbol">→</a> <a id="1048" href="/lia/part5/Maybe/#352" class="Generalizable">C</a> <a id="1050" class="Symbol">→</a> <a id="1052" href="/lia/part5/Maybe/#386" class="Datatype">Maybe</a> <a id="1058" href="/lia/part5/Maybe/#370" class="Generalizable">D</a><a id="1059" class="Symbol">)</a> <a id="1061" class="Symbol">→</a> <a id="1063" href="/lia/part5/Maybe/#386" class="Datatype">Maybe</a> <a id="1069" href="/lia/part5/Maybe/#316" class="Generalizable">A</a> <a id="1071" class="Symbol">→</a> <a id="1073" href="/lia/part5/Maybe/#386" class="Datatype">Maybe</a> <a id="1079" href="/lia/part5/Maybe/#334" class="Generalizable">B</a> <a id="1081" class="Symbol">→</a> <a id="1083" href="/lia/part5/Maybe/#386" class="Datatype">Maybe</a> <a id="1089" href="/lia/part5/Maybe/#352" class="Generalizable">C</a> <a id="1091" class="Symbol">→</a> <a id="1093" href="/lia/part5/Maybe/#386" class="Datatype">Maybe</a> <a id="1099" href="/lia/part5/Maybe/#370" class="Generalizable">D</a>
+<a id="1101" href="/lia/part5/Maybe/#1030" class="Function">lift3⊥</a> <a id="1108" href="/lia/part5/Maybe/#1108" class="Bound">f</a> <a id="1110" href="/lia/part5/Maybe/#481" class="InductiveConstructor">⊥</a> <a id="1112" class="Symbol">_</a> <a id="1114" class="Symbol">_</a> <a id="1116" class="Symbol">=</a> <a id="1118" href="/lia/part5/Maybe/#481" class="InductiveConstructor">⊥</a>
+<a id="1120" href="/lia/part5/Maybe/#1030" class="CatchallClause Function">lift3⊥</a><a id="1126" class="CatchallClause"> </a><a id="1127" href="/lia/part5/Maybe/#1127" class="CatchallClause Bound">f</a><a id="1128" class="CatchallClause"> </a><a id="1129" class="CatchallClause Symbol">_</a><a id="1130" class="CatchallClause"> </a><a id="1131" href="/lia/part5/Maybe/#481" class="CatchallClause InductiveConstructor">⊥</a><a id="1132" class="CatchallClause"> </a><a id="1133" class="CatchallClause Symbol">_</a> <a id="1135" class="Symbol">=</a> <a id="1137" href="/lia/part5/Maybe/#481" class="InductiveConstructor">⊥</a>
+<a id="1139" href="/lia/part5/Maybe/#1030" class="CatchallClause Function">lift3⊥</a><a id="1145" class="CatchallClause"> </a><a id="1146" href="/lia/part5/Maybe/#1146" class="CatchallClause Bound">f</a><a id="1147" class="CatchallClause"> </a><a id="1148" class="CatchallClause Symbol">_</a><a id="1149" class="CatchallClause"> </a><a id="1150" class="CatchallClause Symbol">_</a><a id="1151" class="CatchallClause"> </a><a id="1152" href="/lia/part5/Maybe/#481" class="CatchallClause InductiveConstructor">⊥</a> <a id="1154" class="Symbol">=</a> <a id="1156" href="/lia/part5/Maybe/#481" class="InductiveConstructor">⊥</a>
+<a id="1158" href="/lia/part5/Maybe/#1030" class="Function">lift3⊥</a> <a id="1165" href="/lia/part5/Maybe/#1165" class="Bound">f</a> <a id="1167" href="/lia/part5/Maybe/#501" class="InductiveConstructor Operator">⌊</a> <a id="1169" href="/lia/part5/Maybe/#1169" class="Bound">a</a> <a id="1171" href="/lia/part5/Maybe/#501" class="InductiveConstructor Operator">⌋</a> <a id="1173" href="/lia/part5/Maybe/#501" class="InductiveConstructor Operator">⌊</a> <a id="1175" href="/lia/part5/Maybe/#1175" class="Bound">b</a> <a id="1177" href="/lia/part5/Maybe/#501" class="InductiveConstructor Operator">⌋</a> <a id="1179" href="/lia/part5/Maybe/#501" class="InductiveConstructor Operator">⌊</a> <a id="1181" href="/lia/part5/Maybe/#1181" class="Bound">c</a> <a id="1183" href="/lia/part5/Maybe/#501" class="InductiveConstructor Operator">⌋</a> <a id="1185" class="Symbol">=</a> <a id="1187" href="/lia/part5/Maybe/#1165" class="Bound">f</a> <a id="1189" href="/lia/part5/Maybe/#1169" class="Bound">a</a> <a id="1191" href="/lia/part5/Maybe/#1175" class="Bound">b</a> <a id="1193" href="/lia/part5/Maybe/#1181" class="Bound">c</a></pre>
 
-<p>ide : AExp ide = Abs λ x → ` x</p>
+<p>Just-inv : ⌊ m ⌋ ≡ ⌊ n ⌋ → m ≡ n Just-inv refl = refl</p>
 
-<pre class="Agda"><a id="fv"></a><a id="776" href="/lia/part5/Binding/#776" class="Function">fv</a> <a id="779" class="Symbol">:</a> <a id="781" href="/lia/part5/Binding/#432" class="Datatype">AExp</a> <a id="786" class="Symbol">→</a> <a id="788" href="/lia/part5/Exp/#544" class="Function">VarName</a> <a id="796" href="/lia/part0/List/#468" class="Datatype Operator">*</a>
-<a id="fresh"></a><a id="798" href="/lia/part5/Binding/#798" class="Function">fresh</a> <a id="804" class="Symbol">:</a> <a id="806" href="/lia/part5/Binding/#432" class="Datatype">AExp</a> <a id="811" class="Symbol">→</a> <a id="813" href="/lia/part5/Exp/#544" class="Function">VarName</a>
+<p>⊥≡Just-elim : ⊥ ≡ ⌊ m ⌋ → ∀ {ℓ} {A : Set ℓ} → A ⊥≡Just-elim ()</p>
 
-<a id="822" href="/lia/part5/Binding/#776" class="Function">fv</a> <a id="825" class="Symbol">(</a><a id="826" href="/lia/part5/Binding/#462" class="InductiveConstructor Operator">$</a> <a id="828" href="/lia/part5/Binding/#828" class="Bound">n</a><a id="829" class="Symbol">)</a> <a id="831" class="Symbol">=</a> <a id="833" href="/lia/part0/List/#505" class="InductiveConstructor">ε</a>
-<a id="835" href="/lia/part5/Binding/#776" class="Function">fv</a> <a id="838" class="Symbol">(</a><a id="839" href="/lia/part5/Binding/#484" class="InductiveConstructor Operator">`</a> <a id="841" href="/lia/part5/Binding/#841" class="Bound">x</a><a id="842" class="Symbol">)</a> <a id="844" class="Symbol">=</a> <a id="846" href="/lia/part0/List/#1792" class="Function">[</a> <a id="848" href="/lia/part5/Binding/#841" class="Bound">x</a> <a id="850" href="/lia/part0/List/#2043" class="Function Operator">]</a>
-<a id="852" href="/lia/part5/Binding/#776" class="Function">fv</a> <a id="855" class="Symbol">(</a><a id="856" href="/lia/part5/Binding/#856" class="Bound">e₀</a> <a id="859" href="/lia/part5/Binding/#512" class="InductiveConstructor Operator">+</a> <a id="861" href="/lia/part5/Binding/#861" class="Bound">e₁</a><a id="863" class="Symbol">)</a> <a id="865" class="Symbol">=</a> <a id="867" href="/lia/part5/Binding/#776" class="Function">fv</a> <a id="870" href="/lia/part5/Binding/#856" class="Bound">e₀</a> <a id="873" href="/lia/part0/List/#3100" class="Function Operator">++</a> <a id="876" href="/lia/part5/Binding/#776" class="Function">fv</a> <a id="879" href="/lia/part5/Binding/#861" class="Bound">e₁</a>
-<a id="882" href="/lia/part5/Binding/#776" class="Function">fv</a> <a id="885" class="Symbol">(</a><a id="886" href="/lia/part5/Binding/#886" class="Bound">e₀</a> <a id="889" href="/lia/part5/Binding/#542" class="InductiveConstructor Operator">·</a> <a id="891" href="/lia/part5/Binding/#891" class="Bound">e₁</a><a id="893" class="Symbol">)</a> <a id="895" class="Symbol">=</a> <a id="897" href="/lia/part5/Binding/#776" class="Function">fv</a> <a id="900" href="/lia/part5/Binding/#886" class="Bound">e₀</a> <a id="903" href="/lia/part0/List/#3100" class="Function Operator">++</a> <a id="906" href="/lia/part5/Binding/#776" class="Function">fv</a> <a id="909" href="/lia/part5/Binding/#891" class="Bound">e₁</a>
-<a id="912" href="/lia/part5/Binding/#776" class="Function">fv</a> <a id="915" class="Symbol">(</a><a id="916" href="/lia/part5/Binding/#572" class="InductiveConstructor">App</a> <a id="920" href="/lia/part5/Binding/#920" class="Bound">e₀</a> <a id="923" href="/lia/part5/Binding/#923" class="Bound">e₁</a><a id="925" class="Symbol">)</a> <a id="927" class="Symbol">=</a> <a id="929" href="/lia/part5/Binding/#776" class="Function">fv</a> <a id="932" href="/lia/part5/Binding/#920" class="Bound">e₀</a> <a id="935" href="/lia/part0/List/#3100" class="Function Operator">++</a> <a id="938" href="/lia/part5/Binding/#776" class="Function">fv</a> <a id="941" href="/lia/part5/Binding/#923" class="Bound">e₁</a>
-<a id="944" href="/lia/part5/Binding/#776" class="Function">fv</a> <a id="947" class="Symbol">(</a><a id="948" href="/lia/part5/Binding/#599" class="InductiveConstructor">Abs</a> <a id="952" href="/lia/part5/Binding/#952" class="Bound">f</a><a id="953" class="Symbol">)</a> <a id="955" class="Symbol">=</a> <a id="957" class="Symbol">{!   !}</a>
-<a id="965" class="Comment">--  with </a>
+<p>infix 5 <em>⊑</em> <em>⊒</em> data <em>⊑</em> : ℕ⊥ → ℕ⊥ → Set where ⊑-⊥ : ⊥ ⊑ m⊥ ⊑-Just : ⌊ m
+⌋ ⊑ ⌊ m ⌋</p>
 
-<a id="976" href="/lia/part5/Binding/#798" class="Function">fresh</a> <a id="982" href="/lia/part5/Binding/#982" class="Bound">e</a> <a id="984" class="Symbol">=</a> <a id="986" class="Symbol">{!   !}</a></pre>
-<pre class="Agda"><a id="Env"></a><a id="1003" href="/lia/part5/Binding/#1003" class="Function">Env</a> <a id="1007" class="Symbol">=</a> <a id="1009" href="/lia/part5/Exp/#544" class="Function">VarName</a> <a id="1017" class="Symbol">→</a> <a id="1019" href="/lia/part0/Naturals/#301" class="Function">ℕ</a>
+<p>refl-⊑ : v ⊑ v refl-⊑ {⊥} = ⊑-⊥ refl-⊑ {⌊ _ ⌋} = ⊑-Just</p>
 
-<a id="1022" class="Comment">-- ⟦_⟧_ : AExp → Env → ℕ</a>
-<a id="1047" class="Comment">-- ⟦ $ n ⟧ ϱ = n</a>
-<a id="1064" class="Comment">-- ⟦ ` x ⟧ ϱ = ϱ x</a>
-<a id="1083" class="Comment">-- ⟦ e + f ⟧ ϱ = ⟦ e ⟧ ϱ +ℕ ⟦ f ⟧ ϱ</a>
-<a id="1119" class="Comment">-- ⟦ e · f ⟧ ϱ = ⟦ e ⟧ ϱ ·ℕ ⟦ f ⟧ ϱ</a>
-<a id="1155" class="Comment">-- ⟦ Abs f ⟧ ϱ = {!   !} -- ⟦ f x₀ ⟧ ϱ -- ⟦ f ⟧ ϱ [ x ↦ ⟦ e ⟧ ϱ ]</a>
-<a id="1221" class="Comment">-- ⟦ App e₀ e₁ ⟧ ϱ = {!   !}</a></pre>
-<pre class="Agda"><a id="1259" class="Comment">-- infix 4 _,_⇒_</a>
+<p>trans-⊑ : v₀ ⊑ v₁ → v₁ ⊑ v₂ → v₀ ⊑ v₂ trans-⊑ ⊑-⊥ ⊑-Just = ⊑-⊥ trans-⊑
+⊑-⊥ ⊑-⊥ = ⊑-⊥ trans-⊑ ⊑-Just ⊑-Just = ⊑-Just</p>
 
-<a id="1277" class="Comment">-- data _,_⇒_ : AExp → State → ℕ → Set</a>
+<p><em>⊒</em> : ℕ⊥ → ℕ⊥ → Set v₀ ⊒ v₁ = v₁ ⊑ v₀</p>
 
-<a id="1317" class="Comment">-- data _,_⇒_ where</a>
+<p>⊑-⊥-lemma : v ⊑ ⊥ → v ≡ ⊥ ⊑-⊥-lemma ⊑-⊥ = refl</p>
 
-<a id="1338" class="Comment">--   ⇒-Num :</a>
-<a id="1351" class="Comment">--     -----------------</a>
-<a id="1376" class="Comment">--     $ n , s ⇒A n</a>
+<p>⊑-Just-lemma : ⌊ m ⌋ ⊑ n⊥ → n⊥ ≡ ⌊ m ⌋ ⊑-Just-lemma ⊑-Just = refl</p>
 
-<a id="1397" class="Comment">--   ⇒-Var :</a>
-<a id="1410" class="Comment">--     --------------------</a>
-<a id="1438" class="Comment">--     ` x , s ⇒A s x , s</a>
+<p>lift : (ℕ → ℕ) → ℕ⊥ → ℕ⊥ lift f ⊥ = ⊥ lift f (⌊ x ⌋) = ⌊ f x ⌋</p>
 
-<a id="1465" class="Comment">--   ⇒-Add :</a>
-<a id="1478" class="Comment">--     e , s ⇒A m , s′ →</a>
-<a id="1503" class="Comment">--     f , s′ ⇒A n , s″ →</a>
-<a id="1529" class="Comment">--     -----------------------</a>
-<a id="1560" class="Comment">--     e + f , s ⇒A m +ℕ n , s″</a>
+<p>lift2 : (ℕ → ℕ → ℕ) → ℕ⊥ → ℕ⊥ → ℕ⊥ lift2 f ⊥ _ = ⊥ lift2 f (⌊ _ ⌋) ⊥ =
+⊥ lift2 f (⌊ m ⌋) (⌊ n ⌋) = ⌊ f m n ⌋</p>
 
-<a id="1593" class="Comment">--   ⇒-Mul :</a>
-<a id="1606" class="Comment">--     e , s ⇒A m , s′ →</a>
-<a id="1631" class="Comment">--     f , s′ ⇒A n , s″ →</a>
-<a id="1657" class="Comment">--     -----------------------</a>
-<a id="1688" class="Comment">--     e · f , s ⇒A m ·ℕ n , s″ </a>
+<p>lift2-lemma : ∀ f → lift2 f v₀ v₁ ≡ ⌊ n ⌋ → ——————————————- ∃[ n₀ ]
+∃[ n₁ ] v₀ ≡ ⌊ n₀ ⌋ × v₁ ≡ ⌊ n₁ ⌋</p>
 
-<a id="1722" class="Comment">--   ⇒-Let :</a>
-<a id="1735" class="Comment">--     e , s ⇒A m , s′ →</a>
-<a id="1760" class="Comment">--     f , s′ [ x ↦ m ] ⇒A n , s″ →</a>
-<a id="1796" class="Comment">--     ---------------------</a>
-<a id="1825" class="Comment">--     Let x e f , s ⇒A n , s″</a>
+<p>lift2-lemma {v₀} {v₁} f eq with v₀ | v₁ … | ⌊ n₀ ⌋ | ⌊ n₁ ⌋ = n₀ , n₁
+, refl , refl</p>
 
-<a id="1857" class="Comment">--   →-ResultIs :</a>
-<a id="1875" class="Comment">--     c , s ⇒ s′ →</a>
-<a id="1895" class="Comment">--     e , s′ ⇒A n , s″ →</a>
-<a id="1921" class="Comment">--     -------------------------</a>
-<a id="1954" class="Comment">--     c ResultIs e , s ⇒A n , s″</a></pre>
+<p>mon-lift2 : (f : ℕ → ℕ → ℕ) → u₀ ⊑ u₁ → v₀ ⊑ v₁ → —————————– lift2 f u₀
+v₀ ⊑ lift2 f u₁ v₁</p>
 
-<div id="refs">
+<p>mon-lift2 f ⊑-⊥ ⊑-⊥ = ⊑-⊥ mon-lift2 f ⊑-⊥ ⊑-Just = ⊑-⊥ mon-lift2 f
+⊑-Just ⊑-⊥ = ⊑-⊥ mon-lift2 f ⊑-Just ⊑-Just = ⊑-Just</p>
 
-  <h1 id="references">
-<a class="anchor" href="#references" aria-hidden="true"><span class="octicon octicon-link"></span></a>References</h1>
+<p>infixl 13 <em>+⊥</em> <em>-⊥</em> infixl 14 <em>·⊥</em></p>
 
-</div>
+<p><em>+⊥</em> <em>-⊥</em> <em>·⊥</em> : ℕ⊥ → ℕ⊥ → ℕ⊥ <em>+⊥</em> = lift2 <em>+ℕ</em> <em>-⊥</em> = lift2 <em>-ℕ</em> <em>·⊥</em> =
+lift2 <em>·ℕ</em></p>
+
+<p>ite : ℕ⊥ → ℕ⊥ → ℕ⊥ → ℕ⊥ ite ⊥ _ _ = ⊥ ite (⌊ 0 ⌋) v₀ v₁ = v₀ ite (⌊
+suc _ ⌋) v₀ v₁ = v₁</p>
+
+<p>mon-ite : u₀ ⊑ v₀ → u₁ ⊑ v₁ → u₂ ⊑ v₂ → ite u₀ u₁ u₂ ⊑ ite v₀ v₁ v₂
+mon-ite ⊑-⊥ _ _ = ⊑-⊥ mon-ite {u₀ = ⌊ 0 ⌋} ⊑-Just u₁⊑v₁ u₂⊑v₂ = u₁⊑v₁
+mon-ite {u₀ = ⌊ suc _ ⌋} ⊑-Just u₁⊑v₁ u₂⊑v₂ = u₂⊑v₂ ::: {#refs} #
+References :::</p>
 
     </div>
   
@@ -607,7 +600,7 @@
         &bullet;
         
         
-        <a alt="Source code" href="https://github.com/lclem/lia/blob/main/src/part5/Binding.lagda.md">Source</a>
+        <a alt="Source code" href="https://github.com/lclem/lia/blob/main/src/part5/Maybe.lagda.md">Source</a>
         
         
         
