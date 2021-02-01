@@ -40,6 +40,7 @@ RUN ls -la
 
 COPY --chown=$NB_USER:users . /home/$NB_USER/
 COPY --chown=$NB_USER:users ./src /home/$NB_USER/
+RUN rm -fr /home/$NB_USER/src
 
 USER $NB_USER
 
